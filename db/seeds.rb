@@ -116,6 +116,7 @@ CSV.foreach(Rails.root.join('db', 'seeds.csv'), headers: true) do |row|
     )
   end
 
+  # Membership for their latest payment
   membership = Membership.create(
     start: start,
     term_months: row['Term']&.strip == '1yr' ? 12 : nil,
@@ -124,4 +125,10 @@ CSV.foreach(Rails.root.join('db', 'seeds.csv'), headers: true) do |row|
     kind: row['Type']&.strip,
     person: person,
   )
+
+  # Membership for their first payment ("since")
+  since = parse_date(row['Member Since'])
+  if(since)
+    Member.create(start: since, new: true, person: person)
+  end
 end
