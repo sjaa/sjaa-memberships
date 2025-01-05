@@ -30,4 +30,5 @@ Rails.application.routes.draw do
   resource :sessions
   get '/login', to: 'sessions#login', as: :login
   get '/logout', to: 'sessions#destroy', as: :logout
+  get '/unauthorized', to: 'static_pages#unauthorized', as: :unauthorized
 end

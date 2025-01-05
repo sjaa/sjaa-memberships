@@ -15,8 +15,7 @@ module Authenticatable
 
     # Raise the error
     if(!@current_user)
-      #redirect_to login_path, status: :unauthorized
-      render 'sessions/login', status: :unauthorized, notice: 'Unauthorized Access.'
+      render 'static_pages/unauthorized', status: :unauthorized
     end
 
     return @current_user
