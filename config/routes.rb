@@ -20,10 +20,14 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
 
   # Defines the root path route ("/")
-  # root "posts#index"
+  root "people#index"
 
   #resources :api_keys
   post '/api-keys', to: 'api_keys#create'
   delete '/api-keys', to: 'api_keys#destroy'
   get '/api-keys', to: 'api_keys#index'
+
+  resource :sessions
+  get '/login', to: 'sessions#login', as: :login
+  get '/logout', to: 'sessions#destroy', as: :logout
 end

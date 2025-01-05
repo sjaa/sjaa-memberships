@@ -11,6 +11,10 @@
   </head>
 
   <body>
+    <% if @user %>
+      <%= link_to 'Logout', logout_path, data: {confirm: 'Log out?'}%>
+    <% end %>
+    <%= notice %>
     <%= yield %>
   </body>
 </html>

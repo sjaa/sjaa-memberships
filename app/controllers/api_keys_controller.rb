@@ -2,14 +2,11 @@
 class ApiKeysController < ApplicationController
   skip_forgery_protection
 
-  include ApiKeyAuthenticatable 
+  include Authenticatable 
  
   # Require token authentication for index                             
-  prepend_before_action :authenticate_with_api_key!, only: [:index] 
+  skip_before_action :authenticate!, only: [:create] 
  
-  # Optional token authentication for logout                           
-  prepend_before_action :authenticate_with_api_key, only: [:destroy] 
-
   def index
     # Only have admin bearers for now, but they all have api_keys
     render json: current_bearer.api_keys
