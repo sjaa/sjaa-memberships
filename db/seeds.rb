@@ -129,6 +129,6 @@ CSV.foreach(Rails.root.join('db', 'seeds.csv'), headers: true) do |row|
   # Membership for their first payment ("since")
   since = parse_date(row['Member Since'])
   if(since)
-    Member.create(start: since, new: true, person: person)
+    Membership.create(start: since, new: true, person: person)
   end
 end
