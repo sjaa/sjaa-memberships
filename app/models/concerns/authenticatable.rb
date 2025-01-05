@@ -26,11 +26,7 @@ module Authenticatable
  
   # Use this for optional API key authentication
   def authenticate
-    logger.info("[D] Calling authenticate")
-    logger.info("[D] session[:admin_id]: #{session[:admin_id]}")
-    logger.info("[D] session: #{session.inspect}")
     admin = Admin.find_by id: session[:admin_id]
-    logger.info("[D] found admin: #{admin&.id}")
     @current_bearer = authenticate_with_http_token &method(:authenticator)
     @current_user = admin || @current_bearer
 
