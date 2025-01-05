@@ -1,0 +1,14 @@
+<p style="color: green"><%= notice %></p>
+
+<h1>Astrobins</h1>
+
+<div id="astrobins">
+  <% @astrobins.each do |astrobin| %>
+    <%= render astrobin %>
+    <p>
+      <%= link_to "Show this astrobin", astrobin %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New astrobin", new_astrobin_path %>

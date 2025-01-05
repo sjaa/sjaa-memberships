@@ -1,0 +1,47 @@
+<div id="<%= dom_id person %>">
+  <p>
+    <strong>First name:</strong>
+    <%= person.first_name %>
+  </p>
+
+  <p>
+    <strong>Last name:</strong>
+    <%= person.last_name %>
+  </p>
+
+  <p>
+    <strong>Status:</strong>
+    <%= person.status&.name %>
+  </p>
+
+  <p>
+    <strong>Interests:</strong>
+    <%= person.interests.map{|i| i.name}.join(', ') %>
+  </p>
+
+  <p>
+    <strong>Astrobin:</strong>
+    <%= person.astrobin_id %>
+  </p>
+
+  <p>
+    <strong>Notes:</strong>
+    <%= person.notes %>
+  </p>
+
+  <p>
+    <strong>Membership:</strong>
+    <%= person.memberships.map{|m| m.id}.join(', ') %>
+  </p>
+
+  <p>
+    <strong>Discord:</strong>
+    <%= person.discord_id %>
+  </p>
+
+  <p>
+    <strong>Referral:</strong>
+    <%= person.referral&.id %>
+  </p>
+
+</div>

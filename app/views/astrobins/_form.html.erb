@@ -1,0 +1,27 @@
+<%= form_with(model: astrobin) do |form| %>
+  <% if astrobin.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(astrobin.errors.count, "error") %> prohibited this astrobin from being saved:</h2>
+
+      <ul>
+        <% astrobin.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :username, style: "display: block" %>
+    <%= form.text_field :username %>
+  </div>
+
+  <div>
+    <%= form.label :latest_image, style: "display: block" %>
+    <%= form.number_field :latest_image %>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>

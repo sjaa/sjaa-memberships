@@ -1,0 +1,57 @@
+<%= form_with(model: contact) do |form| %>
+  <% if contact.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(contact.errors.count, "error") %> prohibited this contact from being saved:</h2>
+
+      <ul>
+        <% contact.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :address, style: "display: block" %>
+    <%= form.text_field :address %>
+  </div>
+
+  <div>
+    <%= form.label :city_id, style: "display: block" %>
+    <%= form.number_field :city_id %>
+  </div>
+
+  <div>
+    <%= form.label :state_id, style: "display: block" %>
+    <%= form.number_field :state_id %>
+  </div>
+
+  <div>
+    <%= form.label :zipcode, style: "display: block" %>
+    <%= form.text_field :zipcode %>
+  </div>
+
+  <div>
+    <%= form.label :phone, style: "display: block" %>
+    <%= form.text_field :phone %>
+  </div>
+
+  <div>
+    <%= form.label :email, style: "display: block" %>
+    <%= form.text_field :email %>
+  </div>
+
+  <div>
+    <%= form.label :primary, style: "display: block" %>
+    <%= form.check_box :primary %>
+  </div>
+
+  <div>
+    <%= form.label :person_id, style: "display: block" %>
+    <%= form.number_field :person_id %>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>

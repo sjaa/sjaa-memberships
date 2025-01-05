@@ -1,0 +1,10 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @interest %>
+
+<div>
+  <%= link_to "Edit this interest", edit_interest_path(@interest) %> |
+  <%= link_to "Back to interests", interests_path %>
+
+  <%= button_to "Destroy this interest", @interest, method: :delete %>
+</div>

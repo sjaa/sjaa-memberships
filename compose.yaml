@@ -1,0 +1,13 @@
+services:
+  app:
+    image: ruby
+    build:
+      context: .
+      dockerfile: Dockerfile
+    #command: tail -f /dev/null
+    ports: 
+      - "0.0.0.0:3000:3000"
+    volumes: 
+      - type: bind
+        source: ./
+        target: /rails

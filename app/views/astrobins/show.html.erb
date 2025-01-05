@@ -1,0 +1,10 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @astrobin %>
+
+<div>
+  <%= link_to "Edit this astrobin", edit_astrobin_path(@astrobin) %> |
+  <%= link_to "Back to astrobins", astrobins_path %>
+
+  <%= button_to "Destroy this astrobin", @astrobin, method: :delete %>
+</div>

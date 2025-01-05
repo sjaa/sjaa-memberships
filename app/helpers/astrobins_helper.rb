@@ -1,0 +1,2 @@
+module AstrobinsHelper
+end

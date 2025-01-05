@@ -1,0 +1,10 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @referral %>
+
+<div>
+  <%= link_to "Edit this referral", edit_referral_path(@referral) %> |
+  <%= link_to "Back to referrals", referrals_path %>
+
+  <%= button_to "Destroy this referral", @referral, method: :delete %>
+</div>

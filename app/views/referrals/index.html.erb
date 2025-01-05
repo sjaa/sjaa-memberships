@@ -1,0 +1,14 @@
+<p style="color: green"><%= notice %></p>
+
+<h1>Referrals</h1>
+
+<div id="referrals">
+  <% @referrals.each do |referral| %>
+    <%= render referral %>
+    <p>
+      <%= link_to "Show this referral", referral %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New referral", new_referral_path %>
