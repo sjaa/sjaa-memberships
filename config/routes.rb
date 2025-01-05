@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :permissions
   resources :admins
   resources :referrals
   resources :interests

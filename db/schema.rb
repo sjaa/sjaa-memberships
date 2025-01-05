@@ -10,13 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_01_05_172926) do
+ActiveRecord::Schema[7.1].define(version: 2025_01_05_214043) do
   create_table "admins", force: :cascade do |t|
     t.string "email", null: false
     t.string "password_digest", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_admins_on_email", unique: true
+  end
+
+  create_table "admins_permissions", id: false, force: :cascade do |t|
+    t.integer "admin_id", null: false
+    t.integer "permission_id", null: false
+    t.index ["admin_id", "permission_id"], name: "index_admins_permissions_on_admin_id_and_permission_id"
+    t.index ["permission_id", "admin_id"], name: "index_admins_permissions_on_permission_id_and_admin_id"
   end
 
   create_table "api_keys", force: :cascade do |t|
@@ -136,6 +143,13 @@ ActiveRecord::Schema[7.1].define(version: 2025_01_05_172926) do
     t.datetime "updated_at", null: false
     t.index ["first_name"], name: "index_people_on_first_name"
     t.index ["last_name"], name: "index_people_on_last_name"
+  end
+
+  create_table "permissions", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_permissions_on_name"
   end
 
   create_table "referrals", force: :cascade do |t|

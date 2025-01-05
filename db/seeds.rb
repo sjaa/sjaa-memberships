@@ -43,6 +43,19 @@ end
   State.create(name: n, short_name: s)
 end
 
+PERMISSION_HASH = {}
+%w(read write permit).each do |p|
+  PERMISSION_HASH[p] = Permission.create(name: p)
+end
+
+# Default admins
+admin = Admin.create(email: 'vp@sjaa.net', password: 'secret')
+admin.permissions += [PERMISSION_HASH['read'], PERMISSION_HASH['write'], PERMISSION_HASH['permit']]
+admin = Admin.create(email: 'read@sjaa.net', password: 'secret')
+admin.permissions += [PERMISSION_HASH['read']]
+admin = Admin.create(email: 'readwrite@sjaa.net', password: 'secret')
+admin.permissions += [PERMISSION_HASH['read'], PERMISSION_HASH['write']]
+
 require('csv')
 CSV.foreach(Rails.root.join('db', 'seeds.csv'), headers: true) do |row|
   puts "[I] processing row: #{row}"

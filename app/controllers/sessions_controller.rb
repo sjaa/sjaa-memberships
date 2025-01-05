@@ -1,7 +1,5 @@
 class SessionsController < ApplicationController
-  include Authenticatable
-
-  skip_before_action :authenticate!, only: [:login, :create] 
+  skip_before_action :authenticate!, only: [:login, :create]
 
   # Empty controller just renders the login form
   def login
