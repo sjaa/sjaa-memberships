@@ -27,7 +27,7 @@ class ApiKeysController < ApplicationController
     end
 
     # Unauthorized
-    render :status => :unauthorized
+    render json: {errors: ['Unauthorized']}, :status => :unauthorized
   end
  
   def destroy

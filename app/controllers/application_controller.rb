@@ -27,6 +27,9 @@ class ApplicationController < ActionController::Base
 
   def user_not_authorized
     flash[:alert] = "You are not authorized to perform this action."
-    redirect_back_or_to(root_path)
+    respond_to do |format|
+      format.html {redirect_back_or_to(root_path)}
+      format.json {render json: {errors: ['Unauthorized by policy']}, status: :unauthorized}
+    end
   end
 end
