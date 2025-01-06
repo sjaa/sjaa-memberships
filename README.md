@@ -1,41 +1,60 @@
 # Overview
 
-# Design
+This app is designed to help manage membership data for administrative and application use cases.  The primary goal is to provide a secure way to access and edit information about the SJAA membership.  This is accomplished with an authentication system that allows for admins with different permissions to do different things within the app.  Admins need read permission to view any member data, for example.  They need write permissions to update any data, and they need additional permissions to manage the permissions themselves.  All of the data is accessible securely through a front-end UI, or through a secure API.
 
-## Models
+# Use Cases
 
-```sh
-./bin/rails g scaffold person first_name:string last_name:string astrobin_id:integer:index notes:string discord_id:string referral_id:integer
+The app should serve as a secure store for the membership data, and should facilitate a variety of use cases:
 
-./bin/rails g scaffold city name:string
+1. Lookup a person's membership status
+    ```ruby
+    # By name
+    Person.find_by(last_name: 'Svensson').status.name
+    => "member"
 
-./bin/rails g scaffold donation date:datetime value:decimal note:string person_id:integer:index
+    # By email
+    Person.joins(:contacts).where(contact: {email: 'csvenss2@gmail.com'}).first.status.name
+    => "member"
+    ```
+1. Get a person's contact information
+    ```ruby
+    Person.find_by(last_name: 'Svensson').contacts
+    => 
+    [#<Contact:0x0000ffff80a67220
+      id: 126,
+      address: "123 Fake St",
+      city_id: 5,
+      state_id: 1,
+      zipcode: "95555",
+      phone: "123-456-7890",
+      email: "csvenss2@gmail.com",
+      primary: true,
+      person_id: 126]
+    ```
+1. Lookup the donation history for any given member
+    ```ruby
+    Person.find_by(id: 42).donations
+    ```
+2. Lookup a person's membership renewal history
+    ```ruby
+    Person.find_by(id: 42).memberships
+    ```
+2. Lookup when a person first joined
+    ```ruby
+    Person.find_by(id: 42).memberships.order(start: :asc).first.start
+    => Sat, 21 Sep 2019 00:00:00.000000000 UTC +00:00
+    ```
+1. Lookup when a person's membership expires
+    ```ruby
+    membership = Person.find_by(id: 42).memberships.order(start: :desc).first
+    expiration = membership.start + membership.term_months.months
+    => Mon, 24 Nov 2025 00:00:00.000000000 UTC +00:00
+    ```
+1. Find members whose memberships have lapsed
+    ```ruby
+    # All expired memberships
+    Person.lapsed_members
 
-./bin/rails g scaffold astrobin username:string latest_image:integer
-
-./bin/rails g scaffold membership start:datetime term_months:integer ephemeris:boolean new:boolean type:string status_id:integer person_id:integer:index
-
-./bin/rails g scaffold status name:string short_name:string
-
-./bin/rails g scaffold contact address:string city_id:integer state_id:integer zipcode:string phone:string email:string primary:boolean person_id:integer:index
-
-./bin/rails g scaffold state name:string short_name:string
-
-./bin/rails g scaffold group name:string short_name:string email:string
-
-./bin/rails g scaffold equipment instrument_id:integer:index model:string person_id:integer:index
-
-./bin/rails g scaffold instrument name:string:index
-
-./bin/rails g scaffold interest name:string description:string
-
-./bin/rails g scaffold referral name:string description:string
-```
-
-## Join Tables
-
-```sh
-./bin/rails g migration CreateJoinTablePeopleGroups people groups
-
-./bin/rails g migration CreateJoinTableInterestsPeople interests people
-```
+    # Expired memberships who still have the "member" standing
+    Person.lapsed_members(status: 'member')
+    ```
