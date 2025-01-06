@@ -3,13 +3,18 @@
     <h1>People</h1>
   </div>
   <div class="col-12">
-    <%= form_with url: people_search_path, data: {turbo_frame: 'people'} do |f| %>
-      <%= f.text_field :first_name, placeholder: 'First Name' %>
-      <%= f.submit 'Search' %>
+    <%= form_with url: people_search_path, data: {controller: "search-form", search_form_target: "form", turbo_frame: 'people'} do |f| %>
+      <div class="input-group mb-3">
+        <%= f.text_field :first_name, placeholder: 'First Name', class: 'form-control', data: { action: "input->search-form#search" } %>
+        <%= f.text_field :last_name, placeholder: 'Last Name', class: 'form-control', data: { action: "input->search-form#search" } %>
+        <%= f.text_field :email, placeholder: 'Email', class: 'form-control', data: { action: "input->search-form#search" } %>
+        <%= f.text_field :phone, placeholder: 'Phone', class: 'form-control', data: { action: "input->search-form#search" } %>
+        <%= f.submit 'Search', class: 'btn btn-primary' %>
+      </div>
     <% end %>
   </div>
   <div id="people" class="col-12">
-      <%= render partial: 'index' %>
+    <%= render partial: 'index' %>
   </div>
   <%= link_to "New person", new_person_path %>
 </div>

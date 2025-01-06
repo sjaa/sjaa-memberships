@@ -13,7 +13,10 @@ class PeopleController < ApplicationController
 
   def search
     query = Person.all.includes(:donations, :memberships, :contacts, :interests)
-    query = query.where(first_name: params[:first_name]) if(params[:first_name])
+    query = query.where(Person.arel_table[:first_name].matches("%#{params[:first_name]}%")) if(params[:first_name])
+    query = query.where(Person.arel_table[:last_name].matches("%#{params[:last_name]}%")) if(params[:last_name])
+    query = query.joins(:contacts).where(Contact.arel_table[:email].matches("%#{params[:email]}%")) if(params[:email])
+    query = query.joins(:contacts).where(Contact.arel_table[:phone].matches("%#{params[:phone]}%")) if(params[:phone])
     @pagy, @people = pagy(query, limit: 40)
     render turbo_stream: turbo_stream.replace('people', partial: 'index')
   end
