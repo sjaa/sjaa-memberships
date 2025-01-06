@@ -1,6 +1,7 @@
 class ApplicationController < ActionController::Base
   include Authenticatable
   include Pundit::Authorization
+  include Pagy::Backend
 
   prepend_before_action :authenticate!
   append_before_action :set_user

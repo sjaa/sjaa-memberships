@@ -1,8 +1,15 @@
 Rails.application.routes.draw do
+  resources :people do
+    resources :donations
+    resources :interests
+    resources :memberships
+    resources :equipment
+    resources :contacts
+  end
+
   resources :permissions
   resources :admins
   resources :referrals
-  resources :interests
   resources :instruments
   resources :equipment
   resources :groups
@@ -11,9 +18,10 @@ Rails.application.routes.draw do
   resources :statuses
   resources :memberships
   resources :astrobins
-  resources :donations
   resources :cities
-  resources :people
+  resources :donations
+  resources :interests
+
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
@@ -32,4 +40,5 @@ Rails.application.routes.draw do
   get '/login', to: 'sessions#login', as: :login
   get '/logout', to: 'sessions#destroy', as: :logout
   get '/unauthorized', to: 'static_pages#unauthorized', as: :unauthorized
+  post '/people/search', to: 'people#search', as: :people_search
 end

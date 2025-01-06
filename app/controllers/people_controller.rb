@@ -3,11 +3,19 @@ class PeopleController < ApplicationController
 
   # GET /people or /people.json
   def index
-    @people = Person.all
+    @pagy, @people = pagy(Person.all.includes(:donations, :memberships, :contacts, :interests), limit: 40)
+    render partial: 'index' if(params[:page])
   end
 
   # GET /people/1 or /people/1.json
   def show
+  end
+
+  def search
+    query = Person.all.includes(:donations, :memberships, :contacts, :interests)
+    query = query.where(first_name: params[:first_name]) if(params[:first_name])
+    @pagy, @people = pagy(query, limit: 40)
+    render turbo_stream: turbo_stream.replace('people', partial: 'index')
   end
 
   # GET /people/new

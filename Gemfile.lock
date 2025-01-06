@@ -154,6 +154,7 @@ GEM
       racc (~> 1.4)
     nokogiri (1.18.1-x86_64-linux-gnu)
       racc (~> 1.4)
+    pagy (9.3.3)
     psych (5.2.2)
       date
       stringio
@@ -261,6 +262,7 @@ DEPENDENCIES
   debug
   importmap-rails
   jbuilder
+  pagy
   puma (>= 5.0)
   pundit
   rails (~> 7.1.0)

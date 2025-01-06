@@ -14,10 +14,12 @@ class SessionsController < ApplicationController
     if(admin&.authenticate(login_params[:password]))
       # If authentication succeeds, then record session id and redirect to root with success
       session[:admin_id] = admin.id
-      redirect_to root_path, notice: 'Successful login!'
+      flash[:success] = 'Successful login!'
+      redirect_to root_path
     else
       # If authentication fails, redirect to login with an error
-      redirect_to :login, notice: 'Login failed.'
+      flash[:alert] = 'Login failed.'
+      redirect_to :login
     end
   end
 

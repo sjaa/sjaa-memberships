@@ -1,5 +1,5 @@
 class Person < ApplicationRecord
-  has_many :memberships
+  has_many :memberships, -> {order(start: :asc)}
   has_many :donations
   has_many :equipment
   has_many :contacts

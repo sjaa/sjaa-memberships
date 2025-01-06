@@ -1,0 +1,30 @@
+<%= turbo_frame_tag 'people' do %>
+  <%= pagy_bootstrap_nav(@pagy).html_safe %>
+  <table class="table">
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Phone</th>
+      <th>City</th>
+      <th>State</th>
+      <th>Status</th>
+      <th>Ephemeris</th>
+      <th>Interests</th>
+      <th>Donations</th>
+    </tr>
+    <% @people.each do |person| %>
+      <tr>
+        <td><%=person.first_name%> <%=person.last_name%></td>
+        <td><%=person.contacts.map(&:email).join(', ')%></td>
+        <td><%=person.contacts.map(&:phone).join(', ')%></td>
+        <td><%=person.contacts.map{|con| con.city&.name}.join(', ')%></td>
+        <td><%=person.contacts.map{|con| con.state&.short_name}.join(', ')%></td>
+        <td><%=person.status&.name%></td>
+        <td><%=person.memberships.last&.ephemeris ? 'PRINT' : ''%></td>
+        <td><%=person.interests.map(&:name).join(', ')%></td>
+        <td><%=person.donations.map(&:value).join(',')%></td>
+      </tr>
+    <% end %>
+  </table>
+  <%= pagy_bootstrap_nav(@pagy).html_safe %>
+<% end %>
