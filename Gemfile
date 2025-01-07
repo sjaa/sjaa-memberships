@@ -71,3 +71,5 @@ end
 gem 'csv'
 
 gem 'pagy'
+
+gem 'faker'

@@ -7,45 +7,15 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
+require_relative('./sjaa_port')
+include SjaaPort
 
-def not_empty(str)
-  return str && !str&.strip&.empty?
+def rand_date(range = 20.years)
+  DateTime.jd(rand(DateTime.now.ago(range).jd..DateTime.now.jd))
 end
 
-def parse_date(date)
-  begin
-    return DateTime.strptime(date, '%m-%d-%y')
-  rescue
-    puts "[W] Could not form a date out of #{date}"
-    return nil
-  end
-end
-
-# Fixed Values
-INTEREST_LIST = {}
-
-{
-  'astrophotography' => '',
-  'solar system' => '',
-  'deep sky' => '',
-  'science' => '',
-  'history' => '',
-  'solar' => '',
-  'social' => '',
-}.each do |name, description|
-  INTEREST_LIST[name] = Interest.create(name: name, description: description)
-end
-
-{
-  'CA' => 'California',
-  'AZ' => 'Arizona',
-}.each do |s, n|
-  State.create(name: n, short_name: s)
-end
-
-PERMISSION_HASH = {}
-%w(read write permit).each do |p|
-  PERMISSION_HASH[p] = Permission.create(name: p)
+def rand_bool()
+  rand(0..1) == 1
 end
 
 # Default admins
@@ -56,92 +26,83 @@ admin.permissions += [PERMISSION_HASH['read']]
 admin = Admin.create(email: 'readwrite@sjaa.net', password: 'secret')
 admin.permissions += [PERMISSION_HASH['read'], PERMISSION_HASH['write']]
 
-require('csv')
-CSV.foreach(Rails.root.join('db', 'seeds.csv'), headers: true) do |row|
-  puts "[I] processing row: #{row}"
+# Import SJAA Data
+# include SjaaPort
+# port()
+statuses = %w(member expired contact entity).map{|s| Status.create(name: s)}
+referrals = {'internet' => 'Web search', 'friend' => 'Referred from a friend', 'school' => 'From a class at school'}.map{|name, desc| Referral.create(name: name, description: desc)}
+states = {'CA' => 'California', 'AZ' => 'Arizona', 'IL' => 'Illinois'}.map{|s,n| State.create(name: n, short_name: s)}
+kinds = [nil, 'VB-M', 'LIFETIME', nil, nil]
+instruments = %w(telescope mount camera binocular).map{|i| Instrument.create(name: i)}
+groups = {'SJAA Observers' => Faker::Internet.email, 'SJAA Imagers' => Faker::Internet.email, 'SJAA Board' => Faker::Internet.email}.map{|n,e| Group.create(name: n, email: e, short_name: n.split(' ').map(&:first).join.upcase)}
 
-  # Headers are...
-  #   First Name,Last Name,Status,Expiry Date,last payment,Cash?,Term,Type,New/Rtn,Member Since,Ephem,Comp,email1,Address1,City1,ST1,Zip1,phone1,email2,phone2,Observer's Group?,Observers Email Address (if diff),Interests,Equipment,Discord ID,Astrobin Username,Astrobin Last Posted Image
-  start = parse_date(row['last payment'])
-
-  # Parse interests
-  interest_s = row['Interests']&.strip
-  interest = nil
-  if(interest_s)
-    if(interest_s =~ /solar system/i) 
-      interest = INTEREST_LIST['solar system']
-    elsif(interest_s =~ /solar viewing/i) 
-      interest = INTEREST_LIST['solar']
-    elsif(interest_s =~ /deep sky/i) 
-      interest = INTEREST_LIST['deep sky']
-    elsif(interest_s =~ /astrophotography/i) 
-      interest = INTEREST_LIST['astrophotography']
-    elsif(interest_s =~ /history/i) 
-      interest = INTEREST_LIST['history']
-    elsif(interest_s =~ /meeting/i) 
-      interest = INTEREST_LIST['social']
-    elsif(interest_s =~ /science/i) 
-      interest = INTEREST_LIST['science']
-    end
+# OR use Faker
+# Generate 100 people
+100.times do 
+  # Random Person
+  discord = nil
+  if(rand_bool)
+    discord = rand(0..400000)
   end
 
-
-  status = Status.find_or_create_by(
-    name: row['Status']&.strip&.downcase || 'unknown'
-  )
-
-  astrobin = (not_empty(row['Astrobin Username'])) ? 
-    Astrobin.create(username: row['Astrobin Username']&.strip, latest_image: row['Astrobin Last Posted Image']&.to_i) : 
-    nil
-
-  notes = row['Equipment'] ? "Equipment: #{row['Equipment']}" : ''
-  notes = row['Cash?'] ? "#{notes} Donation: #{row['Cash?']}".strip : notes
-  notes = nil if(notes.strip.empty?)
+  astrobin = nil
+  if(rand_bool)
+    astrobin = Astrobin.create(username: Faker::Lorem.word, latest_image: rand(0..400000))
+  end
 
   person = Person.create(
-    first_name: row['First Name'],
-    last_name: row['Last Name'],
-    status: status,
-    discord_id: row['Discord ID']&.strip,
+    first_name: Faker::Name.first_name,
+    last_name: Faker::Name.last_name,
+    notes: Faker::Quotes::Shakespeare.hamlet_quote,
+    status: statuses.sample,
+    referral: referrals.sample,
+    discord_id: discord,
     astrobin: astrobin,
-    notes: notes,
-  )
-  person.interests << interest if(interest)
-
-  puts "[E] #{person.errors.full_messages.join('  ')}" if(person.errors.any?)
-
-  Contact.create(
-    address: row['Address1']&.strip,
-    city: not_empty(row['City1']) ? City.find_or_create_by(name: row['City1'].titleize) : nil,
-    state: not_empty(row['ST1']) ? State.where(short_name: row['ST1']&.strip&.upcase).first : nil,
-    zipcode: not_empty(row['Zip1']) ? row['Zip1']&.strip : nil,
-    phone: not_empty(row['phone1']) ? row['phone1']&.strip : nil,
-    email: not_empty(row['email1']) ? row['email1']&.strip : nil,
-    primary: true,
-    person: person,
   )
 
-  if(not_empty(row['email2']) || not_empty(row['phone2']))
-    Contact.create(
-      email: not_empty(row['email2']) ? row['email2']&.strip : nil,
-      phone: not_empty(row['phone2']) ? row['phone2']&.strip : nil,
-      person: person,
+  # with random memberships
+  rand(1..10).times do |i|
+    person.memberships << Membership.create(
+      start: rand_date,
+      term_months: 12,
+      ephemeris: rand_bool,
+      new: rand_bool,
+      kind: kinds.sample,
     )
   end
 
-  # Membership for their latest payment
-  membership = Membership.create(
-    start: start,
-    term_months: row['Term']&.strip == '1yr' ? 12 : nil,
-    ephemeris: row['Ephem']&.strip == 'PRINT',
-    new: row['New/Rtn']&.strip == 'New',
-    kind: row['Type']&.strip,
-    person: person,
-  )
+  # and random contacts
+  rand(1..3).times do |i|
+    person.contacts << Contact.create(
+      address: Faker::Address.street_address,
+      city: City.find_or_create_by(name: Faker::Address.city),
+      state: states.sample,
+      zipcode: Faker::Address.zip,
+      phone: Faker::PhoneNumber.phone_number,
+      email: Faker::Internet.email,
+      primary: i==0,
+    )
 
-  # Membership for their first payment ("since")
-  since = parse_date(row['Member Since'])
-  if(since)
-    Membership.create(start: since, new: true, person: person)
+    interests = []
+    rand(0..INTEREST_LIST.values.size-1).times do
+      interests << INTEREST_LIST.values.sample
+    end
+    person.interests = interests.uniq
+
+    rand(0..5).times do 
+      person.equipment << Equipment.find_or_create_by(instrument: instruments.sample, model: Faker::Lorem.word)
+    end
+
+    rand(0..2).times do
+      person.groups << groups.sample
+    end
+
+    rand(0..5).times do
+      person.donations << Donation.create(
+        date: rand_date,
+        value: rand(10..1000),
+        note: Faker::Lorem.sentence,
+      )
+    end
   end
 end
