@@ -93,9 +93,11 @@ groups = {'SJAA Observers' => Faker::Internet.email, 'SJAA Imagers' => Faker::In
       person.equipment << Equipment.find_or_create_by(instrument: instruments.sample, model: Faker::Lorem.word)
     end
 
+    pgroups = []
     rand(0..2).times do
-      person.groups << groups.sample
+      pgroups << groups.sample
     end
+    person.groups << pgroups.uniq
 
     rand(0..5).times do
       person.donations << Donation.create(

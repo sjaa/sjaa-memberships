@@ -9,7 +9,7 @@ class ApiKeysController < ApplicationController
  
   def index
     # Only have admin bearers for now, but they all have api_keys
-    render json: current_bearer.api_keys
+    render json: current_bearer.api_keys.map{|key| {token: key.token, permissions: key.bearer.permissions.map(&:name)}}
   end
  
   def create
@@ -21,7 +21,7 @@ class ApiKeysController < ApplicationController
         # Authorized, create key
         api_key = admin.api_keys.create! token: SecureRandom.hex 
  
-        render json: api_key, status: :created
+        render json: {token: api_key.token, permissions: admin.permissions.map(&:name)}, status: :created
         return 
       end
     end

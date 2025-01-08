@@ -1,32 +1,23 @@
 <div id="<%= dom_id membership %>">
-  <p>
-    <strong>Start:</strong>
-    <%= membership.start %>
-  </p>
-
-  <p>
-    <strong>Term months:</strong>
-    <%= membership.term_months %>
-  </p>
-
-  <p>
-    <strong>Ephemeris:</strong>
-    <%= membership.ephemeris %>
-  </p>
-
-  <p>
-    <strong>New:</strong>
-    <%= membership.new %>
-  </p>
-
-  <p>
-    <strong>Kind:</strong>
-    <%= membership.kind %>
-  </p>
-
-  <p>
-    <strong>Person:</strong>
-    <%= membership.person&.id %>
-  </p>
-
+  <span class="h2">
+    Membership 
+  </span>
+  <small class="text-secondary font-weight-bold"><%= membership.new ? 'NEW' : 'RETURNING' %></small>
+  <small class="text-primary font-weight-bold"><%= membership.kind %></small>
+ <div class="table-responsive">
+  <table class="table table-sm">
+    <tr>
+      <td><strong>Duration</strong></td>
+      <td><%= date_format(membership.start) %> to <%= date_format(membership.start + membership.term_months.months) %></td>
+    </tr>
+    <tr>
+      <td><strong>Term</strong></td>
+      <td><%= membership.term_months %> months</td>
+    </tr>
+    <tr>
+      <td><strong>Ephemeris</strong></td>
+      <td><%= ephemeris_format membership.ephemeris %></td>
+    </tr>
+    </table>
+    </div>
 </div>

@@ -1,2 +1,2 @@
-json.extract! person, :id, :first_name, :last_name, :astrobin, :notes, :memberships, :discord_id, :referral, :created_at, :updated_at
+json.extract! person, :id, :first_name, :last_name, :astrobin, :notes, :memberships, :donations, :groups, :discord_id, :referral, :created_at, :updated_at
 json.url person_url(person, format: :json)
