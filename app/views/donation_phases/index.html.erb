@@ -1,0 +1,14 @@
+<p style="color: green"><%= notice %></p>
+
+<h1>Donation phases</h1>
+
+<div id="donation_phases">
+  <% @donation_phases.each do |donation_phase| %>
+    <%= render donation_phase %>
+    <p>
+      <%= link_to "Show this donation phase", donation_phase %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New donation phase", new_donation_phase_path %>

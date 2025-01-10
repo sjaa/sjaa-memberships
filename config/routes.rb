@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  resources :donation_phases
+  resources :donation_items
   resources :people do
     resources :donations
     resources :interests

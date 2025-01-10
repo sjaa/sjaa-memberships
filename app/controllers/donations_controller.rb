@@ -4,6 +4,7 @@ class DonationsController < ApplicationController
   # GET /donations or /donations.json
   def index
     @donations = Donation.all
+    @pagy, @donations = pagy(Donation.all.includes(:person, items: [:phases, :equipment]), limit: 40)
   end
 
   # GET /donations/1 or /donations/1.json

@@ -1,0 +1,10 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @donation_phase %>
+
+<div>
+  <%= link_to "Edit this donation phase", edit_donation_phase_path(@donation_phase) %> |
+  <%= link_to "Back to donation phases", donation_phases_path %>
+
+  <%= button_to "Destroy this donation phase", @donation_phase, method: :delete %>
+</div>

@@ -1,14 +1,24 @@
-<p style="color: green"><%= notice %></p>
-
-<h1>Donations</h1>
-
-<div id="donations">
-  <% @donations.each do |donation| %>
-    <%= render donation %>
-    <p>
-      <%= link_to "Show this donation", donation %>
-    </p>
-  <% end %>
+<div class="row">
+  <div class="col-12">
+    <h1>Donations</h1>
+    <%= link_to "New donation", new_donation_path %>
+    <div id="donations" class="table-responsive">
+      <table class="table">
+        <tr>
+          <th>ID</th>
+          <th>Donor</th>
+          <th>Value</th>
+          <th>Items</th>
+        </tr>
+        <% @donations.each do |donation| %>
+          <tr>
+            <td><%=link_to donation.name, donation%></td>
+            <td><%=link_to donation.person&.name, donation.person %></td>
+            <td><%= dollar_format donation.value %></td>
+            <td><%= donation.items.map{|di| "#{di.equipment&.to_html} </br>"}.join(' ').html_safe %></td>
+          </tr>
+        <% end %>
+      </table>
+    </div>
+  </div>
 </div>
-
-<%= link_to "New donation", new_donation_path %>

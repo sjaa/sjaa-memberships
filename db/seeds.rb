@@ -35,6 +35,7 @@ states = {'CA' => 'California', 'AZ' => 'Arizona', 'IL' => 'Illinois'}.map{|s,n|
 kinds = [nil, 'VB-M', 'LIFETIME', nil, nil]
 instruments = %w(telescope mount camera binocular).map{|i| Instrument.create(name: i)}
 groups = {'SJAA Observers' => Faker::Internet.email, 'SJAA Imagers' => Faker::Internet.email, 'SJAA Board' => Faker::Internet.email}.map{|n,e| Group.create(name: n, email: e, short_name: n.split(' ').map(&:first).join.upcase)}
+phase_names = %w(offered received letter consigned sold)
 
 # OR use Faker
 # Generate 100 people
@@ -90,7 +91,7 @@ groups = {'SJAA Observers' => Faker::Internet.email, 'SJAA Imagers' => Faker::In
     person.interests = interests.uniq
 
     rand(0..5).times do 
-      person.equipment << Equipment.find_or_create_by(instrument: instruments.sample, model: Faker::Lorem.word)
+      person.equipment << Equipment.find_or_create_by(instrument: instruments.sample, model: Faker::Lorem.word, note: Faker::Lorem.sentence)
     end
 
     pgroups = []
@@ -100,11 +101,25 @@ groups = {'SJAA Observers' => Faker::Internet.email, 'SJAA Imagers' => Faker::In
     person.groups << pgroups.uniq
 
     rand(0..5).times do
-      person.donations << Donation.create(
-        date: rand_date,
-        value: rand(10..1000),
+      donation = Donation.create(
+        name: "#{rand_date.jd}#{person.first_name[0].upcase}#{person.last_name[0].upcase}",
         note: Faker::Lorem.sentence,
       )
+
+      # N Items to donate
+      rand(0..4).times do
+        di = DonationItem.create(
+          equipment: Equipment.find_or_create_by(instrument: instruments.sample, model: Faker::Lorem.word, note: Faker::Lorem.sentence),
+          value: rand(0..1000),
+        )
+
+        # Phases
+        di.phases = rand(0..4).times.map{|i| phase_names.sample}.uniq.map{|name| DonationPhase.create(name: name, date: rand_date, person: Person.all.sample)}
+
+        donation.items << di
+      end
+
+      person.donations << donation
     end
   end
 end

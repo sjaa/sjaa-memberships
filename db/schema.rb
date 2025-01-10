@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_01_05_214043) do
+ActiveRecord::Schema[7.1].define(version: 2025_01_10_055400) do
   create_table "admins", force: :cascade do |t|
     t.string "email", null: false
     t.string "password_digest", null: false
@@ -63,19 +63,39 @@ ActiveRecord::Schema[7.1].define(version: 2025_01_05_214043) do
     t.index ["person_id"], name: "index_contacts_on_person_id"
   end
 
-  create_table "donations", force: :cascade do |t|
-    t.datetime "date"
+  create_table "donation_items", force: :cascade do |t|
+    t.integer "donation_id"
+    t.integer "equipment_id"
     t.decimal "value"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["donation_id"], name: "index_donation_items_on_donation_id"
+    t.index ["equipment_id"], name: "index_donation_items_on_equipment_id"
+  end
+
+  create_table "donation_phases", force: :cascade do |t|
+    t.string "name"
+    t.integer "donation_item_id"
+    t.integer "person_id"
+    t.datetime "date"
+    t.index ["donation_item_id"], name: "index_donation_phases_on_donation_item_id"
+    t.index ["name"], name: "index_donation_phases_on_name"
+    t.index ["person_id"], name: "index_donation_phases_on_person_id"
+  end
+
+  create_table "donations", force: :cascade do |t|
     t.string "note"
     t.integer "person_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "name"
     t.index ["person_id"], name: "index_donations_on_person_id"
   end
 
   create_table "equipment", force: :cascade do |t|
     t.integer "instrument_id"
     t.string "model"
+    t.string "note"
     t.integer "person_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
