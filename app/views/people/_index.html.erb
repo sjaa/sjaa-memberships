@@ -24,7 +24,7 @@
             <td><%=person.status&.name%></td>
             <td><%=person.memberships.last&.ephemeris ? 'PRINT' : ''%></td>
             <td><%=person.interests.map(&:name).join(', ')%></td>
-            <td><%=person.donations.map(&:value).join(',')%></td>
+            <td><%=person.donations.map{|d| dollar_format(d.value)}.join(', ')%></td>
           </tr>
         <% end %>
       </tbody>
