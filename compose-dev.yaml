@@ -5,6 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile-dev
     #command: tail -f /dev/null
+    #command: rm -f /rails/tmp/pids/server.pid
     ports: 
       - "127.0.0.1:3000:3000"
       - "127.0.0.1:3001:3001"

@@ -109,7 +109,7 @@ phase_names = %w(offered received letter consigned sold)
       # N Items to donate
       rand(0..4).times do
         di = DonationItem.create(
-          equipment: Equipment.find_or_create_by(instrument: instruments.sample, model: Faker::Lorem.word, note: Faker::Lorem.sentence),
+          equipment: Equipment.create(instrument: instruments.sample, model: Faker::Lorem.word, note: Faker::Lorem.sentence),
           value: rand(0..1000),
         )
 

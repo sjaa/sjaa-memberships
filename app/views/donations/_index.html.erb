@@ -1,0 +1,18 @@
+<div id="donations" class="table-responsive">
+  <table class="table">
+    <tr>
+      <th>ID</th>
+      <th>Donor</th>
+      <th>Value</th>
+      <th>Items</th>
+    </tr>
+    <% donations.each do |donation| %>
+      <tr>
+        <td><%=link_to donation.name, donation%></td>
+        <td><%=link_to donation.person&.name, donation.person %></td>
+        <td><%= dollar_format donation.value %></td>
+        <td><%= donation.items.map{|di| "#{di.equipment&.to_html} </br>"}.join(' ').html_safe %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
