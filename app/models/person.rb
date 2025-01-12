@@ -29,4 +29,17 @@ class Person < ApplicationRecord
   def name
     return "#{first_name} #{last_name}"
   end
+
+  # Take a hash of the form {0 => {attributes}, 1=> {attributes}}
+  # and find/create/delete
+  def interests_attributes=(attributes)
+    _interests = []
+    attributes.each do |num, attribute|
+      # Don't try to save blank names
+      next if(attribute[:name].blank? && attribute[:id].blank?)
+      _interests << Interest.find_or_create_by(attribute)
+    end
+
+    self.interests = _interests
+  end
 end

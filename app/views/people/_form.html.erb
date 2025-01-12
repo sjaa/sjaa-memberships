@@ -2,7 +2,6 @@
   <% if person.errors.any? %>
     <div style="color: red">
       <h2><%= pluralize(person.errors.count, "error") %> prohibited this person from being saved:</h2>
-
       <ul>
         <% person.errors.each do |error| %>
           <li><%= error.full_message %></li>
@@ -10,42 +9,44 @@
       </ul>
     </div>
   <% end %>
-
   <div>
     <%= form.label :first_name, style: "display: block" %>
     <%= form.text_field :first_name %>
   </div>
-
   <div>
     <%= form.label :last_name, style: "display: block" %>
     <%= form.text_field :last_name %>
   </div>
-
   <div>
     <%= form.label :astrobin_id, style: "display: block" %>
     <%= form.number_field :astrobin_id %>
   </div>
-
   <div>
     <%= form.label :notes, style: "display: block" %>
     <%= form.text_field :notes %>
   </div>
-
-  <div>
-    <%= form.label :membership_id, style: "display: block" %>
-    <%= form.number_field :membership_id %>
-  </div>
-
   <div>
     <%= form.label :discord_id, style: "display: block" %>
     <%= form.text_field :discord_id %>
   </div>
-
   <div>
     <%= form.label :referral_id, style: "display: block" %>
-    <%= form.number_field :referral_id %>
+    <%= form.combobox :referral_id, Referral.all %>
   </div>
-
+  <!--
+  <%= form.fields_for :interests do |ib| %>
+    <div>
+      <%# ib.combobox :id,  [{display: 'None', value: nil}] + Interest.all.map{|i| {display: i.name&.titleize, value: i.id}}, name_when_new: 'person[interests][name]' %>
+      <%= ib.text_field :id %>
+    </div>
+  <% end %>
+  -->
+  <% person.interests.each_with_index do |interest, i| %>
+    <div>
+      <%= combobox_tag "person[interests_attributes][#{i}][id]",  Interest.all.map{|i| {display: i.name&.titleize, value: i.id}}, name_when_new: "person[interests_attributes][#{i}][name]", value: interest.id %>
+      <%# text_field_tag "person[interests_attributes][#{i}][id]", interest.id %>
+    </div>
+  <% end %>
   <div>
     <%= form.submit %>
   </div>

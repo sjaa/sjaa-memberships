@@ -69,7 +69,6 @@ group :test do
 end
 
 gem 'csv'
-
 gem 'pagy'
-
 gem 'faker'
+gem 'hotwire_combobox'

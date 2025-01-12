@@ -24,6 +24,7 @@ class PeopleController < ApplicationController
   # GET /people/new
   def new
     @person = Person.new
+    @person.interests.build
   end
 
   # GET /people/1/edit
@@ -76,6 +77,6 @@ class PeopleController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def person_params
-      params.require(:person).permit(:first_name, :last_name, :astrobin_id, :notes, :membership_id, :discord_id, :referral_id)
+      params.require(:person).permit(:first_name, :last_name, :astrobin_id, :notes, :membership_id, :discord_id, :referral_id, interests_attributes: [:name, :id])
     end
 end
