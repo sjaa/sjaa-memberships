@@ -1,4 +1,4 @@
-<%= form_with(model: person) do |form| %>
+<%= form_with(model: person, data: {controller: 'form'}) do |form| %>
   <% if person.errors.any? %>
     <div style="color: red">
       <h2><%= pluralize(person.errors.count, "error") %> prohibited this person from being saved:</h2>
@@ -33,20 +33,23 @@
     <%= form.label :referral_id, style: "display: block" %>
     <%= form.combobox :referral_id, Referral.all %>
   </div>
-  <!--
-  <%= form.fields_for :interests do |ib| %>
+  <div data-form-target="fields">
+    <% person.interests.each_with_index do |interest, i| %>
+      <% id = "interest_#{interest.id}"%>
+      <div id="<%=id%>">
+        <%= combobox_tag "person[interests_attributes][][id]",  Interest.all.map{|i| {display: i.name&.titleize, value: i.id}}, name_when_new: "person[interests_attributes][][name]", value: interest.id %>
+        <button type="button" data-form-id-param="<%=id%>" data-action="form#removeField">Remove Interest</button>
+      </div>
+    <% end %>
+  </div>
+  <template data-form-target="template">
     <div>
-      <%# ib.combobox :id,  [{display: 'None', value: nil}] + Interest.all.map{|i| {display: i.name&.titleize, value: i.id}}, name_when_new: 'person[interests][name]' %>
-      <%= ib.text_field :id %>
+      <%= combobox_tag "person[interests_attributes][][id]",  Interest.all.map{|i| {display: i.name&.titleize, value: i.id}}, name_when_new: "person[interests_attributes][][name]" %>
     </div>
-  <% end %>
-  -->
-  <% person.interests.each_with_index do |interest, i| %>
-    <div>
-      <%= combobox_tag "person[interests_attributes][#{i}][id]",  Interest.all.map{|i| {display: i.name&.titleize, value: i.id}}, name_when_new: "person[interests_attributes][#{i}][name]", value: interest.id %>
-      <%# text_field_tag "person[interests_attributes][#{i}][id]", interest.id %>
-    </div>
-  <% end %>
+  </template>
+  <div>
+    <button type="button" data-action="form#addField">Add Interest</button>
+  </div>
   <div>
     <%= form.submit %>
   </div>

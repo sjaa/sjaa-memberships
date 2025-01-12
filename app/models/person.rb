@@ -30,14 +30,19 @@ class Person < ApplicationRecord
     return "#{first_name} #{last_name}"
   end
 
-  # Take a hash of the form {0 => {attributes}, 1=> {attributes}}
+  # Take an array of the form [{id: 4}, {name: 'foo'}, ...]
   # and find/create/delete
   def interests_attributes=(attributes)
     _interests = []
-    attributes.each do |num, attribute|
+    attributes.each do |attribute|
+      _attribute = attribute.dup
+
       # Don't try to save blank names
       next if(attribute[:name].blank? && attribute[:id].blank?)
-      _interests << Interest.find_or_create_by(attribute)
+      # If we see any name, ignore the id
+      _attribute.delete(:id) if(!attribute[:name].blank?)
+      _attribute[:name]&.downcase!
+      _interests << Interest.find_or_create_by(_attribute)
     end
 
     self.interests = _interests
