@@ -47,4 +47,17 @@ class Person < ApplicationRecord
 
     self.interests = _interests
   end
+
+  def astrobin_attributes=(attributes)
+    _astrobin = nil
+    if(attributes[:id].blank?)
+      _astrobin = Astrobin.new(attributes)
+    else
+      _astrobin = Astrobin.find(attributes[:id])
+      _attributes = attributes.dup
+      _attributes.delete(:id)
+      _astrobin.update(_attributes)
+    end
+    self.astrobin = _astrobin
+  end
 end

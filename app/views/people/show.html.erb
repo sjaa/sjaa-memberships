@@ -3,7 +3,7 @@
     <h1>
       <%= @person.first_name %>
       <%= @person.last_name %>
-      <span class="h4 text-secondary"><%= @person.status&.name.upcase %></span>
+      <span class="h4 text-secondary"><%= @person.status&.name&.upcase %></span>
     </h1>
     <div class="table-responsive">
       <table class="table">

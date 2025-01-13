@@ -19,12 +19,13 @@
       <%= form.text_field :last_name, class: 'form-control' %>
     </div>
     <div class="col-md-6 mt-2">
+      <%= hidden_field_tag 'person[astrobin_attributes][id]', person.astrobin&.id %>
       <%= form.label :astrobin_username, 'Astrobin Username', class: 'form-label' %>
       <%= text_field_tag 'person[astrobin_attributes][username]', person.astrobin&.username, class: 'form-control' %>
     </div>
     <div class="col-md-6 mt-2">
       <%= form.label :astrobin_last_image, 'Latest Astrobin Image ID', class: 'form-label' %>
-      <%= number_field_tag 'person[astrobin][latest_image]', person&.astrobin.latest_image, class: 'form-control' %>
+      <%= number_field_tag 'person[astrobin_attributes][latest_image]', person&.astrobin&.latest_image, class: 'form-control' %>
     </div>
     <div class="col-md-6 mt-2">
       <%= form.label :notes, class: 'form-label' %>
