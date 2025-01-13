@@ -13,10 +13,13 @@ class PeopleController < ApplicationController
 
   def search
     query = Person.all.includes(:donations, :memberships, :contacts, :interests)
-    query = query.where(Person.arel_table[:first_name].matches("%#{params[:first_name]}%")) if(params[:first_name])
-    query = query.where(Person.arel_table[:last_name].matches("%#{params[:last_name]}%")) if(params[:last_name])
-    query = query.joins(:contacts).where(Contact.arel_table[:email].matches("%#{params[:email]}%")) if(params[:email])
-    query = query.joins(:contacts).where(Contact.arel_table[:phone].matches("%#{params[:phone]}%")) if(params[:phone])
+    query = query.where(Person.arel_table[:first_name].matches("%#{params[:first_name]}%")) if(params[:first_name].present?)
+    query = query.where(Person.arel_table[:last_name].matches("%#{params[:last_name]}%")) if(params[:last_name].present?)
+    query = query.joins(:contacts).where(Contact.arel_table[:email].matches("%#{params[:email]}%")) if(params[:email].present?)
+    query = query.joins(:contacts).where(Contact.arel_table[:phone].matches("%#{params[:phone]}%")) if(params[:phone].present?)
+
+    logger.info "query: #{query.to_sql}"
+    logger.info "first: #{query.first.inspect}"
     @pagy, @people = pagy(query, limit: 40)
     render turbo_stream: turbo_stream.replace('people', partial: 'index')
   end
@@ -81,6 +84,7 @@ class PeopleController < ApplicationController
       params.require(:person).permit(
         :first_name, :last_name, :astrobin_id, :notes, :membership_id, :discord_id, :referral_id, :status_id,
         interests_attributes: [:name, :id], 
+        contact_attributes: [:address, :zipcode, :phone, :state_id, :city_id, :city_name, :email, :primary, :id], 
         astrobin_attributes: [:username, :latest_image, :id])
     end
 end

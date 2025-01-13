@@ -60,4 +60,29 @@ class Person < ApplicationRecord
     end
     self.astrobin = _astrobin
   end
+
+  def contact_attributes=(attributes)
+    _contacts = []
+    attributes.each do |contact_attr|
+      contact = contact_attr[:id].present? ? Contact.find(contact_attr[:id]) : Contact.new
+      _contact_attr = contact_attr.dup
+
+      # Use strings for true/false so they are easier to display in the forms, but save them as booleans
+      _contact_attr[:primary] = _contact_attr[:primary] == "true"
+      _contact_attr.delete(:id)
+
+      # If there's a city name, then we need to create  new city
+      if(_contact_attr[:city_name].present?)
+        city = City.new(name: _contact_attr[:city_name])
+        _contact_attr.delete(:city_name)
+        _contact_attr.delete(:city_id)
+        _contact_attr[:city] = city
+      end
+
+      contact.update _contact_attr
+      _contacts << contact if(contact.person_id.blank?)
+    end
+
+    self.contacts = _contacts if(!_contacts.empty?)
+  end
 end
