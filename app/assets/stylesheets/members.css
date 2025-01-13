@@ -5,3 +5,7 @@ fieldset.hw-combobox {
 div.hw-combobox__main__wrapper {
   width: 100%;
 }
+
+.form-label {
+  font-weight: bold;
+}

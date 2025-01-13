@@ -10,31 +10,31 @@
         </ul>
       </div>
     <% end %>
-    <div class="col-md-6">
+    <div class="col-md-6 mt-2">
       <%= form.label :first_name, 'First Name', class: 'form-label' %>
       <%= form.text_field :first_name, class: 'form-control' %>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-6 mt-2">
       <%= form.label :last_name, 'Last Name', class: 'form-label' %>
       <%= form.text_field :last_name, class: 'form-control' %>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-6 mt-2">
       <%= form.label :astrobin_username, 'Astrobin Username', class: 'form-label' %>
       <%= text_field_tag 'person[astrobin_attributes][username]', person.astrobin&.username, class: 'form-control' %>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-6 mt-2">
       <%= form.label :astrobin_last_image, 'Latest Astrobin Image ID', class: 'form-label' %>
       <%= number_field_tag 'person[astrobin][latest_image]', person&.astrobin.latest_image, class: 'form-control' %>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-6 mt-2">
       <%= form.label :notes, class: 'form-label' %>
       <%= form.text_area :notes, class: 'form-control' %>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-6 mt-2">
       <%= form.label :discord_id, 'Discord ID', class: 'form-label' %>
       <%= form.text_field :discord_id, class: 'form-control' %>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-6 mt-2">
       <%= form.label :referral_id, class: 'form-label' %>
       <%= form.combobox :referral_id, Referral.all %>
     </div>

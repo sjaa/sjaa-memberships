@@ -2,6 +2,6 @@ class Referral < ApplicationRecord
   has_many :people
 
   def to_combobox_display
-    name
+    name&.titleize
   end
 end
