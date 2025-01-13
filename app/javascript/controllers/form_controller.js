@@ -5,13 +5,21 @@ export default class extends Controller {
   static targets = ["fields", "template"]
 
   connect() {
+    this.number = 0
   }
 
   addField(event) {
     event.preventDefault()
 
-    var content = this.templateTarget.innerHTML
-    this.fieldsTarget.insertAdjacentHTML("afterend", content)
+    var cloned = this.templateTarget.content.cloneNode(true)
+    console.log(cloned)
+    cloned.childNodes.forEach((node) => {
+      if (node.nodeType != Node.TEXT_NODE) {
+        node.innerHTML.replace(/NEWID/g, `new_interest_${this.number}`)
+        this.fieldsTarget.appendChild(node)
+      }
+    })
+    this.number += 1
   }
 
   removeField(event) {

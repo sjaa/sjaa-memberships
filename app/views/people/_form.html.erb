@@ -1,56 +1,74 @@
 <%= form_with(model: person, data: {controller: 'form'}) do |form| %>
-  <% if person.errors.any? %>
-    <div style="color: red">
-      <h2><%= pluralize(person.errors.count, "error") %> prohibited this person from being saved:</h2>
-      <ul>
-        <% person.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
-  <div>
-    <%= form.label :first_name, style: "display: block" %>
-    <%= form.text_field :first_name %>
-  </div>
-  <div>
-    <%= form.label :last_name, style: "display: block" %>
-    <%= form.text_field :last_name %>
-  </div>
-  <div>
-    <%= form.label :astrobin_id, style: "display: block" %>
-    <%= form.number_field :astrobin_id %>
-  </div>
-  <div>
-    <%= form.label :notes, style: "display: block" %>
-    <%= form.text_field :notes %>
-  </div>
-  <div>
-    <%= form.label :discord_id, style: "display: block" %>
-    <%= form.text_field :discord_id %>
-  </div>
-  <div>
-    <%= form.label :referral_id, style: "display: block" %>
-    <%= form.combobox :referral_id, Referral.all %>
-  </div>
-  <div data-form-target="fields">
-    <% person.interests.each_with_index do |interest, i| %>
-      <% id = "interest_#{interest.id}"%>
-      <div id="<%=id%>">
-        <%= combobox_tag "person[interests_attributes][][id]",  Interest.all.map{|i| {display: i.name&.titleize, value: i.id}}, name_when_new: "person[interests_attributes][][name]", value: interest.id %>
-        <button type="button" data-form-id-param="<%=id%>" data-action="form#removeField">Remove Interest</button>
+  <div class="row">
+    <% if person.errors.any? %>
+      <div style="color: red">
+        <h2><%= pluralize(person.errors.count, "error") %> prohibited this person from being saved:</h2>
+        <ul>
+          <% person.errors.each do |error| %>
+            <li><%= error.full_message %></li>
+          <% end %>
+        </ul>
       </div>
     <% end %>
-  </div>
-  <template data-form-target="template">
-    <div>
-      <%= combobox_tag "person[interests_attributes][][id]",  Interest.all.map{|i| {display: i.name&.titleize, value: i.id}}, name_when_new: "person[interests_attributes][][name]" %>
+    <div class="col-md-6">
+      <%= form.label :first_name, 'First Name', class: 'form-label' %>
+      <%= form.text_field :first_name, class: 'form-control' %>
     </div>
-  </template>
-  <div>
-    <button type="button" data-action="form#addField">Add Interest</button>
+    <div class="col-md-6">
+      <%= form.label :last_name, 'Last Name', class: 'form-label' %>
+      <%= form.text_field :last_name, class: 'form-control' %>
+    </div>
+    <div class="col-md-6">
+      <%= form.label :astrobin_username, 'Astrobin Username', class: 'form-label' %>
+      <%= text_field_tag 'person[astrobin_attributes][username]', person.astrobin&.username, class: 'form-control' %>
+    </div>
+    <div class="col-md-6">
+      <%= form.label :astrobin_last_image, 'Latest Astrobin Image ID', class: 'form-label' %>
+      <%= number_field_tag 'person[astrobin][latest_image]', person&.astrobin.latest_image, class: 'form-control' %>
+    </div>
+    <div class="col-md-6">
+      <%= form.label :notes, class: 'form-label' %>
+      <%= form.text_area :notes, class: 'form-control' %>
+    </div>
+    <div class="col-md-6">
+      <%= form.label :discord_id, 'Discord ID', class: 'form-label' %>
+      <%= form.text_field :discord_id, class: 'form-control' %>
+    </div>
+    <div class="col-md-6">
+      <%= form.label :referral_id, class: 'form-label' %>
+      <%= form.combobox :referral_id, Referral.all %>
+    </div>
   </div>
-  <div>
-    <%= form.submit %>
+  <div data-form-target="fields" class="row">
+    <h2>Interests</h2>
+    <% person.interests.each_with_index do |interest, i| %>
+      <% id = "interest_#{interest.id}"%>
+      <div id="<%=id%>" class="row mt-2">
+        <div class="col-md-6 col-xs-8">
+          <%= combobox_tag "person[interests_attributes][][id]",  Interest.all.map{|i| {display: i.name&.titleize, value: i.id}}, name_when_new: "person[interests_attributes][][name]", value: interest.id %>
+        </div>
+        <div class="col-md-6 col-xs-4">
+          <button type="button" data-form-id-param="<%=id%>" data-action="form#removeField" class="btn btn-danger">Remove</button>
+        </div>
+      </div>
+    <% end %>
+    <template data-form-target="template">
+      <div id="NEWID" class="row mt-2">
+        <div class="col-md-6 col-xs-8">
+          <%= combobox_tag "person[interests_attributes][][id]",  Interest.all.map{|i| {display: i.name&.titleize, value: i.id}}, name_when_new: "person[interests_attributes][][name]" %>
+        </div>
+        <div class="col-md-6 col-xs-4">
+          <button type="button" data-form-id-param="NEWID" data-action="form#removeField" class="btn btn-danger">Remove</button>
+        </div>
+      </div>
+    </template>
+  </div>
+  <div class="row">
+    <div class="col-12 mt-2">
+      <button type="button" data-action="form#addField" class="btn btn-secondary">Add Interest</button>
+    </div>
+    <div class="col-12 mt-2">
+      <%= form.submit 'Update Person', class: 'btn btn-primary' %>
+    </div>
   </div>
 <% end %>
