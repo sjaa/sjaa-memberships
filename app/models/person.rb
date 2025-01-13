@@ -80,9 +80,9 @@ class Person < ApplicationRecord
       end
 
       contact.update _contact_attr
-      _contacts << contact if(contact.person_id.blank?)
+      _contacts << contact
     end
 
-    self.contacts = _contacts if(!_contacts.empty?)
+    self.contacts = _contacts
   end
 end

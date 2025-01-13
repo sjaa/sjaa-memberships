@@ -10,12 +10,12 @@ export default class extends Controller {
 
   addField(event) {
     event.preventDefault()
-
+    var id = event.params.baseid
     var cloned = this.templateTarget.content.cloneNode(true)
-    console.log(cloned)
     cloned.childNodes.forEach((node) => {
       if (node.nodeType != Node.TEXT_NODE) {
-        node.innerHTML.replace(/NEWID/g, `new_interest_${this.number}`)
+        if(node.id) node.id = `${id || 'new'}_${this.number}`
+        node.innerHTML = node.innerHTML.replace(/NEWID/g, `${id || 'new'}_${this.number}`)
         this.fieldsTarget.appendChild(node)
       }
     })

@@ -6,7 +6,7 @@
       <span class="h4 text-secondary"><%= @person.status&.name&.upcase %></span>
     </h1>
     <div class="table-responsive">
-      <table class="table">
+      <table class="table table-striped table-hover">
         <tr>
           <td><strong>Interests</strong></td>
           <td><%= @person.interests.map{|i| i.name}.join(', ') %></td>
@@ -34,13 +34,30 @@
               <%= link_to(@person.astrobin&.username, "https://www.astrobin.com/users/#{@person.astrobin&.username}", target: :_blank) %> <%= @person.astrobin&.latest_image ? "(#{@person.astrobin&.latest_image})" : '' %></td>
           <% end %>
         </tr>
+        <% @person.contacts.each_with_index do |contact, i| %>
+          <tr>
+            <td colspan=2><strong>Contact <%=i+1%></strong><%= contact.primary ? ' (Primary)' : ''%></td>
+          </tr>
+          <tr>
+            <td><strong>Address</strong></td>
+            <td><%=contact.address%>, <%=contact.city&.name%>, <%=contact.state&.short_name%> <%=contact.zipcode%></td>
+          </tr>
+          <tr>
+            <td><strong>Phone</strong></td>
+            <td><%=contact.phone%></td>
+          </tr>
+          <tr>
+            <td><strong>Email</strong></td>
+            <td><%=contact.email%></td>
+          </tr>
+        <%end%>
       </table>
     </div>
   </div>
   <div class="row">
     <div class="col-xs-12 col-md-6 table-responsive">
       <h2>Memberships</h2>
-      <table class="table">
+      <table class="table table-striped table-hover">
         <tr>
           <th>Duration</th>
           <th>Term</th>

@@ -71,7 +71,7 @@
     </div>
     <div class="row">
       <div class="col-12 mt-2">
-        <button type="button" data-action="form#addField" class="btn btn-secondary">Add Interest</button>
+        <button type="button" data-form-baseid-param="new_interest" data-action="form#addField" class="btn btn-secondary">Add Interest</button>
       </div>
     </div>
   </div>
@@ -80,45 +80,15 @@
     <div data-form-target="fields" class="row mt-4">
       <h2>Contacts</h2>
       <% person.contacts.each_with_index do |contact, i| %>
-        <% id = "contact_#{contact.id}"%>
-        <div id="<%=id%>" class="row mt-2">
-          <h3>Contact <%=i+1%></h3>
-          <%= hidden_field_tag 'person[contact_attributes][][id]', contact.id %>
-          <%= hidden_field_tag 'person[contact_attributes][][person_id]', person.id %>
-          <div class="col-md-6 mt-2">
-            <%= label_tag :contact_address, 'Address', class: 'form-label' %>
-            <%= text_field_tag 'person[contact_attributes][][address]', contact.address, class: 'form-control' %>
-          </div>
-          <div class="col-md-6 mt-2">
-            <%= label_tag :contact_zipcode, 'Zipcode', class: 'form-label' %>
-            <%= text_field_tag 'person[contact_attributes][][zipcode]', contact.zipcode, class: 'form-control' %>
-          </div>
-          <div class="col-md-6 mt-2">
-            <%= label_tag :contact_city_id, 'City', class: 'form-label' %>
-            <%= combobox_tag 'person[contact_attributes][][city_id]', City.all, value: contact.city_id, name_when_new: 'person[contact_attributes][][city_name]' %>
-          </div>
-          <div class="col-md-6 mt-2">
-            <%= label_tag :contact_state_id, 'State', class: 'form-label' %>
-            <%= combobox_tag 'person[contact_attributes][][state_id]', State.all, value: contact.state_id %>
-          </div>
-          <div class="col-md-6 mt-2">
-            <%= label_tag :contact_phone, 'Phone', class: 'form-label' %>
-            <%= text_field_tag 'person[contact_attributes][][phone]', contact.phone, class: 'form-control' %>
-          </div>
-          <div class="col-md-6 mt-2">
-            <%= label_tag :contact_email, 'Email', class: 'form-label' %>
-            <%= text_field_tag 'person[contact_attributes][][email]', contact.email, class: 'form-control' %>
-          </div>
-          <div class="col-md-6 mt-2">
-            <%= label_tag :contact_primary, 'Primary', class: 'form-label' %><br/>
-            <%= combobox_tag 'person[contact_attributes][][primary]', [{display: 'Yes', value: 'true'}, {display: 'No', value: 'false'}], value: contact.primary ? 'true' : 'false' %>
-          </div>
-        </div>
+        <%= render partial: 'contact_form', locals: {id: "contact_#{contact.id}", contact: contact, i: i, person: person} %>
       <% end %>
-      <div class="row">
-        <div class="col-12 mt-2">
-          <button type="button" data-action="form#addField" class="btn btn-secondary">Add Contact</button>
-        </div>
+      <template data-form-target="template">
+        <%= render partial: 'contact_form', locals: {id: "NEWID", contact: Contact.new, i: nil, person: person} %>
+      </template>
+    </div>
+    <div class="row">
+      <div class="col-12 mt-2">
+        <button type="button" data-form-baseid-param="new_contact" data-action="form#addField" class="btn btn-secondary">Add Contact</button>
       </div>
     </div>
   </div>
