@@ -13,6 +13,6 @@ module ApplicationHelper
   end
 
   def dollar_format(d)
-    "$ #{sprintf("%.02f", d)}"
+    "$#{sprintf("%.02f", d)}"
   end
 end

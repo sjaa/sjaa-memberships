@@ -39,6 +39,10 @@
       <%= form.label :referral_id, class: 'form-label' %>
       <%= form.combobox :referral_id, Referral.all %>
     </div>
+    <div class="col-md-6 mt-2">
+      <%= form.label :status_id, class: 'form-label' %>
+      <%= form.combobox :status_id, Status.all %>
+    </div>
   </div>
   <div data-form-target="fields" class="row mt-4">
     <h2>Interests</h2>
