@@ -39,7 +39,7 @@
       <%= form.combobox :referral_id, Referral.all %>
     </div>
   </div>
-  <div data-form-target="fields" class="row">
+  <div data-form-target="fields" class="row mt-4">
     <h2>Interests</h2>
     <% person.interests.each_with_index do |interest, i| %>
       <% id = "interest_#{interest.id}"%>
