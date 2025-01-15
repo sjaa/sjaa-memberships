@@ -249,3 +249,16 @@ Use this endpoint to revoke (delete) the api key that is passed in via the heade
   "url": "https://127.0.0.1:3001/people/42.json"
 }
 ```
+
+# Deployment
+
+A few notes for various deployment options
+
+## Heroku
+
+```sh
+git push heroku main # deploy
+heroku run bash # get a shell
+heroku run rake db:schema:load # setup gives a permission error
+heroku run rake db:seed
+```
