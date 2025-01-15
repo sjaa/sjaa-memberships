@@ -52,11 +52,11 @@ class PeopleController < ApplicationController
   # PATCH/PUT /people/1 or /people/1.json
   def update
     respond_to do |format|
-      if @person.update(person_params)
+      if @person.update(person_params) && !@person.errors.any?
         format.html { redirect_to @person, notice: "Person was successfully updated." }
         format.json { render :show, status: :ok, location: @person }
       else
-        flash[:error] = "Could not update Person: #{@person.errors.full_messages.join('  ')}"
+        flash[:error] = "Problem updating person: #{@person.errors.full_messages.join('  ')}"
         format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: @person.errors, status: :unprocessable_entity }
       end
@@ -84,7 +84,8 @@ class PeopleController < ApplicationController
       params.require(:person).permit(
         :first_name, :last_name, :astrobin_id, :notes, :membership_id, :discord_id, :referral_id, :status_id,
         interests_attributes: [:name, :id], 
-        contact_attributes: [:address, :zipcode, :phone, :state_id, :city_id, :city_name, :email, :primary, :id], 
+        contact_attributes: [:address, :zipcode, :phone, :state_id, :city_id, :city_name, :email, :primary, :person_id, :id], 
+        membership_attributes: [:start, :kind, :kind_id, :term_months, :new, :ephemeris, :id, :person_id],
         astrobin_attributes: [:username, :latest_image, :id])
     end
 end

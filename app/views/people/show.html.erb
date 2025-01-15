@@ -3,17 +3,21 @@
     <h1>
       <%= @person.first_name %>
       <%= @person.last_name %>
-      <span class="h4 text-secondary"><%= @person.status&.name&.upcase %></span>
+      <span class="h4 text-secondary">
+        <%= @person.status&.name&.upcase %>
+      </span>
     </h1>
     <div class="table-responsive">
       <table class="table table-striped table-hover">
         <tr>
           <td><strong>Interests</strong></td>
-          <td><%= @person.interests.map{|i| i.name}.join(', ') %></td>
+          <td>
+            <%= @person.interests.map{|i| i.name}.join(', ') %></td>
         </tr>
         <tr>
           <td><strong>Groups</strong></td>
-          <td><%= @person.groups.map{|g| link_to(g.name, group_path(g))}.join(', ').html_safe %></td>
+          <td><%= @person.groups.map{|g| link_to(g.name, group_path(g))}.join('
+              , ').html_safe %></td>
         </tr>
         <tr>
           <td><strong>Notes</strong></td>
@@ -36,19 +40,27 @@
         </tr>
         <% @person.contacts.each_with_index do |contact, i| %>
           <tr>
-            <td colspan=2><strong>Contact <%=i+1%></strong><%= contact.primary ? ' (Primary)' : ''%></td>
+            <td colspan=2><strong>Contact <%=i+1%></strong><%= contact.primary ? ' (Primary)' : '' %>
+            </td>
           </tr>
           <tr>
             <td><strong>Address</strong></td>
-            <td><%=contact.address%>, <%=contact.city&.name%>, <%=contact.state&.short_name%> <%=contact.zipcode%></td>
+            <td>
+              <%=contact.address%>, <%=contact.city&.name%>, <%=contact.state&.short_name%>
+              <%=contact.zipcode%>
+            </td>
           </tr>
           <tr>
             <td><strong>Phone</strong></td>
-            <td><%=contact.phone%></td>
+            <td>
+              <%=contact.phone%>
+            </td>
           </tr>
           <tr>
             <td><strong>Email</strong></td>
-            <td><%=contact.email%></td>
+            <td>
+              <%=contact.email%>
+            </td>
           </tr>
         <%end%>
       </table>
@@ -60,25 +72,33 @@
       <table class="table table-striped table-hover">
         <tr>
           <th>Duration</th>
-          <th>Term</th>
+          <th>Kind</th>
           <th>Ephemeris</th>
         </tr>
         <% @person.memberships.each do |membership| %>
           <tr>
-            <td><%= date_format(membership.start) %> to <%= date_format(membership.start + membership.term_months.months) %></td>
-            <td><%= membership.term_months %> months</td>
-            <td><%= ephemeris_format membership.ephemeris %></td>
+            <td>
+              <%= date_format(membership.start) %> to <%= date_format(membership.start + membership.term_months.months) %>
+              (<%= membership.term_months %> months)
+            </td>
+            <td>
+              <%= membership.kind&.name %>
+            </td>
+            <td>
+              <%= ephemeris_format membership.ephemeris %>
+            </td>
           </tr>
         <% end %>
       </table>
     </div>
     <div class="col-xs-12 col-md-6 table-responsive">
       <h2>Donations</h2>
-      <%= render partial: 'donations/index', locals: {donations: @person.donations} %>
+      <%= render partial: 'donations/index' , locals: {donations: @person.donations} %>
     </div>
     <div class="col-12">
-      <%= link_to "Edit this person", edit_person_path(@person) %> |
-      <%= link_to "Back to people", people_path %>
-      <%= button_to "Delete this person", @person, method: :delete, data: {confirm: 'Are you TOTALLY sure??'} %>
+      <%= link_to "Edit this person" , edit_person_path(@person) %> |
+      <%= link_to "Back to people" , people_path %>
+      <%= button_to "Delete this person" , @person, method: :delete, data: {confirm: 'Are you TOTALLY sure??' } %>
     </div>
   </div>
+</div>

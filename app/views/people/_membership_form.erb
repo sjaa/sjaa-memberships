@@ -1,0 +1,29 @@
+<div id="<%=id%>" class="row mt-2">
+  <h3>Membership <%= i ? i+1 : 'New'%></h3>
+  <%= hidden_field_tag 'person[membership_attributes][][id]', membership.id %>
+  <%= hidden_field_tag 'person[membership_attributes][][person_id]', person&.id %>
+  <div class="col-md-6 mt-2">
+    <%= label_tag :membership_start, 'Start Date', class: 'form-label' %>
+    <%= date_field_tag 'person[membership_attributes][][start]', membership.start&.strftime('%Y-%m-%d'), class: 'form-control' %>
+  </div>
+  <div class="col-md-6 mt-2">
+    <%= label_tag :membership_term, 'Term in Months', class: 'form-label' %>
+    <%= number_field_tag 'person[membership_attributes][][term_months]', membership.term_months || 12, class: 'form-control' %>
+  </div>
+  <div class="col-md-6 mt-2">
+    <%= label_tag :membership_kind_id, 'Kind', class: 'form-label' %>
+    <%= combobox_tag 'person[membership_attributes][][kind_id]', MembershipKind.all, value: membership.kind_id, name_when_new: 'person[membership_attributes][][kind]' %>
+  </div>
+  <div class="col-md-6 mt-2">
+    <%= label_tag :membership_new, 'New Membership?', class: 'form-label' %><br/>
+    <%= combobox_tag 'person[membership_attributes][][new]', [{display: 'Yes', value: 'true'}, {display: 'No', value: 'false'}], value: membership.new ? 'true' : 'false' %>
+  </div>
+  <div class="col-md-6 mt-2">
+    <%= label_tag :membership_ephemeris, 'Printed Ephemeris', class: 'form-label' %><br/>
+    <%= combobox_tag 'person[membership_attributes][][ephemeris]', [{display: 'Yes', value: 'true'}, {display: 'No', value: 'false'}], value: membership.ephemeris ? 'true' : 'false' %>
+  </div>
+  <div class="col-md-6 mt-2">
+    <%= label_tag :membership_delete, 'Delete', class: 'form-label' %><br/>
+    <button type="button" data-form-id-param="<%=id%>" data-action="form#removeField" class="btn btn-danger">Remove</button>
+  </div>
+</div>

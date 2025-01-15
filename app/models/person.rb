@@ -1,8 +1,8 @@
 class Person < ApplicationRecord
-  has_many :memberships, -> {order(start: :asc)}
-  has_many :donations
-  has_many :equipment
-  has_many :contacts
+  has_many :memberships, -> {includes(:kind).order(start: :asc)}
+  has_many :donations, -> {includes(:items)}
+  has_many :equipment, -> {includes(:instrument)}
+  has_many :contacts, -> {includes(:city, :state)}
   has_and_belongs_to_many :interests
   has_and_belongs_to_many :groups
   belongs_to :status, optional: true
@@ -57,6 +57,9 @@ class Person < ApplicationRecord
       _attributes = attributes.dup
       _attributes.delete(:id)
       _astrobin.update(_attributes)
+      _astrobin.errors.each do |err|
+        self.errors.add err.attribute, err.message
+      end
     end
     self.astrobin = _astrobin
   end
@@ -80,9 +83,45 @@ class Person < ApplicationRecord
       end
 
       contact.update _contact_attr
+      contact.errors.each do |err|
+        self.errors.add err.attribute, err.message
+      end
       _contacts << contact
     end
 
     self.contacts = _contacts
+  end
+
+  def membership_attributes=(attributes)
+    _memberships = []
+    attributes.each do |membership_attr|
+      membership = membership_attr[:id].present? ? Membership.find(membership_attr[:id]) : Membership.new
+      _membership_attr = membership_attr.dup
+
+      # Use strings for true/false so they are easier to display in the forms, but save them as booleans
+      _membership_attr[:ephemeris] = _membership_attr[:ephemeris] == "true"
+      _membership_attr[:new] = _membership_attr[:new] == "true"
+      _membership_attr.delete(:id)
+
+      # If there's a city name, then we need to create  new city
+      if(_membership_attr[:kind].present?)
+        kind = MembershipKind.new(name: _membership_attr[:kind])
+        _membership_attr.delete(:kind)
+        _membership_attr.delete(:kind_id)
+        _membership_attr[:kind] = kind
+      end
+
+      if(_membership_attr[:start])
+        _membership_attr[:start] = DateTime.parse _membership_attr[:start]
+      end
+
+      membership.update _membership_attr
+      membership.errors.each do |err|
+        self.errors.add err.attribute, err.message
+      end
+      _memberships << membership
+    end
+
+    self.memberships = _memberships
   end
 end

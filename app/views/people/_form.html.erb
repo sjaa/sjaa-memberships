@@ -75,6 +75,7 @@
       </div>
     </div>
   </div>
+
   <!-- Contacts -->
   <div data-controller="form">
     <div data-form-target="fields" class="row mt-4">
@@ -92,6 +93,26 @@
       </div>
     </div>
   </div>
+
+  <!-- Memberships -->
+  <div data-controller="form">
+    <div data-form-target="fields" class="row mt-4">
+      <h2>Memberships</h2>
+      <% person.memberships.each_with_index do |membership, i| %>
+        <%= render partial: 'membership_form', locals: {id: "membership_#{membership.id}", membership: membership, i: i, person: person} %>
+      <% end %>
+      <template data-form-target="template">
+        <%= render partial: 'membership_form', locals: {id: "NEWID", membership: Membership.new, i: nil, person: person} %>
+      </template>
+    </div>
+    <div class="row">
+      <div class="col-12 mt-2">
+        <button type="button" data-form-baseid-param="new_membership" data-action="form#addField" class="btn btn-secondary">Add Membership</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Submit -->
   <div class="row">
     <div class="col-12 mt-2">
       <%= form.submit 'Update Person', class: 'btn btn-primary' %>

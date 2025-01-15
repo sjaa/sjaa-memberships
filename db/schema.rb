@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_01_10_055400) do
+ActiveRecord::Schema[7.1].define(version: 2025_01_15_051911) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -142,15 +142,22 @@ ActiveRecord::Schema[7.1].define(version: 2025_01_10_055400) do
     t.index ["person_id", "interest_id"], name: "index_interests_people_on_person_id_and_interest_id"
   end
 
+  create_table "membership_kinds", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "memberships", force: :cascade do |t|
     t.datetime "start"
     t.integer "term_months"
     t.boolean "ephemeris"
     t.boolean "new"
-    t.string "kind"
     t.integer "person_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "kind_id"
+    t.index ["kind_id"], name: "index_memberships_on_kind_id"
     t.index ["person_id"], name: "index_memberships_on_person_id"
   end
 
