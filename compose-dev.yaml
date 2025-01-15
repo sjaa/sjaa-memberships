@@ -1,9 +1,39 @@
 services:
+  db:
+    image: postgres:latest
+    container_name: postgres_container
+    build:
+      context: .
+      dockerfile: Dockerfile-postgres
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      #POSTGRES_DB: sjaa-db-dev
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      retries: 5
+      start_period: 5s
+      timeout: 10s
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
   app:
     image: ruby
+    environment:
+      DATABASE_HOST: db
+      DATABASE_USER: root
+      DATABASE_PASSWORD: root
+      PGHOST: db
+      PGUSER: root
+      PGPASSWORD: root
     build:
       context: .
       dockerfile: Dockerfile-dev
+    depends_on:
+      db:
+        condition: service_healthy
     #command: tail -f /dev/null
     #command: rm -f /rails/tmp/pids/server.pid
     ports: 
@@ -13,3 +43,6 @@ services:
       - type: bind
         source: ./
         target: /rails
+
+volumes: 
+  postgres_data:
