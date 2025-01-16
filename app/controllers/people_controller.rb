@@ -67,22 +67,38 @@ class PeopleController < ApplicationController
   
   private
   def filter
-    query = Person.all.includes(:donations, :memberships, :contacts, :interests, :status)
-    query = query.where(Person.arel_table[:first_name].matches("%#{params[:first_name]}%")) if(params[:first_name].present?)
-    query = query.where(Person.arel_table[:last_name].matches("%#{params[:last_name]}%")) if(params[:last_name].present?)
-    query = query.joins(:contacts).where(Contact.arel_table[:email].matches("%#{params[:email]}%")) if(params[:email].present?)
-    query = query.joins(:contacts).where(Contact.arel_table[:phone].matches("%#{params[:phone]}%")) if(params[:phone].present?)
-    query = query.joins(contacts: :city).where(City.arel_table[:name].matches("%#{params[:city]}%")) if(params[:city].present?)
-    query = query.joins(contacts: :state).where(State.arel_table[:short_name].matches("%#{params[:state]}%")) if(params[:state].present?)
-    query = query.joins(:status).where(Status.arel_table[:name].matches("%#{params[:status]}%")) if(params[:status].present?)
-    
     @query_params = params.dup
     @query_params.delete(:authenticity_token)
     @query_params.delete(:submit)
     @query_params.select!{|k,v| v.present?}
-    @query_params = @query_params.permit(:first_name, :last_name, :email, :phone, :city, :state, :status)
+    @query_params = @query_params.permit(:interest_operation, :first_name, :last_name, :email, :phone, :city, :state, :status, interests: [])
+    qp = @query_params
     
-    @pagy, @people = pagy(query, limit: 40)
+    query = Person.all
+    query = query.where(Person.arel_table[:first_name].matches("%#{qp[:first_name]}%")) if(qp[:first_name].present?)
+    query = query.where(Person.arel_table[:last_name].matches("%#{qp[:last_name]}%")) if(qp[:last_name].present?)
+    query = query.joins(:contacts).where(Contact.arel_table[:email].matches("%#{qp[:email]}%")) if(qp[:email].present?)
+    query = query.joins(:contacts).where(Contact.arel_table[:phone].matches("%#{qp[:phone]}%")) if(qp[:phone].present?)
+    query = query.joins(contacts: :city).where(City.arel_table[:name].matches("%#{qp[:city]}%")) if(qp[:city].present?)
+    query = query.joins(contacts: :state).where(State.arel_table[:short_name].matches("%#{qp[:state]}%")) if(qp[:state].present?)
+    query = query.joins(:status).where(Status.arel_table[:name].matches("%#{qp[:status]}%")) if(qp[:status].present?)
+
+    if(qp[:interests].present?)
+      query = query.joins(:interests)
+
+      if(qp[:interest_operation] != 'and')
+        query = query.where(interests: {id: qp[:interests]})
+      else
+        # Yucky rendering out all the people, but what else to do?
+        _people = Person.where(id: query.map(&:id).uniq).includes(:interests)
+        _people = _people.select{|p| (qp[:interests].map(&:to_i) - p.interests.map(&:id)).empty?}
+        query = Person.where(id: _people.map(&:id))
+      end
+    end
+   
+    people = Person.where(id: query.map(&:id).uniq).includes(:donations, :memberships, :contacts, :interests, :status)
+    @pagy, @people = pagy(people, limit: 40)
+
   end
 
   # Use callbacks to share common setup or constraints between actions.

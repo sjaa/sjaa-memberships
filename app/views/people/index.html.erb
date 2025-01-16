@@ -16,6 +16,23 @@
         <%= f.text_field :status, placeholder: 'Status', value: @query_params[:status], class: 'form-control', data: { action: "input->search-form#search" } %>
         <%= f.submit 'Search', class: 'btn btn-primary' %>
       </div>
+      <div class="input-group mb-3">
+        <% Interest.all.each do |interest| %>
+          <% label_id = "interest_#{interest.id}" %>
+          <span style="margin-right: 20px;">
+            <%= check_box_tag 'interests[]', interest.id, id: label_id, class: 'form-check-input', checked: @query_params[:interests]&.map(&:to_i)&.include?(interest.id), data: {action: "search-form#search"} %>
+            <%= label_tag label_id, interest.name&.capitalize, class: 'form-check-label' %>
+          </span>
+        <% end %>
+        <span style="margin-right: 20px;">
+          <%= radio_button_tag 'interest_operation', 'and', class: 'form-check-input', checked: @query_params[:interest_operation] == 'and', data: {action: "search-form#search"} %>
+          <%= label_tag 'interest_operation_and', 'And', class: 'form-check-label' %>
+        </span>
+        <span style="margin-right: 20px;">
+          <%= radio_button_tag 'interest_operation', 'or', class: 'form-check-input', checked: @query_params[:interest_operation] != 'and', data: {action: "search-form#search"} %>
+          <%= label_tag 'interest_operation_or', 'Or', class: 'form-check-label' %>
+        </span>
+      </div>
     <% end %>
   </div>
   <div id="people" class="col-12 mt-2">
