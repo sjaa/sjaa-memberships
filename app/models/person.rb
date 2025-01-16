@@ -30,6 +30,11 @@ class Person < ApplicationRecord
     return "#{first_name} #{last_name}"
   end
 
+  # Assumes a 12-month term
+  def active_membership(date: DateTime.now())
+    memberships.where(Membership.arel_table[:start].gt(DateTime.now - 12.months))
+  end
+
   # Take an array of the form [{id: 4}, {name: 'foo'}, ...]
   # and find/create/delete
   def interests_attributes=(attributes)

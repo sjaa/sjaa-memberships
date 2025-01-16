@@ -71,7 +71,7 @@ class PeopleController < ApplicationController
     @query_params.delete(:authenticity_token)
     @query_params.delete(:submit)
     @query_params.select!{|k,v| v.present?}
-    @query_params = @query_params.permit(:interest_operation, :first_name, :last_name, :email, :phone, :city, :state, :status, interests: [])
+    @query_params = @query_params.permit(:interest_operation, :first_name, :last_name, :email, :phone, :city, :state, :ephemeris, :status, interests: [])
     qp = @query_params
     
     query = Person.all
@@ -83,6 +83,7 @@ class PeopleController < ApplicationController
     query = query.joins(contacts: :state).where(State.arel_table[:short_name].matches("%#{qp[:state]}%")) if(qp[:state].present?)
     query = query.joins(:status).where(Status.arel_table[:name].matches("%#{qp[:status]}%")) if(qp[:status].present?)
 
+    # Handle interests specially
     if(qp[:interests].present?)
       query = query.joins(:interests)
 
@@ -96,6 +97,18 @@ class PeopleController < ApplicationController
       end
     end
    
+    # Handle Ephemeris specially
+    if(qp[:ephemeris].present? && qp[:ephemeris] != 'either')
+      _people = Person.where(id: query.map(&:id).uniq).includes(:memberships)
+      if(qp[:ephemeris] == 'printed')
+        _people = _people.select{|p| p.active_membership.first&.ephemeris}
+      else
+        _people = _people.select{|p| !p.active_membership.first&.ephemeris}
+      end
+
+      query = Person.where(id: _people)
+    end
+
     people = Person.where(id: query.map(&:id).uniq).includes(:donations, :memberships, :contacts, :interests, :status)
     @pagy, @people = pagy(people, limit: 40)
 

@@ -14,7 +14,8 @@
         <%= f.text_field :city, placeholder: 'City', value: @query_params[:city], class: 'form-control', data: { action: "input->search-form#search" } %>
         <%= f.text_field :state, placeholder: 'State', value: @query_params[:state], class: 'form-control', data: { action: "input->search-form#search" } %>
         <%= f.text_field :status, placeholder: 'Status', value: @query_params[:status], class: 'form-control', data: { action: "input->search-form#search" } %>
-        <%= f.submit 'Search', class: 'btn btn-primary' %>
+        <%= f.select :ephemeris, options_for_select([ ['PRINTED', 'printed'], ['DIGITAL', 'digital'], ['EITHER', 'either'] ], selected: @query_params[:ephemeris] || 'either'), {}, {class: 'form-control', data: { action: "change->search-form#search" } } %>
+        <%# f.submit 'Search', class: 'btn btn-primary' %>
       </div>
       <div class="input-group mb-3">
         <% Interest.all.each do |interest| %>
