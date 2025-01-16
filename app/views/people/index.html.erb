@@ -5,15 +5,20 @@
   <div class="col-12">
     <%= form_with url: people_search_path, data: {controller: "search-form", search_form_target: "form", turbo_frame: 'people'} do |f| %>
       <div class="input-group mb-3">
-        <%= f.text_field :first_name, placeholder: 'First Name', class: 'form-control', data: { action: "input->search-form#search" } %>
-        <%= f.text_field :last_name, placeholder: 'Last Name', class: 'form-control', data: { action: "input->search-form#search" } %>
-        <%= f.text_field :email, placeholder: 'Email', class: 'form-control', data: { action: "input->search-form#search" } %>
-        <%= f.text_field :phone, placeholder: 'Phone', class: 'form-control', data: { action: "input->search-form#search" } %>
+        <%= f.text_field :first_name, placeholder: 'First Name', value: @query_params[:first_name], class: 'form-control', data: { action: "input->search-form#search" } %>
+        <%= f.text_field :last_name, placeholder: 'Last Name', value: @query_params[:last_name], class: 'form-control', data: { action: "input->search-form#search" } %>
+        <%= f.text_field :email, placeholder: 'Email', value: @query_params[:email], class: 'form-control', data: { action: "input->search-form#search" } %>
+        <%= f.text_field :phone, placeholder: 'Phone', value: @query_params[:phone], class: 'form-control', data: { action: "input->search-form#search" } %>
+      </div>
+      <div class="input-group mb-3">
+        <%= f.text_field :city, placeholder: 'City', value: @query_params[:city], class: 'form-control', data: { action: "input->search-form#search" } %>
+        <%= f.text_field :state, placeholder: 'State', value: @query_params[:state], class: 'form-control', data: { action: "input->search-form#search" } %>
+        <%= f.text_field :status, placeholder: 'Status', value: @query_params[:status], class: 'form-control', data: { action: "input->search-form#search" } %>
         <%= f.submit 'Search', class: 'btn btn-primary' %>
       </div>
     <% end %>
   </div>
-  <div id="people" class="col-12">
+  <div id="people" class="col-12 mt-2">
     <%= render partial: 'index' %>
   </div>
   <%= link_to "New person", new_person_path %>

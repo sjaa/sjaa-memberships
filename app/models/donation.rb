@@ -1,6 +1,6 @@
 class Donation < ApplicationRecord
   belongs_to :person
-  has_many :items, class_name: 'DonationItem'
+  has_many :items, ->{ includes(:equipment) }, class_name: 'DonationItem'
 
   # Value is the sum of all the "items" values
   def value
