@@ -1,10 +1,12 @@
 class DonationsController < ApplicationController
   before_action :set_donation, only: %i[ show edit update destroy ]
 
+  INCLUDES = [:person, items: [:phases, equipment: :instrument]]
+
   # GET /donations or /donations.json
   def index
     @donations = Donation.all
-    @pagy, @donations = pagy(Donation.all.includes(:person, items: [:phases, :equipment]), limit: 40)
+    @pagy, @donations = pagy(Donation.all.includes(INCLUDES), limit: 40)
   end
 
   # GET /donations/1 or /donations/1.json
@@ -61,7 +63,7 @@ class DonationsController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_donation
-      @donation = Donation.find(params[:id])
+      @donation = Donation.includes(INCLUDES).find(params[:id])
     end
 
     # Only allow a list of trusted parameters through.

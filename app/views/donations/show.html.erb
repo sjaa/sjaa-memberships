@@ -6,5 +6,5 @@
   <%= link_to "Edit this donation", edit_donation_path(@donation) %> |
   <%= link_to "Back to donations", donations_path %>
 
-  <%= button_to "Destroy this donation", @donation, method: :delete %>
+  <%= button_to "Delete this donation", @donation, method: :delete, form: { data: {turbo_confirm: 'Are you sure?'} }, class: 'btn btn-danger' %>
 </div>

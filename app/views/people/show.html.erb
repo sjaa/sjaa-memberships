@@ -7,7 +7,9 @@
         <%= @person.status&.name&.upcase %>
       </span>
     </h1>
-    <div class="table-responsive">
+    <%= link_to "Edit this person", edit_person_path(@person), class: 'btn btn-primary d-inline-block' %>
+    <%= link_to "Delete this person", @person, method: :delete, form: {data: {turbo_confirm: 'Are you TOTALLY sure??' }}, class: 'btn btn-danger d-inline-block' %>
+    <div class="table-responsive mt-4">
       <table class="table table-striped table-hover">
         <tr>
           <td><strong>Interests</strong></td>
@@ -94,11 +96,6 @@
     <div class="col-xs-12 col-md-6 table-responsive">
       <h2>Donations</h2>
       <%= render partial: 'donations/index' , locals: {donations: @person.donations} %>
-    </div>
-    <div class="col-12">
-      <%= link_to "Edit this person" , edit_person_path(@person) %> |
-      <%= link_to "Back to people" , people_path %>
-      <%= button_to "Delete this person" , @person, method: :delete, data: {confirm: 'Are you TOTALLY sure??' } %>
     </div>
   </div>
 </div>
