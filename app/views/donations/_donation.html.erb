@@ -28,7 +28,7 @@
             <% donation.items.each do |item| %>
               <tr>
                 <% e = item.equipment %>
-                <td><%= e&.instrument&.name %> - <%= e&.model %></td>
+                <td><%= e&.instrument&.kind %> - <%= e&.instrument&.model %></td>
                 <td><%= dollar_format item.value %></td>
                 <td>
                   <% item.phases.each do |phase| %>

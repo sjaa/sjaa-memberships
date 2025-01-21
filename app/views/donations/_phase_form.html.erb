@@ -1,0 +1,19 @@
+<div class="row bg-light mt-2 pb-2 border-top border-bottom" id="<%=id%>">
+  <div class="col-md-6 mt-2">
+    <%= hidden_field_tag 'donation[items_attributes][][phase_attributes][][id]', phase.id %>
+    <%= label_tag 'donation[items_attributes][][phase_attributes][][name]', 'Phase Name', class: 'form-label' %>
+    <%= text_field_tag 'donation[items_attributes][][phase_attributes][][name]', phase.name, class: 'form-control' %>
+  </div>
+  <div class="col-md-6 mt-2">
+    <%= label_tag 'donation[items_attributes][][phase_attributes][][person_id]', 'Phase Person', class: 'form-label' %>
+    <%= combobox_tag 'donation[items_attributes][][phase_attributes][][person_id]', people_selector, value: phase.person_id %>
+  </div>
+  <div class="col-md-6 mt-2">
+    <%= label_tag 'donation[items_attributes][][phase_attributes][][date]', 'Phase Date', class: 'form-label' %>
+    <%= date_field_tag 'donation[items_attributes][][phase_attributes][][date]', phase.date&.strftime('%Y-%m-%d'), class: 'form-control' %>
+  </div>
+  <div class="col-md-6 mt-2">
+    <%= label_tag '', 'Remove', class: 'form-label' %></br>
+  <button type="button" data-form-id-param="<%=id%>" data-action="form#removeField" class="btn btn-danger">Remove Phase</button>
+  </div>
+</div>

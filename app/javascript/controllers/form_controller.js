@@ -11,11 +11,12 @@ export default class extends Controller {
   addField(event) {
     event.preventDefault()
     var id = event.params.baseid
+    var replaceId = event.params.replaceid || 'NEWID'
     var cloned = this.templateTarget.content.cloneNode(true)
     cloned.childNodes.forEach((node) => {
       if (node.nodeType != Node.TEXT_NODE) {
         if(node.id) node.id = `${id || 'new'}_${this.number}`
-        node.innerHTML = node.innerHTML.replace(/NEWID/g, `${id || 'new'}_${this.number}`)
+        node.innerHTML = node.innerHTML.replace(new RegExp(`${replaceId}`, 'g'), `${id || 'new'}_${this.number}`)
         this.fieldsTarget.appendChild(node)
       }
     })

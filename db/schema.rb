@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_01_15_051911) do
+ActiveRecord::Schema[7.1].define(version: 2025_01_17_153554) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -97,7 +97,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_01_15_051911) do
 
   create_table "equipment", force: :cascade do |t|
     t.integer "instrument_id"
-    t.string "model"
     t.string "note"
     t.integer "person_id"
     t.datetime "created_at", null: false
@@ -122,10 +121,11 @@ ActiveRecord::Schema[7.1].define(version: 2025_01_15_051911) do
   end
 
   create_table "instruments", force: :cascade do |t|
-    t.string "name"
+    t.string "kind"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["name"], name: "index_instruments_on_name"
+    t.string "model"
+    t.index ["kind"], name: "index_instruments_on_kind"
   end
 
   create_table "interests", force: :cascade do |t|

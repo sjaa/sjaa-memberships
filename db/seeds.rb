@@ -32,8 +32,10 @@ admin.permissions += [PERMISSION_HASH['read'], PERMISSION_HASH['write']]
 statuses = %w(member expired contact entity).map{|s| Status.create(name: s)}
 referrals = {'internet' => 'Web search', 'friend' => 'Referred from a friend', 'school' => 'From a class at school'}.map{|name, desc| Referral.create(name: name, description: desc)}
 states = {'CA' => 'California', 'AZ' => 'Arizona', 'IL' => 'Illinois'}.map{|s,n| State.create(name: n, short_name: s)}
-kinds = [nil, 'VB-M', 'LIFETIME', nil, nil]
-instruments = %w(telescope mount camera binocular).map{|i| Instrument.create(name: i)}
+kinds = [nil, MembershipKind.create(name: 'VB-M'), MembershipKind.create(name: 'LIFETIME'), nil, nil]
+instrument_kind = %w(telescope mount camera binocular)
+instrument_model = ['ASI2600MC', 'MEADE LX5000', 'CELESTRON AVX14', 'STELLARVUE 80ST', 'ASKAR 50MM', 'CELESTRON 10x50']
+instruments = instrument_kind.product(instrument_model).map{|kind, model| Instrument.create(kind: kind, model: model)}
 groups = {'SJAA Observers' => Faker::Internet.email, 'SJAA Imagers' => Faker::Internet.email, 'SJAA Board' => Faker::Internet.email}.map{|n,e| Group.create(name: n, email: e, short_name: n.split(' ').map(&:first).join.upcase)}
 phase_names = %w(offered received letter consigned sold)
 
@@ -91,7 +93,7 @@ phase_names = %w(offered received letter consigned sold)
     person.interests = interests.uniq
 
     rand(0..5).times do 
-      person.equipment << Equipment.find_or_create_by(instrument: instruments.sample, model: Faker::Lorem.word, note: Faker::Lorem.sentence)
+      person.equipment << Equipment.find_or_create_by(instrument: instruments.sample, note: Faker::Lorem.sentence)
     end
 
     pgroups = []
@@ -109,7 +111,7 @@ phase_names = %w(offered received letter consigned sold)
       # N Items to donate
       rand(0..4).times do
         di = DonationItem.create(
-          equipment: Equipment.create(instrument: instruments.sample, model: Faker::Lorem.word, note: Faker::Lorem.sentence),
+          equipment: Equipment.create(instrument: instruments.sample, note: Faker::Lorem.sentence),
           value: rand(0..1000),
         )
 

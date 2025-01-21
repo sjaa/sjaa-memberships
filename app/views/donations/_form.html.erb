@@ -1,37 +1,50 @@
+<% people_selector = Person.all.map{|p| {display: p.name, value: p.id}}%>
 <%= form_with(model: donation) do |form| %>
-  <% if donation.errors.any? %>
-    <div style="color: red">
-      <h2><%= pluralize(donation.errors.count, "error") %> prohibited this donation from being saved:</h2>
-
-      <ul>
-        <% donation.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
+  <div class="row">
+    <% if donation.errors.any? %>
+      <div style="color: red">
+        <h2><%= pluralize(donation.errors.count, "error") %> prohibited this donation from being saved:</h2>
+        <ul>
+          <% donation.errors.each do |error| %>
+            <li><%= error.full_message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+    <div class="col-12 mt-2">
+      <%= form.label :note, 'Note', class: 'form-label' %>
+      <%= form.text_area :note, class: 'form-control' %>
     </div>
-  <% end %>
-
-  <div>
-    <%= form.label :date, style: "display: block" %>
-    <%= form.datetime_field :date %>
-  </div>
-
-  <div>
-    <%= form.label :value, style: "display: block" %>
-    <%= form.text_field :value %>
-  </div>
-
-  <div>
-    <%= form.label :note, style: "display: block" %>
-    <%= form.text_field :note %>
-  </div>
-
-  <div>
-    <%= form.label :person_id, style: "display: block" %>
-    <%= form.number_field :person_id %>
-  </div>
-
-  <div>
-    <%= form.submit %>
+    <div class="col-md-6 mt-2">
+      <%= form.label :person_id, 'Person', class: 'form-label' %>
+      <%= form.combobox :person_id, people_selector %>
+      <%= link_to 'New Person', new_person_path, target: :_blank %>
+    </div>
+    <div class="col-md-6 mt-2">
+      <%= form.label :name, 'Identifer', class: 'form-label' %>
+      <div class="input-group">
+        <%= form.text_field :name, class: 'form-control', placeholder: 'Identifier' %>
+        <%= button_tag 'Generate', class: 'btn btn-secondary', type: 'button' %>
+      </div>
+    </div>
+    <!-- Donation Items -->
+    <!-- TODO:  Move Equipment.model into Instrument.model.  Have two form inputs, one for instrument and one for model.  Autocomplete accordingly.  Find or create the unique combination.  Allow new entries. -->
+    <div data-controller="form">
+      <div data-form-target="fields" class="row mt-4">
+        <h2>Items</h2>
+        <% donation.items.each_with_index do |item, i| %>
+          <%= render partial: 'donations/item_form', locals: {id: "item_#{item.id}", item: item, i: i, people_selector: people_selector}%>
+        <% end %>
+        <template data-form-target="template">
+          <%= render partial: 'donations/item_form', locals: {id: "NEWID", item: DonationItem.new, i: nil, people_selector: people_selector}%>
+        </template>
+      </div>
+      <div class="col-12 mt-2">
+        <button type="button" data-form-baseid-param="new_item" data-action="form#addField" class="btn btn-secondary">Add Item</button>
+      </div>
+    </div>
+    <div class="col-12 mt-4">
+      <%= form.submit 'Update Donation', class: 'btn btn-primary' %>
+    </div>
   </div>
 <% end %>

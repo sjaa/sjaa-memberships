@@ -1,0 +1,45 @@
+          
+<div id="<%=id%>" class="row mt-2">
+  <% item_display_name = i ? i+1 : 'New'%>
+  <h3>Item <%= item_display_name%></h3>
+  <div class="col-md-6">
+    <%= hidden_field_tag 'donation[items_attributes][][id]', item&.id %>
+    <%= label_tag 'donation[items_attributes][][value]', 'Dollar Value', class: 'form-label' %>
+    <%= number_field_tag 'donation[items_attributes][][value]', item&.value, class: 'form-control' %>
+  </div>
+  <!-- Equipment -->
+  <div class="col-md-6">
+    <%= hidden_field_tag 'donation[items_attributes][][equipment_attributes][id]', item&.equipment&.id %>
+    <%= label_tag 'donation[items_attributes][][equipment_attributes][note]', 'Note', class: 'form-label' %>
+    <%= text_area_tag 'donation[items_attributes][][equipment_attributes][note]', item&.equipment&.note, class: 'form-control' %>
+  </div>
+  <!-- Instrument -->
+  <% instruments = Instrument.all %>
+  <div class="col-md-6 mt-2">
+    <%= hidden_field_tag 'donation[items_attributes][][equipment_attributes][instrument_attributes][id]', item&.equipment&.instrument&.id %>
+    <%= label_tag 'donation[items_attributes][][equipment_attributes][instrument_attributes][kind]', 'Instrument Type', class: 'form-label' %>
+    <%= combobox_tag 'donation[items_attributes][][equipment_attributes][instrument_attributes][kind]',  instruments.map(&:kind).uniq.map{|i| {display: i&.titleize, value: i}}, name_when_new: "donation[items_attributes][][equipment_attributes][instrument_attributes][kind]", value: item&.equipment&.instrument&.kind %>
+  </div>
+  <div class="col-md-6 mt-2">
+    <%= label_tag 'donation[items_attributes][][equipment_attributes][instrument_attributes][model]', 'Instrument Model', class: 'form-label' %>
+    <%= combobox_tag 'donation[items_attributes][][equipment_attributes][instrument_attributes][model]',  instruments.map(&:model).uniq.map{|i| {display: i&.upcase, value: i}}, name_when_new: "donation[items_attributes][][equipment_attributes][instrument_attributes][model]", value: item&.equipment&.instrument&.model %>
+  </div>
+  <!-- Phases -->
+  <div class="mt-4" data-controller="form">
+    <div data-form-target="fields" class="row mt-4">
+      <h4>Phases</h4>
+      <% item.phases.each do |phase| %>
+        <%= render partial: 'donations/phase_form', locals: {phase: phase, people_selector: people_selector, id: "phase_#{phase.id}"} %>
+      <% end %>
+      <template data-form-target="template">
+        <%= render partial: 'donations/phase_form', locals: {phase: DonationPhase.new, people_selector: people_selector, id: 'NEW_PHASE_ID'} %>
+      </template>
+    </div>
+    <div class="col-12 mt-2">
+      <button type="button" data-form-baseid-param="new_phase" data-form-replaceid-param="NEW_PHASE_ID" data-action="form#addField" class="btn btn-secondary">Add Phase</button>
+    </div>
+    <div class="col-md-6 mt-4">
+      <button type="button" data-form-id-param="<%=id%>" data-action="form#removeField" class="btn btn-danger">Remove Item <%=item_display_name%></button>
+    </div>
+  </div>
+</div>
