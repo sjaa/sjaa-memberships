@@ -1,14 +1,8 @@
-<p style="color: green"><%= notice %></p>
-
-<h1>Equipment</h1>
-
-<div id="equipment">
-  <% @equipment.each do |equipment| %>
-    <%= render equipment %>
-    <p>
-      <%= link_to "Show this equipment", equipment %>
-    </p>
-  <% end %>
+<div class="row">
+  <div class="col-12">
+    <h1>Equipment</h1>
+  </div>
+  <div id="equipment">
+    <%= render partial: 'index' %>
+  </div>
 </div>
-
-<%= link_to "New equipment", new_equipment_path %>

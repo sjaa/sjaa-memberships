@@ -3,7 +3,7 @@ class EquipmentController < ApplicationController
 
   # GET /equipment or /equipment.json
   def index
-    @equipment = Equipment.all
+    @pagy, @equipment = pagy(Equipment.all, limit: 40)
   end
 
   # GET /equipment/1 or /equipment/1.json

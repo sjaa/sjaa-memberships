@@ -1,6 +1,6 @@
 class DonationItem < ApplicationRecord
   belongs_to :donation
-  belongs_to :equipment
+  belongs_to :equipment, ->{ includes(:instrument) }
   has_many :phases, ->{order(date: :asc)}, class_name: 'DonationPhase'
 
   def phase_attributes=(attrs)

@@ -1,10 +1,15 @@
-<p style="color: green"><%= notice %></p>
-
-<%= render @equipment %>
-
-<div>
-  <%= link_to "Edit this equipment", edit_equipment_path(@equipment) %> |
-  <%= link_to "Back to equipment", equipment_index_path %>
-
-  <%= button_to "Destroy this equipment", @equipment, method: :delete %>
+<div class="row">
+  <div class="col-12 mt-2">
+    <h1><%= @equipment&.instrument&.kind&.titleize %> <small><%= @equipment&.instrument&.model%></small></h1>
+  </div>
+  <div class="col-12 mt-2">
+    <p>
+      <strong>Note: </strong> <%= @equipment&.note%>
+    </p>
+  </div>
+  <div class="col-12">
+    <%= link_to "Edit this equipment", edit_equipment_path(@equipment), class: 'btn btn-primary' %>
+    <%= link_to "Back to equipment", equipment_index_path, class: 'btn btn-secondary' %>
+    <%= button_to "Delete this equipment", @equipment, method: :delete, data: {turbo_confirm: 'Are you TOTALLY sure??' }, class: 'btn btn-danger d-inline-block mt-4' %>
+  </div>
 </div>
