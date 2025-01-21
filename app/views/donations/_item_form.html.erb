@@ -5,7 +5,7 @@
   <div class="col-md-6">
     <%= hidden_field_tag 'donation[items_attributes][][id]', item&.id %>
     <%= label_tag 'donation[items_attributes][][value]', 'Dollar Value', class: 'form-label' %>
-    <%= number_field_tag 'donation[items_attributes][][value]', item&.value, class: 'form-control' %>
+    <%= number_field_tag 'donation[items_attributes][][value]', item&.value, class: 'form-control', step: '0.01' %>
   </div>
   <!-- Equipment -->
   <div class="col-md-6">
