@@ -1,45 +1,44 @@
-<div class="row">
-  <div class="col-12">
-    <h2><%= donation.name %></h2>
-  </div>
-  <div class="col-12">
-    <div id="<%= dom_id donation %>">
-      <p>
-        <strong>From:</strong>
-        <%= link_to donation.person.name, donation.person %>
-      </p>
-      <p>
-        <strong>Value:</strong>
-        <%= dollar_format donation.value %>
-      </p>
-      <p>
-        <strong>Note:</strong>
-        <%= donation.note %>
-      </p>
-      <div class="row">
-        <div class="col-12 table-responsive">
-          <h2>Items</h2>
-          <table class="table">
+  
+<div class="col-12 mt-2">
+  <h2><%= donation.name %></h2>
+</div>
+<div class="col-12">
+  <div id="<%= dom_id donation %>">
+    <p>
+      <strong>From:</strong>
+      <%= link_to donation.person.name, donation.person %>
+    </p>
+    <p>
+      <strong>Value:</strong>
+      <%= dollar_format donation.value %>
+    </p>
+    <p>
+      <strong>Note:</strong>
+      <%= donation.note %>
+    </p>
+    <div class="row">
+      <div class="col-12 table-responsive">
+        <h2>Items</h2>
+        <table class="table">
+          <tr>
+            <th>Equipment</th>
+            <th>Value</th>
+            <th>Phases</th>
+          </tr>
+          <% donation.items.each do |item| %>
             <tr>
-              <th>Equipment</th>
-              <th>Value</th>
-              <th>Phases</th>
+              <% e = item.equipment %>
+              <td><%= e&.to_html.html_safe %></td>
+              <td><%= dollar_format item.value %></td>
+              <td>
+                <% item.phases.each do |phase| %>
+                  <strong><%= phase.name.capitalize%></strong> <%= phase.person&.name %> <small><%= date_format phase.date %></small>
+                  <br/>
+                <% end %>
+              </td>
             </tr>
-            <% donation.items.each do |item| %>
-              <tr>
-                <% e = item.equipment %>
-                <td><%= e&.to_html.html_safe %></td>
-                <td><%= dollar_format item.value %></td>
-                <td>
-                  <% item.phases.each do |phase| %>
-                    <strong><%= phase.name.capitalize%></strong> <%= phase.person&.name %> <small><%= date_format phase.date %></small>
-                    <br/>
-                  <% end %>
-                </td>
-              </tr>
-            <% end %>
-          </table>
-        </div>
+          <% end %>
+        </table>
       </div>
     </div>
   </div>
