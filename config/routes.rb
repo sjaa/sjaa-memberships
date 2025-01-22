@@ -1,4 +1,10 @@
 Rails.application.routes.draw do
+
+  post '/people/search', to: 'people#search', as: :people_search
+  get '/people/search', to: 'people#search'
+  post '/donations/search', to: 'donations#search', as: :donations_search
+  get '/donations/search', to: 'donations#search'
+
   resources :donation_phases
   resources :donation_items
   resources :people do
@@ -42,5 +48,5 @@ Rails.application.routes.draw do
   get '/login', to: 'sessions#login', as: :login
   get '/logout', to: 'sessions#destroy', as: :logout
   get '/unauthorized', to: 'static_pages#unauthorized', as: :unauthorized
-  post '/people/search', to: 'people#search', as: :people_search
+
 end

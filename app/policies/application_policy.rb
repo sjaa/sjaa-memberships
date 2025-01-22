@@ -12,6 +12,10 @@ class ApplicationPolicy
     user&.has_permission? :read
   end
 
+  def search?
+    user&.has_permission? :read
+  end
+
   def show?
     user&.has_permission? :read
   end

@@ -1,7 +1,30 @@
-<div class="row">
-  <div class="col-12">
-    <h1>Donations</h1>
-    <%= link_to "New donation", new_donation_path, class: 'btn btn-primary mb-2' %>
+<%= form_with url: donations_search_path, data: {controller: "search-form", search_form_target: "form", turbo_frame: 'donations'} do |f| %>
+  <div class="row">
+    <div class="col-12">
+      <h1>Donations</h1>
+    </div>
+    <div class="col-12">
+      <%= f.combobox :person_id, Person.where(id: DonationPhase.where.not(person_id: nil).select(:person_id).distinct.map(&:person_id)).map{|p| [p.name, p.id]}, placeholder: 'Person', value: @query_params[:person_id], data: { action: "hw-combobox:selection->search-form#search" } %>
+    </div>
+    <div class="col-md-3 col-sm-6 mt-2">
+      <%= f.label :from_date, class: 'form-label pr-4' %>
+      <%= f.date_field :from_date, value: @query_params[:from_date], class: 'form-control', data: { action: "input->search-form#search" } %>
+    </div>
+    <div class="col-md-3 col-sm-6 mt-2">
+      <%= f.label :to_date, class: 'form-label pr-4' %>
+      <%= f.date_field :to_date, value: @query_params[:to_date], class: 'form-control', data: { action: "input->search-form#search" } %>
+    </div>
+    <div class="col-md-3 col-sm-6 mt-2">
+      <%= f.label :from_value, class: 'form-label pr-4' %>
+      <%= f.number_field :from_value, value: @query_params[:from_value], class: 'form-control', step: '0.01', data: { action: "input->search-form#search" } %>
+    </div>
+    <div class="col-md-3 col-sm-6 mt-2">
+      <%= f.label :to_value, class: 'form-label pr-4' %>
+      <%= f.number_field :to_value, value: @query_params[:to_value], class: 'form-control', step: '0.01', data: { action: "input->search-form#search" } %>
+    </div>
+    <div class="col-12 mt-2">
+      <%= link_to "New donation", new_donation_path, class: 'btn btn-primary mb-2' %>
+    </div>
+    <%= render partial: 'index' %>
   </div>
-  <%= render partial: 'index', locals: {donations: @donations} %>
-</div>
+<% end %>

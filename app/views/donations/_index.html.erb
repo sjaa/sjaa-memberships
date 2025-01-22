@@ -1,37 +1,39 @@
-<div class="col-12 mt-2">
-  <%= pagy_bootstrap_nav(@pagy).html_safe %>
-</div>
-<div class="col-12 mt-2">
-  <div id="donations" class="table-responsive">
-    <table class="table table-striped table-hover">
-      <tr>
-        <th>ID</th>
-        <th>Donor</th>
-        <th>Value</th>
-        <th>Items</th>
-      </tr>
-      <% donations.each do |donation| %>
-        <tr>
-          <td><%=link_to donation.name, donation%></td>
-          <td><%=link_to donation.person&.name, donation.person %></td>
-          <td><%= dollar_format donation.value %></td>
-          <td>
-            <% donation.items.each do |di| %>
-              <%= di.equipment&.to_html&.html_safe %> <br/>
-              <% if di.phases.size > 0 %>
-                <ul>
-                  <% di.phases.each do |phase| %>
-                    <li><strong><%= phase.name.capitalize%></strong> <%= phase.person&.name %> <small><%= date_format phase.date %></small></li>
-                  <% end %>
-                </ul>
-              <% end %>
-            <% end %>
-          </td>
-        </tr>
-      <% end %>
-    </table>
+<%= turbo_frame_tag 'donations' do %>
+  <div class="col-12 mt-2">
+    <%= pagy_bootstrap_nav(@pagy).html_safe %>
   </div>
-</div>
-<div class="col-12 mt-2">
-  <%= pagy_bootstrap_nav(@pagy).html_safe %>
-</div>
+  <div class="col-12 mt-2">
+    <div id="donations" class="table-responsive">
+      <table class="table table-striped table-hover">
+        <tr>
+          <th>ID</th>
+          <th>Donor</th>
+          <th>Total Value</th>
+          <th>Items</th>
+        </tr>
+        <% @donations.each do |donation| %>
+          <tr>
+            <td><%=link_to donation.name, donation%></td>
+            <td><%=link_to donation.person&.name, donation.person %></td>
+            <td><%= dollar_format donation.value %></td>
+            <td>
+              <% donation.items.each do |di| %>
+                <strong><%=di.value ? '$' + sprintf('%.2f', di.value) : ''%></strong> <%= di.equipment&.to_html&.html_safe %> <br/>
+                <% if di.phases.size > 0 %>
+                  <ul>
+                    <% di.phases.each do |phase| %>
+                      <li><strong><%= phase.name.capitalize%></strong> <%= phase.person&.name %> <small><%= date_format phase.date %></small></li>
+                    <% end %>
+                  </ul>
+                <% end %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </table>
+    </div>
+  </div>
+  <div class="col-12 mt-2">
+    <%= pagy_bootstrap_nav(@pagy).html_safe %>
+  </div>
+<% end %>
