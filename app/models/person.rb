@@ -1,6 +1,6 @@
 class Person < ApplicationRecord
   has_many :memberships, -> {includes(:kind).order(start: :asc)}
-  has_many :donations, -> {includes(:items)}
+  has_many :donations, -> {includes(DonationsController::INCLUDES)}
   has_many :equipment, -> {includes(:instrument)}
   has_many :contacts, -> {includes(:city, :state)}
   has_and_belongs_to_many :interests

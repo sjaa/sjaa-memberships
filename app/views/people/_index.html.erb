@@ -3,7 +3,7 @@
     <div class="col-12 mt-2">
       <%= button_tag 'Copy Link', class: 'btn btn-secondary d-inline-block', style: 'min-width: 100px; margin-right: 20px;',
           data: {action: 'clipboard#copy', clipboard_text_param: people_url(@query_params)}  %>
-      <%= link_to "New Person", new_person_path, class: 'btn btn-primary d-inline-block' %>
+      <%= link_to "New Person", new_person_path, class: 'btn btn-primary d-inline-block', data: {turbo: false} %>
     </div>
     <div class="col-12 mt-2">
       <%= pagy_bootstrap_nav(@pagy).html_safe %>

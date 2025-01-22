@@ -1,7 +1,7 @@
 <div class="row">
   <div class="col-12">
     <h1>Donations</h1>
-    <%= link_to "New donation", new_donation_path %>
-    <%= render partial: 'index', locals: {donations: @donations} %>
+    <%= link_to "New donation", new_donation_path, class: 'btn btn-primary mb-2' %>
   </div>
+  <%= render partial: 'index', locals: {donations: @donations} %>
 </div>
