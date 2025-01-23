@@ -84,7 +84,7 @@ class DonationsController < ApplicationController
 
     donations = Donation.where(id: query)
 
-    @pagy, @donations = pagy(donations, limit: 40)
+    @pagy, @donations = pagy(donations, limit: 40, params: @query_params.to_h)
   end
 
   # Use callbacks to share common setup or constraints between actions.

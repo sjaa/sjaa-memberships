@@ -25,6 +25,6 @@
     <div class="col-12 mt-2">
       <%= link_to "New donation", new_donation_path, class: 'btn btn-primary mb-2' %>
     </div>
-    <%= render partial: 'index' %>
+    <%= render partial: 'index', locals: {donations: @donations} %>
   </div>
 <% end %>

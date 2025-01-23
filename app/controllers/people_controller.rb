@@ -110,7 +110,7 @@ class PeopleController < ApplicationController
     end
 
     people = Person.where(id: query.map(&:id).uniq).includes(:donations, :memberships, :contacts, :interests, :status)
-    @pagy, @people = pagy(people, limit: 40)
+    @pagy, @people = pagy(people, limit: 40, params: @query_params.to_h)
 
   end
 

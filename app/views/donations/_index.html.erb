@@ -1,7 +1,10 @@
+<% donations ||= @donations %>
 <%= turbo_frame_tag 'donations' do %>
-  <div class="col-12 mt-2">
-    <%= pagy_bootstrap_nav(@pagy).html_safe %>
-  </div>
+  <% if @pagy %>
+    <div class="col-12 mt-2">
+      <%= pagy_bootstrap_nav(@pagy).html_safe %>
+    </div>
+  <% end %>
   <div class="col-12 mt-2">
     <div id="donations" class="table-responsive">
       <table class="table table-striped table-hover">
@@ -11,10 +14,10 @@
           <th>Total Value</th>
           <th>Items</th>
         </tr>
-        <% @donations.each do |donation| %>
+        <% donations.each do |donation| %>
           <tr>
-            <td><%=link_to donation.name, donation%></td>
-            <td><%=link_to donation.person&.name, donation.person %></td>
+            <td><%=link_to donation.name, donation, data: {turbo: false}%></td>
+            <td><%=link_to donation.person&.name, donation.person, data: {turbo: false} %></td>
             <td><%= dollar_format donation.value %></td>
             <td>
               <% donation.items.each do |di| %>
@@ -33,7 +36,9 @@
       </table>
     </div>
   </div>
-  <div class="col-12 mt-2">
-    <%= pagy_bootstrap_nav(@pagy).html_safe %>
-  </div>
+  <% if @pagy %>
+    <div class="col-12 mt-2">
+      <%= pagy_bootstrap_nav(@pagy).html_safe %>
+    </div>
+  <% end %>
 <% end %>
