@@ -16,8 +16,8 @@
             <%= @person.interests.map{|i| i.name}.join(', ') %></td>
         </tr>
         <tr>
-          <td><strong>Groups</strong></td>
-          <td><%= @person.groups.map{|g| link_to(g.name, group_path(g))}.join('
+          <td><strong>Roles</strong></td>
+          <td><%= @person.roles.map{|r| link_to(r.name, role_path(r))}.join('
               , ').html_safe %></td>
         </tr>
         <tr>

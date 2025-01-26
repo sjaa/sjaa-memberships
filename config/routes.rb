@@ -17,12 +17,12 @@ Rails.application.routes.draw do
     resources :contacts
   end
 
+  resources :roles
   resources :permissions
   resources :admins
   resources :referrals
   resources :instruments
   resources :equipment
-  resources :groups
   resources :states
   resources :contacts
   resources :statuses

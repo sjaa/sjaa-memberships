@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_01_17_153554) do
+ActiveRecord::Schema[7.1].define(version: 2025_01_26_042930) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -105,21 +105,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_01_17_153554) do
     t.index ["person_id"], name: "index_equipment_on_person_id"
   end
 
-  create_table "groups", force: :cascade do |t|
-    t.string "name"
-    t.string "short_name"
-    t.string "email"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
-  create_table "groups_people", id: false, force: :cascade do |t|
-    t.integer "person_id", null: false
-    t.integer "group_id", null: false
-    t.index ["group_id", "person_id"], name: "index_groups_people_on_group_id_and_person_id"
-    t.index ["person_id", "group_id"], name: "index_groups_people_on_person_id_and_group_id"
-  end
-
   create_table "instruments", force: :cascade do |t|
     t.string "kind"
     t.datetime "created_at", null: false
@@ -175,6 +160,13 @@ ActiveRecord::Schema[7.1].define(version: 2025_01_17_153554) do
     t.index ["last_name"], name: "index_people_on_last_name"
   end
 
+  create_table "people_roles", id: false, force: :cascade do |t|
+    t.integer "person_id", null: false
+    t.integer "role_id", null: false
+    t.index ["person_id"], name: "index_people_roles_on_person_id"
+    t.index ["role_id"], name: "index_people_roles_on_role_id"
+  end
+
   create_table "permissions", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
@@ -185,6 +177,14 @@ ActiveRecord::Schema[7.1].define(version: 2025_01_17_153554) do
   create_table "referrals", force: :cascade do |t|
     t.string "name"
     t.string "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "roles", force: :cascade do |t|
+    t.string "name"
+    t.string "short_name"
+    t.string "email"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

@@ -4,7 +4,7 @@ class Person < ApplicationRecord
   has_many :equipment, -> {includes(:instrument)}
   has_many :contacts, -> {includes(:city, :state)}
   has_and_belongs_to_many :interests
-  has_and_belongs_to_many :groups
+  has_and_belongs_to_many :roles
   belongs_to :status, optional: true
   belongs_to :astrobin, optional: true
   belongs_to :referral, optional: true

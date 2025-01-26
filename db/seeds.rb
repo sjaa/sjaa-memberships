@@ -36,7 +36,7 @@ kinds = [nil, MembershipKind.create(name: 'VB-M'), MembershipKind.create(name: '
 instrument_kind = %w(telescope mount camera binocular)
 instrument_model = ['ASI2600MC', 'MEADE LX5000', 'CELESTRON AVX14', 'STELLARVUE 80ST', 'ASKAR 50MM', 'CELESTRON 10x50']
 instruments = instrument_kind.product(instrument_model).map{|kind, model| Instrument.create(kind: kind, model: model)}
-groups = {'SJAA Observers' => Faker::Internet.email, 'SJAA Imagers' => Faker::Internet.email, 'SJAA Board' => Faker::Internet.email}.map{|n,e| Group.create(name: n, email: e, short_name: n.split(' ').map(&:first).join.upcase)}
+roles = {'SJAA Observers' => Faker::Internet.email, 'SJAA Imagers' => Faker::Internet.email, 'SJAA Board' => Faker::Internet.email}.map{|n,e| Role.create(name: n, email: e, short_name: n.split(' ').map(&:first).join.upcase)}
 phase_names = %w(offered received letter consigned sold)
 
 # OR use Faker
@@ -96,11 +96,11 @@ phase_names = %w(offered received letter consigned sold)
       person.equipment << Equipment.find_or_create_by(instrument: instruments.sample, note: Faker::Lorem.sentence)
     end
 
-    pgroups = []
+    proles = []
     rand(0..2).times do
-      pgroups << groups.sample
+      proles << roles.sample
     end
-    person.groups << pgroups.uniq
+    person.roles << proles.uniq
 
     rand(0..5).times do
       donation = Donation.create(
