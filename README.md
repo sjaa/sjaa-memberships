@@ -262,3 +262,12 @@ heroku run bash # get a shell
 heroku run rake db:schema:load # setup gives a permission error
 heroku run rake db:seed
 ```
+
+# To Do
+
+* Change "groups" to "roles"
+  * e.g. "Volunteer," "ITSP Volunteer," "Solar Volunteer"
+* Add "skills" to people
+  * e.g. "solar," "outreach," "education"
+* Find all people with "solar" skills
+* Find all volunteers who could fill a "solar" need

@@ -1,8 +1,17 @@
-<div class="row">
-  <div class="col-12">
-    <h1>Equipment</h1>
+<% kinds = Instrument.distinct.pluck(:kind) %>
+<%= form_with url: equipment_search_path, data: {controller: "search-form", search_form_target: "form", turbo_frame: 'equipment'} do |f| %>
+  <div class="row">
+    <div class="col-12">
+      <h1>Equipment</h1>
+    </div>
+    <div class="col-12">
+      <%= f.combobox :person_id, Person.where(id: Equipment.where.not(person_id: nil).select(:person_id).distinct).map{|p| [p.name, p.id]}, placeholder: 'Person', value: @query_params[:person_id], data: { action: "hw-combobox:selection->search-form#search" } %>
+    </div>
+    <div class="col-12">
+      <%= f.combobox :kind_name, kinds.map{|k| [k.titleize, k]}, placeholder: 'Instrument Kind', value: @query_params[:kind_name], data: { action: "hw-combobox:selection->search-form#search" } %>
+    </div>
+    <div id="equipment">
+      <%= render partial: 'index' %>
+    </div>
   </div>
-  <div id="equipment">
-    <%= render partial: 'index' %>
-  </div>
-</div>
+<% end %>
