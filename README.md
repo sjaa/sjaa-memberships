@@ -267,6 +267,7 @@ heroku run rake db:seed
 
 * Change "groups" to "roles"
   * e.g. "Volunteer," "ITSP Volunteer," "Solar Volunteer"
+  * Done
 * Add "skills" to people
   * e.g. "solar," "outreach," "education"
 * Find all people with "solar" skills
