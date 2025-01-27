@@ -1,17 +1,33 @@
 <%= form_with(model: role) do |form| %>
-  <% if role.errors.any? %>
-    <div style="color: red">
-      <h2><%= pluralize(role.errors.count, "error") %> prohibited this role from being saved:</h2>
-
-      <ul>
-        <% role.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
+  <div class="row">
+    <% if role.errors.any? %>
+      <div style="color: red">
+        <h2><%= pluralize(role.errors.count, "error") %> prohibited this role from being saved:</h2>
+        <ul>
+          <% role.errors.each do |error| %>
+            <li><%= error.full_message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+    <div class="col-md-6 col-xs-12 mt-2">
+      <%= form.label :name, class: "form-label" %>
+      <%= form.text_field :name, class: 'form-control' %>
     </div>
-  <% end %>
-
-  <div>
-    <%= form.submit %>
+    <div class="col-md-6 col-xs-12 mt-2">
+      <%= form.label :short_name, class: "form-label" %>
+      <%= form.text_field :short_name, class: 'form-control' %>
+    </div>
+    <div class="col-md-6 col-xs-12 mt-2">
+      <%= form.label :discord_id, class: "form-label" %>
+      <%= form.text_field :discord_id, class: 'form-control' %>
+    </div>
+    <div class="col-md-6 col-xs-12 mt-2">
+      <%= form.label :email, class: "form-label" %>
+      <%= form.text_field :email, class: 'form-control' %>
+    </div>
+    <div class="col-12 mt-2">
+      <%= form.submit class: 'btn btn-primary' %>
+    </div>
   </div>
 <% end %>

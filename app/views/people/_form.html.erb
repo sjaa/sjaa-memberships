@@ -76,6 +76,25 @@
     </div>
   </div>
 
+  <!-- Roles -->
+  <div data-controller="form">
+    <div data-form-target="fields" class="row mt-4">
+      <h2>Roles</h2>
+      <% person.roles.each_with_index do |role, i| %>
+        <%= render partial: 'role_form', locals: {id: "role_#{role.id}", role: role, i: i, person: person} %>
+      <% end %>
+      <template data-form-target="template">
+        <%= render partial: 'role_form', locals: {id: "NEWID", role: Role.new } %>
+      </template>
+    </div>
+    <div class="row">
+      <div class="col-12 mt-2">
+        <button type="button" data-form-baseid-param="new_role" data-action="form#addField" class="btn btn-secondary">Add Role</button>
+      </div>
+    </div>
+  </div>
+
+
   <!-- Contacts -->
   <div data-controller="form">
     <div data-form-target="fields" class="row mt-4">

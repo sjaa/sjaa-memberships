@@ -1,2 +1,14 @@
-<div id="<%= dom_id role %>">
+<div class="row" id="<%= dom_id role %>">
+  <div class="col-12 table-responsive">
+    <h1><%= role&.name %> <small>(<%=role&.short_name%>)</small></h1>
+    <%= render partial: 'layouts/object_table', locals: {obj: role} %>
+    <h2>People</h2>
+    <table class="table table-striped">
+    <% role.people.each do |person| %>
+      <tr>
+        <td><%= link_to person&.name, person_path(person) %></td>
+      </tr>
+    <% end %>
+    </table>
+  </div>
 </div>

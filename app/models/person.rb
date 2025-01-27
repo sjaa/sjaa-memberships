@@ -53,6 +53,13 @@ class Person < ApplicationRecord
     self.interests = _interests
   end
 
+  # Take an array of the form [{id: 4}, ...]
+  # and find/create/delete
+  def roles_attributes=(attributes)
+    _roles = Role.where(id: attributes.map{|h| h[:id]}).uniq
+    self.roles = _roles
+  end
+
   def astrobin_attributes=(attributes)
     _astrobin = nil
     if(attributes[:id].blank?)

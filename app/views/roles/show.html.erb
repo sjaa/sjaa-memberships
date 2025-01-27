@@ -1,6 +1,6 @@
 <p style="color: green"><%= notice %></p>
 
-<%= render @role %>
+<%= render partial: 'role', locals: {role: @role, show_people: true} %>
 
 <div>
   <%= link_to "Edit this role", edit_role_path(@role) %> |
