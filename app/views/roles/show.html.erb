@@ -1,10 +1,7 @@
-<p style="color: green"><%= notice %></p>
-
 <%= render partial: 'role', locals: {role: @role, show_people: true} %>
 
 <div>
-  <%= link_to "Edit this role", edit_role_path(@role) %> |
-  <%= link_to "Back to roles", roles_path %>
-
-  <%= button_to "Destroy this role", @role, method: :delete %>
+  <%= link_to "Edit this role", edit_role_path(@role), class: 'btn btn-primary' %>
+  <%= link_to "Back to roles", roles_path, class: 'btn btn-secondary' %>
+  <%= link_to "Destroy this role", @role, method: :delete, class: 'btn btn-danger', data: {turbo_confirm: 'Are you sure?'} %>
 </div>

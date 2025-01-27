@@ -6,6 +6,7 @@ Rails.application.routes.draw do
   get '/donations/search', to: 'donations#search'
   post '/equipment/search', to: 'equipment#search', as: :equipment_search
   get '/equipment/search', to: 'equipment#search'
+  post '/roles/add_person', to: 'roles#add_person', as: :roles_add_person
 
   resources :donation_phases
   resources :donation_items

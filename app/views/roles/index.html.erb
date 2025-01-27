@@ -13,7 +13,7 @@
         <% @roles.each do |role| %>
           <tr>
             <td>
-              <%= link_to "#{role.name} (#{role.short_name})" %>
+              <%= link_to "#{role.name} (#{role.short_name})", role %>
             </td>
             <td>
               <% count = role.people.count %>

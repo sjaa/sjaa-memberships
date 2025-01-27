@@ -24,6 +24,10 @@ class ApplicationPolicy
     user&.has_permission? :write
   end
 
+  def add_person?
+    user&.has_permission? :write
+  end
+
   def new?
     user&.has_permission? :write
   end
