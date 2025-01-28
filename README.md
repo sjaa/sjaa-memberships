@@ -271,5 +271,6 @@ heroku pg:reset # to drop the database
   * Done
 * Add "skills" to people
   * e.g. "solar," "outreach," "education"
+  * Nah, make these interests instead
 * Find all people with "solar" skills
 * Find all volunteers who could fill a "solar" need

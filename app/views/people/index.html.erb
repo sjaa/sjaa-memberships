@@ -2,40 +2,56 @@
   <div class="col-12">
     <h1>People</h1>
   </div>
-  <div class="col-12">
-    <%= form_with url: people_search_path, data: {controller: "search-form", search_form_target: "form", turbo_frame: 'people'} do |f| %>
-      <div class="input-group mb-3">
-        <%= f.text_field :first_name, placeholder: 'First Name', value: @query_params[:first_name], class: 'form-control', data: { action: "input->search-form#search" } %>
-        <%= f.text_field :last_name, placeholder: 'Last Name', value: @query_params[:last_name], class: 'form-control', data: { action: "input->search-form#search" } %>
-        <%= f.text_field :email, placeholder: 'Email', value: @query_params[:email], class: 'form-control', data: { action: "input->search-form#search" } %>
-        <%= f.text_field :phone, placeholder: 'Phone', value: @query_params[:phone], class: 'form-control', data: { action: "input->search-form#search" } %>
+  <%= form_with url: people_search_path, data: {controller: "search-form", search_form_target: "form", turbo_frame: 'people'} do |f| %>
+    <div class="row">
+      <div class="col-xs-12 mb-3">
+        <div class="input-group">
+          <%= f.text_field :first_name, placeholder: 'First Name', value: @query_params[:first_name], class: 'form-control', data: { action: "input->search-form#search" } %>
+          <%= f.text_field :last_name, placeholder: 'Last Name', value: @query_params[:last_name], class: 'form-control', data: { action: "input->search-form#search" } %>
+        </div>
       </div>
-      <div class="input-group mb-3">
-        <%= f.text_field :city, placeholder: 'City', value: @query_params[:city], class: 'form-control', data: { action: "input->search-form#search" } %>
-        <%= f.text_field :state, placeholder: 'State', value: @query_params[:state], class: 'form-control', data: { action: "input->search-form#search" } %>
+      <div class="col-md-6 col-xs-12 mb-3">
+        <div class="input-group">
+          <%= f.text_field :email, placeholder: 'Email', value: @query_params[:email], class: 'form-control', data: { action: "input->search-form#search" } %>
+          <%= f.text_field :phone, placeholder: 'Phone', value: @query_params[:phone], class: 'form-control', data: { action: "input->search-form#search" } %>
+        </div>
+      </div>
+      <div class="col-md-6 col-xs-12 mb-3">
+        <div class="input-group">
+          <%= f.text_field :city, placeholder: 'City', value: @query_params[:city], class: 'form-control', data: { action: "input->search-form#search" } %>
+          <%= f.text_field :state, placeholder: 'State', value: @query_params[:state], class: 'form-control', data: { action: "input->search-form#search" } %>
+        </div>
+      </div>
+      <div class="col-md-3 col-xs-12 mb-3">
+        <%= f.label :status, class: 'form-label' %>
         <%= f.text_field :status, placeholder: 'Status', value: @query_params[:status], class: 'form-control', data: { action: "input->search-form#search" } %>
+      </div>
+      <div class="col-md-3 col-xs-12 mb-3">
+        <%= f.label :ephemeris, 'Ephemeris Subscription', class: 'form-label' %>
         <%= f.select :ephemeris, options_for_select([ ['PRINTED', 'printed'], ['DIGITAL', 'digital'], ['EITHER', 'either'] ], selected: @query_params[:ephemeris] || 'either'), {}, {class: 'form-control', data: { action: "change->search-form#search" } } %>
-        <%# f.submit 'Search', class: 'btn btn-primary' %>
       </div>
-      <div class="input-group mb-3">
-        <% Interest.all.each do |interest| %>
-          <% label_id = "interest_#{interest.id}" %>
+      <div class="col-12 mb-3">
+        <%= f.label 'Interests', class: 'form-label' %>
+        <div class="input-group">
+          <% Interest.all.each do |interest| %>
+            <% label_id = "interest_#{interest.id}" %>
+            <span style="margin-right: 20px;">
+              <%= check_box_tag 'interests[]', interest.id, id: label_id, class: 'form-check-input', checked: @query_params[:interests]&.map(&:to_i)&.include?(interest.id), data: {action: "search-form#search"} %>
+              <%= label_tag label_id, interest.name&.capitalize, class: 'form-check-label' %>
+            </span>
+          <% end %>
           <span style="margin-right: 20px;">
-            <%= check_box_tag 'interests[]', interest.id, id: label_id, class: 'form-check-input', checked: @query_params[:interests]&.map(&:to_i)&.include?(interest.id), data: {action: "search-form#search"} %>
-            <%= label_tag label_id, interest.name&.capitalize, class: 'form-check-label' %>
+            <%= radio_button_tag 'interest_operation', 'and', class: 'form-check-input', checked: @query_params[:interest_operation] == 'and', data: {action: "search-form#search"} %>
+            <%= label_tag 'interest_operation_and', 'And', class: 'form-check-label' %>
           </span>
-        <% end %>
-        <span style="margin-right: 20px;">
-          <%= radio_button_tag 'interest_operation', 'and', class: 'form-check-input', checked: @query_params[:interest_operation] == 'and', data: {action: "search-form#search"} %>
-          <%= label_tag 'interest_operation_and', 'And', class: 'form-check-label' %>
-        </span>
-        <span style="margin-right: 20px;">
-          <%= radio_button_tag 'interest_operation', 'or', class: 'form-check-input', checked: @query_params[:interest_operation] != 'and', data: {action: "search-form#search"} %>
-          <%= label_tag 'interest_operation_or', 'Or', class: 'form-check-label' %>
-        </span>
+          <span style="margin-right: 20px;">
+            <%= radio_button_tag 'interest_operation', 'or', class: 'form-check-input', checked: @query_params[:interest_operation] != 'and', data: {action: "search-form#search"} %>
+            <%= label_tag 'interest_operation_or', 'Or', class: 'form-check-label' %>
+          </span>
+        </div>
       </div>
-    <% end %>
-  </div>
+    </div>
+  <% end %>
   <div id="people" class="col-12 mt-2">
     <%= render partial: 'index' %>
   </div>
