@@ -22,7 +22,8 @@
         <th>Status</th>
         <th>Ephemeris</th>
         <th>Interests</th>
-        <th>Donations</th>
+        <th>Roles</th>
+        <!--<th>Donations</th>-->
       </tr>
       <tbody class="table-group-divider">
         <% @people.each do |person| %>
@@ -32,10 +33,11 @@
             <td><%=person.contacts.map(&:phone).join('<br/>').html_safe%></td>
             <td><%=person.contacts.map{|con| con.city&.name}.join('<br/>').html_safe%></td>
             <td><%=person.contacts.map{|con| con.state&.short_name}.join('<br/>').html_safe%></td>
-            <td><%=person.status&.name%></td>
+            <td><%=person.status&.name&.upcase%></td>
             <td><%=person.memberships.last&.ephemeris ? 'PRINT' : ''%></td>
-            <td><%=person.interests.map(&:name).join(', ')%></td>
-            <td><%=person.donations.map{|d| dollar_format(d.value)}.join(', ')%></td>
+            <td><%=person.interests.map{|i| i.name&.titleize}.join(', ')%></td>
+            <td><%=person.roles.map(&:name).join(', ')%></td>
+            <!--<td><%=person.donations.map{|d| dollar_format(d.value)}.join(', ')%></td>-->
           </tr>
         <% end %>
       </tbody>

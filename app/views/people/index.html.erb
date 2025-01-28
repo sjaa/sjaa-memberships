@@ -22,6 +22,62 @@
           <%= f.text_field :state, placeholder: 'State', value: @query_params[:state], class: 'form-control', data: { action: "input->search-form#search" } %>
         </div>
       </div>
+
+      <!-- Interests -->
+      <div class="col-md-6 col-xs-12 mb-2" data-controller="form">
+        <div class="row">
+          <div class="col-12">
+            <%= label_tag 'interests', 'Interests', class: 'form-label' %>
+            <div data-form-target="fields mt-2 mb-2">
+            </div>
+            <template data-form-target="template">
+              <span id="NEWID" class="d-inline-block mt-2" style="margin-right: 0.5em;">
+                <%= hidden_field_tag 'interests[]', 'REPLACEVALUE' %>
+                <a data-form-id-param="NEWID" data-action="search-form#search form#removeField" class="btn btn-secondary">REPLACENAME</a>
+              </span>
+            </template>
+          </div>
+          <div class="col-12 mt-2">
+            <%= combobox_tag "interests[]", Interest.all.map{|r| {display: r.name.titleize, value: r.id}}, placeholder: 'Select interests', data: { form_baseid_param: 'interest', form_target: 'source', action: "hw-combobox:selection->search-form#search hw-combobox:selection->form#addField" } %>
+            <span style="margin-right: 20px;">
+              <%= radio_button_tag 'interest_operation', 'and', class: 'form-check-input', checked: @query_params[:interest_operation] == 'and', data: {action: "search-form#search"} %>
+              <%= label_tag 'interest_operation_and', 'And', class: 'form-check-label' %>
+            </span>
+            <span style="margin-right: 20px;">
+              <%= radio_button_tag 'interest_operation', 'or', class: 'form-check-input', checked: @query_params[:interest_operation] != 'and', data: {action: "search-form#search"} %>
+              <%= label_tag 'interest_operation_or', 'Or', class: 'form-check-label' %>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Roles -->
+      <div class="col-md-6 col-xs-12 mb-2" data-controller="form">
+        <div class="row">
+          <div class="col-12">
+            <%= label_tag 'Roles', 'Roles', class: 'form-label' %>
+            <div data-form-target="fields mt-2 mb-2">
+            </div>
+            <template data-form-target="template">
+              <span id="NEWID" class="d-inline-block mt-2" style="margin-right: 0.5em;">
+                <%= hidden_field_tag 'roles[]', 'REPLACEVALUE' %>
+                <a data-form-id-param="NEWID" data-action="search-form#search form#removeField" class="btn btn-secondary">REPLACENAME</a>
+              </span>
+            </template>
+          </div>
+          <div class="col-12 mt-2">
+            <%= combobox_tag "roles[]", Role.all.map{|r| {display: r.name, value: r.id}}, placeholder: 'Select Roles', data: { form_baseid_param: 'role', form_target: 'source', action: "hw-combobox:selection->search-form#search hw-combobox:selection->form#addField" } %>
+            <span style="margin-right: 20px;">
+              <%= radio_button_tag 'role_operation', 'and', class: 'form-check-input', checked: @query_params[:role_operation] == 'and', data: {action: "search-form#search"} %>
+              <%= label_tag 'role_operation_and', 'And', class: 'form-check-label' %>
+            </span>
+            <span style="margin-right: 20px;">
+              <%= radio_button_tag 'role_operation', 'or', class: 'form-check-input', checked: @query_params[:role_operation] != 'and', data: {action: "search-form#search"} %>
+              <%= label_tag 'role_operation_or', 'Or', class: 'form-check-label' %>
+            </span>
+          </div>
+        </div>
+      </div>
       <div class="col-md-3 col-xs-12 mb-3">
         <%= f.label :status, class: 'form-label' %>
         <%= f.text_field :status, placeholder: 'Status', value: @query_params[:status], class: 'form-control', data: { action: "input->search-form#search" } %>
@@ -29,44 +85,6 @@
       <div class="col-md-3 col-xs-12 mb-3">
         <%= f.label :ephemeris, 'Ephemeris Subscription', class: 'form-label' %>
         <%= f.select :ephemeris, options_for_select([ ['PRINTED', 'printed'], ['DIGITAL', 'digital'], ['EITHER', 'either'] ], selected: @query_params[:ephemeris] || 'either'), {}, {class: 'form-control', data: { action: "change->search-form#search" } } %>
-      </div>
-      <div class="col-12 mb-3">
-        <%= f.label 'Interests', class: 'form-label' %>
-        <div class="input-group">
-          <% Interest.all.each do |interest| %>
-            <% label_id = "interest_#{interest.id}" %>
-            <span style="margin-right: 20px;">
-              <%= check_box_tag 'interests[]', interest.id, id: label_id, class: 'form-check-input', checked: @query_params[:interests]&.map(&:to_i)&.include?(interest.id), data: {action: "search-form#search"} %>
-              <%= label_tag label_id, interest.name&.capitalize, class: 'form-check-label' %>
-            </span>
-          <% end %>
-          <span style="margin-right: 20px;">
-            <%= radio_button_tag 'interest_operation', 'and', class: 'form-check-input', checked: @query_params[:interest_operation] == 'and', data: {action: "search-form#search"} %>
-            <%= label_tag 'interest_operation_and', 'And', class: 'form-check-label' %>
-          </span>
-          <span style="margin-right: 20px;">
-            <%= radio_button_tag 'interest_operation', 'or', class: 'form-check-input', checked: @query_params[:interest_operation] != 'and', data: {action: "search-form#search"} %>
-            <%= label_tag 'interest_operation_or', 'Or', class: 'form-check-label' %>
-          </span>
-        </div>
-      </div>
-      <!-- Roles -->
-      <div class="col-12 mb-3" data-controller="form">
-        <div class="row">
-          <div class="col-12">
-            <div data-form-target="fields mt-2 mb-2">
-            </div>
-            <template data-form-target="template">
-              <span id="NEWID">
-                <%= hidden_field_tag 'roles[]', 'REPLACEVALUE' %>
-                <a data-form-id-param="NEWID" data-action="form#removeField" class="btn btn-secondary">REPLACENAME</a>
-              </span>
-            </template>
-          </div>
-          <div class="col-12 mt-2">
-            <%= combobox_tag "person[roles][]", Role.all.map{|r| {display: r.name, value: r.id}}, data: { form_baseid_param: 'role', form_target: 'source', action: "hw-combobox:selection->form#addField" } %>
-          </div>
-        </div>
       </div>
     </div>
   <% end %>

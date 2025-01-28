@@ -71,7 +71,9 @@ class PeopleController < ApplicationController
     @query_params.delete(:authenticity_token)
     @query_params.delete(:submit)
     @query_params.select!{|k,v| v.present?}
-    @query_params = @query_params.permit(:interest_operation, :first_name, :last_name, :email, :phone, :city, :state, :ephemeris, :status, interests: [])
+    @query_params = @query_params.permit(
+      :role_operation, :interest_operation, :first_name, :last_name, :email, :phone, :city, :state, :ephemeris, :status, interests: [], roles: []
+    )
     qp = @query_params
     
     query = Person.all
@@ -82,21 +84,11 @@ class PeopleController < ApplicationController
     query = query.joins(contacts: :city).where(City.arel_table[:name].matches("%#{qp[:city]}%")) if(qp[:city].present?)
     query = query.joins(contacts: :state).where(State.arel_table[:short_name].matches("%#{qp[:state]}%")) if(qp[:state].present?)
     query = query.joins(:status).where(Status.arel_table[:name].matches("%#{qp[:status]}%")) if(qp[:status].present?)
-
-    # Handle interests specially
-    if(qp[:interests].present?)
-      query = query.joins(:interests)
-
-      if(qp[:interest_operation] != 'and')
-        query = query.where(interests: {id: qp[:interests]})
-      else
-        # Yucky rendering out all the people, but what else to do?
-        _people = Person.where(id: query.map(&:id).uniq).includes(:interests)
-        _people = _people.select{|p| (qp[:interests].map(&:to_i) - p.interests.map(&:id)).empty?}
-        query = Person.where(id: _people.map(&:id))
-      end
-    end
-   
+    
+    # Handle interests and roles specially
+    query = and_or_helper(query, qp[:interest_operation], :interests, qp[:interests]) if(qp[:interests].present?)
+    query = and_or_helper(query, qp[:role_operation], :roles, qp[:roles]) if(qp[:roles].present?)
+    
     # Handle Ephemeris specially
     if(qp[:ephemeris].present? && qp[:ephemeris] != 'either')
       _people = Person.where(id: query.map(&:id).uniq).includes(:memberships)
@@ -105,15 +97,15 @@ class PeopleController < ApplicationController
       else
         _people = _people.select{|p| !p.active_membership.first&.ephemeris}
       end
-
+      
       query = Person.where(id: _people)
     end
-
-    people = Person.where(id: query.map(&:id).uniq).includes(:donations, :memberships, :contacts, :interests, :status)
+    
+    people = Person.where(id: query.map(&:id).uniq).includes(:donations, :memberships, :contacts, :interests, :status, :roles)
     @pagy, @people = pagy(people, limit: 40, params: @query_params.to_h)
-
+    
   end
-
+  
   # Use callbacks to share common setup or constraints between actions.
   def set_person
     @person = Person.find(params[:id])
@@ -128,5 +120,22 @@ class PeopleController < ApplicationController
     contact_attributes: [:address, :zipcode, :phone, :state_id, :city_id, :city_name, :email, :primary, :person_id, :id], 
     membership_attributes: [:start, :kind, :kind_id, :term_months, :new, :ephemeris, :id, :person_id],
     astrobin_attributes: [:username, :latest_image, :id])
+  end
+  
+  def and_or_helper(query, operation, field, list)
+    list.select!{|l| l.present?}
+    return query if(list.empty?)
+    query = query.joins(field)
+    
+    if(operation != 'and')
+      query = query.where(field => {id: list})
+    else
+      # Yucky rendering out all the people, but what else to do?
+      _people = Person.where(id: query.map(&:id).uniq).includes(field)
+      _people = _people.select{|p| (list.map(&:to_i) - p.association(field).reader.map(&:id)).empty?}
+      query = Person.where(id: _people.map(&:id))
+    end
+    
+    return query
   end
 end
