@@ -50,6 +50,24 @@
           </span>
         </div>
       </div>
+      <!-- Roles -->
+      <div class="col-12 mb-3" data-controller="form">
+        <div class="row">
+          <div class="col-12">
+            <div data-form-target="fields mt-2 mb-2">
+            </div>
+            <template data-form-target="template">
+              <span id="NEWID">
+                <%= hidden_field_tag 'roles[]', 'REPLACEVALUE' %>
+                <a data-form-id-param="NEWID" data-action="form#removeField" class="btn btn-secondary">REPLACENAME</a>
+              </span>
+            </template>
+          </div>
+          <div class="col-12 mt-2">
+            <%= combobox_tag "person[roles][]", Role.all.map{|r| {display: r.name, value: r.id}}, data: { form_baseid_param: 'role', form_target: 'source', action: "hw-combobox:selection->form#addField" } %>
+          </div>
+        </div>
+      </div>
     </div>
   <% end %>
   <div id="people" class="col-12 mt-2">
