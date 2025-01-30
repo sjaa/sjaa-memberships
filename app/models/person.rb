@@ -5,6 +5,8 @@ class Person < ApplicationRecord
   has_many :contacts, -> {includes(:city, :state)}
   has_and_belongs_to_many :interests
   has_and_belongs_to_many :roles
+  has_many :api_keys, as: :bearer
+  has_secure_password
   belongs_to :status, optional: true
   belongs_to :astrobin, optional: true
   belongs_to :referral, optional: true
@@ -28,6 +30,16 @@ class Person < ApplicationRecord
 
   def name
     return "#{first_name} #{last_name}"
+  end
+
+  # Right now, normal members have no permissions, but they can access their own records
+  # through the policy
+  def has_permission?(p)
+    false
+  end
+
+  def self.find_by_email(email)
+    Contact.find_by(email: email)&.person
   end
 
   # Assumes a 12-month term

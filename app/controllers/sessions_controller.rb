@@ -5,10 +5,17 @@ class SessionsController < ApplicationController
   def login
   end
 
+  def forgot_password
+  end
+
+  def member_login
+  end
+
   # Form handling from login
   def create
     # Lookup admin by email
     admin = Admin.find_by email: login_params[:email]
+    person = Person.find_by_email login_params[:email]
 
     # Try to authenticate
     if(admin&.authenticate(login_params[:password]))
@@ -16,6 +23,10 @@ class SessionsController < ApplicationController
       session[:admin_id] = admin.id
       flash[:success] = 'Successful login!'
       redirect_to root_path
+    elsif(person&.authenticate(login_params[:password]))
+      session[:person_id] = person.id
+      flash[:success] = 'Successful login!'
+      redirect_to person_path(person)
     else
       # If authentication fails, redirect to login with an error
       flash[:alert] = 'Login failed.'

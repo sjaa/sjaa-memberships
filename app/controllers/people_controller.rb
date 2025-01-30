@@ -44,7 +44,13 @@ class PeopleController < ApplicationController
   # PATCH/PUT /people/1 or /people/1.json
   def update
     respond_to do |format|
-      if @person.update(person_params) && !@person.errors.any?
+      begin
+        update_success = @person.update(person_params)
+      rescue
+        update_success = false
+      end
+
+      if update_success && !@person.errors.any?
         format.html { redirect_to @person, notice: "Person was successfully updated." }
         format.json { render :show, status: :ok, location: @person }
       else
@@ -137,5 +143,16 @@ class PeopleController < ApplicationController
     end
     
     return query
+  end
+
+  def policy_handling
+    begin
+      set_person
+      puts("Authorizing #{@person.inspect}")
+      authorize @person, policy_class: PersonPolicy
+    rescue => e
+      puts("Person not set! #{e.message}")
+      authorize self.class, policy_class: PersonPolicy
+    end
   end
 end

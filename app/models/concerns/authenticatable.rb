@@ -27,8 +27,9 @@ module Authenticatable
   # Use this for optional API key authentication
   def authenticate
     admin = Admin.find_by id: session[:admin_id]
+    person = Person.find_by id: session[:person_id]
     @current_bearer = authenticate_with_http_token &method(:authenticator)
-    @current_user = admin || @current_bearer
+    @current_user = admin || person || @current_bearer
 
     return @current_user
   end

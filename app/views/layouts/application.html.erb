@@ -20,35 +20,37 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <% if @user %>
-              <li class="nav-item">
-                <%= link_to 'People', people_path, class: 'nav-link' %>
-              </li>
-              <li class="nav-item">
-                <%= link_to 'Roles', roles_path, class: 'nav-link' %>
-              </li>
-              <li class="nav-item">
-                <%= link_to 'Donations', donations_path, class: 'nav-link' %>
-              </li>
-              <li class="nav-item">
-                <%= link_to 'Equipment', equipment_index_path, class: 'nav-link' %>
-              </li>
-              <% if @user.has_permission? :permit %>
+              <% if @user.is_a?(Admin) %>
                 <li class="nav-item">
-                  <a class="nav-link" href="#">Permissions</a>
+                  <%= link_to 'People', people_path, class: 'nav-link' %>
+                </li>
+                <li class="nav-item">
+                  <%= link_to 'Roles', roles_path, class: 'nav-link' %>
+                </li>
+                <li class="nav-item">
+                  <%= link_to 'Donations', donations_path, class: 'nav-link' %>
+                </li>
+                <li class="nav-item">
+                  <%= link_to 'Equipment', equipment_index_path, class: 'nav-link' %>
+                </li>
+                <% if @user.has_permission? :permit %>
+                  <li class="nav-item">
+                    <a class="nav-link" href="#">Permissions</a>
+                  </li>
+                <% end %>
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Reports
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#">Lapsed Members</a></li>
+                    <li><a class="dropdown-item" href="#">YTD Donations</a></li>
+                    <li><a class="dropdown-item" href="#">Ephemeris List</a></li>
+                  </ul>
                 </li>
               <% end %>
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  Reports
-                </a>
-                <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="#">Lapsed Members</a></li>
-                  <li><a class="dropdown-item" href="#">YTD Donations</a></li>
-                  <li><a class="dropdown-item" href="#">Ephemeris List</a></li>
-                </ul>
-              </li>
               <li class="nav-item">
-                <%= link_to "Logout (#{@user.email})", logout_path, class: 'nav-link', data: { confirm: 'Log out?' } %>
+                <%= link_to "Logout (#{@user.is_a?(Person) ? @user.name : @user.email})", logout_path, class: 'nav-link', data: { confirm: 'Log out?' } %>
               </li>
             <% else %>
               <li class="nav-item">

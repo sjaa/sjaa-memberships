@@ -264,7 +264,7 @@ heroku run rake db:seed
 heroku pg:reset # to drop the database
 ```
 
-# To Do
+## To Do
 
 * Change "groups" to "roles"
   * e.g. "Volunteer," "ITSP Volunteer," "Solar Volunteer"
@@ -274,3 +274,168 @@ heroku pg:reset # to drop the database
   * Nah, make these interests instead
 * Find all people with "solar" skills
 * Find all volunteers who could fill a "solar" need
+
+## Mail
+Setting up mail in a Rails application is straightforward, but it does involve a few steps. Here's a step-by-step guide to get you started:
+
+1. **Install the `mail` gem**: Rails comes with Action Mailer, but you'll want to make sure the `mail` gem is included in your `Gemfile`.
+    ```ruby
+    gem 'mail'
+    ```
+
+2. **Set up the Mailer**: Generate a mailer using the Rails generator.
+    ```sh
+    rails generate mailer UserMailer
+    ```
+    This will create a mailer file (`app/mailers/user_mailer.rb`) and corresponding views for your mail templates.
+
+3. **Configure your mail settings**: In your environment configuration file (e.g., `config/environments/development.rb`), set up your mailer configuration. For example, if you're using Gmail, it might look like this:
+    ```ruby
+    config.action_mailer.delivery_method = :smtp
+    config.action_mailer.smtp_settings = {
+      address:              'smtp.gmail.com',
+      port:                 587,
+      domain:               'yourdomain.com',
+      user_name:            '<your_email>@gmail.com',
+      password:             '<your_email_password>',
+      authentication:       'plain',
+      enable_starttls_auto: true
+    }
+    ```
+
+4. **Define your mailer methods**: In `app/mailers/user_mailer.rb`, define the methods to send emails. For example:
+    ```ruby
+    class UserMailer < ApplicationMailer
+      default from: 'notifications@example.com'
+
+      def welcome_email(user)
+        @user = user
+        @url  = 'http://example.com/login'
+        mail(to: @user.email, subject: 'Welcome to My Awesome Site')
+      end
+    end
+    ```
+
+5. **Create email views**: In `app/views/user_mailer`, create the HTML and text templates for your emails. For example, `welcome_email.html.erb` and `welcome_email.text.erb`.
+
+6. **Send the email**: Call the mailer method from your controller or background job. For example:
+    ```ruby
+    UserMailer.welcome_email(@user).deliver_now
+    ```
+
+Here's an example of how it all fits together:
+
+```ruby
+# app/controllers/users_controller.rb
+class UsersController < ApplicationController
+  def create
+    @user = User.new(user_params)
+    if @user.save
+      UserMailer.welcome_email(@user).deliver_now
+      redirect_to @user, notice: 'User was successfully created.'
+    else
+      render :new
+    end
+  end
+end
+```
+
+Great question! Testing mail views ensures that your emails look right before sending them out to users. Here’s how you can test mail views in a Rails application:
+
+### 1. **Use Preview Classes**
+
+Rails provides a convenient way to preview emails in the browser using preview classes. Here’s how to set it up:
+
+1. **Create a Mailer Preview**: In your `test/mailers/previews` directory, create a preview file for your mailer (e.g., `user_mailer_preview.rb`).
+
+    ```ruby
+    # test/mailers/previews/user_mailer_preview.rb
+    class UserMailerPreview < ActionMailer::Preview
+      def welcome_email
+        user = User.first
+        UserMailer.welcome_email(user)
+      end
+    end
+    ```
+
+2. **Access the Preview**: Start your Rails server and navigate to `/rails/mailers/user_mailer/welcome_email` in your browser to see the email preview.
+
+### 2. **RSpec Testing**
+
+If you’re using RSpec for testing, you can also write tests for your mailers. Here’s an example:
+
+1. **Install RSpec**: If you haven’t already, add RSpec to your `Gemfile` and install it.
+    ```ruby
+    gem 'rspec-rails'
+    ```
+
+2. **Generate RSpec Mailer Specs**: Generate the spec file for your mailer.
+    ```sh
+    rails generate rspec:mailer UserMailer
+    ```
+
+3. **Write the Tests**: In your generated mailer spec file (e.g., `spec/mailers/user_mailer_spec.rb`), write your tests.
+
+    ```ruby
+    require "rails_helper"
+
+    RSpec.describe UserMailer, type: :mailer do
+      describe 'welcome_email' do
+        let(:user) { create(:user) }
+        let(:mail) { UserMailer.welcome_email(user) }
+
+        it 'renders the headers' do
+          expect(mail.subject).to eq('Welcome to My Awesome Site')
+          expect(mail.to).to eq([user.email])
+          expect(mail.from).to eq(['notifications@example.com'])
+        end
+
+        it 'renders the body' do
+          expect(mail.body.encoded).to match('Welcome to My Awesome Site')
+        end
+      end
+    end
+    ```
+
+### 3. **Rails Console**
+
+You can also use the Rails console to send emails to your development environment to see how they look.
+
+```sh
+rails console
+```
+
+```ruby
+user = User.first
+UserMailer.welcome_email(user).deliver_now
+```
+
+This will send the email to the address specified in your development environment.
+
+### 4. **Local SMTP Server**
+
+For more advanced testing, you can set up a local SMTP server like [MailCatcher](https://mailcatcher.me/) to capture and view outgoing emails.
+
+1. **Install MailCatcher**:
+    ```sh
+    gem install mailcatcher
+    ```
+
+2. **Start MailCatcher**:
+    ```sh
+    mailcatcher
+    ```
+
+3. **Configure Rails**: In your `config/environments/development.rb`, configure Action Mailer to use MailCatcher.
+
+    ```ruby
+    config.action_mailer.delivery_method = :smtp
+    config.action_mailer.smtp_settings = {
+      address: 'localhost',
+      port: 1025
+    }
+    ```
+
+4. **Send Emails**: Any email sent from your Rails app will be caught by MailCatcher. Access it via `http://localhost:1080`.
+
+By combining these techniques, you can ensure that your mail views are perfect before sending them out to users. 

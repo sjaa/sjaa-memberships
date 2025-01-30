@@ -3,6 +3,10 @@ class SessionPolicy < ApplicationPolicy
     true
   end
 
+  def member_login?
+    true
+  end
+
   def destroy?
     true
   end

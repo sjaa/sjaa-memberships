@@ -1,7 +1,11 @@
+<div class="row">
+<div class="col-12">
 <%= form_with url: sessions_path do |form| %>
-  <%= form.label :email %>
-  <%= form.email_field :email %>
-  <%= form.label :password %>
-  <%= form.password_field :password %>
-  <%= form.submit %>
+  <%= form.label :email, class: 'form-label' %>
+  <%= form.email_field :email, class: 'form-control' %>
+  <%= form.label :password, class: 'form-label' %>
+  <%= form.password_field :password, class: 'form-control' %>
+  <%= form.submit 'Login', class: 'btn btn-primary mt-2' %>
 <% end %>
+</div>
+</div>
