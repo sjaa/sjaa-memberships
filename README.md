@@ -43,7 +43,7 @@ The app should serve as a secure store for the membership data, and should facil
       state_id: 1,
       zipcode: "95555",
       phone: "123-456-7890",
-      email: "csvenss2@gmail.com",
+      email: "jorge.conseco@att.net",
       primary: true,
       person_id: 126]
     ```
