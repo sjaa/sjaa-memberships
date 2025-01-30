@@ -266,14 +266,11 @@ heroku pg:reset # to drop the database
 
 ## To Do
 
-* Change "groups" to "roles"
-  * e.g. "Volunteer," "ITSP Volunteer," "Solar Volunteer"
-  * Done
-* Add "skills" to people
-  * e.g. "solar," "outreach," "education"
-  * Nah, make these interests instead
-* Find all people with "solar" skills
-* Find all volunteers who could fill a "solar" need
+* E-mail views
+* Forgot/Generate password flow
+* Membership Dues Payment Flow
+* New Member flow
+* Equipment transfers
 
 ## Mail
 Setting up mail in a Rails application is straightforward, but it does involve a few steps. Here's a step-by-step guide to get you started:
