@@ -19,7 +19,7 @@ class ApplicationController < ActionController::Base
     # Pick a policy, any policy
     policyClass = nil
     begin
-      policyClass = "#{self.class.name.split('C')[0].singularize}Policy".constantize
+      policyClass = "#{self.class.name.split('Controller')[0].singularize}Policy".constantize
     rescue
       policyClass = ApplicationPolicy
     end

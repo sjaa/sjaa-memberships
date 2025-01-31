@@ -1,0 +1,14 @@
+<div class="row">
+  <div class="col-12">
+    <h1>Forgot Your Password?</h1>
+    <%= form_with(url: password_resets_path, local: true) do |form| %>
+      <div class="field">
+        <%= form.label :email %>
+        <%= form.email_field :email %>
+      </div>
+      <div class="actions">
+        <%= form.submit "Reset Password" %>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -72,6 +72,19 @@ Rails.application.configure do
   # config.active_job.queue_name_prefix = "sjaa_members_production"
 
   config.action_mailer.perform_caching = false
+  config.action_mailer.default_url_options = { host: '127.0.0.1:3001' }
+
+  # Use SMTP to send emails
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    address:              ENV['SMTP_ADDRESS'],
+    port:                 ENV['SMTP_PORT'],
+    domain:               ENV['SMTP_DOMAIN'],
+    user_name:            ENV['SMTP_USER_NAME'],
+    password:             ENV['SMTP_PASSWORD'],
+    authentication:       'plain',
+    enable_starttls_auto: true
+  }
 
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.

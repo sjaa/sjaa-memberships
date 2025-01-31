@@ -1,5 +1,4 @@
 Rails.application.routes.draw do
-
   post '/people/search', to: 'people#search', as: :people_search
   get '/people/search', to: 'people#search'
   post '/donations/search', to: 'donations#search', as: :donations_search
@@ -8,6 +7,8 @@ Rails.application.routes.draw do
   get '/equipment/search', to: 'equipment#search'
   post '/roles/add_person', to: 'roles#add_person', as: :roles_add_person
 
+  post '/password_resets/:id', to: 'password_resets#update', as: :password_reset_form
+  resources :password_resets, only: [:new, :create, :edit, :update]
   resources :donation_phases
   resources :donation_items
   resources :people do

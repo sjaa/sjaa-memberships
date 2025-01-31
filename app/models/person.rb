@@ -1,4 +1,6 @@
 class Person < ApplicationRecord
+  include PasswordResettable
+
   has_many :memberships, -> {includes(:kind).order(start: :asc)}
   has_many :donations, -> {includes(DonationsController::INCLUDES)}
   has_many :equipment, -> {includes(:instrument)}
@@ -30,6 +32,14 @@ class Person < ApplicationRecord
 
   def name
     return "#{first_name} #{last_name}"
+  end
+
+  def primary_contact
+    contacts.where(primary: true).first
+  end
+
+  def email
+    return primary_contact&.email || contacts.first.email
   end
 
   # Right now, normal members have no permissions, but they can access their own records

@@ -1,0 +1,14 @@
+<div class="row">
+  <div class="col-12">
+    <h1>Reset Your Password</h1>
+    <%= form_with(url: password_reset_form_path(@user.reset_password_token), local: true) do |form| %>
+      <div class="field">
+        <%= form.label :password %>
+        <%= form.password_field :password %>
+      </div>
+      <div class="actions">
+        <%= form.submit "Update Password" %>
+      </div>
+    <% end %>
+  </div>
+</div>

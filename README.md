@@ -436,3 +436,191 @@ For more advanced testing, you can set up a local SMTP server like [MailCatcher]
 4. **Send Emails**: Any email sent from your Rails app will be caught by MailCatcher. Access it via `http://localhost:1080`.
 
 By combining these techniques, you can ensure that your mail views are perfect before sending them out to users. 
+
+## Reset Password
+
+Generating a "reset password" email without using Devise requires you to build your own system for handling password resets. Here's how you can do it step-by-step:
+
+### 1. **Set Up Your User Model**
+
+Ensure your user model has the necessary fields for handling password resets. You’ll need a token and a timestamp.
+
+1. **Add Fields to Users**:
+    ```sh
+    rails generate migration add_password_reset_to_users reset_password_token:string reset_password_sent_at:datetime
+    rails db:migrate
+    ```
+
+2. **Update User Model**:
+    ```ruby
+    class User < ApplicationRecord
+      # Add validations, callbacks, and other logic as needed
+    end
+    ```
+
+### 2. **Generate the Token and Timestamp**
+
+Create methods in your User model to handle generating and setting the reset token and timestamp.
+
+1. **User Model**:
+    ```ruby
+    class User < ApplicationRecord
+      # Generates a unique token for password reset
+      def generate_password_reset_token!
+        self.reset_password_token = SecureRandom.urlsafe_base64
+        self.reset_password_sent_at = Time.zone.now
+        save!
+      end
+
+      # Checks if the password reset token is still valid (e.g., within 2 hours)
+      def password_reset_token_valid?
+        reset_password_sent_at >= 2.hours.ago
+      end
+
+      # Resets the password
+      def reset_password!(new_password)
+        self.password = new_password
+        self.reset_password_token = nil
+        save!
+      end
+    end
+    ```
+
+### 3. **Create the Mailer**
+
+Set up a mailer to send the password reset email.
+
+1. **Generate a Mailer**:
+    ```sh
+    rails generate mailer UserMailer
+    ```
+
+2. **Mailer Setup**:
+    ```ruby
+    class UserMailer < ApplicationMailer
+      default from: 'no-reply@example.com'
+
+      def password_reset(user)
+        @user = user
+        @url = edit_password_reset_url(user.reset_password_token)
+        mail(to: @user.email, subject: 'Password Reset Instructions')
+      end
+    end
+    ```
+
+3. **Create Email Views**:
+    Create views for your email in `app/views/user_mailer/`.
+
+    **password_reset.html.erb**:
+    ```erb
+    <h1>Password Reset Instructions</h1>
+    <p>
+      To reset your password, click the link below:
+      <a href="<%= @url %>">Reset Password</a>
+    </p>
+    ```
+
+    **password_reset.text.erb**:
+    ```erb
+    Password Reset Instructions
+
+    To reset your password, click the link below:
+    <%= @url %>
+    ```
+
+### 4. **Controller for Password Resets**
+
+Create a controller to handle password reset requests and token validation.
+
+1. **Generate a Controller**:
+    ```sh
+    rails generate controller PasswordResets new edit create update
+    ```
+
+2. **Set Up Routes**:
+    ```ruby
+    Rails.application.routes.draw do
+      resources :password_resets, only: [:new, :create, :edit, :update]
+    end
+    ```
+
+3. **Controller Actions**:
+    ```ruby
+    class PasswordResetsController < ApplicationController
+      def new
+      end
+
+      def create
+        user = User.find_by(email: params[:email])
+        if user
+          user.generate_password_reset_token!
+          UserMailer.password_reset(user).deliver_now
+          redirect_to root_path, notice: 'Password reset email has been sent.'
+        else
+          flash.now[:alert] = 'Email address not found.'
+          render :new
+        end
+      end
+
+      def edit
+        @user = User.find_by(reset_password_token: params[:id])
+        if @user.nil? || !@user.password_reset_token_valid?
+          redirect_to new_password_reset_path, alert: 'Password reset token is invalid or expired.'
+        end
+      end
+
+      def update
+        @user = User.find_by(reset_password_token: params[:id])
+        if @user.update(user_params)
+          @user.reset_password!(params[:user][:password])
+          redirect_to root_path, notice: 'Your password has been reset!'
+        else
+          render :edit
+        end
+      end
+
+      private
+
+      def user_params
+        params.require(:user).permit(:password, :password_confirmation)
+      end
+    end
+    ```
+
+### 5. **Create Views for Password Resets**
+
+Create the necessary views in `app/views/password_resets/`.
+
+- **new.html.erb**:
+    ```erb
+    <h1>Forgot Your Password?</h1>
+    <%= form_with(url: password_resets_path, local: true) do |form| %>
+      <div class="field">
+        <%= form.label :email %>
+        <%= form.email_field :email %>
+      </div>
+      <div class="actions">
+        <%= form.submit "Reset Password" %>
+      </div>
+    <% end %>
+    ```
+
+- **edit.html.erb**:
+    ```erb
+    <h1>Reset Your Password</h1>
+    <%= form_with(model: @user, url: password_reset_path(@user.reset_password_token), local: true) do |form| %>
+      <div class="field">
+        <%= form.label :password %>
+        <%= form.password_field :password %>
+      </div>
+      <div class="field">
+        <%= form.label :password_confirmation %>
+        <%= form.password_field :password_confirmation %>
+      </div>
+      <div class="actions">
+        <%= form.submit "Update Password" %>
+      </div>
+    <% end %>
+    ```
+
+By following these steps, you can implement a custom password reset feature in your Rails application without relying on Devise. If you have any further questions or need more details, feel free to ask! 🚀🔐
