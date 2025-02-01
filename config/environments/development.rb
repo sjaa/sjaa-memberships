@@ -52,7 +52,7 @@ Rails.application.configure do
     user_name:            ENV['SMTP_USER_NAME'],
     password:             ENV['SMTP_PASSWORD'],
     host:                 ENV['SMTP_HOST'],
-    authentication:       :login,
+    authentication:       'plain',
     enable_starttls_auto: true
   }
   # Print deprecation notices to the Rails logger.
