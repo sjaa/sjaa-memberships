@@ -72,7 +72,7 @@ Rails.application.configure do
   # config.active_job.queue_name_prefix = "sjaa_members_production"
 
   config.action_mailer.perform_caching = false
-  config.action_mailer.default_url_options = { host: '127.0.0.1:3001' }
+  config.action_mailer.default_url_options = { host: 'https://sjaa-members-866e0b003e92.herokuapp.com' }
 
   # Use SMTP to send emails
   config.action_mailer.delivery_method = :smtp
