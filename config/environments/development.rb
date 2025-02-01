@@ -40,7 +40,7 @@ Rails.application.configure do
   config.action_mailer.raise_delivery_errors = true
 
   config.action_mailer.perform_caching = false
-  config.action_mailer.default_url_options = { host: '127.0.0.1:3001' }
+  config.action_mailer.default_url_options = { host: 'https://127.0.0.1:3001' }
 
   # Use SMTP to send emails
   config.action_mailer.delivery_method = :smtp
@@ -51,7 +51,7 @@ Rails.application.configure do
     #domain:               ENV['SMTP_DOMAIN'],
     user_name:            ENV['SMTP_USER_NAME'],
     password:             ENV['SMTP_PASSWORD'],
-    host:                 ENV['SMTP_HOST'],
+    host:                 ENV['SMTP_ADDRESS'],
     authentication:       'plain',
     enable_starttls_auto: true
   }
