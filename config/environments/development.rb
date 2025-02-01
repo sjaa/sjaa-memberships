@@ -48,11 +48,11 @@ Rails.application.configure do
   config.action_mailer.smtp_settings = {
     address:              ENV['SMTP_ADDRESS'],
     port:                 ENV['SMTP_PORT'],
-    #domain:               ENV['SMTP_DOMAIN'],
+    domain:               ENV['SMTP_DOMAIN'],
     user_name:            ENV['SMTP_USER_NAME'],
     password:             ENV['SMTP_PASSWORD'],
     host:                 ENV['SMTP_ADDRESS'],
-    authentication:       'plain',
+    authentication:       :login,
     enable_starttls_auto: true
   }
   # Print deprecation notices to the Rails logger.
