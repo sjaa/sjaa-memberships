@@ -1,0 +1,48 @@
+<% membership = Membership.new %>
+<%= form_for membership, url: membership_create_path, data: {controller: 'invoice'} do |f| %>
+  <div class="row">
+    <div class="col-12">
+      <h1>Membership For <%= @person.name %></h1>
+    </div>
+    <!-- hidden fields -->
+    <%= f.hidden_field :person_id, value: @person.id %>
+    <%= f.hidden_field :term_months, value: SjaaMembers::DEFAULT_MEMBERSHIP_TERM %>
+    <!-- Extra Donation -->
+    <div class="col-12">
+      <%= label_tag 'membership[donation]', 'Extra Donation', class: 'form-label' %>
+      <div class="input-group">
+        <span class="input-group-text" id="basic-addon1">$</span>
+        <%= number_field_tag 'membership[donation]', 0, class: 'form-control', style: 'max-width: 120px', data: {invoice_target: 'field', updateid: 'donation_fee', action: 'input->invoice#calculate_total'} %>
+      </div>
+    </div>
+    <!-- Ephemeris -->
+    <div class="col-12 mt-4">
+      <%= f.label :ephemeris, class: 'form-label' %>
+      <%= f.select :ephemeris, options_for_select([ ['Digital +$0', 0], ["Printed +$#{SjaaMembers::EPHEMERIS_FEE}", SjaaMembers::EPHEMERIS_FEE] ]), {}, {class: 'form-select', style: 'max-width: 200px', data: {invoice_target: 'field', updateid: 'ephemeris_fee', action: 'input->invoice#calculate_total'}} %>
+    </div>
+    <div class="col-12 mt-4 table-responsive">
+      <h2>Invoice</h2>
+      <table class="table" style="max-width: 400px;">
+        <tr>
+          <td>Membership Fee</td>
+          <td>$<span data-invoice-target="constant"><%=SjaaMembers::YEARLY_MEMBERSHIP_RATE%></span></td>
+        </tr>
+        <tr>
+          <td>Extra Donation</td>
+          <td>$<span id="donation_fee">0</span></td>
+        </tr>
+        <tr>
+          <td>Ephemeris Fee</td>
+          <td>$<span id="ephemeris_fee">0</span></td>
+        </tr>
+        <tr>
+          <td><strong>Total</strong></td>
+          <td><strong>$<span data-invoice-target="total"><%=SjaaMembers::YEARLY_MEMBERSHIP_RATE%></span></strong></td>
+        </tr>
+      </table>
+    </div>
+    <div class="col-12 mt-4 mb-4">
+      <%= f.submit 'Checkout', class: 'btn btn-primary' %>
+    </div>
+  </div>
+<% end %>

@@ -1,5 +1,5 @@
 class PeopleController < ApplicationController
-  before_action :set_person, only: %i[ show edit update destroy ]
+  before_action :set_person, only: %i[ show edit update destroy new_membership ]
   
   # GET /people or /people.json
   def index
@@ -9,6 +9,12 @@ class PeopleController < ApplicationController
   
   # GET /people/1 or /people/1.json
   def show
+  end
+
+  def new_membership
+  end
+
+  def create_membership
   end
   
   def search

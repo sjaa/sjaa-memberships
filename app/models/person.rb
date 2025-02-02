@@ -54,7 +54,7 @@ class Person < ApplicationRecord
 
   # Assumes a 12-month term
   def active_membership(date: DateTime.now())
-    memberships.where(Membership.arel_table[:start].gt(DateTime.now - 12.months))
+    memberships.where("start + INTERVAL '1 month' * term_months > ?", Date.today).or(memberships.where(term_months: nil))
   end
 
   # Take an array of the form [{id: 4}, {name: 'foo'}, ...]

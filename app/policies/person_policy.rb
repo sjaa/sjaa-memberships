@@ -12,8 +12,15 @@ class PersonPolicy < ApplicationPolicy
     user&.has_permission?(:write) || user.id == record.id
   end
 
+  def new_membership?
+    user&.has_permission?(:write) || user.id == record.id
+  end
+
+  def create_membership?
+    user&.has_permission?(:write) || user.id == record.id
+  end
+
   def show?
-    puts("[I] user: #{user.inspect}, record: #{record.inspect}")
     user&.has_permission?(:read) || user.id == record.id
   end
 end

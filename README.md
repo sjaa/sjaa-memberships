@@ -264,10 +264,72 @@ heroku run rake db:seed
 heroku pg:reset # to drop the database
 ```
 
+## Email
+
+For proof-of-concept, I'm using Google's SMTP server with the vp@sjaa.net account and an app password.  Alternatives include
+verified domains and an SMTP host like Mailgun.
+
+In development, Google's SMTP server could be used, or Mailtrap, which fakes an SMTP server and prevents emails from
+being delivered, but gives you a place to view the emails, through their dashboard, for debug.
+
 ## To Do
 
 * E-mail views - Done
 * Forgot/Generate password flow - Done
 * Membership Dues Payment Flow
+* Remove status (superceded by role)
 * New Member flow
+* Merge two People
+* Widgets Controller
 * Equipment transfers
+
+## Allow Embeds
+
+To embed a Ruby page in an iframe without using JavaScript, you'll need to ensure that your server is configured to allow the page to be embedded. Here are the steps:
+
+### Step 1: Configure Your Server
+1. **Allow Cross-Origin Requests**: Ensure that your server is configured to allow cross-origin requests. This is necessary for embedding content in an iframe from a different domain. You can do this by setting the `Access-Control-Allow-Origin` header in your server configuration. For example, in a Rails application, you can add this to your controller:
+    ```ruby
+    before_action :allow_cross_origin, if: :embeddable?
+
+    def allow_cross_origin
+      headers['Access-Control-Allow-Origin'] = '*'
+    end
+
+    def embeddable?
+      request.headers['X-Frame-Options'].present?
+    end
+    ```
+
+2. **Set X-Frame-Options**: Ensure that the `X-Frame-Options` header is set to `ALLOW-FROM` followed by the URL of the site that will embed your content. For example:
+    ```ruby
+    response.headers['X-Frame-Options'] = 'ALLOW-FROM https://example.com'
+    ```
+
+### Step 2: Update Your Rails Controller
+1. **Create a Controller Action**: Create a controller action to serve the content you want to embed. For example, in `WidgetsController`:
+    ```ruby
+    class WidgetsController < ApplicationController
+      def show
+        # Your widget code here
+      end
+    end
+    ```
+
+2. **Set Content Type**: Ensure that the content type is set to `text/html` so that it can be embedded in an iframe:
+    ```ruby
+    class WidgetsController < ApplicationController
+      def show
+        response.headers['Content-Type'] = 'text/html'
+        render layout: false
+      end
+    end
+    ```
+
+### Step 3: Embed the Content
+1. **Use an Iframe**: On the embedding site, use an iframe to embed the content. For example:
+    ```html
+    <iframe src="https://yourapp.com/widget/show" width="600" height="400"></iframe>
+    ```
+
+By following these steps, you should be able to embed a Ruby page in an iframe without using JavaScript. Does this help clarify the process?

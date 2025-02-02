@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  get '/people/:id/new_membership', to: 'people#new_membership', as: :membership_renewal
+  post '/people/create_membership', to: 'people#create_membership', as: :membership_create
+
   post '/people/search', to: 'people#search', as: :people_search
   get '/people/search', to: 'people#search'
   post '/donations/search', to: 'donations#search', as: :donations_search

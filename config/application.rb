@@ -24,4 +24,8 @@ module SjaaMembers
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
   end
+
+  DEFAULT_MEMBERSHIP_TERM = 12
+  YEARLY_MEMBERSHIP_RATE = 20
+  EPHEMERIS_FEE = 10
 end
