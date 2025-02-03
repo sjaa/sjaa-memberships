@@ -8,7 +8,7 @@
       </span>
     </h1>
     <%= link_to "Edit Personal Information", edit_person_path(@person), class: 'btn btn-primary d-inline-block' %>
-    <% if @active_membership %>
+    <% if @person.active_membership.first %>
       <%= link_to "Membership Active", '#', class: 'btn btn-success d-inline-block' %>
     <% else %>
       <%= link_to "Renew Membership", membership_renewal_path(id: @person.id), class: 'btn btn-warning d-inline-block' %>
