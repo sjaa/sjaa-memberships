@@ -8,7 +8,7 @@ class Person < ApplicationRecord
   has_and_belongs_to_many :interests
   has_and_belongs_to_many :roles
   has_many :api_keys, as: :bearer
-  has_secure_password
+  has_secure_password validations: false # Rethink this... maybe just force a random password when not present
   belongs_to :status, optional: true
   belongs_to :astrobin, optional: true
   belongs_to :referral, optional: true
@@ -134,7 +134,6 @@ class Person < ApplicationRecord
 
       # Use strings for true/false so they are easier to display in the forms, but save them as booleans
       _membership_attr[:ephemeris] = _membership_attr[:ephemeris] == "true"
-      _membership_attr[:new] = _membership_attr[:new] == "true"
       _membership_attr.delete(:id)
 
       # If there's a city name, then we need to create  new city
@@ -157,5 +156,10 @@ class Person < ApplicationRecord
     end
 
     self.memberships = _memberships
+  end
+
+  # Passwords for people can be blank if they've never signed up
+  def password_presence
+    true
   end
 end

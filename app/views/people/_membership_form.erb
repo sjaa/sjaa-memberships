@@ -15,10 +15,6 @@
     <%= combobox_tag 'person[membership_attributes][][kind_id]', MembershipKind.all, value: membership.kind_id, name_when_new: 'person[membership_attributes][][kind]' %>
   </div>
   <div class="col-md-6 mt-2">
-    <%= label_tag :membership_new, 'New Membership?', class: 'form-label' %><br/>
-    <%= combobox_tag 'person[membership_attributes][][new]', [{display: 'Yes', value: 'true'}, {display: 'No', value: 'false'}], value: membership.new ? 'true' : 'false' %>
-  </div>
-  <div class="col-md-6 mt-2">
     <%= label_tag :membership_ephemeris, 'Printed Ephemeris', class: 'form-label' %><br/>
     <%= combobox_tag 'person[membership_attributes][][ephemeris]', [{display: 'Yes', value: 'true'}, {display: 'No', value: 'false'}], value: membership.ephemeris ? 'true' : 'false' %>
   </div>

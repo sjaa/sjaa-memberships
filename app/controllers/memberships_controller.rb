@@ -92,7 +92,7 @@ class MembershipsController < ApplicationController
       membership.order = order
   
       if order.save && membership.save
-        return render :json => {:status => response.result.status}, :status => :ok
+        return render :json => {:status => response.result.status, redirect: person_path(membership.person)}, :status => :ok
       else
         return render :json => {:error => (order.errors.full_messages + membership.errors.full_messages).join('  ')}, :status => :error
       end

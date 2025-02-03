@@ -66,7 +66,7 @@ function loadPayPalButtons() {
           if (responseData.status === 'COMPLETED') {
             alert('COMPLETED');
             console.log('Payment complete!');
-            // TODO: Redirect
+            window.location.href = responseData.redirect;
           }
           else {
             console.log(`PayPal capture error: ${responseData.error}`);
