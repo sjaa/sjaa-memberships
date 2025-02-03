@@ -282,6 +282,10 @@ being delivered, but gives you a place to view the emails, through their dashboa
 * Merge two People
 * Widgets Controller
 * Equipment transfers
+* Admin Dashboard?
+  * https://adminlte.io
+* Maglev site builder?
+  * Needs lots of development to be fully customizable, but has promise
 
 ## Allow Embeds
 
