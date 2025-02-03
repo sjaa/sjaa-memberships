@@ -1,5 +1,5 @@
 <% membership = Membership.new %>
-<%= form_for membership, url: membership_create_path, data: {controller: 'invoice'} do |f| %>
+<%= form_for membership, url: membership_order_path, data: {controller: 'invoice'} do |f| %>
   <div class="row">
     <div class="col-12">
       <h1>Membership For <%= @person.name %></h1>
@@ -9,16 +9,16 @@
     <%= f.hidden_field :term_months, value: SjaaMembers::DEFAULT_MEMBERSHIP_TERM %>
     <!-- Extra Donation -->
     <div class="col-12">
-      <%= label_tag 'membership[donation]', 'Extra Donation', class: 'form-label' %>
+      <%= label_tag 'membership[donation_amount]', 'Extra Donation', class: 'form-label' %>
       <div class="input-group">
         <span class="input-group-text" id="basic-addon1">$</span>
-        <%= number_field_tag 'membership[donation]', 0, class: 'form-control', style: 'max-width: 120px', data: {invoice_target: 'field', updateid: 'donation_fee', action: 'input->invoice#calculate_total'} %>
+        <%= number_field_tag 'membership[donation_amount]', 0, class: 'form-control', style: 'max-width: 120px', data: {invoice_target: 'field', updateid: 'donation_fee', action: 'input->invoice#calculate_total'} %>
       </div>
     </div>
     <!-- Ephemeris -->
     <div class="col-12 mt-4">
-      <%= f.label :ephemeris, class: 'form-label' %>
-      <%= f.select :ephemeris, options_for_select([ ['Digital +$0', 0], ["Printed +$#{SjaaMembers::EPHEMERIS_FEE}", SjaaMembers::EPHEMERIS_FEE] ]), {}, {class: 'form-select', style: 'max-width: 200px', data: {invoice_target: 'field', updateid: 'ephemeris_fee', action: 'input->invoice#calculate_total'}} %>
+      <%= label_tag 'membership[ephemeris_amount]', 'Ephemeris', class: 'form-label' %>
+      <%= select_tag 'membership[ephemeris_amount]', options_for_select([ ['Digital +$0', 0], ["Printed +$#{SjaaMembers::EPHEMERIS_FEE}", SjaaMembers::EPHEMERIS_FEE] ]), {class: 'form-select', style: 'max-width: 200px', data: {invoice_target: 'field', updateid: 'ephemeris_fee', action: 'input->invoice#calculate_total'}} %>
     </div>
     <div class="col-12 mt-4 table-responsive">
       <h2>Invoice</h2>
@@ -43,6 +43,54 @@
     </div>
     <div class="col-12 mt-4 mb-4">
       <%= f.submit 'Checkout', class: 'btn btn-primary' %>
+      <div id="paypal-button-container"></div>
+      <script src="https://www.paypal.com/sdk/js?client-id=<%=ENV['PAYPAL_CLIENT_ID']%>"></script>
+      <script>
+        paypal.Buttons({
+          env: 'sandbox', // Valid values are sandbox and live.
+          createOrder: async () => {
+            // Get the form element
+            const form = document.getElementById('new_membership');
+
+            // Create a FormData object from the form
+            const formData = new FormData(form);
+
+            // Send a POST request with the form data
+            var response = await fetch(form.action, {
+              method: 'POST',
+              body: formData,
+            });
+
+            const responseData = await response.json();
+            if(!responseData.token) {
+              console.log(`Error: ${responseData.error}`);
+            }
+
+            return responseData.token;
+          },
+
+          onApprove: async (data) => {
+            const response = await fetch('<%=membership_capture_order_path%>', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ order_id: data.orderID })
+            });
+
+            const responseData = await response.json();
+
+            if (responseData.status === 'COMPLETED') {
+              alert('COMPLETED');
+              console.log('Payment complete!');
+              // TODO: Redirect
+            }
+            else {
+              console.log(`PayPal capture error: ${responseData.error}`);
+            }
+          }
+        }).render('#paypal-button-container');
+      </script>
     </div>
   </div>
 <% end %>

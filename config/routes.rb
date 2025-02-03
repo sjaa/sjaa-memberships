@@ -1,6 +1,7 @@
 Rails.application.routes.draw do
   get '/people/:id/new_membership', to: 'people#new_membership', as: :membership_renewal
-  post '/people/create_membership', to: 'people#create_membership', as: :membership_create
+  post '/memberships/order', to: 'memberships#create_order', as: :membership_order
+  post '/memberships/capture_order', to: 'memberships#capture_order', as: :membership_capture_order
 
   post '/people/search', to: 'people#search', as: :people_search
   get '/people/search', to: 'people#search'

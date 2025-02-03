@@ -44,6 +44,14 @@ class ApplicationPolicy
     user&.has_permission? :write
   end
 
+  def create_order?
+    true
+  end
+
+  def capture_order?
+    true
+  end
+
   class Scope
     def initialize(user, scope)
       @user = user
