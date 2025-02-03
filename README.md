@@ -261,6 +261,7 @@ git push heroku main # deploy
 heroku run bash # get a shell
 heroku run rake db:schema:load # setup gives a permission error
 heroku run rake db:seed
+heroku run rake db:migrate
 heroku pg:reset # to drop the database
 ```
 
