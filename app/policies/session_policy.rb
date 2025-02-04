@@ -3,6 +3,14 @@ class SessionPolicy < ApplicationPolicy
     true
   end
 
+  def request_google_authorization?
+    user&.is_a?(Admin)
+  end
+
+  def google_oauth2_callback?
+    user&.is_a?(Admin)
+  end
+
   def member_login?
     true
   end

@@ -1,8 +1,30 @@
 class SessionsController < ApplicationController
   skip_before_action :authenticate!, only: [:login, :create]
+  GOOGLE_SCOPES = [
+    'https://www.googleapis.com/auth/spreadsheets', 
+    'https://www.googleapis.com/auth/admin.directory.group',
+    'https://www.googleapis.com/auth/admin.directory.group.member',
+    'https://www.googleapis.com/auth/admin.directory.user.security',
+    'https://www.googleapis.com/auth/admin.directory.user',
+  ]
+  GOOGLE_OAUTH_CLIENT_ID="1078047122367-41rhdub3tj81hmsb6pbopqa5orus6msm.apps.googleusercontent.com"
 
   # Empty controller just renders the login form
   def login
+  end
+
+  def request_google_authorization
+    @authUrl = 'https://accounts.google.com/o/oauth2/auth' +
+    "?client_id=#{GOOGLE_OAUTH_CLIENT_ID}" +
+    "&redirect_uri=#{google_callback_url}" +
+    "&scope=#{GOOGLE_SCOPES.join(' ')}" + 
+    '&response_type=code' +
+    '&access_type=offline';
+  end
+
+  def google_oauth2_callback
+    @code = params[:code]
+    @scope = params[:scope]
   end
 
   def forgot_password
