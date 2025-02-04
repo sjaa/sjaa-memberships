@@ -7,7 +7,8 @@ class SessionsController < ApplicationController
     'https://www.googleapis.com/auth/admin.directory.user.security',
     'https://www.googleapis.com/auth/admin.directory.user',
   ]
-  GOOGLE_OAUTH_CLIENT_ID="1078047122367-41rhdub3tj81hmsb6pbopqa5orus6msm.apps.googleusercontent.com"
+  #GOOGLE_OAUTH_CLIENT_ID="1078047122367-41rhdub3tj81hmsb6pbopqa5orus6msm.apps.googleusercontent.com" # Desktop Client
+  GOOGLE_OAUTH_CLIENT_ID="1078047122367-ksoop1tgdh9pd7jt1pl0eppn2enqki1o.apps.googleusercontent.com" # Web Client
 
   # Empty controller just renders the login form
   def login
