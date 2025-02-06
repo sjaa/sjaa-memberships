@@ -1,4 +1,6 @@
 class SessionsController < ApplicationController
+  include Rails.application.routes.url_helpers
+
   skip_before_action :authenticate!, only: [:login, :create]
   GOOGLE_SCOPES = [
     'https://www.googleapis.com/auth/spreadsheets', 
@@ -20,12 +22,25 @@ class SessionsController < ApplicationController
     "&redirect_uri=#{google_callback_url}" +
     "&scope=#{GOOGLE_SCOPES.join(' ')}" + 
     '&response_type=code' +
+    '&prompt=consent&' + 
     '&access_type=offline';
   end
 
   def google_oauth2_callback
     @code = params[:code]
     @scope = params[:scope]
+  end
+
+  def google_env_variables
+    render json: {
+      client_credentials: ENV['GOOGLE_OAUTH_WEB_CLIENT_CREDENTIALS_BASE64'],
+      redirect_uri: google_callback_url,
+    }
+  end
+
+  def save_refresh_token
+    current_user&.google_refresh_token = params[:refresh_token]
+    current_user&.save
   end
 
   def forgot_password
