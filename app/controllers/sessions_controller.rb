@@ -1,3 +1,5 @@
+require 'google/api_client/client_secrets'
+
 class SessionsController < ApplicationController
   include Rails.application.routes.url_helpers
 
@@ -9,8 +11,7 @@ class SessionsController < ApplicationController
     'https://www.googleapis.com/auth/admin.directory.user.security',
     'https://www.googleapis.com/auth/admin.directory.user',
   ]
-  #GOOGLE_OAUTH_CLIENT_ID="1078047122367-41rhdub3tj81hmsb6pbopqa5orus6msm.apps.googleusercontent.com" # Desktop Client
-  GOOGLE_OAUTH_CLIENT_ID="1078047122367-ksoop1tgdh9pd7jt1pl0eppn2enqki1o.apps.googleusercontent.com" # Web Client
+  GOOGLE_CLIENT_SECRETS = Google::APIClient::ClientSecrets.new(JSON.parse Base64.decode64(ENV['GOOGLE_WEB_CLIENT_BASE64']))
 
   # Empty controller just renders the login form
   def login
@@ -18,7 +19,7 @@ class SessionsController < ApplicationController
 
   def request_google_authorization
     @authUrl = 'https://accounts.google.com/o/oauth2/auth' +
-    "?client_id=#{GOOGLE_OAUTH_CLIENT_ID}" +
+    "?client_id=#{GOOGLE_CLIENT_SECRETS.client_id}" +
     "&redirect_uri=#{google_callback_url}" +
     "&scope=#{GOOGLE_SCOPES.join(' ')}" + 
     '&response_type=code' +
@@ -29,18 +30,42 @@ class SessionsController < ApplicationController
   def google_oauth2_callback
     @code = params[:code]
     @scope = params[:scope]
+    @auth = GOOGLE_CLIENT_SECRETS.to_authorization
+    # Pick the redirect_uri that we generated earlier
+    @auth.redirect_uri = google_callback_url
+    @auth.code = @code
+    @auth.fetch_access_token!
+
+    # Save @auth.refresh_token for this user
+    current_user.refresh_token = @auth.refresh_token
+    current_user.save
   end
 
-  def google_env_variables
-    render json: {
-      client_credentials: ENV['GOOGLE_OAUTH_WEB_CLIENT_CREDENTIALS_BASE64'],
-      redirect_uri: google_callback_url,
-    }
-  end
+  # This is here for reference
+  #  Next steps...
+  #     Create some utilities, like members@sjaa.net management
+  #     Redirect to the google_auth flow if no refresh token is found, or if it doesn't work
+  def dummy_google_scratch
+    require 'google/api_client/client_secrets'
+    # By default looks for a 'client_secrets.json' file, or can accept a path
+    client_secrets = Google::APIClient::ClientSecrets.load 
+    # Alternatively
+    cshash = JSON.parse Base64.decode64(ENV['GOOGLE_WEB_CLIENT_BASE64'])
+    client_secrets = Google::APIClient::ClientSecrets.new cshash
 
-  def save_refresh_token
-    current_user&.google_refresh_token = params[:refresh_token]
-    current_user&.save
+    # Get the auth object
+    auth = client_secrets.to_authorization
+    # Set the code and fetch tokens
+    auth.code = code # From oauth callback
+    auth.fetch_access_token!
+    # OR set the tokens if you have them stored already
+    auth.refresh_token = refresh_token
+
+    # Get a client from googleapis
+    client = Google::Apis::AdminDirectoryV1::DirectoryService.new
+    client.authorization = auth
+    ret = client.list_members('members@sjaa.net')
+    # list_members, insert_member, delete_member, etc
   end
 
   def forgot_password
