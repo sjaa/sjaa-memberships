@@ -1,0 +1,88 @@
+<div class="row">
+  <div class="col-12">
+    <h1>Google Members Group</h1>
+    <p>
+      The table below shows the current list of people in the members@sjaa.net
+      Google Group. Use the "Sync" button below to compute the difference between
+      the Group membership, and the active members listed in the membership database.
+    </p>
+    <%= link_to 'Sync To Database', google_members_path(diff: true), class: 'btn btn-success' %>
+
+    <% if @diff %>
+    <h2>Active Members Missing From Google Group</h2>
+    <div class="table-responsive mt-2">
+      <table class="table table-striped">
+        <tr>
+          <th>Name</th>
+          <th>Email(s)</th>
+        </tr>
+        <% @unmatched_people.each do |person| %>
+          <tr>
+            <td><%= link_to person.name, person %></td>
+            <td><%=person.contacts.map(&:email).select(&:present?).join('<br/>').html_safe%></td>
+          </tr>
+        <% end %>
+      </table>
+    </div>
+
+    <h2>Google Group Members That Are Not Active Members</h2>
+    <div class="table-responsive mt-2">
+      <table class="table table-striped">
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+        </tr>
+        <% @group_unmatched.each do |mh| %>
+          <tr>
+            <td>
+              <%if mh[:person] %>
+                <%=link_to mh[:person]&.name, mh[:person]%>
+              <% else %>
+                Unknown
+              <% end %>
+            </td>
+            <td><%=mh[:email]%></td>
+          </tr>
+        <% end %>
+      </table>
+    </div>
+
+    <h2>Google Group Members Who Are Active Members</h2>
+    <div class="table-responsive mt-2">
+      <table class="table table-striped">
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Type</th>
+        </tr>
+        <% @group_matched.each do |mh| %>
+          <tr>
+            <td><%= link_to mh[:person].name, mh[:person] %></td>
+            <td><%=mh[:member].email%></td>
+            <td><%=mh[:member].role%></td>
+            <td><%=mh[:member].type%></td>
+          </tr>
+        <% end %>
+      </table>
+    </div>
+    <% else %>
+    <div class="table-responsive mt-4">
+      <table class="table table-striped">
+        <tr>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Type</th>
+        </tr>
+        <% @members.each do |member| %>
+        <tr>
+          <td><%=member.email%></td>
+          <td><%=member.role%></td>
+          <td><%=member.type%></td>
+        </tr>
+        <% end %>
+      </table>
+    </div>
+    <% end %>
+  </div>
+</div>

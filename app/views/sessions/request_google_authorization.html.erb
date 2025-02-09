@@ -1,8 +1,14 @@
 <div class="row">
   <div class="col-12">
+    <h1>Google Authenticate</h1>
     <p>In order to automate group membership and certain other Google Workspace tasks,
     we need to authorize our Google app to access certain information as certain accounts.
     Use the button below to authorize the app to use your account.</p>
+
+    <% if @user&.refresh_token %>
+      <p><strong>Note</strong> You already have a refresh_token linked to your account,
+      so you probably don't need to authenticate again, unless you really want to.</p>
+    <% end %>
 
     <%= link_to 'Google OAuth2', @authUrl, class: 'btn btn-primary' %>
   </div>

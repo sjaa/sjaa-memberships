@@ -12,6 +12,18 @@ module SjaaPort
     end
   end
   
+  def parse_term(term, status)
+    _term = term&.strip&.downcase
+    _status = status&.strip&.downcase
+    if(_term == 'life' && _status == 'member')
+      return nil
+    elsif(_term == '1yr' || _status == 'member')
+      return 12
+    else
+      return 0
+    end
+  end
+  
   # Fixed Values
   INTEREST_LIST = {}
   {
@@ -94,7 +106,7 @@ def port()
     
     puts "[E] #{person.errors.full_messages.join('  ')}" if(person.errors.any?)
     
-    Contact.create(
+    c = Contact.create(
     address: row['Address1']&.strip,
     city: not_empty(row['City1']) ? City.find_or_create_by(name: row['City1'].titleize) : nil,
     state: not_empty(row['ST1']) ? State.where(short_name: row['ST1']&.strip&.upcase).first : nil,
@@ -105,28 +117,44 @@ def port()
     person: person,
     )
     
+    puts "[E] #{c.errors.full_messages.join('  ')}" if(c.errors.any?)
+    c.save(validate: false) if(c.email.nil?)
+    
     if(not_empty(row['email2']) || not_empty(row['phone2']))
-      Contact.create(
+      c = Contact.create(
       email: not_empty(row['email2']) ? row['email2']&.strip : nil,
       phone: not_empty(row['phone2']) ? row['phone2']&.strip : nil,
       person: person,
       )
+      puts "[E] #{c.errors.full_messages.join('  ')}" if(c.errors.any?)
+      c.save(validate: false) if(c.email.nil?)
+    end
+    
+    if(row['Observers Email Address (if diff)'].present?)
+      c = Contact.create(
+      email: row['Observers Email Address (if diff)']&.strip,
+      person: person,
+      )
+      puts "[E] #{c.errors.full_messages.join('  ')}" if(c.errors.any?)
+      c.save(validate: false) if(c.email.nil?)
     end
     
     # Membership for their latest payment
+    term = parse_term(row['Term'], row['Status'])
+    kind = term.nil? ? 'lifetime' : row['Type']
     membership = Membership.create(
     start: start,
-    term_months: row['Term']&.strip == '1yr' ? 12 : nil,
+    term_months: term,
     ephemeris: row['Ephem']&.strip == 'PRINT',
-    new: row['New/Rtn']&.strip == 'New',
-    kind: row['Type']&.strip,
+    kind: kind.present? ? MembershipKind.find_or_create_by(name: kind&.strip) : nil,
+    donation_amount: (/(\d+)/.match(row['Cash?'])&.to_a || [])[1],
     person: person,
     )
     
     # Membership for their first payment ("since")
     since = parse_date(row['Member Since'])
     if(since)
-      Membership.create(start: since, new: true, person: person)
+      Membership.create(start: since, term_months: 0, person: person)
     end
   end
 end

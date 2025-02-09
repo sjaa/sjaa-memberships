@@ -38,7 +38,11 @@ class SessionsController < ApplicationController
 
     # Save @auth.refresh_token for this user
     current_user.refresh_token = @auth.refresh_token
-    current_user.save
+    if(current_user.save && @auth.refresh_token)
+      flash[:success] = 'Successfully authorized with Google!'
+    else
+      flash[:alert] = 'Successfully authorized with Google!'
+    end
   end
 
   # This is here for reference

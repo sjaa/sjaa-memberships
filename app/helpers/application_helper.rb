@@ -13,6 +13,7 @@ module ApplicationHelper
   end
 
   def dollar_format(d)
+    return '' if(!d.present?)
     "$#{sprintf("%.02f", d)}"
   end
 end

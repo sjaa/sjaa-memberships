@@ -53,6 +53,8 @@ Rails.application.routes.draw do
   get '/api-keys', to: 'api_keys#index'
 
   resource :sessions
+  get '/google/members/diff', to: 'google#members_diff', as: :google_members_diff
+  get '/google/members', to: 'google#members', as: :google_members
   get '/google/auth', to: 'sessions#request_google_authorization', as: :google_auth
   get '/google/callback', to: 'sessions#google_oauth2_callback', as: :google_callback
   get '/login', to: 'sessions#login', as: :login

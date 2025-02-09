@@ -79,16 +79,24 @@
         <tr>
           <th>Duration</th>
           <th>Kind</th>
+          <th>Donation</th>
           <th>Ephemeris</th>
         </tr>
         <% @person.memberships.each do |membership| %>
           <tr>
             <td>
-              <%= date_format(membership.start) %> to <%= date_format(membership.start + membership.term_months.months) %>
-              (<%= membership.term_months %> months)
+              <% if membership.term_months.nil? %>
+                LIFETIME
+              <% else %>
+                <%= date_format(membership.start) %> to <%= date_format(membership.end) %>
+                (<%= membership.term_months %> months)
+              <% end %>
             </td>
             <td>
               <%= membership.kind&.name %>
+            </td>
+            <td>
+              <%= dollar_format(membership.donation_amount) %>
             </td>
             <td>
               <%= ephemeris_format membership.ephemeris %>
