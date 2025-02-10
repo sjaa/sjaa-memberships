@@ -71,7 +71,6 @@ else
       start: rand_date,
       term_months: 12,
       ephemeris: rand_bool,
-      new: rand_bool,
       kind: kinds.sample,
       )
     end
