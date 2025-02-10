@@ -18,7 +18,7 @@ def rand_bool()
   rand(0..1) == 1
 end
 
-use_port = true
+use_port = false
 
 # Default admins
 admin = Admin.create(email: 'vp@sjaa.net', password: 'secret')
