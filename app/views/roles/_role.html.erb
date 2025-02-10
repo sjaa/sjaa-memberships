@@ -1,6 +1,6 @@
 <div class="row" id="<%= dom_id role %>">
   <div class="col-12">
-    <h1><%= role&.name %> <small>(<%=role&.short_name%>)</small></h1>
+    <h1><%= role&.name %> <small><%=role.short_name.present? ? '(' + role.short_name + ')' : ''%></small></h1>
     <%= render partial: 'layouts/object_table', locals: {obj: role} %>
     <h2>People</h2>
   </div>

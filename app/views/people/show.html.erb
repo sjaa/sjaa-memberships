@@ -4,7 +4,6 @@
       <%= @person.first_name %>
       <%= @person.last_name %>
       <span class="h4 text-secondary">
-        <%= @person.status&.name&.upcase %>
       </span>
     </h1>
     <%= link_to "Edit Personal Information", edit_person_path(@person), class: 'btn btn-primary d-inline-block' %>

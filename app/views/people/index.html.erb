@@ -79,10 +79,6 @@
         </div>
       </div>
       <div class="col-md-3 col-xs-12 mb-3">
-        <%= f.label :status, class: 'form-label' %>
-        <%= f.text_field :status, placeholder: 'Status', value: @query_params[:status], class: 'form-control', data: { action: "input->search-form#search" } %>
-      </div>
-      <div class="col-md-3 col-xs-12 mb-3">
         <%= f.label :ephemeris, 'Ephemeris Subscription', class: 'form-label' %>
         <%= f.select :ephemeris, options_for_select([ ['PRINTED', 'printed'], ['DIGITAL', 'digital'], ['EITHER', 'either'] ], selected: @query_params[:ephemeris] || 'either'), {}, {class: 'form-control', data: { action: "change->search-form#search" } } %>
       </div>

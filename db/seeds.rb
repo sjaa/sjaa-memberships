@@ -28,14 +28,13 @@ admin.permissions += [PERMISSION_HASH['read']]
 admin = Admin.create(email: 'readwrite@sjaa.net', password: 'secret')
 admin.permissions += [PERMISSION_HASH['read'], PERMISSION_HASH['write']]
 
-statuses = %w(member expired contact entity).map{|s| Status.create(name: s)}
 referrals = {'internet' => 'Web search', 'friend' => 'Referred from a friend', 'school' => 'From a class at school'}.map{|name, desc| Referral.create(name: name, description: desc)}
 states = {'CA' => 'California', 'AZ' => 'Arizona', 'IL' => 'Illinois'}.map{|s,n| State.create(name: n, short_name: s)}
 kinds = [nil, MembershipKind.create(name: 'VB-M'), MembershipKind.create(name: 'LIFETIME'), nil, nil]
 instrument_kind = %w(telescope mount camera binocular)
 instrument_model = ['ASI2600MC', 'MEADE LX5000', 'CELESTRON AVX14', 'STELLARVUE 80ST', 'ASKAR 50MM', 'CELESTRON 10x50']
 instruments = instrument_kind.product(instrument_model).map{|kind, model| Instrument.create(kind: kind, model: model)}
-roles = {'SJAA Observers' => Faker::Internet.email, 'SJAA Imagers' => Faker::Internet.email, 'SJAA Board' => Faker::Internet.email}.map{|n,e| Role.create(name: n, email: e, short_name: n.split(' ').map(&:first).join.upcase)}
+roles = {'SJAA Observers' => Faker::Internet.email, 'SJAA Imagers' => Faker::Internet.email, 'SJAA Board' => Faker::Internet.email, 'Member' => nil, 'Expired' => nil}.map{|n,e| Role.create(name: n, email: e, short_name: n.split(' ').map(&:first).join.upcase)}
 phase_names = %w(offered received letter consigned sold)
 
 # Import SJAA Data
@@ -61,7 +60,6 @@ else
     first_name: Faker::Name.first_name,
     last_name: Faker::Name.last_name,
     notes: Faker::Quotes::Shakespeare.hamlet_quote,
-    status: statuses.sample,
     referral: referrals.sample,
     discord_id: discord,
     astrobin: astrobin,

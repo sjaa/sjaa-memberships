@@ -84,7 +84,7 @@ class PeopleController < ApplicationController
     @query_params.delete(:submit)
     @query_params.select!{|k,v| v.present?}
     @query_params = @query_params.permit(
-      :role_operation, :interest_operation, :first_name, :last_name, :email, :phone, :city, :state, :ephemeris, :status, interests: [], roles: []
+      :role_operation, :interest_operation, :first_name, :last_name, :email, :phone, :city, :state, :ephemeris, interests: [], roles: []
     )
     qp = @query_params
     
@@ -95,7 +95,6 @@ class PeopleController < ApplicationController
     query = query.joins(:contacts).where(Contact.arel_table[:phone].matches("%#{qp[:phone]}%")) if(qp[:phone].present?)
     query = query.joins(contacts: :city).where(City.arel_table[:name].matches("%#{qp[:city]}%")) if(qp[:city].present?)
     query = query.joins(contacts: :state).where(State.arel_table[:short_name].matches("%#{qp[:state]}%")) if(qp[:state].present?)
-    query = query.joins(:status).where(Status.arel_table[:name].matches("%#{qp[:status]}%")) if(qp[:status].present?)
     
     # Handle interests and roles specially
     query = and_or_helper(query, qp[:interest_operation], :interests, qp[:interests]) if(qp[:interests].present?)
@@ -113,7 +112,7 @@ class PeopleController < ApplicationController
       query = Person.where(id: _people)
     end
     
-    people = Person.where(id: query.map(&:id).uniq).includes(:donations, :memberships, :contacts, :interests, :status, :roles)
+    people = Person.where(id: query.map(&:id).uniq).includes(:donations, :memberships, :contacts, :interests, :roles)
     @pagy, @people = pagy(people, limit: 40, params: @query_params.to_h)
     
   end
@@ -126,7 +125,7 @@ class PeopleController < ApplicationController
   # Only allow a list of trusted parameters through.
   def person_params
     params.require(:person).permit(
-    :first_name, :last_name, :astrobin_id, :notes, :membership_id, :discord_id, :referral_id, :status_id,
+    :first_name, :last_name, :astrobin_id, :notes, :membership_id, :discord_id, :referral_id,
     interests_attributes: [:name, :id], 
     roles_attributes: [:id], 
     contact_attributes: [:address, :zipcode, :phone, :state_id, :city_id, :city_name, :email, :primary, :person_id, :id], 

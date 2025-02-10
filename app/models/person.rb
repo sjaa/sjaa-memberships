@@ -9,7 +9,6 @@ class Person < ApplicationRecord
   has_and_belongs_to_many :roles
   has_many :api_keys, as: :bearer
   has_secure_password validations: false # Rethink this... maybe just force a random password when not present
-  belongs_to :status, optional: true
   belongs_to :astrobin, optional: true
   belongs_to :referral, optional: true
 
