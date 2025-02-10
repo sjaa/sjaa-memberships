@@ -1,10 +1,18 @@
 class PeopleController < ApplicationController
+  include ReportsHelper
+  include PeopleHelper
+
   before_action :set_person, only: %i[ show edit update destroy new_membership ]
   
   # GET /people or /people.json
   def index
     filter
     render partial: 'index' if(params[:page])
+
+    respond_to do |format|
+      format.html
+      format.csv { send_data to_csv(models: @all_people), filename: "sjaa-people-#{Date.today}.csv" }
+    end
   end
   
   # GET /people/1 or /people/1.json
@@ -78,45 +86,6 @@ class PeopleController < ApplicationController
   end
   
   private
-  def filter
-    @query_params = params.dup
-    @query_params.delete(:authenticity_token)
-    @query_params.delete(:submit)
-    @query_params.select!{|k,v| v.present?}
-    @query_params = @query_params.permit(
-      :role_operation, :interest_operation, :first_name, :last_name, :email, :phone, :city, :state, :ephemeris, interests: [], roles: []
-    )
-    qp = @query_params
-    
-    query = Person.all
-    query = query.where(Person.arel_table[:first_name].matches("%#{qp[:first_name]}%")) if(qp[:first_name].present?)
-    query = query.where(Person.arel_table[:last_name].matches("%#{qp[:last_name]}%")) if(qp[:last_name].present?)
-    query = query.joins(:contacts).where(Contact.arel_table[:email].matches("%#{qp[:email]}%")) if(qp[:email].present?)
-    query = query.joins(:contacts).where(Contact.arel_table[:phone].matches("%#{qp[:phone]}%")) if(qp[:phone].present?)
-    query = query.joins(contacts: :city).where(City.arel_table[:name].matches("%#{qp[:city]}%")) if(qp[:city].present?)
-    query = query.joins(contacts: :state).where(State.arel_table[:short_name].matches("%#{qp[:state]}%")) if(qp[:state].present?)
-    
-    # Handle interests and roles specially
-    query = and_or_helper(query, qp[:interest_operation], :interests, qp[:interests]) if(qp[:interests].present?)
-    query = and_or_helper(query, qp[:role_operation], :roles, qp[:roles]) if(qp[:roles].present?)
-    
-    # Handle Ephemeris specially
-    if(qp[:ephemeris].present? && qp[:ephemeris] != 'either')
-      _people = Person.where(id: query.map(&:id).uniq).includes(:memberships)
-      if(qp[:ephemeris] == 'printed')
-        _people = _people.select{|p| p.active_membership.first&.ephemeris}
-      else
-        _people = _people.select{|p| !p.active_membership.first&.ephemeris}
-      end
-      
-      query = Person.where(id: _people)
-    end
-    
-    people = Person.where(id: query.map(&:id).uniq).includes(:donations, :memberships, :contacts, :interests, :roles)
-    @pagy, @people = pagy(people, limit: 40, params: @query_params.to_h)
-    
-  end
-  
   # Use callbacks to share common setup or constraints between actions.
   def set_person
     @person = Person.find(params[:id])

@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+
+  get '/reports/ephemeris', to: 'reports#ephemeris', as: :ephemeris_report
+
   get '/people/:id/new_membership', to: 'people#new_membership', as: :membership_renewal
   post '/memberships/order', to: 'memberships#create_order', as: :membership_order
   post '/memberships/capture_order', to: 'memberships#capture_order', as: :membership_capture_order

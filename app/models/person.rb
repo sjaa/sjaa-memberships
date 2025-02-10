@@ -57,7 +57,7 @@ class Person < ApplicationRecord
   end
 
   def self.active_members
-    where("start + INTERVAL '1 month' * term_months > ?", Date.today).or(where(memberships: {term_months: nil}))
+    joins(:memberships).where("memberships.start + INTERVAL '1 month' * memberships.term_months > ?", Date.today).or(where(memberships: {term_months: nil}))
   end
 
   # Take an array of the form [{id: 4}, {name: 'foo'}, ...]
