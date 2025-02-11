@@ -36,10 +36,6 @@
         <%= form.label :astrobin_last_image, 'Latest Astrobin Image ID', class: 'form-label' %>
         <%= number_field_tag 'person[astrobin_attributes][latest_image]', person&.astrobin&.latest_image, class: 'form-control' %>
       </div>
-      <div class="col-md-6 mt-2">
-        <%= form.label :status_id, class: 'form-label' %>
-        <%= form.combobox :status_id, Status.all %>
-      </div>
     <% end %>
     <div class="col-md-6 mt-2">
       <%= form.label :referral_id, class: 'form-label' %>

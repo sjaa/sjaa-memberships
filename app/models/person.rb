@@ -57,7 +57,10 @@ class Person < ApplicationRecord
   end
 
   def self.active_members
-    joins(:memberships).where("memberships.start + INTERVAL '1 month' * memberships.term_months > ?", Date.today).or(where(memberships: {term_months: nil}))
+    # Round membership expirations to the end of the month by subtracting the remaining days
+    # to the end of the month from the comparison date (today)
+    day_offset = Date.today.end_of_month - Date.today
+    joins(:memberships).where("memberships.start + INTERVAL '1 month' * memberships.term_months > ?", Date.today - day_offset.days).where(Membership.arel_table[:term_months].gt(0)).or(where(memberships: {term_months: nil}))
   end
 
   # Take an array of the form [{id: 4}, {name: 'foo'}, ...]
