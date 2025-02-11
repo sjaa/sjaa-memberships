@@ -10,6 +10,7 @@ class SessionsController < ApplicationController
     'https://www.googleapis.com/auth/admin.directory.group.member',
     'https://www.googleapis.com/auth/admin.directory.user.security',
     'https://www.googleapis.com/auth/admin.directory.user',
+    'https://www.googleapis.com/auth/apps.groups.settings',
   ]
   GOOGLE_CLIENT_SECRETS = Google::APIClient::ClientSecrets.new(JSON.parse Base64.decode64(ENV['GOOGLE_WEB_CLIENT_BASE64']))
 
