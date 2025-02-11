@@ -8,6 +8,14 @@ class ApplicationPolicy
     @record = record
   end
 
+  def signup?
+    true
+  end
+
+  def signup_2?
+    true
+  end
+
   def index?
     user&.has_permission? :read
   end

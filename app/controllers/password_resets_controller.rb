@@ -6,18 +6,33 @@ class PasswordResetsController < ApplicationController
 
   def create
     user = Admin.find_by(email: params[:email]) || Person.find_by_email(params[:email])
+
+    if(user && params[:signup].present?)
+      flash[:error] = "The email #{params[:email]} is already registered.  Please log in or reset your password."
+      redirect_to login_path
+      return
+    end
+
     if user
       user.generate_password_reset_token!
       AccountMailer.password_reset(user).deliver_now
       redirect_to root_path, notice: 'Password reset email has been sent.'
     else
-      flash.now[:alert] = 'Email address not found.'
-      render :new
+      if(params[:signup].present?)
+        person = Person.create(person_params)
+        contact = Contact.create(contact_params[:email], person_id: person.id)
+        person.generate_password_reset_token!
+        AccountMailer.password_reset(person).deliver_now
+      else
+        flash.now[:alert] = 'Email address not found.'
+        render :new
+      end
     end
   end
 
   def edit
     @user = find_by_reset_token
+    @signup = params[:signup]
     if @user.nil? || !@user.password_reset_token_valid?
       redirect_to new_password_reset_path, alert: 'Password reset token is invalid or expired.'
     end
@@ -27,8 +42,14 @@ class PasswordResetsController < ApplicationController
     @user = find_by_reset_token
     if @user.update(user_params)
       @user.reset_password!(params[:password])
-      redirect_to root_path, notice: 'Your password has been reset!'
+
+      if(@signup)
+        redirect_to root_path, notice: 'Your password has been reset!'
+      else
+        redirect_to edit_person_path(@user), notice: 'Your password has been set!  Please tell us a little more about you...'
+      end
     else
+      flash[:error] = "Password could not be saved.  Please try again."
       render :edit
     end
   end
@@ -41,5 +62,13 @@ class PasswordResetsController < ApplicationController
 
   def user_params
     params.permit(:password)
+  end
+
+  def person_params
+    params.permit(:first_name, :last_name)
+  end
+
+  def contact_params
+    params.permit(:email)
   end
 end
