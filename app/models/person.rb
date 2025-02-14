@@ -51,16 +51,19 @@ class Person < ApplicationRecord
     Contact.find_by(email: email)&.person
   end
 
-  # Assumes a 12-month term
   def active_membership(date: DateTime.now())
-    memberships.where("start + INTERVAL '1 month' * term_months > ?", Date.today).or(memberships.where(term_months: nil))
+    Person.common_active_membership_query(memberships)
   end
 
-  def self.active_members
+  def self.common_active_membership_query(record)
     # Round membership expirations to the end of the month by subtracting the remaining days
     # to the end of the month from the comparison date (today)
     day_offset = Date.today.end_of_month - Date.today
-    joins(:memberships).where("memberships.start + INTERVAL '1 month' * memberships.term_months > ?", Date.today - day_offset.days).where(Membership.arel_table[:term_months].gt(0)).or(where(memberships: {term_months: nil}))
+    record.where("memberships.start + INTERVAL '1 month' * memberships.term_months > ?", Date.today - day_offset.days).where(Membership.arel_table[:term_months].gt(0)).or(record.where(memberships: {term_months: nil}))
+  end
+
+  def self.active_members
+    common_active_membership_query(joins(:memberships))
   end
 
   # Take an array of the form [{id: 4}, {name: 'foo'}, ...]

@@ -102,23 +102,6 @@ class PeopleController < ApplicationController
     astrobin_attributes: [:username, :latest_image, :id])
   end
   
-  def and_or_helper(query, operation, field, list)
-    list.select!{|l| l.present?}
-    return query if(list.empty?)
-    query = query.joins(field)
-    
-    if(operation != 'and')
-      query = query.where(field => {id: list})
-    else
-      # Yucky rendering out all the people, but what else to do?
-      _people = Person.where(id: query.map(&:id).uniq).includes(field)
-      _people = _people.select{|p| (list.map(&:to_i) - p.association(field).reader.map(&:id)).empty?}
-      query = Person.where(id: _people.map(&:id))
-    end
-    
-    return query
-  end
-
   def policy_handling
     begin
       set_person
