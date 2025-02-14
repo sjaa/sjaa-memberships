@@ -121,6 +121,8 @@ GEM
       activesupport (>= 6.1)
     google-apis-admin_directory_v1 (0.60.0)
       google-apis-core (>= 0.15.0, < 2.a)
+    google-apis-calendar_v3 (0.45.0)
+      google-apis-core (>= 0.15.0, < 2.a)
     google-apis-core (0.16.0)
       addressable (~> 2.5, >= 2.5.1)
       googleauth (~> 1.9)
@@ -325,6 +327,7 @@ DEPENDENCIES
   dotenv
   faker
   google-apis-admin_directory_v1
+  google-apis-calendar_v3
   google-apis-groupssettings_v1
   googleauth
   hotwire_combobox

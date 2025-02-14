@@ -49,6 +49,18 @@ class GoogleController < ApplicationController
     end # if diff
   end
 
+  # Calendar snippets
+  # cl = client.list_calendar_lists
+  # aecl = cl.items.select{|c| c.summary =~ /2025 sjaa all events/i}
+  # feb_events = client.list_events(aecl.id, time_min: DateTime.now.beginning_of_month, time_max: DateTime.now.end_of_month)
+  # sorted = feb_events.items.sort{|a,b| (a.start.date || a.start.date_time) <=> (b.start.date || b.start.date_time)}
+  # event_days = sorted.map do |ev|
+  #   s = ev.start.date || ev.start.date_time
+  #   e = ev.end.date || ev.end.date_time
+  #   arr = (e-s).to_i.times.map{|t| ev}
+  #   arr << ev
+  # end.flatten
+
   def members_diff
   end
 
