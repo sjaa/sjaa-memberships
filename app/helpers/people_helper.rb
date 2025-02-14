@@ -47,7 +47,7 @@ module PeopleHelper
     
     query = query.active_members.where(memberships: {ephemeris: true}) if(qp[:ephemeris] == 'printed')
     
-    @all_people = query.includes(:donations, :memberships, :contacts, :interests, :roles)
+    @all_people = Person.where(id: query.map(&:id).uniq).includes(:donations, :memberships, :contacts, :interests, :roles)
     @pagy, @people = pagy(@all_people, limit: 40, params: qp)
   end
   
