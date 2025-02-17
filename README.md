@@ -277,8 +277,8 @@ being delivered, but gives you a place to view the emails, through their dashboa
 
 * E-mail views - Done
 * Forgot/Generate password flow - Done
-* Membership Dues Payment Flow
-* Remove status (superceded by role)
+* Membership Dues Payment Flow - Done
+* Remove status (superceded by role) - Done
 * New Member flow
 * Merge two People
 * Widgets Controller
