@@ -280,6 +280,9 @@ being delivered, but gives you a place to view the emails, through their dashboa
 * Membership Dues Payment Flow - Done
 * Remove status (superceded by role) - Done
 * New Member flow
+  * Public signup - done
+  * Review reset password flow
+  * Update person/edit for new members with more descriptive directions
 * Widgets Controller
 * Merge two People
 * Equipment transfers

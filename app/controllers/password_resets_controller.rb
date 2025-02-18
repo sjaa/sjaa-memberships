@@ -2,6 +2,7 @@ class PasswordResetsController < ApplicationController
   skip_before_action :authenticate!
 
   def new
+    @email = params[:email]
   end
 
   def create

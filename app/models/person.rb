@@ -1,10 +1,10 @@
 class Person < ApplicationRecord
   include PasswordResettable
 
-  has_many :memberships, -> {includes(:kind).order(start: :asc)}
+  has_many :memberships, -> {includes(:kind).order(start: :asc)}, dependent: :destroy
   has_many :donations, -> {includes(DonationsController::INCLUDES)}
-  has_many :equipment, -> {includes(:instrument)}
-  has_many :contacts, -> {includes(:city, :state)}
+  has_many :equipment, -> {includes(:instrument)}, dependent: :destroy
+  has_many :contacts, -> {includes(:city, :state)}, dependent: :destroy
   has_and_belongs_to_many :interests
   has_and_belongs_to_many :roles
   has_many :api_keys, as: :bearer

@@ -20,9 +20,19 @@ class SessionsController < ApplicationController
 
   def member_lookup
     @person = Person.find_by_email(params[:email])
+    @email = params[:email]
   end
 
   def new_member
+    @person = Person.create(contact_attributes: [{primary: true, email: params[:email]}], password: params[:password])
+    if(@person.errors.any?)
+      flash[:alert] = "Could not create account: #{@person.errors.full_messages.join(' ')}"
+      redirect_to public_login_path
+    else
+      flash[:success] = "Created account for #{params[:email]}"
+      session[:person_id] = @person.id
+      redirect_to edit_person_path(@person)
+    end
   end
   
   # Empty controller just renders the login form
