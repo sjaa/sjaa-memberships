@@ -1,6 +1,6 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
+  "theme": "maple",
   "name": "SJAA Members DB",
   "colors": {
     "primary": "#16A34A",
@@ -42,7 +42,14 @@
             ]
           },
           {
-            "group": "Endpoint Examples",
+            "group": "Data Types",
+            "pages": [
+              "api-reference/data-types/api-key",
+              "api-reference/data-types/permissions"
+            ]
+          },
+          {
+            "group": "Endpoints",
             "pages": [
               "api-reference/endpoint/get",
               "api-reference/endpoint/create",
@@ -72,14 +79,12 @@
     "dark": "/logo/OriginalSmall.png"
   },
   "navbar": {
-    "links": [
-    ],
+    "links": [],
     "primary": {
       "type": "button",
       "label": "Dashboard",
       "href": "https://dashboard.mintlify.com"
     }
   },
-  "footer": {
-  }
+  "footer": {}
 }

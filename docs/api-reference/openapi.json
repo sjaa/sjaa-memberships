@@ -1,5 +1,5 @@
 {
-  "openapi": "3.0.1",
+  "openapi": "3.1.1",
   "info": {
     "title": "SJAA Database",
     "description": "An API for securely accessing member and club information.",
@@ -15,14 +15,18 @@
   ],
   "security": [
     {
-      "bearerAuth": [],
-      "basicAuth": []
+      "bearerAuth": []
     }
   ],
   "paths": {
     "/api-keys": {
       "post": {
         "description": "Creates a new api key (bearer token) for the user given by Basic auth.",
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Bearer token api key.",
@@ -34,15 +38,8 @@
               }
             }
           },
-          "400": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
           }
         }
       },
@@ -62,84 +59,82 @@
               }
             }
           },
-          "400": {
-            "description": "Unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      },
+      "delete": {
+        "description": "Revoke an API Key (Bearer token).  The token to revoke is the same one used to authenticate this request.",
+        "responses": {
+          "200": {
+            "description": "Revocation successful."
           }
         }
       }
     }
   },
   "components": {
+    "responses": {
+      "Unauthorized": {
+        "description": "Request failed to authenticate or contained insufficient permissions for the operation.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      }
+    },
     "schemas": {
+      "Permissions": {
+        "type": "string",
+        "anyOf": [
+          {
+            "const": "read",
+            "title": "Read",
+            "description": "Allows reading of any data, except permissions."
+          },
+          {
+            "const": "write",
+            "title": "Write",
+            "description": "Allows writing of any data, excpet permissions."
+          },
+          {
+            "const": "permit",
+            "title": "Permit",
+            "description": "Allows reading and writing of permissions for other Admin accounts."
+          }
+        ]
+      },
       "ApiKey": {
         "type": "object",
         "properties": {
           "token": {
             "description": "The Bearer token that can be used to access other API endpoints.",
-            "type": "String"
+            "type": "string"
           },
           "permissions": {
-            "description": "A list of permissions that your api-key is granted.  i.e. read, write, permit.",
-            "type": "Array[String]"
-          }
-        }
-      },
-      "Plant": {
-        "required": [
-          "name"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "description": "The name of the plant",
-            "type": "string"
-          },
-          "tag": {
-            "description": "Tag to specify the type",
-            "type": "string"
-          }
-        }
-      },
-      "NewPlant": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Plant"
-          },
-          {
-            "required": [
-              "id"
-            ],
-            "type": "object",
-            "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
-              }
+            "description": "A list of permissions that your api-key is granted.  Any of these [Permissions](/api-reference/data-types/permissions).",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Permissions"
             }
           }
-        ]
+        }
       },
       "Error": {
         "required": [
-          "error",
-          "message"
+          "errors"
         ],
         "type": "object",
         "properties": {
-          "error": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "message": {
-            "type": "string"
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       }
