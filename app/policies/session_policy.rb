@@ -3,6 +3,18 @@ class SessionPolicy < ApplicationPolicy
     true
   end
 
+  def public_login?
+    true
+  end
+
+  def member_lookup?
+    true
+  end
+
+  def new_member?
+    true
+  end
+
   def request_google_authorization?
     user&.is_a?(Admin)
   end

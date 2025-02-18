@@ -1,0 +1,16 @@
+<div class="row">
+  <div class="col-12">
+    <h1>Update Your Membership</h1>
+    <p>
+      Thank you for your interest in SJAA! Whether you are looking to become a new member, or are
+      a longtime friend of the club you are in the right place. This form will help guide you
+      through logging into an existing membership or creating a new membership. You can use this
+      form to renew your membership and update your personal information, as well.
+    </p>
+    <%= form_with url: member_lookup_path, data: {turbo: 'false'} do |form| %>
+    <%= form.label :email, class: 'form-label' %>
+    <%= form.email_field :email, class: 'form-control' %>
+    <%= form.submit 'Continue', class: 'btn btn-primary mt-2' %>
+    <% end %>
+  </div>
+</div>

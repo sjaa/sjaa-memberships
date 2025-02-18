@@ -3,7 +3,7 @@ require 'google/api_client/client_secrets'
 class SessionsController < ApplicationController
   include Rails.application.routes.url_helpers
 
-  skip_before_action :authenticate!, only: [:login, :create]
+  skip_before_action :authenticate!, only: [:login, :create, :public_login, :member_lookup, :new_member]
   GOOGLE_SCOPES = [
     'https://www.googleapis.com/auth/spreadsheets', 
     'https://www.googleapis.com/auth/admin.directory.group',
@@ -15,6 +15,16 @@ class SessionsController < ApplicationController
   ]
   GOOGLE_CLIENT_SECRETS = Google::APIClient::ClientSecrets.new(JSON.parse Base64.decode64(ENV['GOOGLE_WEB_CLIENT_BASE64']))
 
+  def public_login
+  end
+
+  def member_lookup
+    @person = Person.find_by_email(params[:email])
+  end
+
+  def new_member
+  end
+  
   # Empty controller just renders the login form
   def login
   end

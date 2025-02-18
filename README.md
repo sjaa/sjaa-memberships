@@ -280,8 +280,8 @@ being delivered, but gives you a place to view the emails, through their dashboa
 * Membership Dues Payment Flow - Done
 * Remove status (superceded by role) - Done
 * New Member flow
-* Merge two People
 * Widgets Controller
+* Merge two People
 * Equipment transfers
 * Admin Dashboard?
   * https://adminlte.io

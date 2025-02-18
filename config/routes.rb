@@ -62,6 +62,9 @@ Rails.application.routes.draw do
   get '/google/callback', to: 'sessions#google_oauth2_callback', as: :google_callback
   get '/login', to: 'sessions#login', as: :login
   get '/logout', to: 'sessions#destroy', as: :logout
+  get '/member_login', to: 'sessions#public_login', as: :public_login
+  post '/member_lookup', to: 'sessions#member_lookup', as: :member_lookup
+  post '/new_member', to: 'sessions#new_member', as: :new_member
   get '/unauthorized', to: 'static_pages#unauthorized', as: :unauthorized
 
 end
