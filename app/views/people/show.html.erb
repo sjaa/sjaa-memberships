@@ -7,8 +7,11 @@
       </span>
     </h1>
     <%= link_to "Edit Personal Information", edit_person_path(@person), class: 'btn btn-primary d-inline-block' %>
-    <% if @person.active_membership.first %>
+    <% active_membership = @person.active_membership.first %>
+    <% if active_membership %>
+      <% expiration = (active_membership.start + active_membership.term_months.months).end_of_month %>
       <%= link_to "Membership Active", '#', class: 'btn btn-success d-inline-block' %>
+      Expires <%= date_format(expiration) %>
     <% else %>
       <%= link_to "Renew Membership", membership_renewal_path(id: @person.id), class: 'btn btn-warning d-inline-block' %>
     <% end %>
