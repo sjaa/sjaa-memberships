@@ -38,7 +38,7 @@ class Person < ApplicationRecord
   end
 
   def email
-    return primary_contact&.email || contacts.first.email
+    return primary_contact&.email || contacts.first&.email
   end
 
   # Right now, normal members have no permissions, but they can access their own records
