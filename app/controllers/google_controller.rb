@@ -26,6 +26,9 @@ class GoogleController < ApplicationController
     else
       @members = get_members(auth: @auth)
     end # if diff
+
+    # For fun, kick off a job
+    SyncJob.perform_later(1)
   end
 
   # Calendar snippets
