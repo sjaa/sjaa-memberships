@@ -3,6 +3,6 @@ class SyncJob < ApplicationJob
 
   def perform(*args)
     sleep 5 # just an example
-    ActionCable.server.broadcast "NotificationChannel", "Job is done!"
+    ActionCable.server.broadcast "NotificationChannel", {message: "Job is done!"}
   end
 end
