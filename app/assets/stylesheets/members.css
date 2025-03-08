@@ -9,3 +9,7 @@ div.hw-combobox__main__wrapper {
 .form-label {
   font-weight: bold;
 }
+
+a:visited { 
+  outline: none !important;
+}

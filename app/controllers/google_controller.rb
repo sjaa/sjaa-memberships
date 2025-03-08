@@ -11,21 +11,17 @@ class GoogleController < ApplicationController
       return
     end
 
-    @diff = params[:diff].present?
+    @diff = true
     @commit = params[:commit].present?
 
     if(@commit)
       diff_results = sync(auth: auth, save: true)
     end
 
-    if(@diff)
-      diff_results ||= diff_members_group(auth: @auth)
-      @group_matched = diff_results[:group_matched]
-      @unmatched_people = diff_results[:unmatched_people]
-      @group_unmatched = diff_results[:group_unmatched]
-    else
-      @members = get_members(auth: @auth)
-    end # if diff
+    diff_results ||= diff_members_group(auth: @auth)
+    @group_matched = diff_results[:group_matched]
+    @unmatched_people = diff_results[:unmatched_people]
+    @group_unmatched = diff_results[:group_unmatched]
 
     # For fun, kick off a job
     SyncJob.perform_later(1)
