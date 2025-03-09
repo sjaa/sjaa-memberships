@@ -33,7 +33,7 @@ class ReportsController < ApplicationController
   end
 
   def renewal_reminders
-    @people = People.renewable_members
+    @people = Person.renewable_members.sort_by{|person| person.latest_membership.end}
 
     if(params[:page])
       render turbo_stream: turbo_stream.replace('people', partial: 'people/index')

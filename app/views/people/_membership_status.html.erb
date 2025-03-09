@@ -1,0 +1,34 @@
+<%= turbo_frame_tag 'people' do %>
+  <div class="row" data-controller="clipboard">
+    <div class="col-12 mt-2">
+      <%= button_tag 'Copy Link', class: 'btn btn-secondary d-inline-block', style: 'min-width: 100px; margin-right: 20px;',
+          data: {action: 'clipboard#copy', clipboard_text_param: request.original_url}  %>
+      <%= link_to "Download CSV", renewal_reminders_path(format: :csv), class: 'btn btn-success d-inline-block', style: 'margin-right: 20px;', data: {turbo: false} %>
+    </div>
+    <div class="col-12 clearfix mb-2" data-clipboard-target="status">
+    </div>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover table-striped table-sm">
+      <tr>
+        <th>Name</th>
+        <th>Status</th>
+        <th>Membership End</th>
+        <th>Membership Start</th>
+        <th>Term</th>
+      </tr>
+      <tbody class="table-group-divider">
+        <% @people.each do |person| %>
+          <% last_membership = person.latest_membership %>
+          <tr>
+            <td><%=link_to "#{person.first_name} #{person.last_name}", person_path(person.id), data: {turbo: false} %></td>
+            <td><%=last_membership.is_active? ? 'Active' : 'Expired'%></td>
+            <td><%=last_membership&.end%></td>
+            <td><%=last_membership&.start%></td>
+            <td><%=last_membership&.term_months%></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>

@@ -53,7 +53,7 @@
                     Reports
                   </a>
                   <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#">Lapsed Members</a></li>
+                    <li><%= link_to 'Renewal Reminders', renewal_reminders_path, class: 'dropdown-item' %></li>
                     <li><a class="dropdown-item" href="#">YTD Donations</a></li>
                     <li><%= link_to 'Ephemeris List', ephemeris_report_path, class: 'dropdown-item'%></li>
                   </ul>

@@ -5,6 +5,10 @@ class Membership < ApplicationRecord
   before_save :update_end_date
   inheritance_column = :inherits
 
+  def is_active?
+    DateTime.now <= (self.end || 0)
+  end
+
   private
   def update_end_date
     if(self.start && self.term_months)

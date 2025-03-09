@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
 
+  get '/reports/renewal_reminders', to: 'reports#renewal_reminders', as: :renewal_reminders
   get '/reports/ephemeris', to: 'reports#ephemeris', as: :ephemeris_report
 
   get '/people/:id/new_membership', to: 'people#new_membership', as: :membership_renewal

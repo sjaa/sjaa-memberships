@@ -51,14 +51,15 @@ class Person < ApplicationRecord
     Contact.find_by(email: email)&.person
   end
 
+  def latest_membership
+    memberships.sort_by{|m| m.end}.last
+  end
+
   def active_membership(date: DateTime.now())
     Person.common_active_membership_query(memberships)
   end
 
-  # TODO: Add end date to memberships to simplify all of this
   def self.common_active_membership_query(record)
-    # Round membership expirations to the end of the month by adding
-    # The remainder days of the membership start date to the term
     record.where("memberships.end > ?", Date.today).or(record.where(memberships: {term_months: nil}))
   end
 
@@ -71,7 +72,36 @@ class Person < ApplicationRecord
   def self.renewable_members
     date_max = Date.today.end_of_month + 2.months # Expiring this month and two months ahead
     date_min = Date.today.beginning_of_month - 3.months # Expired up to 3 months ago
-    joins(:memberships).where(memberships: {end: date_min..date_max}).where.not(memberships: {term_months: nil}).where(Membership.arel_table[:term_months].gt(0))
+
+    # Begin the Arel madness
+    people = Person.arel_table
+    memberships = Membership.arel_table
+
+    ## Get a grouping of (person_id, latest_end_date) records
+    latest_dates = Membership.select('person_id, MAX("end") AS latest_end').group(:person_id).arel.as('latest')
+
+    ## Get the actual membership records to go along with said latest_date records
+    latest_memberships = memberships.join(latest_dates)
+      .on(memberships[:person_id].eq(latest_dates[:person_id]).and(memberships[:end].eq(latest_dates[:latest_end])))
+      .project(memberships[Arel.star]).as('latest_membership')
+
+    ## Get the people records to go with the full membership records, and apply the desired date range
+    ppl_mem = people.join(latest_memberships)
+      .on(people[:id].eq(latest_memberships[:person_id]))
+      .project(people[Arel.star])
+      .distinct(people[:id])
+      .where(latest_memberships[:end].between(date_min..date_max))
+
+    # End the madness... returns a plain array, not Active Record or Arel
+    ppl = find_by_sql(ppl_mem.to_sql)
+
+    # Preload memberships data
+    ActiveRecord::Associations::Preloader.new(
+      records: ppl, 
+      associations: :memberships
+    ).call
+
+    return ppl
   end
 
   # Take an array of the form [{id: 4}, {name: 'foo'}, ...]
