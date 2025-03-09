@@ -31,4 +31,13 @@ class ReportsController < ApplicationController
       end
     end
   end
+
+  def renewal_reminders
+    @people = People.renewable_members
+
+    if(params[:page])
+      render turbo_stream: turbo_stream.replace('people', partial: 'people/index')
+      return
+    end
+  end
 end

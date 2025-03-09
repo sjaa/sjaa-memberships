@@ -55,15 +55,25 @@ class Person < ApplicationRecord
     Person.common_active_membership_query(memberships)
   end
 
+  # TODO: Add end date to memberships to simplify all of this
   def self.common_active_membership_query(record)
-    # Round membership expirations to the end of the month by subtracting the remaining days
-    # to the end of the month from the comparison date (today)
-    day_offset = Date.today.end_of_month - Date.today
-    record.where("memberships.start + INTERVAL '1 month' * memberships.term_months > ?", Date.today - day_offset.days).where(Membership.arel_table[:term_months].gt(0)).or(record.where(memberships: {term_months: nil}))
+    # Round membership expirations to the end of the month by adding
+    # The remainder days of the membership start date to the term
+    record.where("memberships.start + (DATE_TRUNC('month', memberships.start + INTERVAL '1 month') - memberships.start) + INTERVAL '1 month' * memberships.term_months > ?", Date.today).where(Membership.arel_table[:term_months].gt(0)).or(record.where(memberships: {term_months: nil}))
   end
 
   def self.active_members
     common_active_membership_query(joins(:memberships))
+  end
+
+  # Members who are within 3 months of expiration are eligible to receive
+  # renewal reminders
+  def self.renewable_members
+    date_max = Date.today.end_of_month + 2.months # Expiring this month and two months ahead
+    date_min = Date.today.beginning_of_month - 3.months # Expired up to 3 months ago
+    joins(:memberships).where("memberships.start + INTERVAL '1 month' * memberships.term_months > ?", date_min).
+      where("memberships.start + INTERVAL '1 month' * memberships.term_months < ?", date_max).
+      where(Membership.arel_table[:term_months].gt(0)).where.not(memberships: {term_months: nil})
   end
 
   # Take an array of the form [{id: 4}, {name: 'foo'}, ...]
