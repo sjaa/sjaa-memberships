@@ -24,7 +24,7 @@ class GoogleController < ApplicationController
     @group_unmatched = diff_results[:group_unmatched]
 
     # For fun, kick off a job
-    SyncJob.perform_later(1)
+    SyncJob.perform_later(get_user_id)
   end
 
   # Calendar snippets

@@ -15,6 +15,17 @@ class ApplicationController < ActionController::Base
     @user = current_user
   end
 
+  def get_user_id
+    id = {}
+
+    if(@user)
+      id[:admin_id] = @user.id if(@user.is_a?(Admin))
+      id[:person_id] = @user.id if(@user.is_a?(Person))
+    end
+
+    return id
+  end
+
   def policy_handling
     # Pick a policy, any policy
     policyClass = nil

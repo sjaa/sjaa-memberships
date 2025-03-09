@@ -14,5 +14,8 @@ consumer.subscriptions.create("NotificationChannel", {
   received(data) {
     // Called when there's incoming data on the websocket for this channel
     alert(data.message)
+
+    // Update notifications partial
+    // Submit an async form to update the notifications via turbostreams
   }
 });

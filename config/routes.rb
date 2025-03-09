@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :notifications
 
   get '/reports/ephemeris', to: 'reports#ephemeris', as: :ephemeris_report
 
