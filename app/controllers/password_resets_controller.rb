@@ -17,7 +17,7 @@ class PasswordResetsController < ApplicationController
     if user
       user.generate_password_reset_token!
       AccountMailer.password_reset(user).deliver_now
-      redirect_to root_path, notice: 'Password reset email has been sent.'
+      redirect_to login_path, notice: 'Password reset email has been sent.'
     else
       if(params[:signup].present?)
         person = Person.create(person_params)
@@ -43,7 +43,8 @@ class PasswordResetsController < ApplicationController
     @user = find_by_reset_token
     if @user.update(user_params)
       @user.reset_password!(params[:password])
-      @user.authenticate(params[:password])
+      key = @user.is_a?(Admin) ? :admin_id : :person_id
+      session[key] = @user.id
 
       if(@signup)
         redirect_to root_path, notice: 'Your password has been reset!'
