@@ -39,10 +39,11 @@ class MembershipsController < ApplicationController
   # Called from people/:id/new_mebership
   #  First step in the PayPal order processing flow
   def create_order
+    person = Person.find membership_params[:person_id]
     mp = membership_params.dup
     ephemeris_amount = mp.delete(:ephemeris_amount)
     mp[:ephemeris] = true if(ephemeris_amount.to_f > 0)
-    mp[:start] = DateTime.now
+    mp[:start] = person.next_membership_start_date
 
     price = SjaaMembers::YEARLY_MEMBERSHIP_RATE
     price += mp[:donation_amount].to_f if(mp[:donation_amount].present?)

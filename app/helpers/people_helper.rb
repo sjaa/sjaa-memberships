@@ -1,4 +1,24 @@
 module PeopleHelper
+  def and_or_helper(query, operation, field, list)
+    list.select!{|l| l.present?}
+    return query if(list.empty?)
+    query = query.joins(field)
+    
+    if(operation != 'and')
+      query = query.where(field => {id: list})
+    else
+      # Yucky rendering out all the people, but what else to do?
+      _people = Person.where(id: query.map(&:id).uniq).includes(field)
+      _people = _people.select{|p| (list.map(&:to_i) - p.association(field).reader.map(&:id)).empty?}
+      query = Person.where(id: _people.map(&:id))
+
+      # Alternative but relies on grouping
+      #query = query.where(field => {id: list}).group(:id).having("COUNT(#{field}.id) >= ?", list.size)
+    end
+    
+    return query
+  end
+
   def filter(_qp = nil)
     if(_qp.nil?)
       @query_params = params.dup
@@ -25,17 +45,7 @@ module PeopleHelper
     query = and_or_helper(query, qp[:interest_operation], :interests, qp[:interests]) if(qp[:interests].present?)
     query = and_or_helper(query, qp[:role_operation], :roles, qp[:roles]) if(qp[:roles].present?)
     
-    # Handle Ephemeris specially
-    if(qp[:ephemeris].present? && qp[:ephemeris] != 'either')
-      _people = Person.where(id: query.map(&:id).uniq).includes(:memberships)
-      if(qp[:ephemeris] == 'printed')
-        _people = _people.select{|p| p.active_membership.first&.ephemeris}
-      else
-        _people = _people.select{|p| !p.active_membership.first&.ephemeris}
-      end
-      
-      query = Person.where(id: _people)
-    end
+    query = query.active_members.where(memberships: {ephemeris: true}) if(qp[:ephemeris] == 'printed')
     
     @all_people = Person.where(id: query.map(&:id).uniq).includes(:donations, :memberships, :contacts, :interests, :roles)
     @pagy, @people = pagy(@all_people, limit: 40, params: qp)

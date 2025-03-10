@@ -82,10 +82,6 @@ def port()
     end
     
     
-    status = Status.find_or_create_by(
-    name: row['Status']&.strip&.downcase || 'unknown'
-    )
-    
     astrobin = (not_empty(row['Astrobin Username'])) ? 
     Astrobin.create(username: row['Astrobin Username']&.strip, latest_image: row['Astrobin Last Posted Image']&.to_i) : 
     nil
@@ -97,7 +93,6 @@ def port()
     person = Person.create(
     first_name: row['First Name'],
     last_name: row['Last Name'],
-    status: status,
     discord_id: row['Discord ID']&.strip,
     astrobin: astrobin,
     notes: notes,

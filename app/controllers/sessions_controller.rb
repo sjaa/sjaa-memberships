@@ -3,16 +3,38 @@ require 'google/api_client/client_secrets'
 class SessionsController < ApplicationController
   include Rails.application.routes.url_helpers
 
-  skip_before_action :authenticate!, only: [:login, :create, :signup, :signup_2]
+  skip_before_action :authenticate!, only: [:login, :create, :public_login, :member_lookup, :new_member. :signup, :signup_2]
   GOOGLE_SCOPES = [
     'https://www.googleapis.com/auth/spreadsheets', 
     'https://www.googleapis.com/auth/admin.directory.group',
     'https://www.googleapis.com/auth/admin.directory.group.member',
     'https://www.googleapis.com/auth/admin.directory.user.security',
     'https://www.googleapis.com/auth/admin.directory.user',
+    'https://www.googleapis.com/auth/apps.groups.settings',
+    'https://www.googleapis.com/auth/calendar.readonly',
   ]
   GOOGLE_CLIENT_SECRETS = Google::APIClient::ClientSecrets.new(JSON.parse Base64.decode64(ENV['GOOGLE_WEB_CLIENT_BASE64']))
 
+  def public_login
+  end
+
+  def member_lookup
+    @person = Person.find_by_email(params[:email])
+    @email = params[:email]
+  end
+
+  def new_member
+    @person = Person.create(contact_attributes: [{primary: true, email: params[:email]}], password: params[:password])
+    if(@person.errors.any?)
+      flash[:alert] = "Could not create account: #{@person.errors.full_messages.join(' ')}"
+      redirect_to public_login_path
+    else
+      flash[:success] = "Created account for #{params[:email]}"
+      session[:person_id] = @person.id
+      redirect_to edit_person_path(@person)
+    end
+  end
+  
   # Empty controller just renders the login form
   def login
   end

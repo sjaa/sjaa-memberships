@@ -1,0 +1,32 @@
+<%= turbo_frame_tag 'people' do %>
+  <div class="row" data-controller="clipboard">
+    <div class="col-12 mt-2">
+      <%= button_tag 'Copy Link', class: 'btn btn-secondary d-inline-block', style: 'min-width: 100px; margin-right: 20px;',
+          data: {action: 'clipboard#copy', clipboard_text_param: request.original_url}  %>
+      <%= link_to "Download CSV", renewal_reminders_path(format: :csv), class: 'btn btn-success d-inline-block', style: 'margin-right: 20px;', data: {turbo: false} %>
+    </div>
+    <div class="col-12 clearfix mb-2" data-clipboard-target="status">
+    </div>
+  </div>
+  <% headers = @table.delete_at(0) %>
+  <div class="table-responsive">
+    <table class="table table-hover table-striped table-sm">
+      <tr>
+        <% headers.slice(1..-1).each do |heading| %>
+          <th><%= heading %></th>
+        <% end %>
+      </tr>
+      <tbody class="table-group-divider">
+          <% @table.each do |row| %>
+            <tr>
+              <%# Grab the ID and Name to make a link %>
+              <td><%=link_to row[1], person_path(row[0]), data: {turbo: false} %></td>
+              <% row.slice(2..-1).each do |entry| %>
+                <td><%=entry%></td>
+              <% end %>
+            </tr>
+          <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>

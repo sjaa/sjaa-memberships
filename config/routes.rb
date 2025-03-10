@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
 
+  get '/reports/renewal_reminders', to: 'reports#renewal_reminders', as: :renewal_reminders
   get '/reports/ephemeris', to: 'reports#ephemeris', as: :ephemeris_report
   get '/signup', to: 'sessions#signup', as: :signup
 
@@ -57,12 +58,14 @@ Rails.application.routes.draw do
   get '/api-keys', to: 'api_keys#index'
 
   resource :sessions
-  get '/google/members/diff', to: 'google#members_diff', as: :google_members_diff
   get '/google/members', to: 'google#members', as: :google_members
   get '/google/auth', to: 'sessions#request_google_authorization', as: :google_auth
   get '/google/callback', to: 'sessions#google_oauth2_callback', as: :google_callback
   get '/login', to: 'sessions#login', as: :login
   get '/logout', to: 'sessions#destroy', as: :logout
+  get '/member_login', to: 'sessions#public_login', as: :public_login
+  post '/member_lookup', to: 'sessions#member_lookup', as: :member_lookup
+  post '/new_member', to: 'sessions#new_member', as: :new_member
   get '/unauthorized', to: 'static_pages#unauthorized', as: :unauthorized
 
 end

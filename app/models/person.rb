@@ -1,10 +1,10 @@
 class Person < ApplicationRecord
   include PasswordResettable
 
-  has_many :memberships, -> {includes(:kind).order(start: :asc)}
+  has_many :memberships, -> {includes(:kind).order(start: :asc)}, dependent: :destroy
   has_many :donations, -> {includes(DonationsController::INCLUDES)}
-  has_many :equipment, -> {includes(:instrument)}
-  has_many :contacts, -> {includes(:city, :state)}
+  has_many :equipment, -> {includes(:instrument)}, dependent: :destroy
+  has_many :contacts, -> {includes(:city, :state)}, dependent: :destroy
   has_and_belongs_to_many :interests
   has_and_belongs_to_many :roles
   has_many :api_keys, as: :bearer
@@ -12,33 +12,18 @@ class Person < ApplicationRecord
   belongs_to :astrobin, optional: true
   belongs_to :referral, optional: true
 
-  def self.lapsed_members(status: nil)
-    people_query = Person.all
-    people_query = people_query.joins(:status).where(status: {name: status}) if(status)
-    result = people_query.select do |person|
-      latest_membership = person.memberships.order(start: :desc).first
-      if(latest_membership.term_months.nil?)
-        true
-      elsif(latest_membership.start.nil?)
-        false
-      else
-        (latest_membership.start + latest_membership.term_months.months) < DateTime.now
-      end
-    end
-
-    return result
-  end
-
   def name
     return "#{first_name} #{last_name}"
   end
 
   def primary_contact
-    contacts.where(primary: true).first
+    # Use ruby functions to select out primary contacts to take advantage of any
+    # preloading
+    contacts.to_a.select{|c| c.primary}.first
   end
 
   def email
-    return primary_contact&.email || contacts.first.email
+    return primary_contact&.email || contacts.first&.email
   end
 
   # Right now, normal members have no permissions, but they can access their own records
@@ -51,13 +36,69 @@ class Person < ApplicationRecord
     Contact.find_by(email: email)&.person
   end
 
-  # Assumes a 12-month term
+  def latest_membership
+    memberships.sort_by{|m| m.end}.last
+  end
+
+  def next_membership_start_date
+    if(latest_membership.is_active?)
+      return (latest_membership.end + 1.day).beginning_of_month
+    end
+
+    return Date.today
+  end
+
+  def status
+    latest_membership&.is_active? ? 'Active' : 'Expired'
+  end
+
   def active_membership(date: DateTime.now())
-    memberships.where("start + INTERVAL '1 month' * term_months > ?", Date.today).or(memberships.where(term_months: nil))
+    Person.common_active_membership_query(memberships)
+  end
+
+  def self.common_active_membership_query(record)
+    record.where("memberships.end > ?", Date.today).or(record.where(memberships: {term_months: nil}))
   end
 
   def self.active_members
-    joins(:memberships).where("memberships.start + INTERVAL '1 month' * memberships.term_months > ?", Date.today).or(where(memberships: {term_months: nil}))
+    common_active_membership_query(joins(:memberships))
+  end
+
+  # Members who are within 3 months of expiration are eligible to receive
+  # renewal reminders
+  def self.renewable_members
+    date_max = Date.today.end_of_month + 2.months # Expiring this month and two months ahead
+    date_min = Date.today.beginning_of_month - 3.months # Expired up to 3 months ago
+
+    # Begin the Arel madness
+    people = Person.arel_table
+    memberships = Membership.arel_table
+
+    ## Get a grouping of (person_id, latest_end_date) records
+    latest_dates = Membership.select('person_id, MAX("end") AS latest_end').group(:person_id).arel.as('latest')
+
+    ## Get the actual membership records to go along with said latest_date records
+    latest_memberships = memberships.join(latest_dates)
+      .on(memberships[:person_id].eq(latest_dates[:person_id]).and(memberships[:end].eq(latest_dates[:latest_end])))
+      .project(memberships[Arel.star]).as('latest_membership')
+
+    ## Get the people records to go with the full membership records, and apply the desired date range
+    ppl_mem = people.join(latest_memberships)
+      .on(people[:id].eq(latest_memberships[:person_id]))
+      .project(people[Arel.star])
+      .distinct(people[:id])
+      .where(latest_memberships[:end].between(date_min..date_max))
+
+    # End the madness... returns a plain array, not Active Record or Arel
+    ppl = find_by_sql(ppl_mem.to_sql)
+
+    # Preload memberships data
+    ActiveRecord::Associations::Preloader.new(
+      records: ppl, 
+      associations: [:memberships, :contacts]
+    ).call
+
+    return ppl
   end
 
   # Take an array of the form [{id: 4}, {name: 'foo'}, ...]

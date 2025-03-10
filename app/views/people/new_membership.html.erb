@@ -4,6 +4,8 @@
     <div class="col-12">
       <h1>Membership For <%= @person.name %></h1>
     </div>
+    <div class="col-12 d-none alert alert-danger" id="paypalErrors">
+    </div>
     <!-- hidden fields -->
     <%= f.hidden_field :person_id, value: @person.id %>
     <%= f.hidden_field :term_months, value: SjaaMembers::DEFAULT_MEMBERSHIP_TERM %>
@@ -23,6 +25,10 @@
     <div class="col-12 mt-4 table-responsive">
       <h2>Invoice</h2>
       <table class="table" style="max-width: 400px;">
+        <tr style="border-bottom: thick; border-style: double;">
+          <td><strong>Start Date</strong></td>
+          <td><strong><%= date_format @person.next_membership_start_date %></strong></td>
+        </tr>
         <tr>
           <td>Membership Fee</td>
           <td>$<span data-invoice-target="constant"><%=SjaaMembers::YEARLY_MEMBERSHIP_RATE%></span></td>

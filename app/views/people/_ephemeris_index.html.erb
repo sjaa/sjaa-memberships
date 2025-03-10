@@ -1,0 +1,39 @@
+<%= turbo_frame_tag 'people' do %>
+  <div class="row" data-controller="clipboard">
+    <div class="col-12 mt-2">
+      <%= button_tag 'Copy Link', class: 'btn btn-secondary d-inline-block', style: 'min-width: 100px; margin-right: 20px;',
+          data: {action: 'clipboard#copy', clipboard_text_param: request.original_url}  %>
+      <%= link_to "Download CSV", ephemeris_report_path(format: :csv), class: 'btn btn-success d-inline-block', style: 'margin-right: 20px;', data: {turbo: false} %>
+    </div>
+    <div class="col-12 mt-2">
+      <%= pagy_bootstrap_nav(@pagy).html_safe %>
+    </div>
+    <div class="col-12 clearfix mb-2" data-clipboard-target="status">
+    </div>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover table-striped table-sm">
+      <tr>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Address</th>
+        <th>City</th>
+        <th>State</th>
+        <th>Zip</th>
+      </tr>
+      <tbody class="table-group-divider">
+        <% @people.each do |person| %>
+          <tr>
+            <td><%=link_to person.first_name, person_path(person.id), data: {turbo: false} %></td>
+            <td><%=person.last_name%></td>
+            <td><%=person.primary_contact&.address%></td>
+            <td><%=person.primary_contact&.city&.name%></td>
+            <td><%=person.primary_contact&.state&.short_name%></td>
+            <td><%=person.primary_contact&.zipcode%></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  <%= pagy_bootstrap_nav(@pagy).html_safe %>
+<% end %>
