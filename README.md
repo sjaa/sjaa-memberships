@@ -18,6 +18,13 @@ The data model in this app allows us to store a lot more robust and accurate inf
 
 All of this data is also structured so as to maximize data integrity, unlike a spreadsheet, where typos can make it hard to get accurate query results.
 
+# Debugs
+
+## Postgres docker doesn't build
+
+Update the Dockerfile-postgres: https://hub.docker.com/_/postgres
+Don't forget to update this: `> ENTRYPOINT ["docker-entrypoint.sh"]`
+
 # Use Cases
 
 The app should serve as a secure store for the membership data, and should facilitate a variety of use cases:
