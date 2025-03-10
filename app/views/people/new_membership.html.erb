@@ -4,6 +4,8 @@
     <div class="col-12">
       <h1>Membership For <%= @person.name %></h1>
     </div>
+    <div class="col-12 d-none alert alert-danger" id="paypalErrors">
+    </div>
     <!-- hidden fields -->
     <%= f.hidden_field :person_id, value: @person.id %>
     <%= f.hidden_field :term_months, value: SjaaMembers::DEFAULT_MEMBERSHIP_TERM %>

@@ -64,12 +64,14 @@ function loadPayPalButtons() {
           const responseData = await response.json();
 
           if (responseData.status === 'COMPLETED') {
-            alert('COMPLETED');
             console.log('Payment complete!');
             window.location.href = responseData.redirect;
           }
           else {
             console.log(`PayPal capture error: ${responseData.error}`);
+            var errorDiv = document.getElementById('paypalErrors');
+            errorDiv.innerHTML = `A PayPal Error Occurred: ${responseData.error} <br/>Please try again later`;
+            errorDiv.classList.remove('d-none');
           }
         }
       }).render('#paypal-button-container');
