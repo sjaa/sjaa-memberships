@@ -41,7 +41,7 @@ class Person < ApplicationRecord
   end
 
   def next_membership_start_date
-    if(latest_membership.is_active?)
+    if(latest_membership&.is_active?)
       return (latest_membership.end + 1.day).beginning_of_month
     end
 
