@@ -8,26 +8,24 @@
     <div class="col-12 clearfix mb-2" data-clipboard-target="status">
     </div>
   </div>
+  <% headers = @table.delete_at(0) %>
   <div class="table-responsive">
     <table class="table table-hover table-striped table-sm">
       <tr>
-        <th>Name</th>
-        <th>Status</th>
-        <th>Membership End</th>
-        <th>Membership Start</th>
-        <th>Term</th>
+        <% headers.slice(1..-1).each do |heading| %>
+          <th><%= heading %></th>
+        <% end %>
       </tr>
       <tbody class="table-group-divider">
-        <% @people.each do |person| %>
-          <% last_membership = person.latest_membership %>
-          <tr>
-            <td><%=link_to "#{person.first_name} #{person.last_name}", person_path(person.id), data: {turbo: false} %></td>
-            <td><%=last_membership.is_active? ? 'Active' : 'Expired'%></td>
-            <td><%=last_membership&.end%></td>
-            <td><%=last_membership&.start%></td>
-            <td><%=last_membership&.term_months%></td>
-          </tr>
-        <% end %>
+          <% @table.each do |row| %>
+            <tr>
+              <%# Grab the ID and Name to make a link %>
+              <td><%=link_to row[1], person_path(row[0]), data: {turbo: false} %></td>
+              <% row.slice(2..-1).each do |entry| %>
+                <td><%=entry%></td>
+              <% end %>
+            </tr>
+          <% end %>
       </tbody>
     </table>
   </div>

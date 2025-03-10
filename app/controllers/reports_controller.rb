@@ -1,6 +1,7 @@
 class ReportsController < ApplicationController
   include ReportsHelper
   include PeopleHelper
+  include ApplicationHelper
 
   def ephemeris
     filter({ephemeris: 'printed'})
@@ -34,10 +35,20 @@ class ReportsController < ApplicationController
 
   def renewal_reminders
     @people = Person.renewable_members.sort_by{|person| person.latest_membership.end}
+    @table = [['ID', 'Name', 'Status', 'Email', 'Membership End', 'Membership Start', 'Term']]
+    @table += @people.map{|person| [person.id, person.name, person.status, person.email, date_format(person.latest_membership&.end), date_format(person.latest_membership&.start), person.latest_membership&.term_months]}
 
-    if(params[:page])
-      render turbo_stream: turbo_stream.replace('people', partial: 'people/index')
-      return
+    respond_to do |format|
+      format.html
+      format.csv do
+        csv_data = CSV.generate(headers: true) do |csv|
+          @table.each do |row|
+            csv << row
+          end
+        end
+
+        send_data csv_data, filename: "sjaa-renewal-reminders-#{Date.today}.csv"
+      end
     end
   end
 end

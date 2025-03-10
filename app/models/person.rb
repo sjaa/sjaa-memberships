@@ -34,7 +34,9 @@ class Person < ApplicationRecord
   end
 
   def primary_contact
-    contacts.where(primary: true).first
+    # Use ruby functions to select out primary contacts to take advantage of any
+    # preloading
+    contacts.to_a.select{|c| c.primary}.first
   end
 
   def email
@@ -53,6 +55,10 @@ class Person < ApplicationRecord
 
   def latest_membership
     memberships.sort_by{|m| m.end}.last
+  end
+
+  def status
+    latest_membership&.is_active? ? 'Active' : 'Expired'
   end
 
   def active_membership(date: DateTime.now())
@@ -98,7 +104,7 @@ class Person < ApplicationRecord
     # Preload memberships data
     ActiveRecord::Associations::Preloader.new(
       records: ppl, 
-      associations: :memberships
+      associations: [:memberships, :contacts]
     ).call
 
     return ppl
