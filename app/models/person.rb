@@ -12,23 +12,6 @@ class Person < ApplicationRecord
   belongs_to :astrobin, optional: true
   belongs_to :referral, optional: true
 
-  def self.lapsed_members(status: nil)
-    people_query = Person.all
-    people_query = people_query.joins(:status).where(status: {name: status}) if(status)
-    result = people_query.select do |person|
-      latest_membership = person.memberships.order(start: :desc).first
-      if(latest_membership.term_months.nil?)
-        true
-      elsif(latest_membership.start.nil?)
-        false
-      else
-        (latest_membership.start + latest_membership.term_months.months) < DateTime.now
-      end
-    end
-
-    return result
-  end
-
   def name
     return "#{first_name} #{last_name}"
   end
@@ -55,6 +38,14 @@ class Person < ApplicationRecord
 
   def latest_membership
     memberships.sort_by{|m| m.end}.last
+  end
+
+  def next_membership_start_date
+    if(latest_membership.is_active?)
+      return (latest_membership.end + 1.day).beginning_of_month
+    end
+
+    return Date.today
   end
 
   def status

@@ -23,6 +23,10 @@
     <div class="col-12 mt-4 table-responsive">
       <h2>Invoice</h2>
       <table class="table" style="max-width: 400px;">
+        <tr style="border-bottom: thick; border-style: double;">
+          <td><strong>Start Date</strong></td>
+          <td><strong><%= date_format @person.next_membership_start_date %></strong></td>
+        </tr>
         <tr>
           <td>Membership Fee</td>
           <td>$<span data-invoice-target="constant"><%=SjaaMembers::YEARLY_MEMBERSHIP_RATE%></span></td>
