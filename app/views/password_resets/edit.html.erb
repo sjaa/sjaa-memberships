@@ -2,13 +2,9 @@
   <div class="col-12">
     <h1>Reset Your Password</h1>
     <%= form_with(url: password_reset_form_path(@user.reset_password_token, signup: @signup), local: true) do |form| %>
-      <div class="field">
         <%= form.label :password, 'Password', class: 'form-label' %>
         <%= form.password_field :password, class: 'form-control' %>
-      </div>
-      <div class="actions">
-        <%= form.submit "Update Password", class: 'btn btn-primary' %>
-      </div>
+        <%= form.submit "Update Password", class: 'mt-4 btn btn-primary' %>
     <% end %>
   </div>
 </div>

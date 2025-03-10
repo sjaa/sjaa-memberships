@@ -43,6 +43,7 @@ class PasswordResetsController < ApplicationController
     @user = find_by_reset_token
     if @user.update(user_params)
       @user.reset_password!(params[:password])
+      @user.authenticate(params[:password])
 
       if(@signup)
         redirect_to root_path, notice: 'Your password has been reset!'
