@@ -1,10 +1,10 @@
 <div class="row">
-  <h1>Editing <%= @person.name %>
-  </h1>
+  <h1>Editing <%= @person.name %></h1>
 </div>
+<%= render partial: 'renew_button' %>
 <%= render "form" , person: @person %>
 <div class="row">
   <div>
-    <%= link_to "View Person" , @person, class: 'btn btn-secondary mt-4' %> 
+    <%= link_to "Back to Person Details" , @person, class: 'btn btn-secondary mt-4' %> 
   </div>
 </div>

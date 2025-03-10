@@ -6,6 +6,7 @@ class Membership < ApplicationRecord
   inheritance_column = :inherits
 
   def is_active?
+    return true if(self.end.nil?)
     DateTime.now <= (self.end || 0)
   end
 
