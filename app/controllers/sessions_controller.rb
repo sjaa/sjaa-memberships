@@ -3,7 +3,7 @@ require 'google/api_client/client_secrets'
 class SessionsController < ApplicationController
   include Rails.application.routes.url_helpers
 
-  skip_before_action :authenticate!, only: [:login, :create, :public_login, :member_lookup, :new_member. :signup, :signup_2]
+  skip_before_action :authenticate!, only: [:login, :create, :public_login, :member_lookup, :new_member, :signup, :signup_2]
   GOOGLE_SCOPES = [
     'https://www.googleapis.com/auth/spreadsheets', 
     'https://www.googleapis.com/auth/admin.directory.group',
