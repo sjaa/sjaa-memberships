@@ -18,31 +18,27 @@ def rand_bool()
   rand(0..1) == 1
 end
 
-use_port = false
-
-# Default admins
 admin = Admin.create(email: 'vp@sjaa.net', password: 'secret')
 admin.permissions += [PERMISSION_HASH['read'], PERMISSION_HASH['write'], PERMISSION_HASH['permit']]
-admin = Admin.create(email: 'read@sjaa.net', password: 'secret')
-admin.permissions += [PERMISSION_HASH['read']]
-admin = Admin.create(email: 'readwrite@sjaa.net', password: 'secret')
-admin.permissions += [PERMISSION_HASH['read'], PERMISSION_HASH['write']]
 
-referrals = {'internet' => 'Web search', 'friend' => 'Referred from a friend', 'school' => 'From a class at school'}.map{|name, desc| Referral.create(name: name, description: desc)}
-states = {'CA' => 'California', 'AZ' => 'Arizona', 'IL' => 'Illinois'}.map{|s,n| State.create(name: n, short_name: s)}
-kinds = [nil, MembershipKind.create(name: 'VB-M'), MembershipKind.create(name: 'LIFETIME'), nil, nil]
-instrument_kind = %w(telescope mount camera binocular)
-instrument_model = ['ASI2600MC', 'MEADE LX5000', 'CELESTRON AVX14', 'STELLARVUE 80ST', 'ASKAR 50MM', 'CELESTRON 10x50']
-instruments = instrument_kind.product(instrument_model).map{|kind, model| Instrument.create(kind: kind, model: model)}
-roles = {'SJAA Observers' => Faker::Internet.email, 'SJAA Imagers' => Faker::Internet.email, 'SJAA Board' => Faker::Internet.email, 'Member' => nil, 'Expired' => nil}.map{|n,e| Role.create(name: n, email: e, short_name: n.split(' ').map(&:first).join.upcase)}
-phase_names = %w(offered received letter consigned sold)
-
-# Import SJAA Data
-if(use_port)
-  port()
-else
+use_faker = false
+if(use_faker)
+  # Default admins
+  admin = Admin.create(email: 'read@sjaa.net', password: 'secret')
+  admin.permissions += [PERMISSION_HASH['read']]
+  admin = Admin.create(email: 'readwrite@sjaa.net', password: 'secret')
+  admin.permissions += [PERMISSION_HASH['read'], PERMISSION_HASH['write']]
   
-  # OR use Faker
+  referrals = {'internet' => 'Web search', 'friend' => 'Referred from a friend', 'school' => 'From a class at school'}.map{|name, desc| Referral.create(name: name, description: desc)}
+  states = {'CA' => 'California', 'AZ' => 'Arizona', 'IL' => 'Illinois'}.map{|s,n| State.create(name: n, short_name: s)}
+  kinds = [nil, MembershipKind.create(name: 'VB-M'), MembershipKind.create(name: 'LIFETIME'), nil, nil]
+  instrument_kind = %w(telescope mount camera binocular)
+  instrument_model = ['ASI2600MC', 'MEADE LX5000', 'CELESTRON AVX14', 'STELLARVUE 80ST', 'ASKAR 50MM', 'CELESTRON 10x50']
+  instruments = instrument_kind.product(instrument_model).map{|kind, model| Instrument.create(kind: kind, model: model)}
+  roles = {'SJAA Observers' => Faker::Internet.email, 'SJAA Imagers' => Faker::Internet.email, 'SJAA Board' => Faker::Internet.email, 'Member' => nil, 'Expired' => nil}.map{|n,e| Role.create(name: n, email: e, short_name: n.split(' ').map(&:first).join.upcase)}
+  phase_names = %w(offered received letter consigned sold)
+  
+  
   # Generate 100 people
   100.times do 
     # Random Person
