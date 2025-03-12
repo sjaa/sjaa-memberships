@@ -15,7 +15,7 @@ class GoogleController < ApplicationController
     @commit = params[:commit].present?
 
     if(@commit)
-      diff_results = sync(auth: auth, save: true)
+      diff_results = sync(auth: @auth, save: true)
     end
 
     if(@diff)
