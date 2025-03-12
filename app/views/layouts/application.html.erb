@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!--<html data-bs-theme="dark">-->
+<!--<html data-bs-theme="sjaa-dark">-->
 <html>
   <head>
     <title>SjaaMembers</title>
@@ -12,7 +12,7 @@
     <%= combobox_style_tag %>
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
       <div class="container-fluid">
         <a class="navbar-brand" href="#">SJAA Members</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -78,7 +78,7 @@
         </div>
       </div>
     </nav>
-    <div class="container-fluid" style="max-width: 1500px">
+    <div class="container-fluid" style="max-width: 1200px">
       <% {'warning' => notice, 'success' => flash[:success], 'danger' => flash[:alert]}.each do |style, msg| %>
         <% if msg %>
           <div class="alert alert-<%=style%> alert-dismissible fade show" role="alert">
