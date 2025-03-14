@@ -106,6 +106,8 @@ GEM
       irb (~> 1.10)
       reline (>= 0.3.8)
     declarative (0.0.20)
+    dockerfile-rails (1.7.9)
+      rails (>= 3.0.0)
     dotenv (3.1.7)
     drb (2.2.1)
     erubi (1.13.1)
@@ -337,6 +339,7 @@ DEPENDENCIES
   capybara
   csv
   debug
+  dockerfile-rails
   dotenv
   faker
   google-apis-admin_directory_v1

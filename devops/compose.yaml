@@ -1,7 +1,7 @@
 services:
   db:
     image: postgres:latest
-    container_name: postgres_container
+    container_name: postgres_devops_container
     build:
       context: .
       dockerfile: Dockerfile-postgres
