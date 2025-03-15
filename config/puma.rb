@@ -14,7 +14,7 @@ threads min_threads_count, max_threads_count
 # Specifies that the worker count should equal the number of processors in production.
 if ENV["RAILS_ENV"] == "production"
   require "concurrent-ruby"
-  worker_count = 2
+  worker_count = 1
   workers worker_count if worker_count > 1
 end
 
