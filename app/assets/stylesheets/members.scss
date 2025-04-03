@@ -9,3 +9,17 @@ div.hw-combobox__main__wrapper {
 .form-label {
   font-weight: bold;
 }
+
+.active {
+  background-color: $success-bg-subtle !important;
+  color: $success !important;
+  text-align: center;
+  font-weight: bold;
+}
+
+.inactive {
+  background-color: $danger-bg-subtle !important;
+  color: $danger !important;
+  text-align: center;
+  font-weight: bold;
+}

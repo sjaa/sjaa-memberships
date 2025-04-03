@@ -52,6 +52,17 @@ class Person < ApplicationRecord
     latest_membership&.is_active? ? 'Active' : 'Expired'
   end
 
+  # Pick out preloaded memberships that match this person
+  def membership_map(_memberships, current = false)
+    matches = _memberships[self.id] || []
+    if(current)
+      now = DateTime.now()
+      matches.select{|m| m.term_months == nil || (m.start <= now && m.end >= now)}
+    end
+
+    return matches
+  end
+
   def active_membership(date: DateTime.now())
     Person.common_active_membership_query(memberships)
   end

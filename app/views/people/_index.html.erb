@@ -15,6 +15,7 @@
   <div class="table-responsive">
     <table class="table table-hover table-striped table-sm">
       <tr>
+        <th>Status</th>
         <th>Name</th>
         <th>Email</th>
         <th>Phone</th>
@@ -27,13 +28,16 @@
       </tr>
       <tbody class="table-group-divider">
         <% @people.each do |person| %>
+          <% active_membership = person.membership_map(@active_memberships, true)&.last %>
+          <% active = active_membership ? 'ACTIVE' : 'INACTIVE' %>
           <tr>
+            <td class="<%=active.downcase%>"><%=active%></td>
             <td><%=link_to "#{person.first_name} #{person.last_name}", person_path(person.id), data: {turbo: false} %></td>
             <td><%=person.contacts.map(&:email).join('<br/>').html_safe%></td>
             <td><%=person.contacts.map(&:phone).join('<br/>').html_safe%></td>
             <td><%=person.contacts.map{|con| con.city&.name}.join('<br/>').html_safe%></td>
             <td><%=person.contacts.map{|con| con.state&.short_name}.join('<br/>').html_safe%></td>
-            <td><%=person.active_membership.last&.ephemeris ? 'PRINT' : ''%></td>
+            <td><%=active_membership&.ephemeris ? 'PRINT' : ''%></td>
             <td><%=person.interests.map{|i| i.name&.titleize}.join(', ')%></td>
             <td><%=person.roles.map(&:name).join(', ')%></td>
             <!--<td><%=person.donations.map{|d| dollar_format(d.value)}.join(', ')%></td>-->
