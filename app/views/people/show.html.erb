@@ -68,6 +68,12 @@
     </div>
   </div>
   <div class="row">
+    <% if @person.donations.count > 0 %>
+      <div class="col-12 table-responsive">
+        <h2>Donations</h2>
+        <%= render partial: 'donations/index' , locals: {donations: @person.donations} %>
+      </div>
+    <% end %>
     <div class="col-xs-12 col-md-6 table-responsive">
       <h2>Memberships</h2>
       <table class="table table-striped table-hover">
@@ -99,10 +105,6 @@
           </tr>
         <% end %>
       </table>
-    </div>
-    <div class="col-xs-12 col-md-6 table-responsive">
-      <h2>Donations</h2>
-      <%= render partial: 'donations/index' , locals: {donations: @person.donations} %>
     </div>
   </div>
   <% if @user.is_a?(Admin) %>
