@@ -26,7 +26,7 @@ module PeopleHelper
       @query_params.delete(:submit)
       @query_params.select!{|k,v| v.present?}
       @query_params = @query_params.permit(
-      :role_operation, :interest_operation, :first_name, :last_name, :email, :phone, :city, :state, :ephemeris, interests: [], roles: []
+      :role_operation, :interest_operation, :first_name, :last_name, :email, :phone, :city, :state, :ephemeris, :active, interests: [], roles: []
       )
       qp = @query_params.to_h
     else
@@ -46,6 +46,15 @@ module PeopleHelper
     query = and_or_helper(query, qp[:role_operation], :roles, qp[:roles]) if(qp[:roles].present?)
     
     query = query.active_members.where(memberships: {ephemeris: true}) if(qp[:ephemeris] == 'printed')
+
+    # Do the active filter last, as this turns query into an Array
+    if(qp[:active] == 'yes')
+      # Subtract out the inactive people
+      query = query - Person.inactive_members
+    elsif(qp[:active] == 'no')
+      # Subtract out the active people
+      query = query - Person.active_members
+    end
     
     @all_people = Person.where(id: query.map(&:id).uniq).includes(:donations, :memberships, :contacts, :interests, :roles)
     @pagy, @people = pagy(@all_people, limit: 40, params: qp)

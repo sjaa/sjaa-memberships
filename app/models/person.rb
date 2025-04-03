@@ -56,6 +56,11 @@ class Person < ApplicationRecord
     Person.common_active_membership_query(memberships)
   end
 
+  # Returns an Array.  Can't be chained with other AR calls
+  def self.inactive_members
+    Person.all - active_members
+  end
+
   def self.common_active_membership_query(record)
     record.where("memberships.end > ?", Date.today).or(record.where(memberships: {term_months: nil}))
   end

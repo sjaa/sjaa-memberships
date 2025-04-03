@@ -82,6 +82,23 @@
         <%= f.label :ephemeris, 'Ephemeris Subscription', class: 'form-label' %>
         <%= f.select :ephemeris, options_for_select([ ['DIGITAL', 'digital'], ['PRINTED', 'printed'] ], selected: @query_params[:ephemeris] || 'either'), {}, {class: 'form-control', data: { action: "change->search-form#search" } } %>
       </div>
+      <div class="col-md-3 col-xs-12 mb-3">
+        <%= f.label :active, 'Active Members', class: 'form-label' %>
+        <div class="col-12">
+        <span style="margin-right: 20px;">
+          <%= radio_button_tag 'active', 'yes', class: 'form-check-input', checked: @query_params[:active] == 'yes', data: {action: "search-form#search"} %>
+          <%= label_tag 'active_yes', 'Yes', class: 'form-check-label' %>
+        </span>
+        <span style="margin-right: 20px;">
+          <%= radio_button_tag 'active', 'no', class: 'form-check-input', checked: @query_params[:active] == 'no', data: {action: "search-form#search"} %>
+          <%= label_tag 'active_no', 'No', class: 'form-check-label' %>
+        </span>
+        <span style="margin-right: 20px;">
+          <%= radio_button_tag 'active', 'either', class: 'form-check-input', checked: !(['yes', 'no'].include?(@query_params[:active])) , data: {action: "search-form#search"} %>
+          <%= label_tag 'active_either', 'Either', class: 'form-check-label' %>
+        </span>
+        </div>
+      </div>
     </div>
   <% end %>
   <div id="people" class="col-12 mt-2">
