@@ -9,7 +9,7 @@ class PasswordResetsController < ApplicationController
     user = Admin.find_by(email: params[:email]) || Person.find_by_email(params[:email])
 
     if(user && params[:signup].present?)
-      flash[:error] = "The email #{params[:email]} is already registered.  Please log in or reset your password."
+      flash[:alert] = "The email #{params[:email]} is already registered.  Please log in or reset your password."
       redirect_to login_path
       return
     end
@@ -25,7 +25,7 @@ class PasswordResetsController < ApplicationController
         person.generate_password_reset_token!
         AccountMailer.password_reset(person).deliver_now
       else
-        flash.now[:alert] = 'Email address not found.'
+        flash[:alert] = 'Email address not found.'
         render :new
       end
     end
