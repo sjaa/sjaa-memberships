@@ -78,7 +78,7 @@
         </div>
       </div>
     </nav>
-    <div class="container-fluid" style="max-width: 1200px">
+    <div class="container-fluid mt-2" style="max-width: 1200px">
       <% {'warning' => notice, 'success' => flash[:success], 'danger' => flash[:alert]}.each do |style, msg| %>
         <% if msg %>
           <div class="alert alert-<%=style%> alert-dismissible fade show" role="alert">

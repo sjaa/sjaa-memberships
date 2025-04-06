@@ -21,9 +21,10 @@ class PasswordResetsController < ApplicationController
     else
       if(params[:signup].present?)
         person = Person.create(person_params)
-        contact = Contact.create(contact_params[:email], person_id: person.id)
+        contact = Contact.create(email: contact_params[:email], person_id: person.id)
         person.generate_password_reset_token!
         AccountMailer.password_reset(person).deliver_now
+        redirect_to login_path, notice: 'Please check your email to set your password and complete registration.'
       else
         flash[:alert] = 'Email address not found.'
         render :new
