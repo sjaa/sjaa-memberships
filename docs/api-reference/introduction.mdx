@@ -1,33 +1,44 @@
 ---
 title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+description: 'Features and usage of the REST API'
 ---
 
-<Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
-</Note>
+This app provides a secure [REST API](https://www.ibm.com/think/topics/rest-apis) to access various membership and user data.
+This allows for a *secure* and *managed* way to incorporate appropriate data from our membership database into other applications.
+For example, a widget on the public website could use this API to get a list of available equipment in the loaner program.  Or, 
+a Discord Bot could verify a person's membership status to grant them access to more channels in the Discord Server.  Or, perhaps
+someone wants to write a program that syncs our mailing lists with our active membership and their interests.  
 
-## Welcome
+The API is an interface to our organization's data.
+Anything that is stored in the database can be securely made available for automation, reporting, or other appropriate jobs.
+It serves as the basis for building applications to help us administer a growing organization.  It is accessible in any programming
+language, so if developers come and go with different expertise, the API remains a common denominator.
 
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
+## Basics
 
-<Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
->
-  View the OpenAPI specification file
-</Card>
+Access to the API is through HTTP requests.  This standard is accessible through any number of libraries across any programming language.
+The Endpoints section lists different queries that can be made, and has interactive examples on how to use each one.  For example, the [Get API Key](endpoint/get) endpoint shows how to make a request to list all of your API Keys.  In each endpoint page
+there is sample code in a number of different programming language.  Pick your favorite, and get coding!
 
-## Authentication
+### Authentication
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+Almost all API endpoints are authenticated using Bearer tokens.  These are sometimes also referred to as "tokens" or "API Keys."
+Regardless of the name, the idea is the same.  It is a string that can be used as a substitute for your username and password,
+which gives you an extra layer of security when accessing the API endpoints.  
 
-```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
-```
+You can create an API Key using the [Create API Key](endpoint/create) endpoint.  Take special note of how you use a username and password
+to create the initial token.  Write down the response somewhere safe.  API Keys should be kept secret, but if somehow
+your secret gets out, use the [Delete API Key](endpoint/delete) endpoint to delete your compromised key.  Once deleted, it will no
+longer work to authenticate you, and you should create a different key if you want to keep using the API.
+
+### Endpoints
+
+Each "function" or "feature" of the API is accessed through an **endpoint**.  An endpoint is a URL of a particular format.  In this
+API, every endpoint will return [JSON](https://en.wikipedia.org/wiki/JSON) responses.  This is a universal format that is easily parsed by many programming languages.
+Each endpoint is documented on this page in the "Endpoints" section, and comes with descriptions of the inputs and outputs, and usage
+examples.
+
+### Data Types
+
+The Data Types section gives you information about the various types of inputs and outputs used throughout the API.  They will help
+you provide the correct arguments and interpret the returned results.

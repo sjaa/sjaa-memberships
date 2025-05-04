@@ -1,5 +1,22 @@
 ---
-title: 'Members and People'
+title: 'People and Memberships'
 description: 'How people are organized in the database.'
 icon: 'person'
 ---
+
+People and Memberships are the core of this application.  A person is stored as a record
+in a `people` table in the database.  People have the following attributes and relations:
+
+A person has...
+* One `first_name` and one `last_name`
+* An internal `id`
+* Associated astrobin data (username, latest image id)
+* A `discord_id`
+* One or more contact objects that contain:
+  * An address
+  * An email
+  * A phone number
+  * An indicator if this is primary contact information or not
+* Zero or more interests (such as: "solar system," "astrophotography," etc)
+* Zero or one referral (i.e. website, search, school, other)
+* Zero or more donations each containing one or more items (or cash)
