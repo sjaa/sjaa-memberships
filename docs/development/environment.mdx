@@ -2,3 +2,18 @@
 title: 'Environment'
 description: 'How to get a local development environment'
 ---
+
+## Docker
+
+The prefered and supported way to maintain a replicable development environment is with Docker.  Download Docker from their
+website: https://www.docker.com/products/docker-desktop/ .  No subscription is required, just choose the free-est options.
+
+Once installed, simply run the following commands from the root source code folder to get started:
+
+```sh
+docker-compose build
+docker-compose up
+```
+
+The first time `docker-compose up` is run, your database will be initialized with random, seed data.  This is a good start
+for testing functionality.

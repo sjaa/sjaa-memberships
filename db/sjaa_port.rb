@@ -113,7 +113,7 @@ module SjaaPort
     CSV.foreach(Rails.root.join('db', patch_file), headers: true) do |row|
       # Look up person by e-mail
       person = Person.find_by_email(row['email1'])
-      person ||= Person.find_by_email(row['email1'])
+      person ||= Person.find_by_email(row['email2'])
       
       # Look up person by name if email fails
       person ||= Person.find_or_create_by(first_name: row['First Name'], last_name: row['Last Name'])
@@ -124,7 +124,7 @@ module SjaaPort
       
       old_contact.destroy if(old_contact)
       contact.save() 
-      puts "[E] #{c.errors.full_messages.join('  ')}" if(contact.errors.any?)
+      puts "[E] #{contact.errors.full_messages.join('  ')}" if(contact.errors.any?)
       contact.save(validate: false) if(contact.email.nil?)
       
       # Update Membership info

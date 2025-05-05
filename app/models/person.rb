@@ -33,11 +33,12 @@ class Person < ApplicationRecord
   end
 
   def self.find_by_email(email)
-    Contact.find_by(email: email)&.person
+    email.nil? ? nil : Contact.find_by(email: email)&.person
   end
 
   def latest_membership
-    memberships.sort_by{|m| m.end}.last
+    # Make a nil end (lifetime membership) come up as the latest result
+    memberships.sort_by{|m| m.end || (DateTime.now + 999.years)}.last
   end
 
   def next_membership_start_date
@@ -196,15 +197,25 @@ class Person < ApplicationRecord
       _membership_attr[:ephemeris] = _membership_attr[:ephemeris] == "true"
       _membership_attr.delete(:id)
 
-      # If there's a city name, then we need to create  new city
+      # Handle finding or creating the membership kind
+      # Fetch the actual MembershipKind object so we can handle LIFETIME memberships
       if(_membership_attr[:kind].present?)
-        kind = MembershipKind.new(name: _membership_attr[:kind])
+        kind = MembershipKind.find_or_create_by(name: _membership_attr[:kind]&.upcase)
         _membership_attr.delete(:kind)
         _membership_attr.delete(:kind_id)
         _membership_attr[:kind] = kind
+      elsif(_membership_attr[:kind_id].present?)
+        _membership_attr[:kind] = MembershipKind.find _membership_attr[:kind_id]
+        _membership_attr.delete(:kind_id)
       end
 
-      if(_membership_attr[:start])
+      # LIFETIME memberships should have no term
+      if(_membership_attr[:kind]&.name == 'LIFETIME')
+        _membership_attr[:start] = nil
+        _membership_attr[:term_months] = nil
+      end
+
+      if(_membership_attr[:start].present?)
         _membership_attr[:start] = DateTime.parse _membership_attr[:start]
       end
 

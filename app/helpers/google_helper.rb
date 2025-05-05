@@ -44,7 +44,7 @@ module GoogleHelper
     results[:client] = client
 
     # Diff Members
-    active_people = Person.all.includes(:contacts).joins(:memberships).active_members.to_a #Person
+    active_people = Person.all.includes(:contacts).joins(:memberships).active_members.uniq.to_a #Person
     matched_people = []
     results[:group_matched] = [] # {person: p, member: member}
     group_unmatched = members # Member

@@ -1,15 +1,5 @@
 <%= form_with(model: person) do |form| %>
   <div class="row">
-    <% if person.errors.any? %>
-      <div style="color: red">
-        <h2><%= pluralize(person.errors.count, "error") %> prohibited this person from being saved:</h2>
-        <ul>
-          <% person.errors.each do |error| %>
-            <li><%= error.full_message %></li>
-          <% end %>
-        </ul>
-      </div>
-    <% end %>
     <div class="col-md-6 mt-2">
       <%= form.label :first_name, 'First Name', class: 'form-label' %>
       <%= form.text_field :first_name, class: 'form-control' %>

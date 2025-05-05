@@ -38,5 +38,6 @@
 /db/seeds.bac2
 /db/seeds.csv
 /db/seeds_min.csv
+/db/reconcile
 
 deploy_private_key

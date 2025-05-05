@@ -60,15 +60,16 @@ class PeopleController < ApplicationController
     respond_to do |format|
       begin
         update_success = @person.update(person_params)
-      rescue
+      rescue => e
         update_success = false
+        @person.errors.add :exception, e.message
       end
 
       if update_success && !@person.errors.any?
         format.html { redirect_to @person, notice: "Person was successfully updated." }
         format.json { render :show, status: :ok, location: @person }
       else
-        flash[:error] = "Problem updating person: #{@person.errors.full_messages.join('  ')}"
+        flash[:alert] = "Problem updating person: <ul>#{@person.errors.full_messages.map{|er| "<li>#{er}</li>"}.join('  ')}</ul>"
         format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: @person.errors, status: :unprocessable_entity }
       end

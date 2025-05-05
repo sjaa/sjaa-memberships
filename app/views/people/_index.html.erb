@@ -1,5 +1,16 @@
 <%= turbo_frame_tag 'people' do %>
   <div class="row" data-controller="clipboard">
+    <div class="col-sm-12 col-md-6 mt-2">
+      <h2>Results</h2>
+      <table class="table table-hover table-striped table-sm">
+        <% @totals&.each do |type, val| %>
+          <tr>
+            <td><strong><%=type&.to_s&.titleize%></strong></td>
+            <td><%=val%><td>
+          </tr>
+        <% end %>
+      </table>
+    </div>
     <div class="col-12 mt-2">
       <%= button_tag 'Copy Link', class: 'btn btn-secondary d-inline-block', style: 'min-width: 100px; margin-right: 20px;',
           data: {action: 'clipboard#copy', clipboard_text_param: people_url(@query_params)}  %>

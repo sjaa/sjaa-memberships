@@ -12,7 +12,7 @@ class Membership < ApplicationRecord
 
   private
   def update_end_date
-    if(self.start && self.term_months)
+    if(self.start.present? && self.term_months.present?)
       self.end = (self.start + self.term_months.months).end_of_month
     end
   end

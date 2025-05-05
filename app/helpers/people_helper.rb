@@ -58,6 +58,7 @@ module PeopleHelper
     
     @active_memberships = Person.common_active_membership_query(Membership.all).group_by{|m| m.person_id}
     @all_people = Person.where(id: query.map(&:id).uniq).includes(:donations, :memberships, :contacts, :interests, :roles)
+    @totals = {total: @all_people.count}
     @pagy, @people = pagy(@all_people, limit: 40, params: qp)
   end
   

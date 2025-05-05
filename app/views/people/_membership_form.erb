@@ -12,7 +12,7 @@
   </div>
   <div class="col-md-6 mt-2">
     <%= label_tag :membership_kind_id, 'Kind', class: 'form-label' %>
-    <%= combobox_tag 'person[membership_attributes][][kind_id]', MembershipKind.all, value: membership.kind&.name, name_when_new: 'person[membership_attributes][][kind]' %>
+    <%= combobox_tag 'person[membership_attributes][][kind_id]', MembershipKind.all, value: membership.kind&.id, name_when_new: 'person[membership_attributes][][kind]' %>
   </div>
   <div class="col-md-6 mt-2">
     <%= label_tag :membership_ephemeris, 'Printed Ephemeris', class: 'form-label' %><br/>

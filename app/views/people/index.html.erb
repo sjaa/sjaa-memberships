@@ -5,6 +5,7 @@
   <%= form_with url: people_search_path, data: {controller: "search-form", search_form_target: "form", turbo_frame: 'people'} do |f| %>
     <div class="row">
       <div class="col-xs-12 mb-3">
+        <h2>Filters</h2>
         <div class="input-group">
           <%= f.text_field :first_name, placeholder: 'First Name', value: @query_params[:first_name], class: 'form-control', data: { action: "input->search-form#search" } %>
           <%= f.text_field :last_name, placeholder: 'Last Name', value: @query_params[:last_name], class: 'form-control', data: { action: "input->search-form#search" } %>
