@@ -62,6 +62,8 @@ if(use_faker)
     )
     
     # with random memberships
+    # TODO: Use person.update with membership_attrs: {} to get consistent
+    #   behavior for LIFETIME memberships
     rand(1..10).times do |i|
       person.memberships << Membership.create(
       start: rand_date,
