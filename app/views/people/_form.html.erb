@@ -32,92 +32,114 @@
       <%= form.combobox :referral_id, Referral.all %>
     </div>
   </div>
-  <div data-controller="form">
-    <div data-form-target="fields" class="row mt-4">
-      <h2>Interests</h2>
-      <% person.interests.each_with_index do |interest, i| %>
-        <% id = "interest_#{interest.id}"%>
-        <div id="<%=id%>" class="row mt-2">
-          <div class="col-md-6 col-xs-8">
-            <% options = {value: interest.id} %>
-            <% options[:name_when_new] = "person[interests_attributes][][name]" if(@user.is_a?(Admin)) %>
-            <%= combobox_tag "person[interests_attributes][][id]",  Interest.all.map{|i| {display: i.name&.titleize, value: i.id}}, **options %>
-          </div>
-          <div class="col-md-6 col-xs-4">
-            <button type="button" data-form-id-param="<%=id%>" data-action="form#removeField" class="btn btn-danger">Remove</button>
+
+  <div class="row mt-4 pb-4 pt-2">
+    <div class="col-12">
+      <div data-controller="form">
+        <div data-form-target="fields">
+          <h2 class="p-2 bg-body-secondary">Interests</h2>
+          <% interests = person&.interests&.empty? ? [Interest.new()] : person.interests %>
+          <% interests.each_with_index do |interest, i| %>
+            <% id = "interest_#{interest.id}"%>
+            <div id="<%=id%>" class="row">
+              <div class="col-md-6 col-xs-8 mt-2">
+                <% options = {value: interest.id} %>
+                <% options[:name_when_new] = "person[interests_attributes][][name]" if(@user.is_a?(Admin)) %>
+                <%= combobox_tag "person[interests_attributes][][id]",  Interest.all.map{|i| {display: i.name&.titleize, value: i.id}}, **options %>
+              </div>
+              <div class="col-md-6 col-xs-4 mt-2">
+                <button type="button" data-form-id-param="<%=id%>" data-action="form#removeField" class="btn btn-danger">Remove Interest</button>
+              </div>
+            </div>
+          <% end %>
+          <template data-form-target="template">
+            <div id="NEWID" class="row">
+              <div class="col-md-6 col-xs-8 mt-2">
+                <% options = {} %>
+                <% options[:name_when_new] = "person[interests_attributes][][name]" if(@user.is_a?(Admin)) %>
+                <%= combobox_tag "person[interests_attributes][][id]",  Interest.all.map{|i| {display: i.name&.titleize, value: i.id}}, **options %>
+              </div>
+              <div class="col-md-6 col-xs-4 mt-2">
+                <button type="button" data-form-id-param="NEWID" data-action="form#removeField" class="btn btn-danger">Remove</button>
+              </div>
+            </div>
+          </template>
+        </div>
+        <div class="row">
+          <div class="col-12 mt-2">
+            <button type="button" data-form-baseid-param="new_interest" data-action="form#addField" class="btn btn-secondary">Add Interest</button>
           </div>
         </div>
-      <% end %>
-      <template data-form-target="template">
-        <div id="NEWID" class="row mt-2">
-          <div class="col-md-6 col-xs-8">
-            <% options = {} %>
-            <% options[:name_when_new] = "person[interests_attributes][][name]" if(@user.is_a?(Admin)) %>
-            <%= combobox_tag "person[interests_attributes][][id]",  Interest.all.map{|i| {display: i.name&.titleize, value: i.id}}, **options %>
-          </div>
-          <div class="col-md-6 col-xs-4">
-            <button type="button" data-form-id-param="NEWID" data-action="form#removeField" class="btn btn-danger">Remove</button>
-          </div>
-        </div>
-      </template>
-    </div>
-    <div class="row">
-      <div class="col-12 mt-2">
-        <button type="button" data-form-baseid-param="new_interest" data-action="form#addField" class="btn btn-secondary">Add Interest</button>
       </div>
     </div>
   </div>
+
+
   <% if @user.is_a?(Admin) %>
     <!-- Roles -->
-    <div data-controller="form">
-      <div data-form-target="fields" class="row mt-4">
-        <h2>Roles</h2>
-        <% person.roles.each_with_index do |role, i| %>
-          <%= render partial: 'role_form', locals: {id: "role_#{role.id}", role: role, i: i, person: person} %>
-        <% end %>
-        <template data-form-target="template">
-          <%= render partial: 'role_form', locals: {id: "NEWID", role: Role.new } %>
-        </template>
-      </div>
-      <div class="row">
-        <div class="col-12 mt-2">
-          <button type="button" data-form-baseid-param="new_role" data-action="form#addField" class="btn btn-secondary">Add Role</button>
+    <div class="row mt-4 pb-4 pt-2">
+      <div class="col-12">
+        <div data-controller="form">
+          <div data-form-target="fields" class="mt-4">
+            <h2 class="p-2 bg-body-secondary">Roles</h2>
+            <% person.roles.each_with_index do |role, i| %>
+              <%= render partial: 'role_form', locals: {id: "role_#{role.id}", role: role, i: i, person: person} %>
+            <% end %>
+            <template data-form-target="template">
+              <%= render partial: 'role_form', locals: {id: "NEWID", role: Role.new } %>
+            </template>
+          </div>
+          <div class="row">
+            <div class="col-12 mt-2">
+              <button type="button" data-form-baseid-param="new_role" data-action="form#addField" class="btn btn-secondary">Add Role</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   <% end %>
+
   <!-- Contacts -->
-  <div data-controller="form">
-    <div data-form-target="fields" class="row mt-4">
-      <h2>Contacts</h2>
-      <% person.contacts.each_with_index do |contact, i| %>
-        <%= render partial: 'contact_form', locals: {id: "contact_#{contact.id}", contact: contact, i: i, person: person} %>
-      <% end %>
-      <template data-form-target="template">
-        <%= render partial: 'contact_form', locals: {id: "NEWID", contact: Contact.new, i: nil, person: person} %>
-      </template>
-    </div>
-    <div class="row">
-      <div class="col-12 mt-2">
-        <button type="button" data-form-baseid-param="new_contact" data-action="form#addField" class="btn btn-secondary">Add Contact</button>
+  <div class="row mt-4 pb-4 pt-2">
+    <div class="col-12">
+      <div data-controller="form">
+        <div data-form-target="fields" class="">
+          <h2 class="p-2 bg-body-secondary">Contacts</h2>
+          <% person.contacts.each_with_index do |contact, i| %>
+            <%= render partial: 'contact_form', locals: {id: "contact_#{contact.id}", contact: contact, i: i, person: person} %>
+          <% end %>
+          <template data-form-target="template">
+            <%= render partial: 'contact_form', locals: {id: "NEWID", contact: Contact.new, i: nil, person: person} %>
+          </template>
+        </div>
+        <div class="row">
+          <div class="col-12 mt-2">
+            <button type="button" data-form-baseid-param="new_contact" data-action="form#addField" class="btn btn-secondary">Add Contact</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
+
   <% if @user.is_a?(Admin) %>
     <!-- Memberships -->
-    <div data-controller="form">
-      <div data-form-target="fields" class="row mt-4">
-        <h2>Memberships</h2>
-        <% person.memberships.each_with_index do |membership, i| %>
-          <%= render partial: 'membership_form', locals: {id: "membership_#{membership.id}", membership: membership, i: i, person: person} %>
-        <% end %>
-        <template data-form-target="template">
-          <%= render partial: 'membership_form', locals: {id: "NEWID", membership: Membership.new, i: nil, person: person} %>
-        </template>
-      </div>
-      <div class="row">
-        <div class="col-12 mt-2">
-          <button type="button" data-form-baseid-param="new_membership" data-action="form#addField" class="btn btn-secondary">Add Membership</button>
+    <div class="row mt-4 pb-4 pt-2">
+      <div class="col-12">
+        <div data-controller="form">
+          <div data-form-target="fields" class="mt-4">
+            <h2 class="p-2 bg-body-secondary">Memberships</h2>
+            <% person.memberships.each_with_index do |membership, i| %>
+              <%= render partial: 'membership_form', locals: {id: "membership_#{membership.id}", membership: membership, i: i, person: person} %>
+            <% end %>
+            <template data-form-target="template">
+              <%= render partial: 'membership_form', locals: {id: "NEWID", membership: Membership.new, i: nil, person: person} %>
+            </template>
+          </div>
+          <div class="row">
+            <div class="col-12 mt-2">
+              <button type="button" data-form-baseid-param="new_membership" data-action="form#addField" class="btn btn-secondary">Add Membership</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -125,7 +147,9 @@
   <!-- Submit -->
   <div class="row">
     <div class="col-12 mt-2">
-      <%= form.submit 'Update Person', class: 'btn btn-primary' %>
+    <hr/>
+      <%= form.submit 'Save Changes', class: 'btn btn-primary' %>
+      <%= link_to "Cancel" , @person, class: 'btn btn-secondary' %> 
     </div>
   </div>
 <% end %>

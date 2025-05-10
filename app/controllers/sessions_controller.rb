@@ -121,7 +121,12 @@ class SessionsController < ApplicationController
     elsif(person&.authenticate(login_params[:password]))
       session[:person_id] = person.id
       flash[:success] = 'Successful login!'
-      redirect_to person_path(person)
+      if(person.is_active?)
+        redirect_to person_path(person)
+      else
+        flash[:success] += '  Our records show that it is time to renew your membership.  If you would like to do that now, please use the form below to complete payment.'
+        redirect_to membership_renewal_path(person)
+      end
     else
       # If authentication fails, redirect to login with an error
       flash[:alert] = 'Login failed.'

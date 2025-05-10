@@ -64,6 +64,8 @@ function loadPayPalButtons() {
           const responseData = await response.json();
 
           if (responseData.status === 'COMPLETED') {
+            var msg_container = document.getElementById('success-message');
+            msg_container.classList.remove('d-none');
             console.log('Payment complete!');
             window.location.href = responseData.redirect;
           }

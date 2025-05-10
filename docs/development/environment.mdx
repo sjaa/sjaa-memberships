@@ -17,3 +17,61 @@ docker-compose up
 
 The first time `docker-compose up` is run, your database will be initialized with random, seed data.  This is a good start
 for testing functionality.
+
+
+# Use Cases
+
+The app should serve as a secure store for the membership data, and should facilitate a variety of use cases:
+
+1. Lookup a person's membership status
+    ```ruby
+    # By name
+    Person.find_by(last_name: 'Nomo').status.name
+    => "member"
+
+    # By email
+    Person.joins(:contacts).where(contact: {email: 'nomo@gmail.com'}).first.status.name
+    => "member"
+    ```
+1. Get a person's contact information
+    ```ruby
+    Person.find_by(last_name: 'Nomo').contacts
+    => 
+    [#<Contact:0x0000ffff80a67220
+      id: 126,
+      address: "123 Fake St",
+      city_id: 5,
+      state_id: 1,
+      zipcode: "95555",
+      phone: "123-456-7890",
+      email: "jorge.conseco@att.net",
+      primary: true,
+      person_id: 126]
+    ```
+1. Lookup the donation history for any given member
+    ```ruby
+    Person.find_by(id: 42).donations
+    ```
+2. Lookup a person's membership renewal history
+    ```ruby
+    Person.find_by(id: 42).memberships
+    ```
+2. Lookup when a person first joined
+    ```ruby
+    Person.find_by(id: 42).memberships.order(start: :asc).first.start
+    => Sat, 21 Sep 2019 00:00:00.000000000 UTC +00:00
+    ```
+1. Lookup when a person's membership expires
+    ```ruby
+    membership = Person.find_by(id: 42).memberships.order(start: :desc).first
+    expiration = membership.start + membership.term_months.months
+    => Mon, 24 Nov 2025 00:00:00.000000000 UTC +00:00
+    ```
+1. Find members whose memberships have lapsed
+    ```ruby
+    # All expired memberships
+    Person.lapsed_members
+
+    # Expired memberships who still have the "member" standing
+    Person.lapsed_members(status: 'member')
+    ```

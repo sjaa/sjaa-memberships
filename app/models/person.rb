@@ -49,8 +49,12 @@ class Person < ApplicationRecord
     return Date.today
   end
 
+  def is_active?
+    latest_membership&.is_active?
+  end
+
   def status
-    latest_membership&.is_active? ? 'Active' : 'Expired'
+    is_active? ? 'Active' : 'Expired'
   end
 
   # Pick out preloaded memberships that match this person

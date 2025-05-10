@@ -1,7 +1,9 @@
-<div id="<%=id%>" class="row mt-2">
-  <h3>Membership <%= i ? i+1 : 'New'%></h3>
-  <%= hidden_field_tag 'person[membership_attributes][][id]', membership.id %>
-  <%= hidden_field_tag 'person[membership_attributes][][person_id]', person&.id %>
+<div id="<%=id%>" class="row m-2">
+  <div class="col-12">
+    <h3 class="p-2 bg-body-tertiary">Membership <%= i ? i+1 : 'New'%></h3>
+    <%= hidden_field_tag 'person[membership_attributes][][id]', membership.id %>
+    <%= hidden_field_tag 'person[membership_attributes][][person_id]', person&.id %>
+  </div>
   <div class="col-md-6 mt-2">
     <%= label_tag :membership_start, 'Start Date', class: 'form-label' %>
     <%= date_field_tag 'person[membership_attributes][][start]', membership.start&.strftime('%Y-%m-%d'), class: 'form-control' %>
@@ -20,6 +22,6 @@
   </div>
   <div class="col-md-6 mt-2">
     <%= label_tag :membership_delete, 'Delete', class: 'form-label' %><br/>
-    <button type="button" data-form-id-param="<%=id%>" data-action="form#removeField" class="btn btn-danger">Remove</button>
+    <button type="button" data-form-id-param="<%=id%>" data-action="form#removeField" class="btn btn-danger">Remove Membership</button>
   </div>
 </div>

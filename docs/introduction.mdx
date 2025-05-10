@@ -1,11 +1,7 @@
 ---
 title: Introduction
-description: "Documentation for the SJAA Memberships Database."
+description: "Documentation for the SJAA Members Application."
 ---
-
-# Overview
-
-This app is designed to help manage membership data for administrative and application use cases.  The primary goal is to provide a secure way to access and edit information about the SJAA membership.  This is accomplished with an authentication system that allows for admins with different permissions to do different things within the app.  Admins need read permission to view any member data, for example.  They need write permissions to update any data, and they need additional permissions to manage the permissions themselves.  All of the data is accessible securely through a front-end UI, or through a secure API.
 
 <img
   className="block dark:hidden"
@@ -19,75 +15,24 @@ This app is designed to help manage membership data for administrative and appli
 />
 
 
-# Database
+# Overview
 
-The data model in this app allows us to store a lot more robust and accurate information about our membership than a spreadsheet.  This app can store:
+This app is designed to help manage membership data for administrative and application use cases.  The primary goal is to provide a secure way to access and edit information about the SJAA membership.  This is accomplished with an authentication system that allows for admins with different permissions to do different things within the app.  Admins need read permission to view any member data, for example.  They need write permissions to update any data, and they need additional permissions to manage the permissions themselves.  All of the data is accessible securely through a front-end UI, or through a secure API.
 
-* All members of SJAA throughout history
-* Many different reported interests of each member
-* Many different contact addresses, phone numbers, emails, etc per person
+The database model in this app allows us to store a lot more robust and accurate information about our membership than a spreadsheet.  All of this data is also structured so as to maximize data integrity, unlike a spreadsheet, where typos can make it hard to get accurate query results.
+
+Features include:
+
+* **Secure access.**  Manage access to sensitive information, through permissions.  Grant permission to see aggregate reports as needed without revealing more than necessary.
+* **Brand new, fully integrated sign-up and renewal flow.**  This app allows for fully automated on-boarding and record keeping.  As soon as a member pays for their next membership term, the database is updated and members are added to the appropriate email lists.  Includes full integration with SJAA's PayPal account.
+* **Track all memberships over time.**  People may join or leave (and join and leave...) over time.  This application allows us to keep tabs on each one of those membership periods.  With this information, we can gain insights about how well we retain members once they join.
+* **Keep tabs on the most up-to-date contact information for members and key club contacts.**  The application allows for any number of alternate contacts for a given person.  Each member has access to update their own contact information as desired.
+* **Keep track of each member's stated interests and expertise.**  Our membership contains a wealth of knowledge and wide array of interests within astronomy.  This application helps us robustly track all stated interests of each member, and find who has the experience or interest in areas where we may need help.  We can also use this information to inform our programs and offerings to members.
 * The current standing of any given person
-* When each time a person signed up or renewed their membership, for how long, and when that membership expired
 * The full donation history for a member, including the date and amount of each donation
 * All the equipment a person reports as hanving, orgainzed into individual, queryable instruments
 * What groups and roles within the organization a person belongs to (i.e. "Observers List" or "Vice-President")
 * Any linked accounts, such as Discord or Astrobin
+* Reports like lapsed and expiring members
 
-All of this data is also structured so as to maximize data integrity, unlike a spreadsheet, where typos can make it hard to get accurate query results.
-
-# Use Cases
-
-The app should serve as a secure store for the membership data, and should facilitate a variety of use cases:
-
-1. Lookup a person's membership status
-    ```ruby
-    # By name
-    Person.find_by(last_name: 'Nomo').status.name
-    => "member"
-
-    # By email
-    Person.joins(:contacts).where(contact: {email: 'nomo@gmail.com'}).first.status.name
-    => "member"
-    ```
-1. Get a person's contact information
-    ```ruby
-    Person.find_by(last_name: 'Nomo').contacts
-    => 
-    [#<Contact:0x0000ffff80a67220
-      id: 126,
-      address: "123 Fake St",
-      city_id: 5,
-      state_id: 1,
-      zipcode: "95555",
-      phone: "123-456-7890",
-      email: "jorge.conseco@att.net",
-      primary: true,
-      person_id: 126]
-    ```
-1. Lookup the donation history for any given member
-    ```ruby
-    Person.find_by(id: 42).donations
-    ```
-2. Lookup a person's membership renewal history
-    ```ruby
-    Person.find_by(id: 42).memberships
-    ```
-2. Lookup when a person first joined
-    ```ruby
-    Person.find_by(id: 42).memberships.order(start: :asc).first.start
-    => Sat, 21 Sep 2019 00:00:00.000000000 UTC +00:00
-    ```
-1. Lookup when a person's membership expires
-    ```ruby
-    membership = Person.find_by(id: 42).memberships.order(start: :desc).first
-    expiration = membership.start + membership.term_months.months
-    => Mon, 24 Nov 2025 00:00:00.000000000 UTC +00:00
-    ```
-1. Find members whose memberships have lapsed
-    ```ruby
-    # All expired memberships
-    Person.lapsed_members
-
-    # Expired memberships who still have the "member" standing
-    Person.lapsed_members(status: 'member')
-    ```
+The sky is the limit!  With data in several conveniently accessible forms, we can enable more robust interactions for our membership and administrators.

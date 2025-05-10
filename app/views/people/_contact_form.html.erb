@@ -1,7 +1,9 @@
-<div id="<%=id%>" class="row mt-2">
-  <h3>Contact <%= i ? i+1 : 'New'%></h3>
-  <%= hidden_field_tag 'person[contact_attributes][][id]', contact.id %>
-  <%= hidden_field_tag 'person[contact_attributes][][person_id]', person&.id %>
+<div id="<%=id%>" class="row m-2">
+  <div class="col-12">
+    <h3 class="p-2 bg-body-tertiary">Contact <%= i ? i+1 : 'New'%></h3>
+    <%= hidden_field_tag 'person[contact_attributes][][id]', contact.id %>
+    <%= hidden_field_tag 'person[contact_attributes][][person_id]', person&.id %>
+  </div>
   <div class="col-md-6 mt-2">
     <%= label_tag :contact_address, 'Address', class: 'form-label' %>
     <%= text_field_tag 'person[contact_attributes][][address]', contact.address, class: 'form-control' %>
@@ -32,6 +34,6 @@
   </div>
   <div class="col-md-6 mt-2">
     <%= label_tag :contact_primary, 'Delete', class: 'form-label' %><br/>
-    <button type="button" data-form-id-param="<%=id%>" data-action="form#removeField" class="btn btn-danger">Remove</button>
+    <button type="button" data-form-id-param="<%=id%>" data-action="form#removeField" class="btn btn-danger">Remove Contact</button>
   </div>
 </div>

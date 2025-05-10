@@ -23,7 +23,7 @@ class PasswordResetsController < ApplicationController
         person = Person.create(person_params)
         contact = Contact.create(email: contact_params[:email], person_id: person.id)
         person.generate_password_reset_token!
-        AccountMailer.password_reset(person).deliver_now
+        AccountMailer.new_person(person).deliver_now
         redirect_to login_path, notice: 'Please check your email to set your password and complete registration.'
       else
         flash[:alert] = 'Email address not found.'
@@ -42,15 +42,18 @@ class PasswordResetsController < ApplicationController
 
   def update
     @user = find_by_reset_token
+    @signup = params[:signup]
+
     if @user.update(user_params)
       @user.reset_password!(params[:password])
       key = @user.is_a?(Admin) ? :admin_id : :person_id
       session[key] = @user.id
 
       if(@signup)
-        redirect_to root_path, notice: 'Your password has been reset!'
+        person = @user
+        redirect_to membership_renewal_path(id: person.id), notice: 'Your password has been set!  Please complete the payment process below to activate your membership.'
       else
-        redirect_to edit_person_path(@user), notice: 'Your password has been set!  Please tell us a little more about you...'
+        redirect_to @user.is_a?(Admin) ? root_path : edit_person_path(id: @user.id), notice: 'Your password has been reset!'
       end
     else
       flash[:error] = "Password could not be saved.  Please try again."

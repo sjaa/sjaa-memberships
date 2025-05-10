@@ -1,10 +1,13 @@
 <div class="row">
-  <h1>Editing <%= @person.name %></h1>
+  <h1><%= @person.name %><span><%= render partial: 'renew_button' %></span></h1>
+  <p>
+    Please tell us a bit about yourself!  Your information is securely stored on our servers, and 
+    we will never sell or distribute your information.  A mailing address is required if you have
+    opted to receive printed Ephemeris issues.
+  </p>
 </div>
-<%= render partial: 'renew_button' %>
 <%= render "form" , person: @person %>
 <div class="row">
   <div>
-    <%= link_to "Back to Person Details" , @person, class: 'btn btn-secondary mt-4' %> 
   </div>
 </div>
