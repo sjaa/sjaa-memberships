@@ -78,7 +78,7 @@
         </div>
       </div>
     </nav>
-    <div class="container-fluid mt-2" style="max-width: 1200px">
+    <div class="container-fluid mt-2" style="max-width: 1200px; min-height: 70vh;">
       <% {'warning' => notice, 'success' => flash[:success], 'danger' => flash[:alert]}.each do |style, msg| %>
         <% if msg %>
           <div class="alert alert-<%=style%> alert-dismissible fade show" role="alert">
@@ -90,9 +90,15 @@
       <%= yield %>
     </div>
 
-    <!--<div class="row bg-dark mt-4">
-      <div class="col-12 p-4" style="height: 200px;">
+  <div class="container-fluid mt-4 bg-dark text-light">
+    <div class="row">
+      <div class="col-12 p-4 text-center" style="height: 200px;">
+          <!--<a class="text-white">sjaa.net</a> |
+          <a class="text-white">sjaa.net</a> |-->
+          <a href="https://www.sjaa.net" class="text-white" target="_blank">sjaa.net</a>
+          <br/>
+          © <small>SJAA 2025</small>
       </div>
-    </div>-->
+    </div>
   </body>
 </html>

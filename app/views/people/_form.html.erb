@@ -9,17 +9,38 @@
       <%= form.text_field :last_name, class: 'form-control' %>
     </div>
     <div class="col-md-6 mt-2">
-      <%= hidden_field_tag 'person[astrobin_attributes][id]', person.astrobin&.id %>
-      <%= form.label :astrobin_username, 'Astrobin Username', class: 'form-label' %>
-      <%= text_field_tag 'person[astrobin_attributes][username]', person.astrobin&.username, class: 'form-control' %>
+      <%= form.label :referral_id, class: 'form-label mb-0' %>
+      <br/>
+      <small class="form-text text-muted">
+      Optional.  Please tell us how you heard of us.
+      </small>
+      <%= form.combobox :referral_id, Referral.all %>
     </div>
     <div class="col-md-6 mt-2">
-      <%= form.label :notes, class: 'form-label' %>
+      <%= form.label :notes, class: 'form-label mb-0' %>
+      <br/>
+      <small class="form-text text-muted">
+      Optional.  Any additional information you'd like us to know?
+      </small>
       <%= form.text_area :notes, class: 'form-control' %>
+    </div>
+    <div class="col-md-6 mt-2">
+      <%= hidden_field_tag 'person[astrobin_attributes][id]', person.astrobin&.id %>
+      <%= form.label :astrobin_username, 'Astrobin Username', class: 'form-label mb-0' %>
+      <br/>
+      <small class="form-text text-muted">
+      Optional.  If you use Astrobin, feel free to share your images with us by providing your
+      account name.  We will use this to highlight your images to our members.
+      </small>
+      <%= text_field_tag 'person[astrobin_attributes][username]', person.astrobin&.username, class: 'form-control' %>
     </div>
     <% if @user.is_a?(Admin) %>
       <div class="col-md-6 mt-2">
-        <%= form.label :discord_id, 'Discord ID', class: 'form-label' %>
+        <%= form.label :discord_id, 'Discord ID', class: 'form-label mb-0' %>
+        <br/>
+        <small class="form-text text-muted">
+        Optional.  This is currently only used in Discord, and should usually be set by individuals using the Discord commands.
+        </small>
         <%= form.text_field :discord_id, class: 'form-control' %>
       </div>
       <div class="col-md-6 mt-2">
@@ -27,10 +48,6 @@
         <%= number_field_tag 'person[astrobin_attributes][latest_image]', person&.astrobin&.latest_image, class: 'form-control' %>
       </div>
     <% end %>
-    <div class="col-md-6 mt-2">
-      <%= form.label :referral_id, class: 'form-label' %>
-      <%= form.combobox :referral_id, Referral.all %>
-    </div>
   </div>
 
   <div class="row mt-4 pb-4 pt-2">
@@ -38,6 +55,10 @@
       <div data-controller="form">
         <div data-form-target="fields">
           <h2 class="p-2 bg-body-secondary">Interests</h2>
+          <p>
+            Please tell us what areas of astronomy you are interested in.  This information will help us better
+            serve our members, and shape our offerings.
+          </p>
           <% interests = person&.interests&.empty? ? [Interest.new()] : person.interests %>
           <% interests.each_with_index do |interest, i| %>
             <% id = "interest_#{interest.id}"%>
@@ -105,6 +126,10 @@
       <div data-controller="form">
         <div data-form-target="fields" class="">
           <h2 class="p-2 bg-body-secondary">Contacts</h2>
+          <p>
+            Please share any additional contact information with us.  If you wish to receive a printed Ephemeris, please
+            make sure you have a entered a valid mailing address.  You may add multiple contacts.
+          </p>
           <% person.contacts.each_with_index do |contact, i| %>
             <%= render partial: 'contact_form', locals: {id: "contact_#{contact.id}", contact: contact, i: i, person: person} %>
           <% end %>
