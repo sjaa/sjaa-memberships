@@ -12,4 +12,15 @@ class AccountMailer < ApplicationMailer
     @url = edit_password_reset_url(person.reset_password_token, signup: true)
     mail(to: @person.email, subject: '[SJAA] Please Confirm Your Email Address')
   end
+
+  def sample()
+    mail(to: 'vp@sjaa.net', subject: '[SJAA] Test Email')
+  end
+
+  def renewal_notice(person)
+    @person = person
+    @expiration_date = person&.latest_membership&.end
+    @renew_url = membership_renewal_url(id: person.id)
+    mail(to: @person.email, subject: '[SJAA] Time to Renew Your SJAA Membership')
+  end
 end

@@ -4,14 +4,61 @@ description: 'How people are organized in the database.'
 icon: 'person'
 ---
 
+## Overview
+
 People and Memberships are the core of this application.  A person is stored as a record
-in a `people` table in the database.  People have the following attributes and relations:
+in a `people` table in the database.  A person must have a unique email address to sign up or 
+otherwise manage their own memberships and information.  Every time a person makes a payment to 
+begin or renew their membership, we log the information about their payment and the term of the
+membership.  This allows us to accrue the full history of a person's memberships and payments,
+and to ensure uninterrupted membership.  Note that we can record information about important
+people who are not members, like key contacts with our partners.  These people can easily be
+distinguished from members and other people through their roles and membership information.
+
+Each person will use their email address
+and a password to sign in.  Existing members will not have a password, but can use their email
+address to receive a password reset email, and then sign in with the password of their choice.  This
+allows people to manage all of their information that they choose to share with us, view the
+status of their membership, and renew their memberships.  Having this information properly associated
+to each person reduces the need for members to re-enter all of their contact information whenever they
+renew, and makes for a smoother overall membership experience.  *Some people may not wish to manage
+another password, and we will provide convenient and secure ways to renew memberships without needing
+to sign in.* More on that in the following sections.
+
+## Person Dashboard
+
+When a person logs in to the application, they will be presented with a page that displays
+the information that they've previously submitted to us.  This includes contact information,
+interests, and a host of other optional information.  A person has the option to edit any of
+this information at any time, and our records will remain in sync.  A person can also see
+the status of their membership, and are presented with the option to renew if their membership
+has expired.
+
+## Roles
+
+Roles are brief descriptors that can be assigned to people.  A person can have many different roles.  Each
+role can be used to denote any number of different things.  For example, every person who paid for a membership
+at some point in time can have the Member role.  Whether they are active or not depends on their payments, but
+the term "Member" is useful to describe how they are related to the club.  Likewise, we can identify officers
+and position holders with roles.  We could also choose to identify membership in our Google Groups as a role
+assigned to each person.  Each role comes with a description and an email address, for cases where a role represents
+some larger group that we have an email address for (i.e. imagers Google Group).
+
+## Signup Flow
+
+## Renewal Flow
+
+
+## Database Representation
+
+People have the following attributes and relations:
 
 A person has...
 * One `first_name` and one `last_name`
 * An internal `id`
-* Associated astrobin data (username, latest image id)
-* A `discord_id`
+* Optional extra information, like...
+  * Associated astrobin data (username, latest image id)
+  * A `discord_id`
 * One or more contact objects that contain:
   * An address
   * An email

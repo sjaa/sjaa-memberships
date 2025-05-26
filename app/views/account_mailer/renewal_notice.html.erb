@@ -1,0 +1,16 @@
+<h1>SJAA Renewal Reminder</h1>
+<p>Dear <%=@person.first_name || "Valued SJAA Member" %>,</p>
+
+<p>
+Our records indicate that your membership <%= (@expiration_date && (@expiration_date <= DateTime.now)) ? "expired" : "expires" %> 
+<%= @expiration_date ? "on <b>#{@expiration_date.strftime("%B %-d, %Y")}</b>".html_safe : "soon" %>.  Please consider
+renewing your membership by clicking this link: <a href="<%=@renew_url%>"><%=@renew_url%></a>
+
+</p>
+Thank you for being a part of SJAA.  We hope to see you soon, and until then, clear skies!
+<p>
+
+<p>
+Sincerely,<br/>
+SJAA Leadership
+</p>
