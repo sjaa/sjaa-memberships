@@ -85,6 +85,10 @@ class Person < ApplicationRecord
     common_active_membership_query(joins(:memberships))
   end
 
+  def self.lifetime_members
+    return Person.joins(:memberships).where(memberships: {end: nil})
+  end
+
   # Members who are within 3 months of expiration are eligible to receive
   # renewal reminders
   def self.renewable_members
@@ -110,8 +114,11 @@ class Person < ApplicationRecord
       .distinct(people[:id])
       .where(latest_memberships[:end].between(date_min..date_max))
 
+    ## Compute lifetime members and subtract them
+    lifers = lifetime_members
+
     # End the madness... returns a plain array, not Active Record or Arel
-    ppl = find_by_sql(ppl_mem.to_sql)
+    ppl = find_by_sql(ppl_mem.to_sql) - lifers.to_a
 
     # Preload memberships data
     ActiveRecord::Associations::Preloader.new(
