@@ -35,6 +35,7 @@
 /config/master.key
 
 /db/seeds/
+/db/backups/
 /db/reconcile
 
 deploy_private_key
