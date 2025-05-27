@@ -2,7 +2,10 @@ class SampleJob < ApplicationJob
   queue_as :default
 
   def perform(*args)
-    AccountMailer.sample.deliver_now
+    # Add some date checks
+    #if Date.today.day == 1
+      AccountMailer.sample.deliver_now
+    #end
   end
 
 end
