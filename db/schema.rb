@@ -151,16 +151,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_05_26_183216) do
     t.index ["person_id"], name: "index_memberships_on_person_id"
   end
 
-  create_table "notifications", force: :cascade do |t|
-    t.string "message"
-    t.integer "person_id"
-    t.integer "admin_id"
-    t.boolean "unread", default: true
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["unread"], name: "index_notifications_on_unread"
-  end
-
   create_table "orders", force: :cascade do |t|
     t.decimal "price"
     t.string "token"

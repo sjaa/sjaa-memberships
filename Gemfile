@@ -86,4 +86,4 @@ gem 'google-apis-sheets_v4'
 
 gem 'net-smtp', '~> 0.5.1'
 gem "sassc-rails"
-gem "solid_queue", "~> 1.1"
+gem "solid_queue", "1.1.0"
