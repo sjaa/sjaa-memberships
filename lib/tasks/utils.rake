@@ -39,3 +39,11 @@ task csv_compare: [:environment] do
   puts "People in #{csv2} but not #{csv1}"
   puts results[csv2].inspect
 end
+
+
+desc "Add some fake people to the database"
+task generate_data: [:environment] do
+  require_relative('../../db/faker_seed')
+  include FakerSeed
+  generate_people(size: 100)
+end

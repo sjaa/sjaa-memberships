@@ -3,7 +3,7 @@ class Admin < ApplicationRecord
 
   has_secure_password
   has_many :api_keys, as: :bearer
-  has_and_belongs_to_many :permissions
+  has_and_belongs_to_many :permissions, :uniq => true
 
   def has_permission?(p)
     self.permissions.where(name: p).first

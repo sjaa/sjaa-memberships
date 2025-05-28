@@ -3,10 +3,11 @@ title: 'Environment'
 description: 'How to get a local development environment'
 ---
 
-## Docker
+## Initial Setup
 
 The prefered and supported way to maintain a replicable development environment is with Docker.  Download Docker from their
-website: https://www.docker.com/products/docker-desktop/ .  No subscription is required, just choose the free-est options.
+website: https://www.docker.com/products/docker-desktop/ .  No subscription is required, just choose the free-est options.  You can,
+of course, setup your own environment without Docker, but this is not covered in this documentation.
 
 Once installed, simply run the following commands from the root source code folder to get started:
 
@@ -15,11 +16,27 @@ docker-compose build
 docker-compose up
 ```
 
-The first time `docker-compose up` is run, your database will be initialized with random, seed data.  This is a good start
-for testing functionality.
+Next, you will need a `.env` file that contains some application secrets.  For security reasons this is not part of the repo, but
+can be obtained by contacting the developers for appropriate uses.
 
+The first time `docker-compose up` is run, your database will be initialized with a single admin: `vp@sjaa.net`.  To generate more sample data, run the following rake
+task.  Make sure your docker containers are running.
 
-# Use Cases
+```sh
+docker container exec -it sjaa-memberships-app-1 bin/rake generate_data
+```
+
+Now, you should be able to navigate to https://127.0.0.1:3001 to view your local copy of the application, complete with sample data.  You may get a warning from your
+browser that the connection is not secure.  This is because we use a self-signed certificate in development.  It is safe to click through those
+warnings to access the app.
+
+## Console
+
+```sh
+docker container exec -it sjaa-memberships-app-1 bin/rails c 
+```
+
+## Use Cases
 
 The app should serve as a secure store for the membership data, and should facilitate a variety of use cases:
 
