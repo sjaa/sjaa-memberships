@@ -35,6 +35,6 @@ class ApplicationController < ActionController::Base
   end
 
   def redirect_path_for(user)
-    return user.is_a?(Person) ? person_path(user) : root_path
+    return user.is_a?(Person) ? edit_person_path(user) : root_path
   end
 end

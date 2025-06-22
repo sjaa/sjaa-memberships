@@ -136,6 +136,7 @@ class SessionsController < ApplicationController
 
   def destroy
     session.delete(:admin_id)
+    session.delete(:person_id)
     redirect_to :login, notice: 'Logged out.'
   end
 

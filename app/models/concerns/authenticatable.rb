@@ -16,7 +16,8 @@ module Authenticatable
     # Raise the error
     if(!@current_user)
       respond_to do |format|
-        format.html {render 'static_pages/unauthorized', status: :unauthorized}
+        #format.html {render 'static_pages/unauthorized', status: :unauthorized}
+        format.html {redirect_to login_path, notice: 'You are not authorized to view the requested content.' }
         format.json {render json: {errors: ['Unauthorized']},status: :unauthorized}
       end
     end
