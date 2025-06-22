@@ -59,6 +59,10 @@
                     <li><%= link_to 'Ephemeris List', ephemeris_report_path, class: 'dropdown-item'%></li>
                   </ul>
                 </li>
+              <% else %>
+              <li class="nav-item">
+                <%= link_to "Profile", edit_person_path(@user), class: 'nav-link' %>
+              </li>
               <% end %>
               <li class="nav-item">
                 <%= link_to "Logout (#{@user.is_a?(Person) ? @user.name : @user.email})", logout_path, class: 'nav-link', data: { confirm: 'Log out?' } %>

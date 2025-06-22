@@ -2,7 +2,15 @@
 <%= form_for membership, url: membership_order_path, data: {controller: 'invoice'} do |f| %>
   <div class="row">
     <div class="col-12">
-      <h1>Membership For <%= @person.name %></h1>
+      <h1>Membership Payment For <%= @person.name %></h1>
+      <% if @person.is_active?%>
+      <div class="alert alert-warning">
+        Your membership is currently active, and will end on <strong><%= date_format @person.latest_membership&.end %></strong>.
+        If you would like to renew your membership, please proceed below.
+      </div>
+      <% end %>
+      <p>Thank you for your interest in being part of the SJAA! Please know that your new or renewing membership will be provisional, until the board of directors votes to formally approve your membership at the next board meeting, per the club's by-laws. All benefits of membership, at the discretion of the board, are in effect during the provisional membership period.</p>
+      <p>Your membership will be for a one year period, ending one year after the end of the month you join.  The start and end dates are listed in the invoice below.</p>
     </div>
     <div class="col-12 d-none alert alert-danger" id="paypalErrors">
     </div>
@@ -12,6 +20,10 @@
     <!-- Extra Donation -->
     <div class="col-12">
       <%= label_tag 'membership[donation_amount]', 'Extra Donation', class: 'form-label' %>
+      <p>
+      <small>The SJAA is a non-profit organization dedicated to bringing astronomy to the general public. Member dues and other donations are used to enhance our programs, such as the telescope loans.
+        If you would like to make an additional donation to help support the SJAA, please enter the amount below.  Thank you!</small>
+      </p>
       <div class="input-group">
         <span class="input-group-text" id="basic-addon1">$</span>
         <%= number_field_tag 'membership[donation_amount]', 0, class: 'form-control', style: 'max-width: 120px', data: {invoice_target: 'field', updateid: 'donation_fee', action: 'input->invoice#calculate_total'} %>
@@ -19,15 +31,24 @@
     </div>
     <!-- Ephemeris -->
     <div class="col-12 mt-4">
-      <%= label_tag 'membership[ephemeris_amount]', 'Ephemeris', class: 'form-label' %>
+      <%= label_tag 'membership[ephemeris_amount]', 'Ephemeris', class: 'form-label mb-0' %>
+      <p>
+      <small>The digital edition of The Ephemeris is free to everyone.  If you would like a printed version for $10/yr, please indicate this below.</small>
+      </p>
       <%= select_tag 'membership[ephemeris_amount]', options_for_select([ ['Digital +$0', 0], ["Printed +$#{SjaaMembers::EPHEMERIS_FEE}", SjaaMembers::EPHEMERIS_FEE] ]), {class: 'form-select', style: 'max-width: 200px', data: {invoice_target: 'field', updateid: 'ephemeris_fee', action: 'input->invoice#calculate_total'}} %>
     </div>
     <div class="col-12 mt-4 table-responsive">
       <h2>Invoice</h2>
       <table class="table" style="max-width: 400px;">
-        <tr style="border-bottom: thick; border-style: double;">
+        <% membership = Membership.new(start: @person.next_membership_start_date, term_months: SjaaMembers::DEFAULT_MEMBERSHIP_TERM) %>
+        <% membership.update_end_date %>
+        <tr>
           <td><strong>Start Date</strong></td>
-          <td><strong><%= date_format @person.next_membership_start_date %></strong></td>
+          <td><strong><%= date_format membership.start %></strong></td>
+        </tr>
+        <tr style="border-bottom: thick; border-style: double;">
+          <td><strong>End Date</strong></td>
+          <td><strong><%= date_format membership.end %></strong></td>
         </tr>
         <tr>
           <td>Membership Fee</td>
@@ -41,7 +62,7 @@
           <td>Ephemeris Fee</td>
           <td>$<span id="ephemeris_fee">0</span></td>
         </tr>
-        <tr>
+        <tr style="border-top: thick; border-style: double;">
           <td><strong>Total</strong></td>
           <td><strong>$<span data-invoice-target="total"><%=SjaaMembers::YEARLY_MEMBERSHIP_RATE%></span></strong></td>
         </tr>

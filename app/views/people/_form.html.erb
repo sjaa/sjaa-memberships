@@ -17,14 +17,6 @@
       <%= form.combobox :referral_id, Referral.all %>
     </div>
     <div class="col-md-6 mt-2">
-      <%= form.label :notes, class: 'form-label mb-0' %>
-      <br/>
-      <small class="form-text text-muted">
-      Optional.  Any additional information you'd like us to know?
-      </small>
-      <%= form.text_area :notes, class: 'form-control' %>
-    </div>
-    <div class="col-md-6 mt-2">
       <%= hidden_field_tag 'person[astrobin_attributes][id]', person.astrobin&.id %>
       <%= form.label :astrobin_username, 'Astrobin Username', class: 'form-label mb-0' %>
       <br/>
@@ -34,6 +26,15 @@
       </small>
       <%= text_field_tag 'person[astrobin_attributes][username]', person.astrobin&.username, class: 'form-control' %>
     </div>
+    <div class="col-12 mt-2">
+      <%= form.label :notes, class: 'form-label mb-0' %>
+      <br/>
+      <small class="form-text text-muted">
+      Optional.  Please tell us about any telescopes or equipment you own, or any other information you would like to share with us.
+      </small>
+      <%= form.text_area :notes, class: 'form-control' %>
+    </div>
+
     <% if @user.is_a?(Admin) %>
       <div class="col-md-6 mt-2">
         <%= form.label :discord_id, 'Discord ID', class: 'form-label mb-0' %>
@@ -48,8 +49,23 @@
         <%= number_field_tag 'person[astrobin_attributes][latest_image]', person&.astrobin&.latest_image, class: 'form-control' %>
       </div>
     <% end %>
+    <div class="col-md-12 mt-2">
+      <%= form.label :interests, 'Interests', class: 'form-label mb-0' %>
+      <p>
+      <small class="form-text text-muted">
+        Please tell us what areas of astronomy you are interested in.  This information will help us better
+        serve our members, and shape our offerings.
+      </small>
+      </p>
+      <% interest_ids = person.interests.map(&:id) %>
+      <% Interest.all.each do |interest|%>
+         <%= check_box_tag "person[interests_attributes][][id]", interest.id, interest_ids.include?(interest.id), autocomplete: "off", id: "interest_#{interest.id}", class: 'btn-check' %>
+         <label class="btn btn-light" for="interest_<%=interest.id%>"><%=interest.name.titleize%></label>
+      <% end %>
+    </div>
   </div>
 
+<!--
   <div class="row mt-4 pb-4 pt-2">
     <div class="col-12">
       <div data-controller="form">
@@ -94,6 +110,7 @@
       </div>
     </div>
   </div>
+  -->
 
 
   <% if @user.is_a?(Admin) %>
@@ -121,30 +138,28 @@
   <% end %>
 
   <!-- Contacts -->
-  <div class="row mt-4 pb-4 pt-2">
-    <div class="col-12">
-      <div data-controller="form">
-        <div data-form-target="fields" class="">
+  <% if @user.is_a?(Admin) %>
+  <div class="row mt-4 pb-4 pt-2" data-controller="form">
+    <div class="col-12" data-form-target="fields">
           <h2 class="p-2 bg-body-secondary">Contacts</h2>
-          <p>
-            Please share any additional contact information with us.  If you wish to receive a printed Ephemeris, please
-            make sure you have a entered a valid mailing address.  You may add multiple contacts.
-          </p>
           <% person.contacts.each_with_index do |contact, i| %>
             <%= render partial: 'contact_form', locals: {id: "contact_#{contact.id}", contact: contact, i: i, person: person} %>
           <% end %>
           <template data-form-target="template">
             <%= render partial: 'contact_form', locals: {id: "NEWID", contact: Contact.new, i: nil, person: person} %>
           </template>
-        </div>
         <div class="row">
           <div class="col-12 mt-2">
             <button type="button" data-form-baseid-param="new_contact" data-action="form#addField" class="btn btn-secondary">Add Contact</button>
           </div>
         </div>
-      </div>
     </div>
   </div>
+  <% else %>
+    <% person.contacts.each_with_index do |contact, i| %>
+      <%= render partial: 'contact_form', locals: {id: "contact_#{contact.id}", contact: contact, i: i, person: person} %>
+    <% end %>
+  <% end %>
 
   <% if @user.is_a?(Admin) %>
     <!-- Memberships -->
@@ -172,7 +187,7 @@
   <!-- Submit -->
   <div class="row">
     <div class="col-12 mt-2">
-    <hr/>
+    <hr class="thick"/>
       <%= form.submit 'Save Changes', class: 'btn btn-primary' %>
       <%= link_to "Cancel" , @person, class: 'btn btn-secondary' %> 
     </div>

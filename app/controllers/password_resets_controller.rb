@@ -20,16 +20,22 @@ class PasswordResetsController < ApplicationController
       redirect_to login_path, notice: 'Password reset email has been sent.'
     else
       if(params[:signup].present?)
-        person = Person.create(person_params)
-        contact = Contact.create(email: contact_params[:email], person_id: person.id)
+        person = Person.create(person_params.merge({signup_completed: false}))
+        contact = Contact.create(email: contact_params[:email], person_id: person.id, primary: true)
         person.generate_password_reset_token!
         AccountMailer.new_person(person).deliver_now
-        redirect_to login_path, notice: 'Please check your email to set your password and complete registration.'
+        redirect_to post_signup_path(person_id: person.id)
+        #redirect_to login_path, notice: 'Please check your email to set your password and complete registration.'
       else
         flash[:alert] = 'Email address not found.'
         render :new
       end
     end
+  end
+
+  def signup
+    @person = Person.find_by(id: params[:person_id])
+    render :signup
   end
 
   def edit
@@ -51,6 +57,7 @@ class PasswordResetsController < ApplicationController
 
       if(@signup)
         person = @user
+        person.update_attribute(:signup_completed, true)
         redirect_to membership_renewal_path(id: person.id), notice: 'Your password has been set!  Please complete the payment process below to activate your membership.'
       else
         redirect_to @user.is_a?(Admin) ? root_path : edit_person_path(id: @user.id), notice: 'Your password has been reset!'

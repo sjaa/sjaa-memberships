@@ -17,6 +17,7 @@ Rails.application.routes.draw do
   post '/roles/add_person', to: 'roles#add_person', as: :roles_add_person
 
   post '/password_resets/:id', to: 'password_resets#update', as: :password_reset_form
+  get '/post_signup', to: 'password_resets#signup', as: :post_signup
   resources :password_resets, only: [:new, :create, :edit, :update]
   resources :donation_phases
   resources :donation_items

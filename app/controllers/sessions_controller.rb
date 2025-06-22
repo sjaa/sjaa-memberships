@@ -122,7 +122,7 @@ class SessionsController < ApplicationController
       session[:person_id] = person.id
       flash[:success] = 'Successful login!'
       if(person.is_active?)
-        redirect_to person_path(person)
+        redirect_to edit_person_path(person)
       else
         flash[:success] += '  Our records show that it is time to renew your membership.  If you would like to do that now, please use the form below to complete payment.'
         redirect_to membership_renewal_path(person)

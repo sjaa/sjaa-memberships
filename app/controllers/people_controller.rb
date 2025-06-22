@@ -46,7 +46,7 @@ class PeopleController < ApplicationController
     
     respond_to do |format|
       if @person.save
-        format.html { redirect_to @person, notice: "Person was successfully created." }
+        format.html { redirect_to @person, notice: "Profile was successfully created." }
         format.json { render :show, status: :created, location: @person }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -66,7 +66,7 @@ class PeopleController < ApplicationController
       end
 
       if update_success && !@person.errors.any?
-        format.html { redirect_to @person, notice: "Person was successfully updated." }
+        format.html { redirect_to edit_person_path(@person), notice: "Profile was successfully updated." }
         format.json { render :show, status: :ok, location: @person }
       else
         flash[:alert] = "Problem updating person: <ul>#{@person.errors.full_messages.map{|er| "<li>#{er}</li>"}.join('  ')}</ul>"
