@@ -3,7 +3,7 @@ task patch: [:environment] do
   require_relative('../../db/sjaa_port')
   include SjaaPort
 
-  patch(ENV['PATCH_FILE'])
+  patch(ENV['PATCH_FILE'], ENV['COMMIT'])
 end
 
 desc "Compare CSV1 and CSV2 first two columns - used for reconciling membership lists"

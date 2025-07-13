@@ -109,34 +109,41 @@ module SjaaPort
   
   # Use this to update records from the source (currently SJAA DB)
   #   Tries to find records before creating them...
-  def patch(patch_file)
-    CSV.foreach(Rails.root.join('db', patch_file), headers: true) do |row|
-      # Look up person by e-mail
-      person = Person.find_by_email(row['email1'])
-      person ||= Person.find_by_email(row['email2'])
-      
-      # Look up person by name if email fails
-      person ||= Person.find_or_create_by(first_name: row['First Name'], last_name: row['Last Name'])
-      
-      # Update Contact Info
-      old_contact = person.contacts.find_by(primary: true)
-      contact = populate_contact(person, row)
-      
-      old_contact.destroy if(old_contact)
-      contact.save() 
-      puts "[E] #{contact.errors.full_messages.join('  ')}" if(contact.errors.any?)
-      contact.save(validate: false) if(contact.email.nil?)
-      
-      # Update Membership info
-      membership = populate_membership(person, row)
-      existing_membership = person.memberships.find_by(start: membership.start)
-      membership.save if(existing_membership.nil?)
-      
-      # Membership for their first payment ("since")
-      since = parse_date(row['Member Since'])
-      if(since)
-        Membership.create(start: since, term_months: 0, person: person) if(person.memberships.find_by(start: since).nil?)
+  def patch(patch_file, commit=true)
+    ActiveRecord::Base.transaction do
+      CSV.foreach(Rails.root.join('db', patch_file), headers: true) do |row|
+        # Look up person by e-mail
+        person = Person.find_by_email(row['email1'])
+        person ||= Person.find_by_email(row['email2'])
+
+        # Look up person by name if email fails
+        person ||= Person.find_or_create_by(first_name: row['First Name'], last_name: row['Last Name'])
+
+        # Update Contact Info
+        old_contact = person.contacts.find_by(primary: true)
+        contact = populate_contact(person, row)
+
+        old_contact.destroy if(old_contact)
+        contact.save() 
+        puts "[E] #{contact.errors.full_messages.join('  ')}" if(contact.errors.any?)
+        contact.save(validate: false) if(contact.email.nil?)
+
+        # Update Membership info
+        membership = populate_membership(person, row)
+        existing_membership = person.memberships.find_by(start: membership.start)
+        membership.save if(existing_membership.nil?)
+
+        # Membership for their first payment ("since")
+        since = parse_date(row['Member Since'])
+        if(since)
+          Membership.create(start: since, term_months: 0, person: person) if(person.memberships.find_by(start: since).nil?)
+        end
       end
+
+      raise "Rolling back due to commit being false" if(!commit)
     end
+  rescue => e
+    puts "[W] Rolling back patch transactions due to exception:"
+    puts e
   end
 end

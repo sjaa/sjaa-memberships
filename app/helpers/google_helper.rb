@@ -6,6 +6,7 @@ module GoogleHelper
     # Compute diff
     diff = diff_members_group(auth: auth)
     client = diff[:client]
+    diff[:errors] ||= []
 
     # Optionally save off all removed members in a temporary group
     if(save)
@@ -16,7 +17,11 @@ module GoogleHelper
 
       # Add the to-be-removed members to a new group
       diff[:group_unmatched].each do |mh|
-        client.insert_member(REMOVE_GROUP, Google::Apis::AdminDirectoryV1::Member.new(email: mh[:email]))
+        begin
+          client.insert_member(REMOVE_GROUP, Google::Apis::AdminDirectoryV1::Member.new(email: mh[:email]))
+        rescue => e
+          diff[:errors] << {source: :remove, email: mh[:email], error: e}
+        end
       end
     end
 
@@ -27,7 +32,11 @@ module GoogleHelper
 
     # Add the missing people
     diff[:unmatched_people].each do |person|
-      client.insert_member(MEMBERS_GROUP, Google::Apis::AdminDirectoryV1::Member.new(email: person.email)) if(person.email.present?)
+      begin
+        client.insert_member(MEMBERS_GROUP, Google::Apis::AdminDirectoryV1::Member.new(email: person.email)) if(person.email.present?)
+      rescue => e
+        diff[:errors] << {source: :remove, email: person.email, error: e}
+      end
     end
 
     return diff
