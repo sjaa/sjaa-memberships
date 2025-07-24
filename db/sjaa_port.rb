@@ -29,6 +29,7 @@ module SjaaPort
   INTEREST_LIST = {}
   {
     'astrophotography' => '',
+    'amateur telescope making' => '',
     'solar system' => '',
     'deep sky' => '',
     'science' => '',
