@@ -11,7 +11,7 @@ class Membership < ApplicationRecord
   end
 
   def term_years
-    return 0 if(self.term_months.nil?)
+    return nil if(self.term_months.nil?)
     self.term_months / 12
   end
 

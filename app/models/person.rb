@@ -42,7 +42,7 @@ class Person < ApplicationRecord
   end
 
   def first_membership
-    memberships.sort_by(&:start).first
+    memberships.sort_by{|m| m.start || (DateTime.now + 999.years)}.first
   end
 
   def next_membership_start_date
