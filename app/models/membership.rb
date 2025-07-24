@@ -10,6 +10,11 @@ class Membership < ApplicationRecord
     DateTime.now <= (self.end || 0)
   end
 
+  def term_years
+    return 0 if(self.term_months.nil?)
+    self.term_months / 12
+  end
+
   def update_end_date
     if(self.start.present? && self.term_months.present?)
       self.end = (self.start + self.term_months.months).end_of_month

@@ -11,7 +11,7 @@ class PeopleController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.csv { send_data to_csv(models: @all_people), filename: "sjaa-people-#{Date.today}.csv" }
+      format.csv { send_data people_to_sjaa_db(@all_people), filename: "sjaa-people-#{Date.today}.csv" }
     end
   end
   

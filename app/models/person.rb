@@ -41,6 +41,10 @@ class Person < ApplicationRecord
     memberships.sort_by{|m| m.end || (DateTime.now + 999.years)}.last
   end
 
+  def first_membership
+    memberships.sort_by(&:start).first
+  end
+
   def next_membership_start_date
     if(latest_membership&.is_active?)
       return (latest_membership.end + 1.day).beginning_of_month
