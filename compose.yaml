@@ -10,7 +10,7 @@ services:
       POSTGRES_PASSWORD: root
       #POSTGRES_DB: sjaa-db-dev
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready"]
+      test: [ "CMD-SHELL", "pg_isready" ]
       interval: 2s
       retries: 5
       start_period: 2s
@@ -40,17 +40,18 @@ services:
     #command: rm -f /rails/tmp/pids/server.pid
     networks:
       - sjaanet
-    ports: 
+    ports:
       - "127.0.0.1:3000:3000"
       - "127.0.0.1:3001:3001"
       - "127.0.0.1:9876:9876"
-    volumes: 
+    volumes:
       - type: bind
         source: ./
         target: /rails
 
-volumes: 
+volumes:
   postgres_data:
+
 
 networks:
   sjaanet:

@@ -33,6 +33,12 @@ class ReportsController < ApplicationController
     end
   end
 
+  def memberships
+    @start_date = params[:start].presence || Date.today.beginning_of_month
+    @end_date = params[:end].presence || Date.today.end_of_month
+    @report = membership_report(date_range: @start_date..@end_date)
+  end
+
   def renewal_reminders
     @people = Person.renewable_members.sort_by{|person| person.latest_membership.end}
     @table = [['ID', 'Name', 'Status', 'Email', 'Membership End', 'Membership Start', 'Term']]

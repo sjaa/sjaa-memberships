@@ -1,0 +1,102 @@
+<div class="row">
+  <div class="col-12">
+    <h1>Membership Report</h1>
+    <!-- Form for selecting date range -->
+    <form method="get" action="<%= memberships_report_path %>" class="mb-3">
+      <div class="input-group">
+        <input type="date" name="start" value="<%= @start_date %>" class="form-control" aria-label="Start Date">
+        <input type="date" name="end" value="<%= @end_date %>" class="form-control" aria-label="End Date">
+        <button type="submit" class="btn btn-primary">Generate Report</button>
+      </div>
+    </form>
+    <% new_memberships_count = @report[:new_memberships].count %>
+    <% lost_memberships_count = @report[:lost_memberships].count %>
+    <!-- Show total changes in memberships -->
+    <table class="table table-bordered mb-3">
+      <thead>
+        <tr>
+          <th>Beginning Total Membership</th>
+          <th>Ending Total Membership</th>
+          <th>Change</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><%=  %></td>
+          <td><%=  %></td>
+          <td><%= new_memberships_count - lost_memberships_count %></td>
+        </tr>
+      </tbody>
+    </table>
+    <h2>Memberships Gained <span style="color: green;">(<%=new_memberships_count%>)</span></h2>
+    <!-- Show totals -->
+    <div class="mb-3">
+      <% new_memberships = @report[:new_memberships].count %>
+      <% returning_members = @report[:previous_memberships].count %>
+      <table class="table table-bordered mb-3">
+        <thead>
+          <tr>
+            <th>New Memberships</th>
+            <th>New Members</th>
+            <th>Renewals</th>
+            <th>Donation Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><%= new_memberships %></td>
+            <td><%= new_memberships - returning_members %></td>
+            <td><%= returning_members %></td>
+            <td><%= dollar_format(@report[:total_donations]) %></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- Table with columns for name, membership start, membership end, donation -->
+    <table class="table table-hover table-striped table-sm">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Membership Start</th>
+          <th>Membership End</th>
+          <th>Donation</th>
+          <th>Previous Membership</th>
+        </tr>
+      </thead>
+      <tbody class="table-group-divider">
+        <% @report[:new_memberships].each do |person, new_memberships| %>
+          <% new_membership = new_memberships.first %>
+          <% previous_membership = @report[:previous_memberships][person.id]&.first %>
+          <% donation = new_membership.donation_amount || 0 %>
+          <tr>
+            <td><%= person.name %></td>
+            <td><%= date_format(new_membership.start)%></td>
+            <td><%= date_format(new_membership.end)%></td>
+            <td><%= donation > 0 ? dollar_format(donation) : '' %></td>
+            <td><%= previous_membership ? date_format(previous_membership.end) : 'New Member' %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    <h2>Memberships Lost <span style="color: red;">(<%=lost_memberships_count%>)</span></h2>
+    <table class="table table-hover table-striped table-sm">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Membership Start</th>
+          <th>Membership End</th>
+        </tr>
+      </thead>
+      <tbody class="table-group-divider">
+        <% @report[:lost_memberships].each do |person, lost_memberships| %>
+          <% lost_membership = lost_memberships.first %>
+          <tr>
+            <td><%= person.name %></td>
+            <td><%= date_format(lost_membership.start) %></td>
+            <td><%= date_format(lost_membership.end) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

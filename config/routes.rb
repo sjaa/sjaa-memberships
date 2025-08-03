@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
 
+  get '/reports/memberships', to: 'reports#memberships', as: :memberships_report
   get '/reports/renewal_reminders', to: 'reports#renewal_reminders', as: :renewal_reminders
   get '/reports/ephemeris', to: 'reports#ephemeris', as: :ephemeris_report
   get '/signup', to: 'sessions#signup', as: :signup

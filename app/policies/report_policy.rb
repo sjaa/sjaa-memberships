@@ -6,4 +6,8 @@ class ReportPolicy < ApplicationPolicy
   def renewal_reminders?
     user&.has_permission? :read
   end
+
+  def memberships?
+    user&.has_permission? :read
+  end
 end
