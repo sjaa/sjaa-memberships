@@ -34,8 +34,8 @@ class ReportsController < ApplicationController
   end
 
   def memberships
-    @start_date = params[:start].presence || Date.today.beginning_of_month
-    @end_date = params[:end].presence || Date.today.end_of_month
+    @start_date = params[:start].present? ? Date.strptime(params[:start]) : Date.today.beginning_of_month
+    @end_date = params[:end].present? ? Date.strptime(params[:end]) : Date.today.end_of_month
     @report = membership_report(date_range: @start_date..@end_date)
   end
 

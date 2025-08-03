@@ -72,8 +72,8 @@ class Person < ApplicationRecord
     return matches
   end
 
-  def active_membership(date: DateTime.now())
-    Person.common_active_membership_query(memberships)
+  def active_membership(date = Date.today)
+    Person.common_active_membership_query(memberships, date)
   end
 
   # Returns an Array.  Can't be chained with other AR calls
@@ -81,12 +81,12 @@ class Person < ApplicationRecord
     Person.all - active_members
   end
 
-  def self.common_active_membership_query(record)
-    record.where("memberships.end > ?", Date.today).or(record.where(memberships: {term_months: nil}))
+  def self.common_active_membership_query(record, date = Date.today)
+    record.where("memberships.end > ?", date).where("memberships.start <= ?", date).or(record.where(memberships: {term_months: nil}))
   end
 
-  def self.active_members
-    common_active_membership_query(joins(:memberships))
+  def self.active_members(date = Date.today)
+    common_active_membership_query(joins(:memberships), date)
   end
 
   def self.lifetime_members
@@ -95,9 +95,9 @@ class Person < ApplicationRecord
 
   # Members who are within 3 months of expiration are eligible to receive
   # renewal reminders
-  def self.renewable_members
-    date_max = Date.today.end_of_month + 2.months # Expiring this month and two months ahead
-    date_min = Date.today.beginning_of_month - 3.months # Expired up to 3 months ago
+  def self.renewable_members(date = Date.today)
+    date_max = date.end_of_month + 2.months # Expiring this month and two months ahead
+    date_min = date.beginning_of_month - 3.months # Expired up to 3 months ago
 
     # Begin the Arel madness
     people = Person.arel_table

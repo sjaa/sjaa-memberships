@@ -29,6 +29,9 @@ module ReportsHelper
     net_expired_members = report[:expired_memberships].keys - report[:new_memberships].keys
     report[:lost_memberships] = report[:expired_memberships].slice(*net_expired_members)
 
+    report[:starting_count] = Person.active_members(date_range.begin).uniq.count
+    report[:ending_count] = Person.active_members(date_range.end).uniq.count
+
     return report
   end
 
