@@ -11,6 +11,8 @@
     </form>
     <% new_memberships_count = @report[:new_memberships].count %>
     <% lost_memberships_count = @report[:lost_memberships].count %>
+    <% new_memberships = @report[:new_memberships].count %>
+    <% returning_members = @report[:previous_memberships].count %>
     <!-- Show total changes in memberships -->
     <table class="table table-bordered mb-3">
       <thead>
@@ -24,15 +26,13 @@
         <tr>
           <td><%= @report[:starting_count] %></td>
           <td><%= @report[:ending_count] %></td>
-          <td><%= new_memberships_count - lost_memberships_count %></td>
+          <td><%= @report[:ending_count] - @report[:starting_count] %></td>
         </tr>
       </tbody>
     </table>
     <h2>Memberships Gained <span style="color: green;">(<%=new_memberships_count%>)</span></h2>
     <!-- Show totals -->
     <div class="mb-3">
-      <% new_memberships = @report[:new_memberships].count %>
-      <% returning_members = @report[:previous_memberships].count %>
       <table class="table table-bordered mb-3">
         <thead>
           <tr>
@@ -69,7 +69,7 @@
           <% previous_membership = @report[:previous_memberships][person.id]&.first %>
           <% donation = new_membership.donation_amount || 0 %>
           <tr>
-            <td><%= person.name %></td>
+            <td><%= link_to person.name, person %></td>
             <td><%= date_format(new_membership.start)%></td>
             <td><%= date_format(new_membership.end)%></td>
             <td><%= donation > 0 ? dollar_format(donation) : '' %></td>
@@ -91,7 +91,7 @@
         <% @report[:lost_memberships].each do |person, lost_memberships| %>
           <% lost_membership = lost_memberships.first %>
           <tr>
-            <td><%= person.name %></td>
+            <td><%= link_to person.name, person %></td>
             <td><%= date_format(lost_membership.start) %></td>
             <td><%= date_format(lost_membership.end) %></td>
           </tr>

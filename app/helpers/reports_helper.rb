@@ -17,7 +17,7 @@ module ReportsHelper
                                              .group(:person_id, :id)
                                              .having('MAX(start) < ?', date_range.begin)
                                              .group_by(&:person_id)
-    
+
     # Calculate total donations for new memberships
     report[:total_donations] = report[:new_memberships].values.flatten.sum{ |membership| membership.donation_amount || 0 }
 
@@ -26,11 +26,14 @@ module ReportsHelper
                                      order(:end).group_by(&:person)
 
     # Find members who had expired memberships and did not renew
-    net_expired_members = report[:expired_memberships].keys - report[:new_memberships].keys
-    report[:lost_memberships] = report[:expired_memberships].slice(*net_expired_members)
+    still_active_expired = Person.where(id: report[:expired_memberships].keys.map(&:id)).active_members(date_range.end).uniq
+    actually_lost_people = report[:expired_memberships].keys - still_active_expired
+    report[:lost_memberships] = report[:expired_memberships].slice(*actually_lost_people)
 
     report[:starting_count] = Person.active_members(date_range.begin).uniq.count
+    #report[:starting_members] = Person.active_members(date_range.begin).uniq
     report[:ending_count] = Person.active_members(date_range.end).uniq.count
+    #report[:ending_members] = Person.active_members(date_range.end).uniq
 
     return report
   end
