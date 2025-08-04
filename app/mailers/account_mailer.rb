@@ -29,6 +29,6 @@ class AccountMailer < ApplicationMailer
     @membership = membership
     @person = membership.person
     @renewal = @person.memberships.count > 1
-    mail(to: @person.email, subject: '[SJAA] Welcome to SJAA Membership')
+    mail(to: @person.email, subject: '[SJAA] Welcome to SJAA')
   end
 end
