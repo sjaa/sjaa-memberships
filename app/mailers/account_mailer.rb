@@ -1,5 +1,6 @@
 class AccountMailer < ApplicationMailer
   default from: 'website@sjaa.net', reply_to: 'allpersonnel@sjaa.net'
+  helper :application
 
   def password_reset(user)
     @user = user
@@ -22,5 +23,12 @@ class AccountMailer < ApplicationMailer
     @expiration_date = person&.latest_membership&.end
     @renew_url = membership_renewal_url(id: person.id)
     mail(to: @person.email, subject: '[SJAA] Time to Renew Your SJAA Membership')
+  end
+
+  def welcome(membership)
+    @membership = membership
+    @person = membership.person
+    @renewal = @person.memberships.count > 1
+    mail(to: @person.email, subject: '[SJAA] Welcome to SJAA Membership')
   end
 end

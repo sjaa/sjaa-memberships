@@ -4,15 +4,13 @@
     <div class="col-12">
       <h1>Membership Payment For <%= @person.name %></h1>
       <% if @person.is_active?%>
-      <div class="alert alert-warning">
-        Your membership is currently active, and will end on <strong><%= date_format @person.latest_membership&.end %></strong>.
-        If you would like to renew your membership, please proceed below.
-      </div>
+        <div class="alert alert-warning">
+          Your membership is currently active, and will end on <strong><%= date_format @person.latest_membership&.end %></strong>.
+          If you would like to renew your membership, please proceed below.
+        </div>
       <% end %>
       <p>Thank you for your interest in being part of the SJAA! Please know that your new or renewing membership will be provisional, until the board of directors votes to formally approve your membership at the next board meeting, per the club's by-laws. All benefits of membership, at the discretion of the board, are in effect during the provisional membership period.</p>
       <p>Your membership will be for a one year period, ending one year after the end of the month you join.  The start and end dates are listed in the invoice below.</p>
-    </div>
-    <div class="col-12 d-none alert alert-danger" id="paypalErrors">
     </div>
     <!-- hidden fields -->
     <%= f.hidden_field :person_id, value: @person.id %>
@@ -21,8 +19,8 @@
     <div class="col-12">
       <%= label_tag 'membership[donation_amount]', 'Extra Donation', class: 'form-label' %>
       <p>
-      <small>The SJAA is a non-profit organization dedicated to bringing astronomy to the general public. Member dues and other donations are used to enhance our programs, such as the telescope loans.
-        If you would like to make an additional donation to help support the SJAA, please enter the amount below.  Thank you!</small>
+        <small>The SJAA is a non-profit organization dedicated to bringing astronomy to the general public. Member dues and other donations are used to enhance our programs, such as the telescope loans.
+          If you would like to make an additional donation to help support the SJAA, please enter the amount below.  Thank you!</small>
       </p>
       <div class="input-group">
         <span class="input-group-text" id="basic-addon1">$</span>
@@ -33,7 +31,7 @@
     <div class="col-12 mt-4">
       <%= label_tag 'membership[ephemeris_amount]', 'Ephemeris', class: 'form-label mb-0' %>
       <p>
-      <small>The digital edition of The Ephemeris is free to everyone.  If you would like a printed version for $10/yr, please indicate this below.</small>
+        <small>The digital edition of The Ephemeris is free to everyone.  If you would like a printed version for $10/yr, please indicate this below.</small>
       </p>
       <%= select_tag 'membership[ephemeris_amount]', options_for_select([ ['Digital +$0', 0], ["Printed +$#{SjaaMembers::EPHEMERIS_FEE}", SjaaMembers::EPHEMERIS_FEE] ]), {class: 'form-select', style: 'max-width: 200px', data: {invoice_target: 'field', updateid: 'ephemeris_fee', action: 'input->invoice#calculate_total'}} %>
     </div>
@@ -71,8 +69,37 @@
     <div class="col-md-4 col-sm-8 mt-4 mb-4" style="max-width: 400px;">
       <div id="paypal-button-container"></div>
     </div>
-    <div class="col-12 d-none" id="success-message">
-      <p class="text-success">Payment successful!  Please wait to be redirected...</p>
+    <!-- Bootstrap Modal for PayPal Success -->
+    <div class="modal fade" id="paypalSuccessModal" tabindex="-1" aria-labelledby="paypalSuccessModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Payment Successful!</h5>
+          </div>
+          <div class="modal-body">
+            <p>Your payment was successful! You will be redirected shortly.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Bootstrap Modal for PayPal Errors -->
+    <div class="modal fade" id="paypalErrorModal" tabindex="-1" aria-labelledby="paypalErrorModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Payment Error</h5>
+          </div>
+          <div class="modal-body">
+            <p id="paypalErrors">An error occurred while processing your payment. Please try again or contact support.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 <% end %>

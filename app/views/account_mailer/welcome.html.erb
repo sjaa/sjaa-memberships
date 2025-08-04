@@ -1,0 +1,58 @@
+<html>
+  <p>
+    <% if @renewal %>
+      Thank you, <%=@person.name%>, for renewing your membership with the San Jose Astronomical Association (SJAA),
+    <% else %>
+      Welcome to the San Jose Astronomical Association (SJAA),
+    <% end %>
+    <% if @membership&.donation_amount > 0 %>
+      and thank you for your generous donation of <%= dollar_format(@membership.donation_amount) %>!
+    <% else %>
+      and thank you for being a part of our community!
+    <% end %>
+    <% if @membership.ephemeris %>
+      Your membership includes a printed subscription to the SJAA Ephemeris, our quarterly publication.  Make sure we have the correct mailing address for you by 
+      <%= link_to "checking your contact information", root_url %> on your account page.
+    <% end %>
+  </p>
+  <p>
+    This message contains important information about your membership, including how to manage your account and all the benefits that come with being a member.
+    You can view or update your contact information and make payments at any time by logging into your account at <%= link_to root_url, root_url %>.
+  </p>
+  <p>
+    SJAA conducts many programs and private observing/imaging events where you will get to rub elbows with many experienced astronomers who can assist you in learning the hobby. And if you are an experienced astronomer yourself, we encourage you to come and share your knowledge, and assist those who are just starting in the hobby.
+    Here are just a few of the <%= link_to 'benefits of being a member', 'https://www.sjaa.net/membership/benefits-of-membership-2/' %>:
+  </p>
+  <ul>
+    <li>Access to private observing and imaging events at local dark sky sites.</li>
+    <li>Volunteer opportunities to help with public outreach, education, logistics, and more!  Email <%= link_to 'volunteer@sjaa.net', 'mailto:volunteer@sjaa.net'%> to get started.</li>
+    <li>Advanced <%= link_to 'Loaner Telescope', 'https://www.sjaa.net/programs/loaner-telescope-program/' %> Program</li>
+    <li><%= link_to 'Astro-imaging programs', 'https://www.sjaa.net/programs/imaging-sig/'%> (Special Interest Group as well as Hands-on Workshops)</li>
+    <li>Eligibility to borrow books, atlases and other items from the <%= link_to 'SJAA Library', 'https://www.sjaa.net/learnresources/sjaa-library/'%></li>
+    <li>Printed or electronic copy of SJAA newsletter, the <%= link_to 'Ephemeris and Ephemeris Bulletin', 'https://www.sjaa.net/membership/sjaa-newsletter-ephemeris/' %></li>
+    <li>Eligibility to vote for <%= link_to 'Board Members', 'https://www.sjaa.net/membership/officers-board-members/'%> (and become a board member too!)</li>
+    <li><%= link_to 'SJAA Observers Google group', 'https://groups.google.com/d/forum/sjaa-observers'%></li>
+    <li><%= link_to 'SJAA AstroImaging Google group', 'https://groups.google.com/d/forum/sjaa-astroimaging'%></li>
+  </ul>
+  <p>
+    We also offer many programs that are open to the public, and we encourage members to also participate in these offerings. 
+    Announcements of SJAA public events are done through <%=link_to 'Meetup', 'https://www.meetup.com/SJ-Astronomy/'%>. Please do join this Meetup group, as this is a great way to keep abreast of all our public events.
+    Some of these events include:
+  </p>
+  <ul>
+    <li><a href="https://www.sjaa.net/programs/school-star-party/">School star parties</a></li>
+    <li><a href="https://www.sjaa.net/events/monthly-star-parties/">Free public star parties</a></li>
+    <li><a href="https://www.sjaa.net/events/solar-observing/">Solar Observing</a></li>
+    <li><a href="https://www.sjaa.net/programs/monthly-guest-speakers/">Free public lectures</a></li>
+    <li><a href="https://www.sjaa.net/programs/beginners-astronomy/">Beginner astronomy talk</a></li>
+    <li><a href="https://www.sjaa.net/programs/fixit/">Telescope Fix It Session</a></li>
+  </ul>
+  <p>
+    You can find all of this and a host of other information on our <%= link_to 'website', 'http://www.sjaa.net/'%>. You may start your journey with SJAA here.  Once again, welcome!  We look forward to seeing you at our events.
+  </p>
+  <p>
+    Warm Regards,<br/>
+    <strong>SJAA Officers and Board</strong><br/>
+    <%= link_to 'sjaa.net', 'https://www.sjaa.net'%>
+  </p>
+</html>
