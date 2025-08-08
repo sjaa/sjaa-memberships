@@ -27,7 +27,7 @@ class ApplicationController < ActionController::Base
   end
 
   def user_not_authorized
-    flash[:alert] = "You are not authorized to perform this action."
+    flash[:alert] = @user.nil? ? "Please login to continue." : "You are not authorized to perform this action."
     respond_to do |format|
       format.html {redirect_back_or_to(redirect_path_for(@user))}
       format.json {render json: {errors: ['Unauthorized by policy']}, status: :unauthorized}

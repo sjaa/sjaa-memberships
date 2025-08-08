@@ -42,20 +42,6 @@ class GoogleController < ApplicationController
 
   private
   def set_auth
-    # Make sure there's a valid refresh token available
-    if(@user&.refresh_token.nil?)
-      @auth = nil
-      return
-    end
-
-    # Load client secrets
-    cshash = JSON.parse Base64.decode64(ENV['GOOGLE_WEB_CLIENT_BASE64'])
-    client_secrets = Google::APIClient::ClientSecrets.new cshash
-
-    # Get the auth object
-    auth = client_secrets.to_authorization
-    auth.refresh_token = @user.refresh_token
-
-    @auth = auth
+    @auth = get_auth(@user)
   end
 end

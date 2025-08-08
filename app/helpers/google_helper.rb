@@ -1,6 +1,25 @@
+require 'google/api_client/client_secrets'
+
 module GoogleHelper
   MEMBERS_GROUP = 'members@sjaa.net'
   REMOVE_GROUP = 'expired-members@sjaa.net'
+
+  def get_auth(user)
+    # Make sure there's a valid refresh token available
+    if(user&.refresh_token.nil?)
+      return nil
+    end
+
+    # Load client secrets
+    cshash = JSON.parse Base64.decode64(ENV['GOOGLE_WEB_CLIENT_BASE64'])
+    client_secrets = Google::APIClient::ClientSecrets.new cshash
+
+    # Get the auth object
+    auth = client_secrets.to_authorization
+    auth.refresh_token = user.refresh_token
+
+    return auth
+  end
 
   def sync(auth: nil, save: true)
     # Compute diff
