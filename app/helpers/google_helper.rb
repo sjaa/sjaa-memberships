@@ -12,7 +12,11 @@ module GoogleHelper
     if(save)
       members = get_members(client: client, group: REMOVE_GROUP)
       members.each do |member|
-        client.delete_member(REMOVE_GROUP, member.email)
+        begin
+          client.delete_member(REMOVE_GROUP, member.email)
+        rescue
+          puts "[W] Skipping delete of #{member.inspect} from #{REMOVE_GROUP}"
+        end
       end
 
       # Add the to-be-removed members to a new group
@@ -27,7 +31,11 @@ module GoogleHelper
 
     # Remove the unmatched people from the member's group
     diff[:group_unmatched].each do |mh|
-      client.delete_member(MEMBERS_GROUP, mh[:email])
+      begin
+        client.delete_member(MEMBERS_GROUP, mh[:email])
+      rescue
+        puts "[W] Skipping delete of #{mh.inspect} from #{MEMBERS_GROUP}"
+      end
     end
 
     # Add the missing people
