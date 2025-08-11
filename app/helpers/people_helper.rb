@@ -26,7 +26,7 @@ module PeopleHelper
       @query_params.delete(:submit)
       @query_params.select!{|k,v| v.present?}
       @query_params = @query_params.permit(
-      :role_operation, :interest_operation, :first_name, :last_name, :email, :phone, :city, :state, :ephemeris, :active, interests: [], roles: []
+      :role_operation, :interest_operation, :first_name, :last_name, :email, :phone, :city, :state, :ephemeris, :active, :discord_id, interests: [], roles: []
       )
       qp = @query_params.to_h
     else
@@ -34,6 +34,7 @@ module PeopleHelper
     end
     
     query = Person.all
+    query = query.where(discord_id: qp[:discord_id]) if(qp[:discord_id].present?)
     query = query.where(Person.arel_table[:first_name].matches("%#{qp[:first_name]}%")) if(qp[:first_name].present?)
     query = query.where(Person.arel_table[:last_name].matches("%#{qp[:last_name]}%")) if(qp[:last_name].present?)
     query = query.joins(:contacts).where(Contact.arel_table[:email].matches("%#{qp[:email]}%")) if(qp[:email].present?)

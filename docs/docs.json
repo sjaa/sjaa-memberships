@@ -1,71 +1,26 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "maple",
-  "name": "SJAA Members DB",
   "colors": {
-    "primary": "#16A34A",
+    "dark": "#15803D",
     "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#16A34A"
   },
   "favicon": "/favicon.svg",
+  "footer": {},
+  "logo": {
+    "dark": "/logo/OriginalSmall.png",
+    "light": "/logo/OriginalSmall.png"
+  },
+  "name": "SJAA Members DB",
+  "navbar": {
+    "links": [],
+    "primary": {
+      "href": "https://dashboard.mintlify.com",
+      "label": "Dashboard",
+      "type": "button"
+    }
+  },
   "navigation": {
-    "tabs": [
-      {
-        "tab": "Application",
-        "groups": [
-          {
-            "group": "Application Overview",
-            "pages": [
-              "introduction",
-              "essentials/people",
-              "essentials/equipment",
-              "essentials/donations",
-              "essentials/permissions",
-              "essentials/reports"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "Development",
-        "groups": [
-          {
-            "group": "Developer Guides",
-            "pages": [
-              "development/environment",
-              "development/database",
-              "development/documentation"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "API Reference",
-        "groups": [
-          {
-            "group": "API Documentation",
-            "pages": [
-              "api-reference/introduction"
-            ]
-          },
-          {
-            "group": "Data Types",
-            "pages": [
-              "api-reference/data-types/api-key",
-              "api-reference/data-types/permissions"
-            ]
-          },
-          {
-            "group": "Endpoints",
-            "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete"
-            ]
-          }
-        ]
-      }
-    ],
     "global": {
       "anchors": [
         {
@@ -84,19 +39,76 @@
           "icon": "code"
         }
       ]
-    }
+    },
+    "tabs": [
+      {
+        "groups": [
+          {
+            "group": "Application Overview",
+            "pages": [
+              "introduction",
+              "essentials/people",
+              "essentials/equipment",
+              "essentials/donations",
+              "essentials/permissions",
+              "essentials/reports"
+            ]
+          }
+        ],
+        "tab": "Application"
+      },
+      {
+        "groups": [
+          {
+            "group": "Developer Guides",
+            "pages": [
+              "development/environment",
+              "development/database",
+              "development/documentation"
+            ]
+          }
+        ],
+        "tab": "Development"
+      },
+      {
+        "groups": [
+          {
+            "group": "API Documentation",
+            "pages": [
+              "api-reference/introduction"
+            ]
+          },
+          {
+            "group": "Data Types",
+            "pages": [
+              "api-reference/data-types/api-key",
+              "api-reference/data-types/permissions"
+            ]
+          },
+          {
+            "group": "Endpoints",
+            "pages": [
+              {
+                "group": "Keys",
+                "pages": [
+                  "api-reference/keys/get",
+                  "api-reference/keys/create",
+                  "api-reference/keys/delete"
+                ]
+              },
+            {
+                "group": "People",
+                "pages": [
+                  "api-reference/people/search",
+                  "api-reference/people/update"
+                ]
+              }
+            ]
+          }
+        ],
+        "tab": "API Reference"
+      }
+    ]
   },
-  "logo": {
-    "light": "/logo/OriginalSmall.png",
-    "dark": "/logo/OriginalSmall.png"
-  },
-  "navbar": {
-    "links": [],
-    "primary": {
-      "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
-    }
-  },
-  "footer": {}
+  "theme": "maple"
 }

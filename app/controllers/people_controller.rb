@@ -3,6 +3,7 @@ class PeopleController < ApplicationController
   include PeopleHelper
 
   before_action :set_person, only: %i[ show edit update destroy new_membership ]
+  skip_before_action :verify_authenticity_token, only: [:update], if: -> { request.format.json? }
   
   # GET /people or /people.json
   def index
@@ -11,6 +12,7 @@ class PeopleController < ApplicationController
 
     respond_to do |format|
       format.html
+      format.json
       format.csv { send_data people_to_sjaa_db(@all_people), filename: "sjaa-people-#{Date.today}.csv" }
     end
   end

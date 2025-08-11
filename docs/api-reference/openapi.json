@@ -10,7 +10,7 @@
   },
   "servers": [
     {
-      "url": "https://sjaa-members-866e0b003e92.herokuapp.com"
+      "url": "https://membership.sjaa.net/api"
     }
   ],
   "security": [
@@ -19,7 +19,7 @@
     }
   ],
   "paths": {
-    "/api-keys": {
+    "/keys": {
       "post": {
         "description": "Creates a new api key (bearer token) for the user given by Basic auth.",
         "security": [
@@ -72,6 +72,69 @@
           }
         }
       }
+    },
+    "/people": {
+      "get": {
+        "description": "Returns all people matching the requested query.  Does not include Admins.  Requires read permissions.",
+        "requestBody":{
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PersonFilter"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Array of people.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Person"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/people/:id": {
+      "patch": {
+        "description": "Update the person with the indicated :id in the URL.  Requires write permissions.",
+        "requestBody":{
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PersonForm"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated Person record.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Person"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -88,6 +151,88 @@
       }
     },
     "schemas": {
+      "PersonForm": {
+        "type": "object",
+        "properties": {
+          "person[first_name]": {
+            "description": "Update first name.",
+            "type": "string"
+          },
+          "person[last_name]": {
+            "description": "Update last name.",
+            "type": "string"
+          },
+          "person[discord_id]": {
+            "description": "Update Discord user ID.",
+            "type": "string"
+          }
+        }
+      },
+      "Person": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Internal database identifier.  Use where :id is required.",
+            "type": "array"
+          },
+          "contacts": {
+            "description": "List of contacts, including address, phone, and email.",
+            "type": "array"
+          },
+          "memberships": {
+            "description": "List of memberships, which include start and end dates.",
+            "type": "array"
+          },
+          "first_name": {
+            "description": "first name.",
+            "type": "string"
+          },
+          "last_name": {
+            "description": "last name.",
+            "type": "string"
+          },
+          "discord_id": {
+            "description": "Discord user ID.",
+            "type": "string"
+          }
+        }
+      },
+      "PersonFilter": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "description": "Filter by given email address.",
+            "type": "string"
+          },
+          "first_name": {
+            "description": "Filter by given first name.",
+            "type": "string"
+          },
+          "last_name": {
+            "description": "Filter by given last name.",
+            "type": "string"
+          },
+          "active": {
+            "type": "string",
+            "anyOf": [
+              {
+                "const": "yes",
+                "title": "Active",
+                "description": "People with a current membership."
+              },
+              {
+                "const": "no",
+                "title": "Inactive",
+                "description": "People without a current membership."
+              }
+            ]
+          },
+          "discord_id": {
+            "description": "Filter by given Discord user ID.",
+            "type": "string"
+          }
+        }
+      },
       "Permissions": {
         "type": "string",
         "anyOf": [
