@@ -42,13 +42,21 @@ The app should serve as a secure store for the membership data, and should facil
 
 1. Lookup a person's membership status
     ```ruby
-    # By name
-    Person.find_by(last_name: 'Nomo').status.name
-    => "member"
-
-    # By email
-    Person.joins(:contacts).where(contact: {email: 'nomo@gmail.com'}).first.status.name
-    => "member"
+    p = Person.find 42
+    p.active_membership
+    => 
+    [#<Membership:0x0000ffff8b1b3358
+      id: 3568,
+      start: Mon, 04 Aug 2025 00:00:00.000000000 UTC +00:00,
+      term_months: 12,
+      ephemeris: false,
+      person_id: 1992,
+      created_at: Sat, 09 Aug 2025 22:39:12.523926000 UTC +00:00,
+      updated_at: Sat, 09 Aug 2025 22:39:12.523926000 UTC +00:00,
+      kind_id: nil,
+      donation_amount: nil,
+      order_id: nil,
+      end: Mon, 31 Aug 2026 23:59:59.999999000 UTC +00:00>]
     ```
 1. Get a person's contact information
     ```ruby
