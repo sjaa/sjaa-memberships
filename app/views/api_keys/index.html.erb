@@ -1,0 +1,26 @@
+<div class="row">
+  <div class="col-12">
+    <h2>Your API Keys</h2>
+
+    <% if @keys&.empty? %>
+    <p> No keys available yet. Please create some.</p>
+    <% else %>
+    <table class="table table-striped table-hover">
+      <tr>
+        <th>Token</th>
+        <th>Permissions</th>
+        <th></th>
+      </tr>
+      </tr>
+      <% @keys.each do |key| %>
+      <tr>
+        <td><%= key&.token %></td>
+        <td><%= key&.bearer&.permissions&.map(&:name)&.join(', ') %></td>
+        <td><%= button_to "Delete Token", key, method: :delete, class: 'btn btn-danger d-inline-block', data: {confrim: "Are you sure you want to delete this token?"} %></td>
+      </tr>
+      <% end %>
+    </table>
+    <% end %>
+    <%= button_to "Generate Token", api_keys_path, method: :post, class: 'btn btn-primary d-inline-block' %>
+  </div>
+</div>

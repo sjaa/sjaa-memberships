@@ -61,6 +61,9 @@
                     <li><%= link_to 'Ephemeris List', ephemeris_report_path, class: 'dropdown-item'%></li>
                   </ul>
                 </li>
+                <li class="nav-item">
+                  <%= link_to 'API Keys', api_keys_path, class: "nav-link" %>
+                </li>
               <% else %>
               <li class="nav-item">
                 <%= link_to "Profile", edit_person_path(@user), class: 'nav-link' %>

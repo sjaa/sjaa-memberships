@@ -19,6 +19,9 @@ class PeopleController < ApplicationController
   def show
   end
 
+  def admin
+  end
+
   def new_membership
   end
 
@@ -27,7 +30,9 @@ class PeopleController < ApplicationController
   
   def search
     filter
-    render turbo_stream: turbo_stream.replace('people', partial: 'index')
+    respond_to do |format|
+      format.turbo_stream {render turbo_stream: turbo_stream.replace('people', partial: 'index')}
+    end
   end
   
   # GET /people/new
