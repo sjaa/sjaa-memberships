@@ -73,11 +73,11 @@ class MembershipsController < ApplicationController
       if order.save
         return render :json => {:token => response.result.id, membership: mp}, :status => :ok
       else
-        return render :json => {error: "Could not process membership order.  Please try later."}, :status => :error
+        return render :json => {error: "Could not process membership order.  Please try later."}, :status => :ok
       end
     rescue PayPalHttp::HttpError => ioe
       # HANDLE THE ERROR
-      return render :json => {error: "PayPal Error: #{ioe}"}, :status => :error
+      return render :json => {error: "PayPal Error: #{ioe}"}, :status => :ok
     end
   end
 
