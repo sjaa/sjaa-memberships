@@ -77,7 +77,7 @@ class MembershipsController < ApplicationController
       end
     rescue PayPalHttp::HttpError => ioe
       # HANDLE THE ERROR
-      puts "[E] PayPal Error: #{ioe.full_message}"
+      puts "[E] PayPal Error: #{ioe.full_message} - #{ioe.detailed_message}"
       puts "    #{ioe.status_code} - #{ioe.headers}"
       puts "    #{ioe.result.inspect}"
       puts "    #{ioe.backtrace.join("\n    ")}"
