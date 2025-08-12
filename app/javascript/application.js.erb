@@ -30,7 +30,7 @@ function loadPayPalButtons() {
   if (container) {
     loadScript('https://www.paypal.com/sdk/js?client-id=<%=ENV['PAYPAL_CLIENT_ID']%>', () => {
       paypal.Buttons({
-        env: 'sandbox', // Valid values are sandbox and live.
+        env: '<%=config.paypal_mode%>', // Valid values are sandbox and live.
         createOrder: async () => {
           // Get the form element
           const form = document.getElementById('new_membership');
