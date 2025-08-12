@@ -78,7 +78,7 @@ class MembershipsController < ApplicationController
     rescue PayPalHttp::HttpError => ioe
       # HANDLE THE ERROR
       puts "[E] PayPal Error: #{ioe.to_s}"
-      puts "[E] Stack trace: \n#{ioe.backtrace.join("\n")}"
+      puts "    #{ioe.inspect}"
       return render :json => {error: "PayPal Error: #{ioe}"}, :status => :ok
     end
   end
