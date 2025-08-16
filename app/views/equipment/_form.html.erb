@@ -11,15 +11,7 @@
     </div>
   <% end %>
 
-  <div>
-    <%= form.label :instrument_id, style: "display: block" %>
-    <%= form.number_field :instrument_id %>
-  </div>
-
-  <div>
-    <%= form.label :model, style: "display: block" %>
-    <%= form.text_field :model %>
-  </div>
+  <%= render partial: 'equipment/instrument_form', locals: {equipment: equipment, prefix: 'equipment[instrument_attributes]'} %>
 
   <div>
     <%= form.label :person_id, style: "display: block" %>
@@ -27,7 +19,6 @@
   </div>
 
 <%= form.file_field :images, multiple: true %>
-
   <div>
     <%= form.submit %>
   </div>

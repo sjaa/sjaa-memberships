@@ -104,7 +104,22 @@ function showPayPalError(error_string) {
   modal.show();
 }
 
+function loadImageModals() {
+  console.log("loading Image Modals...");
+  const modalImage = document.querySelector("#lightboxModal img");
+
+  document.querySelectorAll("[data-bs-toggle='modal']").forEach(img => {
+    img.addEventListener("click", () => {
+      const fullUrl = img.dataset.fullImageUrl;
+      console.log(`fullUrl: ${fullUrl}`);
+      modalImage.src = fullUrl;
+    });
+  });
+}
+
+
 document.addEventListener('turbo:load', function () {
   console.log('turbo loaded')
   loadPayPalButtons();
+  loadImageModals();
 });

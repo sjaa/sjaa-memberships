@@ -14,7 +14,7 @@
     <%= text_area_tag 'donation[items_attributes][][equipment_attributes][note]', item&.equipment&.note, class: 'form-control' %>
   </div>
   <!-- Instrument -->
-  <%= render partial: 'equipment/instrument_form', locals: {item: item, prefix: 'donation[items_attributes][][equipment_attributes][instrument_attributes]'} %>
+  <%= render partial: 'equipment/instrument_form', locals: {equipment: item&.equipment, prefix: 'donation[items_attributes][][equipment_attributes][instrument_attributes]'} %>
   <!-- Phases -->
   <div class="mt-4" data-controller="form">
     <div data-form-target="fields" class="row mt-4">

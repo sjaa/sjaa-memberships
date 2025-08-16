@@ -1,6 +1,7 @@
 class Equipment < ApplicationRecord
   belongs_to :instrument
   belongs_to :person, required: false
+  belongs_to :role, required: false
   has_many_attached :images
   include ItemCasable
 
