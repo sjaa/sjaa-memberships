@@ -72,17 +72,19 @@ class DonationsController < ApplicationController
     @query_params.delete(:authenticity_token)
     @query_params.delete(:submit)
     @query_params.select!{|k,v| v.present?}
+    Rails.logger.info "query_params: #{@query_params.inspect}"
     @query_params = @query_params.permit(:person_id, :from_date, :to_date, :from_value, :to_value)
     qp = @query_params
 
-    query = Donation.all.joins(INCLUDES).select(:id)
-    query = query.where(phases: {person_id: qp[:person_id]}) if(qp[:person_id].present?)
-    query = query.where(DonationItem.arel_table[:value].gteq(qp[:from_value])) if(qp[:from_value].present?)
-    query = query.where(DonationItem.arel_table[:value].lteq(qp[:to_value])) if(qp[:to_value].present?)
-    query = query.where(DonationPhase.arel_table[:date].gteq(qp[:from_date])) if(qp[:from_date].present?)
-    query = query.where(DonationPhase.arel_table[:date].lteq(qp[:to_date])) if(qp[:to_date].present?)
+    query = Donation.all.select(:id)
+    query = query.joins(items: [:phases]).where(phases: {person_id: qp[:person_id]}) if(qp[:person_id].present?)
+    query = query.joins(:items).where(DonationItem.arel_table[:value].gteq(qp[:from_value])) if(qp[:from_value].present?)
+    query = query.joins(:items).where(DonationItem.arel_table[:value].lteq(qp[:to_value])) if(qp[:to_value].present?)
+    query = query.joins(items: [:phases]).where(DonationPhase.arel_table[:date].gteq(qp[:from_date])) if(qp[:from_date].present?)
+    query = query.joins(items: [:phases]).where(DonationPhase.arel_table[:date].lteq(qp[:to_date])) if(qp[:to_date].present?)
 
-    donations = Donation.where(id: query)
+    donations = Donation.where(id: query).includes(INCLUDES)
+    Rails.logger.info "donations: #{query.map(&:id).inspect}"
 
     @pagy, @donations = pagy(donations, limit: 40, params: @query_params.to_h)
   end

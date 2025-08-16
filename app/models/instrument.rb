@@ -3,8 +3,5 @@ class Instrument < ApplicationRecord
   before_save :caseitize
 
   private
-  def caseitize
-    self.kind = self.kind&.downcase
-    self.model = self.model&.upcase
-  end
+  include ItemCasable
 end

@@ -1,0 +1,10 @@
+  <% item ||= nil %>
+  <% instruments = Instrument.all %>
+  <div class="col-md-6 mt-2">
+    <%= label_tag attributize(prefix: prefix, field: 'kind'), 'Instrument Type', class: 'form-label' %>
+    <%= combobox_tag attributize(prefix: prefix, field: 'kind'),  instruments.map(&:kind).uniq.map{|i| {display: i&.titleize, value: i}}, name_when_new: attributize(prefix: prefix, field: 'kind'), value: item&.equipment&.instrument&.kind %>
+  </div>
+  <div class="col-md-6 mt-2">
+    <%= label_tag attributize(prefix: prefix, field: 'model'), 'Instrument Model', class: 'form-label' %>
+    <%= combobox_tag attributize(prefix: prefix, field: 'model'),  instruments.map(&:model).uniq.map{|i| {display: i&.upcase, value: i}}, name_when_new: attributize(prefix: prefix, field: 'model'), value: item&.equipment&.instrument&.model %>
+  </div>

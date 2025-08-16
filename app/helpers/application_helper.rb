@@ -30,4 +30,9 @@ module ApplicationHelper
 
     return str.html_safe
   end
+
+  # Use for assigning prefix (if present) to a field
+  def attributize(prefix: nil, field: nil)
+    return prefix.nil? ? field&.to_s : "#{prefix}[#{field}]"
+  end
 end

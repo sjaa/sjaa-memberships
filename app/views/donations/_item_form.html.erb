@@ -14,16 +14,7 @@
     <%= text_area_tag 'donation[items_attributes][][equipment_attributes][note]', item&.equipment&.note, class: 'form-control' %>
   </div>
   <!-- Instrument -->
-  <% instruments = Instrument.all %>
-  <div class="col-md-6 mt-2">
-    <%= hidden_field_tag 'donation[items_attributes][][equipment_attributes][instrument_attributes][id]', item&.equipment&.instrument&.id %>
-    <%= label_tag 'donation[items_attributes][][equipment_attributes][instrument_attributes][kind]', 'Instrument Type', class: 'form-label' %>
-    <%= combobox_tag 'donation[items_attributes][][equipment_attributes][instrument_attributes][kind]',  instruments.map(&:kind).uniq.map{|i| {display: i&.titleize, value: i}}, name_when_new: "donation[items_attributes][][equipment_attributes][instrument_attributes][kind]", value: item&.equipment&.instrument&.kind %>
-  </div>
-  <div class="col-md-6 mt-2">
-    <%= label_tag 'donation[items_attributes][][equipment_attributes][instrument_attributes][model]', 'Instrument Model', class: 'form-label' %>
-    <%= combobox_tag 'donation[items_attributes][][equipment_attributes][instrument_attributes][model]',  instruments.map(&:model).uniq.map{|i| {display: i&.upcase, value: i}}, name_when_new: "donation[items_attributes][][equipment_attributes][instrument_attributes][model]", value: item&.equipment&.instrument&.model %>
-  </div>
+  <%= render partial: 'equipment/instrument_form', locals: {item: item, prefix: 'donation[items_attributes][][equipment_attributes][instrument_attributes]'} %>
   <!-- Phases -->
   <div class="mt-4" data-controller="form">
     <div data-form-target="fields" class="row mt-4">
