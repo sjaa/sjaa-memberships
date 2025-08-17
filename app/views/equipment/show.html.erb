@@ -10,9 +10,7 @@ owners << link_to(role.name, role) if(!role.nil?)
     <h1><%= @equipment&.instrument&.kind&.titleize %> <small><%= @equipment&.instrument&.model%></small></h1>
   </div>
   <div class="col-12 mt-2">
-    <% @equipment.images.each do |image| %>
-    <%= image_tag url_for(image), class: "img-thumbnail", width: '200px', data: { bs_toggle: "modal", bs_target: "#lightboxModal", full_image_url: url_for(image) } %>
-    <% end %>
+    <%= render partial: 'equipment/show_images', locals: {images: @equipment.images} %>
     <p>
       <strong>Owner(s): </strong> <%= owners.join(', ').html_safe %>
     </p>
@@ -24,15 +22,5 @@ owners << link_to(role.name, role) if(!role.nil?)
     <%= link_to "Edit this equipment", edit_equipment_path(@equipment), class: 'btn btn-primary' %>
     <%= link_to "Back to equipment", equipment_index_path, class: 'btn btn-secondary' %>
     <%= button_to "Delete this equipment", @equipment, method: :delete, data: {turbo_confirm: 'Are you TOTALLY sure??' }, class: 'btn btn-danger d-inline-block mt-4' %>
-  </div>
-</div>
-
-<div class="modal fade" id="lightboxModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content border-0">
-      <div class="modal-body text-center p-4">
-        <%= image_tag '', class: "img-fluid rounded" %>
-      </div>
-    </div>
   </div>
 </div>

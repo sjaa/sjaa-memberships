@@ -11,15 +11,33 @@
     </div>
   <% end %>
 
+  <%= render partial: 'equipment/show_images', locals: {images: equipment.images} %>
   <%= render partial: 'equipment/instrument_form', locals: {equipment: equipment, prefix: 'equipment[instrument_attributes]'} %>
 
-  <div>
-    <%= form.label :person_id, style: "display: block" %>
-    <%= form.number_field :person_id %>
+  <div class="mt-4">
+    <% people_selector = Person.all.map{|p| {display: p.name, value: p.id}}%>
+    <%= form.label :person_id, 'Person Owner', class: 'form-label' %>
+    <%= form.combobox :person_id, people_selector %>
+    <%= link_to 'New Person', new_person_path, target: :_blank %>
   </div>
 
-<%= form.file_field :images, multiple: true %>
-  <div>
-    <%= form.submit %>
+  <div class="mt-4">
+    <% group_selector = Role.all.map{|p| {display: p.name, value: p.id}}%>
+    <%= form.label :role_id, 'Group Owner', class: 'form-label' %>
+    <%= form.combobox :role_id, group_selector %>
+    <%= link_to 'New Group', new_role_path, target: :_blank %>
+  </div>
+
+  <div class="mt-4">
+  <%= form.file_field :images, multiple: true, class: 'form-control' %>
+  </div>
+
+  <div class="mt-4">
+    <%= form.label :note, 'Notes', class: 'form-label' %>
+    <%= form.text_area :note, class: 'form-control' %>
+  </div>
+
+  <div class="mt-4">
+    <%= form.submit 'Save Equipment', class: 'btn btn-primary'%>
   </div>
 <% end %>

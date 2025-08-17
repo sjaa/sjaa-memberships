@@ -35,4 +35,9 @@ module ApplicationHelper
   def attributize(prefix: nil, field: nil)
     return prefix.nil? ? field&.to_s : "#{prefix}[#{field}]"
   end
+
+  def julian_date(date)
+    date ||= Date.today
+    return "#{date.year}#{sprintf("%3d", date.yday)}"
+  end
 end
