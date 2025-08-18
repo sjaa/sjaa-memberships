@@ -10,6 +10,9 @@ export default class extends Controller {
 
   addField(event) {
     event.preventDefault()
+    // Need to handle undefined event
+    if(event == undefined) {return;}
+
     var id = event.params.baseid
     var replaceId = event.params.replaceid || 'NEWID'
     var cloned = this.templateTarget.content.cloneNode(true)
@@ -20,7 +23,8 @@ export default class extends Controller {
     var value = null
     var name = null
 
-    console.log(`Adding Field... ${event.inspect}`)
+    console.log(`Adding Field...`)
+    console.log(event)
 
     // Construct the target node and replace important values
     cloned.childNodes.forEach((node) => {
@@ -32,11 +36,23 @@ export default class extends Controller {
         // Assume the source is a combo-box
         if(this.hasSourceTarget) {
           var selectedOption = this.sourceTarget.querySelector('[aria-selected="true"]')
-          var clearHandle = this.sourceTarget.getElementsByClassName('hw-combobox__handle')[0]
-          node.innerHTML = node.innerHTML.replace(new RegExp(`${replaceValue}`, 'g'), `${selectedOption.dataset.value}`)
-          node.innerHTML = node.innerHTML.replace(new RegExp(`${replaceName}`, 'g'), `${selectedOption.dataset.autocompletableAs}`)
+
+          if(selectedOption) {
+            node.innerHTML = node.innerHTML.replace(new RegExp(`${replaceValue}`, 'g'), `${selectedOption.dataset.value}`)
+            node.innerHTML = node.innerHTML.replace(new RegExp(`${replaceName}`, 'g'), `${selectedOption.dataset.autocompletableAs}`)
+          } else {
+            // New Entry, so grab the text
+            var text = this.sourceTarget.querySelector('.hw-combobox__input')
+            if(!(!text.value || text.value.trim() == "")) {
+              node.innerHTML = node.innerHTML.replace(new RegExp(`${replaceValue}`, 'g'), `${text.value}`)
+              node.innerHTML = node.innerHTML.replace(new RegExp(`${replaceName}`, 'g'), `${text.value}`)
+            } else {
+              return;
+            }
+          }
 
           // Clear the selection
+          var clearHandle = this.sourceTarget.getElementsByClassName('hw-combobox__handle')[0]
           clearHandle.click();
         }
 

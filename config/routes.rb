@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :tags
   
   get '/reports/memberships', to: 'reports#memberships', as: :memberships_report
   get '/reports/renewal_reminders', to: 'reports#renewal_reminders', as: :renewal_reminders

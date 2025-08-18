@@ -7,12 +7,15 @@ owners << link_to(role.name, role) if(!role.nil?)
 %>
 <div class="row">
   <div class="col-12 mt-2">
-    <h1><%= @equipment&.instrument&.kind&.titleize %> <small><%= @equipment&.instrument&.model%></small></h1>
+    <h1><%= @equipment&.instrument&.model%> <small>(<%= @equipment&.instrument&.kind&.titleize %></small>)</h1>
   </div>
   <div class="col-12 mt-2">
     <%= render partial: 'equipment/show_images', locals: {images: @equipment.images} %>
     <p>
       <strong>Owner(s): </strong> <%= owners.join(', ').html_safe %>
+    </p>
+    <p>
+      <strong>Tags: </strong> <%= @equipment&.tags&.map(&:name).join(', ')%>
     </p>
     <p>
       <strong>Note: </strong> <%= @equipment&.note%>

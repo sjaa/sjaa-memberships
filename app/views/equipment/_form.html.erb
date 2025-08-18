@@ -14,6 +14,32 @@
   <%= render partial: 'equipment/show_images', locals: {images: equipment.images} %>
   <%= render partial: 'equipment/instrument_form', locals: {equipment: equipment, prefix: 'equipment[instrument_attributes]'} %>
 
+  <!-- Tags -->
+  <div class="mt-4" data-controller="form">
+    <div class="row">
+      <div class="col-12">
+        <%= label_tag 'tags', 'Tags', class: 'form-label' %>
+        <div data-form-target="fields mt-2 mb-2">
+        <% equipment.tags.each do |tag| %>
+          <span id="tags_<%=tag.id%>" class="d-inline-block mt-2" style="margin-right: 0.5em;">
+            <%= hidden_field_tag 'equipment[tag_attributes][]', tag.name %>
+            <a data-form-id-param="tags_<%=tag.id%>" data-action="form#removeField" class="btn btn-secondary"><%=tag.name%></a>
+          </span>
+        <% end %>
+        </div>
+        <template data-form-target="template">
+          <span id="NEWID" class="d-inline-block mt-2" style="margin-right: 0.5em;">
+            <%= hidden_field_tag 'equipment[tag_attributes][]', 'REPLACEVALUE' %>
+            <a data-form-id-param="NEWID" data-action="form#removeField" class="btn btn-secondary">REPLACENAME</a>
+          </span>
+        </template>
+      </div>
+      <div class="col-12 mt-2">
+        <%= combobox_tag "equipment[tag_attributes][]", Tag.all.map{|r| {display: r.name.downcase, value: r.name}}, placeholder: 'Select Tags', name_when_new: 'equipment[tag_attributes][]', data: { form_baseid_param: 'tags', form_target: 'source', action: "hw-combobox:selection->form#addField" } %>
+      </div>
+    </div>
+  </div>
+
   <div class="mt-4">
     <% people_selector = Person.all.map{|p| {display: p.name, value: p.id}}%>
     <%= form.label :person_id, 'Person Owner', class: 'form-label' %>
