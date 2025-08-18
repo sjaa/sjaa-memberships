@@ -1,6 +1,7 @@
 class EquipmentController < ApplicationController
   before_action :set_equipment, only: %i[ show edit update destroy ]
   include Resizable
+  include Filterable
   
   # GET /equipment or /equipment.json
   def index
@@ -73,13 +74,17 @@ class EquipmentController < ApplicationController
     @query_params.delete(:authenticity_token)
     @query_params.delete(:submit)
     @query_params.select!{|k,v| v.present?}
-    @query_params = @query_params.permit(:kind_name, :model_name, :person_id, :group_id, :note)
+    @query_params = @query_params.permit(:kind_name, :model_name, :person_id, :group_id, :note, :role_id, :tag_operation, tags: [])
     qp = @query_params
+    qp[:tags] = qp[:tags]&.map(&:strip)&.select{|t| !t.empty?}&.uniq
+    logger.info("Tags: #{qp[:tags].inspect}")
     
     query = Equipment.all.includes(:instrument)
     query = query.where(instrument: {kind: qp[:kind_name]}) if(qp[:kind_name].present?)
     query = query.where(person_id: qp[:person_id]) if(qp[:person_id].present?)
-    equipment = query
+    query = query.where(role_id: qp[:role_id]) if(qp[:role_id].present?)
+    query = and_or_helper(Tag, query, qp[:tag_operation], :tags, qp[:tags]) if(qp[:tags].present?)
+    equipment = Equipment.where(id: query.map(&:id).uniq)
     
     @pagy, @equipment = pagy(equipment, limit: 40, params: @query_params.to_h)
   end

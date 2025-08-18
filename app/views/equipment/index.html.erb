@@ -8,8 +8,42 @@
       <%= f.combobox :person_id, Person.where(id: Equipment.where.not(person_id: nil).select(:person_id).distinct).map{|p| [p.name, p.id]}, placeholder: 'Person', value: @query_params[:person_id], data: { action: "hw-combobox:selection->search-form#search" } %>
     </div>
     <div class="col-12">
+      <%= f.combobox :person_id, Role.all.map{|p| [p.name, p.id]}, placeholder: 'Role', value: @query_params[:role_d], data: { action: "hw-combobox:selection->search-form#search" } %>
+    </div>
+    <div class="col-12">
       <%= f.combobox :kind_name, kinds.map{|k| [k.titleize, k]}, placeholder: 'Instrument Kind', value: @query_params[:kind_name], data: { action: "hw-combobox:selection->search-form#search" } %>
     </div>
+
+    <!-- Tags -->
+    <div class="col-md-6 col-xs-12 mb-2" data-controller="form">
+      <div class="row">
+        <div class="col-12">
+          <%= label_tag 'tags', 'Tags', class: 'form-label' %>
+          <div data-form-target="fields mt-2 mb-2">
+          </div>
+          <template data-form-target="template">
+            <span id="NEWID" class="d-inline-block mt-2" style="margin-right: 0.5em;">
+              <%= hidden_field_tag 'tags[]', 'REPLACEVALUE' %>
+              <a data-form-id-param="NEWID" data-action="search-form#search form#removeField" class="btn btn-secondary">REPLACENAME</a>
+            </span>
+          </template>
+        </div>
+        <div class="col-12 mt-2">
+          <%= combobox_tag "tags[]", Tag.all.map{|r| {display: r.name.titleize, value: r.id}}, placeholder: 'Select tags', data: { form_baseid_param: 'tag', form_target: 'source', action: "hw-combobox:selection->search-form#search hw-combobox:selection->form#addField" } %>
+          <span style="margin-right: 20px;">
+            <%= radio_button_tag 'tag_operation', 'and', class: 'form-check-input', checked: @query_params[:tag_operation] == 'and', data: {action: "search-form#search"} %>
+            <%= label_tag 'tag_operation_and', 'And', class: 'form-check-label' %>
+          </span>
+          <span style="margin-right: 20px;">
+            <%= radio_button_tag 'tag_operation', 'or', class: 'form-check-input', checked: @query_params[:tag_operation] != 'and', data: {action: "search-form#search"} %>
+            <%= label_tag 'tag_operation_or', 'Or', class: 'form-check-label' %>
+          </span>
+        </div>
+      </div>
+    </div>
+
+
+
     <div id="equipment">
       <%= render partial: 'index' %>
     </div>
