@@ -1,14 +1,15 @@
 <p style="color: green"><%= notice %></p>
 
 <h1>Tags</h1>
+<p>
+<%= link_to new_tag_path, class: 'btn btn-primary' do %>
+<i class="bi bi-plus-circle"></i> Add Tag
+<% end %>
+</p>
 
 <div id="tags">
   <% @tags.each do |tag| %>
-    <%= render tag %>
-    <p>
-      <%= link_to "Show this tag", tag %>
-    </p>
+    <%= display_tag(tag: tag, editable: false) %>
   <% end %>
 </div>
 
-<%= link_to "New tag", new_tag_path %>

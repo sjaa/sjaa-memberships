@@ -1,0 +1,20 @@
+<% img = equipment&.images&.first ? url_for(equipment.images.first) : image_url('placeholder.svg') %>
+<div class="card m-2 p-2" style="width: 18rem;">
+  <img class="card-img-top" src="<%=img%>" alt="Equipment photo">
+  <div class="card-body">
+    <hr/>
+    <h5 class="card-title"><%=equipment&.instrument&.model%></h5>
+    <p class="card-text">
+      <%=equipment.note%>
+    </p>
+    <p>
+      <%= link_to(equipment.person&.name, equipment.person) if(equipment.person) %>
+      <%= link_to(equipment.role&.name, equipment.role) if(equipment.role) %>
+    </p>
+    <div class="d-flex">
+      <% equipment&.tags.each do |tag| %>
+        <%= display_tag tag: tag %>
+      <% end %>
+    </div>
+  </div>
+</div>

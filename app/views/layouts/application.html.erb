@@ -25,21 +25,26 @@
                 <li class="nav-item">
                   <%= link_to 'People', people_path, class: 'nav-link' %>
                 </li>
-                <li class="nav-item">
-                  <%= link_to 'Roles', roles_path, class: 'nav-link' %>
+
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Data
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li><%= link_to 'Roles', roles_path, class: 'dropdown-item' %></li>
+                    <li><%= link_to 'Tags', tags_path, class: 'dropdown-item' %></li>
+                    <% if @user.has_permission? :permit %>
+                      <li><a class="dropdown-item" href="#">Permissions</a></li>
+                    <% end %>
+                  </ul>
                 </li>
+
                 <li class="nav-item">
                   <%= link_to 'Donations', donations_path, class: 'nav-link' %>
                 </li>
                 <li class="nav-item">
                   <%= link_to 'Equipment', equipment_index_path, class: 'nav-link' %>
                 </li>
-                <%# if @user.has_permission? :permit %>
-                <% if false %>
-                  <li class="nav-item">
-                    <a class="nav-link" href="#">Permissions</a>
-                  </li>
-                <% end %>
                 <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     Google

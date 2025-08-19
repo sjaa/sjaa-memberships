@@ -1,10 +1,10 @@
 class ReportsController < ApplicationController
   include ReportsHelper
-  include PeopleHelper
+  include Filterable
   include ApplicationHelper
 
   def ephemeris
-    filter({ephemeris: 'printed'})
+    people_filter({ephemeris: 'printed'})
 
     if(params[:page])
       render turbo_stream: turbo_stream.replace('people', partial: 'people/ephemeris_index')

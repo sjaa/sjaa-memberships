@@ -8,6 +8,7 @@ class TagsController < ApplicationController
 
   # GET /tags/1 or /tags/1.json
   def show
+    @equipment = @tag.equipment
   end
 
   # GET /tags/new
