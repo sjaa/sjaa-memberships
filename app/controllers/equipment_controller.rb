@@ -83,7 +83,7 @@ class EquipmentController < ApplicationController
     query = query.where(instrument: {kind: qp[:kind_name]}) if(qp[:kind_name].present?)
     query = query.where(person_id: qp[:person_id]) if(qp[:person_id].present?)
     query = query.where(role_id: qp[:role_id]) if(qp[:role_id].present?)
-    query = and_or_helper(Tag, query, qp[:tag_operation], :tags, qp[:tags]) if(qp[:tags].present?)
+    query = and_or_helper(Equipment, query, qp[:tag_operation], :tags, qp[:tags]) if(qp[:tags].present?)
     equipment = Equipment.where(id: query.map(&:id).uniq)
     
     @pagy, @equipment = pagy(equipment, limit: 40, params: @query_params.to_h)

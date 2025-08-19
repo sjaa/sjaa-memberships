@@ -1,13 +1,13 @@
 class PeopleController < ApplicationController
   include ReportsHelper
-  include PeopleHelper
+  include Filterable
 
   before_action :set_person, only: %i[ show edit update destroy new_membership ]
   skip_before_action :verify_authenticity_token, only: [:update], if: -> { request.format.json? }
   
   # GET /people or /people.json
   def index
-    filter
+    people_filter
     render partial: 'index' if(params[:page])
 
     respond_to do |format|
@@ -31,7 +31,7 @@ class PeopleController < ApplicationController
   end
   
   def search
-    filter
+    people_filter
     respond_to do |format|
       format.turbo_stream {render turbo_stream: turbo_stream.replace('people', partial: 'index')}
     end
@@ -119,5 +119,29 @@ class PeopleController < ApplicationController
       puts("Person not set! #{e.message}")
       authorize self.class, policy_class: PersonPolicy
     end
+  end
+
+  def people_to_sjaa_db(people)
+    csv = CSV.generate(headers: true) do |csv|
+      csv << ["First Name", "Last Name", "Status", "Expiry Date", 
+      "last payment", 'Cash?', 'Term', 
+      'Type', 'New/Rtn', 'Member Since', 'Ephem', 'Comp', 'email1', 
+      'Address1', 'City1', 'ST1', 'Zip1', 'phone1', 'email2', 'phone2', 
+      "Observer's Group?", "Observers Email Address (if diff)", "Interests", "Equipment"]
+
+
+      people.each do |person|
+        term = person.latest_membership&.term_years
+        csv << [
+          person.first_name, person.last_name, person.is_active? ? 'Member' : 'Expired', person.latest_membership&.end&.strftime('%m-%d-%Y') || 'Life', 
+          person.latest_membership&.start&.strftime('%m-%d-%Y') || '', '',  term ? "#{term}yr" : '',
+          person.latest_membership&.kind&.name, person.latest_membership == person.first_membership ? 'New' : 'Rtn', person.first_membership&.start&.strftime('%m-%d-%Y') || '', person.latest_membership&.ephemeris ? 'PRINT' : '', person.latest_membership&.end.nil? ? 'Lifetime' : '', person.contacts.first&.email || '',
+          person.contacts.first&.address || '', person.contacts.first&.city&.name || '', person.contacts.first&.state&.short_name || '', person.contacts.first&.zipcode || '', person.contacts.first&.phone || '', person.contacts.second&.email || '', person.contacts.second&.phone || '',
+          '', '', person.interests.map(&:name).join(", "), person.notes
+        ]
+      end
+    end
+
+    csv
   end
 end
