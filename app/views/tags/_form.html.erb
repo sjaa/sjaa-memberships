@@ -16,9 +16,15 @@
     <%= form.text_field :name, class: 'form-control' %>
   </div>
 
-  <div>
+  <div class="mb-4">
     <%= form.label :color, class: "form-label" %>
     <%= form.color_field :color, class: 'form-control', style: 'width: 50px; height: 35px;' %>
+  </div>
+
+  <div class="mb-4">
+    <%= form.label :name, class: 'form-label' %>
+    <small>An icon from the <%=link_to 'bootstrap-icon', 'https://icons.getbootstrap.com', target: :_blank %> set.</small>
+    <%= form.text_field :icon, class: 'form-control' %>
   </div>
 
   <div>

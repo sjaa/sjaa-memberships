@@ -9,7 +9,7 @@
 
 <div id="tags">
   <% @tags.each do |tag| %>
-    <%= display_tag(tag: tag, editable: false) %>
+    <%= render tag %>
   <% end %>
 </div>
 

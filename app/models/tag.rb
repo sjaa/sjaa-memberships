@@ -7,6 +7,7 @@ class Tag < ApplicationRecord
   def caseitize
     self.name = self.name.downcase.strip
     self.color&.strip!
+    self.icon&.downcase!&.strip!
   end
 
   def color_validation

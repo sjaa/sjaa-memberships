@@ -45,6 +45,7 @@ module ApplicationHelper
     return if tag.nil?
 
     style = "background-color: #{tag.color}; color: #{contrasting_color(tag.color)}; font-weight: bold;"
+    icon = tag.icon ? "<i class=\"bi bi-#{tag.icon}\"></i>" : ''
     link = editable ? edit_tag_path(tag) : tag
     str = <<-EOF
       <span id="tags_#{tag.id}" class="d-inline-block mt-2" style="margin-right: 0.5em;">
@@ -52,11 +53,11 @@ module ApplicationHelper
     if(form)
       str += <<-EOF
         #{hidden_field_tag 'equipment[tag_attributes][]', tag.name}
-        <a data-form-id-param="tags_#{tag.id}" data-action="form#removeField" class="btn" style="#{style}">#{tag.name.titleize}</a>
+        <a data-form-id-param="tags_#{tag.id}" data-action="form#removeField" class="btn" style="#{style}">#{icon.html_safe}#{tag.name.titleize}</a>
       EOF
     else
       str += <<-EOF
-        #{link_to tag.name.titleize, link, class: 'btn', style: style}
+        #{link_to(link, class: 'btn', style: style){"#{icon.html_safe}#{tag.name.titleize}"}}
       EOF
     end
 

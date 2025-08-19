@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_08_18_034707) do
+ActiveRecord::Schema[7.1].define(version: 2025_08_19_043637) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -184,6 +184,16 @@ ActiveRecord::Schema[7.1].define(version: 2025_08_18_034707) do
     t.datetime "end"
     t.index ["kind_id"], name: "index_memberships_on_kind_id"
     t.index ["person_id"], name: "index_memberships_on_person_id"
+  end
+
+  create_table "notifications", force: :cascade do |t|
+    t.string "message"
+    t.integer "person_id"
+    t.integer "admin_id"
+    t.boolean "unread", default: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["unread"], name: "index_notifications_on_unread"
   end
 
   create_table "orders", force: :cascade do |t|
@@ -377,6 +387,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_08_18_034707) do
     t.string "color"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "icon"
     t.index ["name"], name: "index_tags_on_name"
   end
 

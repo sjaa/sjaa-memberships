@@ -13,7 +13,7 @@
     </p>
     <div class="d-flex">
       <% equipment&.tags.each do |tag| %>
-        <%= display_tag tag: tag %>
+        <%= render tag %>
       <% end %>
     </div>
   </div>
