@@ -5,7 +5,7 @@ style = "background-color: #{tag.color}; color: #{contrasting_color(tag.color)};
 icon = tag.icon ? "<i class=\"bi bi-#{tag.icon}\"></i>" : ''
 link = editable ? edit_tag_path(tag) : tag
 %>
-<span id="tags_#{tag.id}" class="d-inline-block mt-2" style="margin-right: 0.5em;">
+<span id="tags_<%=tag.id%>" class="d-inline-block mt-2" style="margin-right: 0.5em;">
 <% if(form) %>
     <%= hidden_field_tag 'equipment[tag_attributes][]', tag.name %>
     <a data-form-id-param="tags_<%=tag.id%>" data-action="form#removeField" class="btn" style="<%=style%>">

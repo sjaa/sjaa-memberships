@@ -21,10 +21,13 @@
         <%= label_tag 'tags', 'Tags', class: 'form-label' %>
         <div data-form-target="fields mt-2 mb-2">
         <% equipment.tags.each do |tag| %>
+        <!--
           <span id="tags_<%=tag.id%>" class="d-inline-block mt-2" style="margin-right: 0.5em;">
             <%= hidden_field_tag 'equipment[tag_attributes][]', tag.name %>
             <a data-form-id-param="tags_<%=tag.id%>" data-action="form#removeField" class="btn btn-secondary"><%=tag.name%></a>
           </span>
+          -->
+          <%= render partial: 'tags/tag', locals: {tag: tag, form: true} %>
         <% end %>
         </div>
         <template data-form-target="template">
