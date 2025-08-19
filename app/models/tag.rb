@@ -1,13 +1,14 @@
 class Tag < ApplicationRecord
   has_and_belongs_to_many :equipment
-  before_save :caseitize
+  before_save :sanitize
   validates :name, presence: true, uniqueness: true
   validate :color_validation
 
-  def caseitize
+  def sanitize
     self.name = self.name.downcase.strip
     self.color&.strip!
     self.icon&.downcase!&.strip!
+    self.color = '#000000' if(self.color.nil?)
   end
 
   def color_validation

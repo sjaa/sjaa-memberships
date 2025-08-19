@@ -1,4 +1,4 @@
-<div class="d-flex">
+<div class="d-flex flex-wrap">
   <% images.each do |image| %>
     <%= image_tag url_for(image), class: "img-thumbnail m-2", width: '200px', data: { bs_toggle: "modal", bs_target: "#lightboxModal", full_image_url: url_for(image) } %>
   <% end %>

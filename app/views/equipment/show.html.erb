@@ -6,12 +6,12 @@ owners << link_to(person.name, person) if(!person.nil?)
 owners << link_to(role.name, role) if(!role.nil?)
 %>
     <h1><%= @equipment&.instrument&.model%> <small>(<%= @equipment&.instrument&.kind&.titleize %></small>)</h1>
-  <div class="d-flex">
+  <div class="d-flex flex-wrap">
     <%= link_to "Edit this equipment", edit_equipment_path(@equipment), class: 'btn btn-primary' %>&nbsp;
     <%= link_to "Back to equipment", equipment_index_path, class: 'btn btn-secondary' %>&nbsp;
     <%= button_to "Delete this equipment", @equipment, method: :delete, data: {turbo_confirm: 'Are you TOTALLY sure??' }, class: 'btn btn-danger' %>
   </div>
-  <div class="d-flex mt-4">
+  <div class="d-flex flex-wrap mt-4">
     <%= render @equipment %>
   </div>
 
