@@ -3,3 +3,30 @@ title: 'Equipment Tracking'
 description: 'What equipment exists in our organization, and where!'
 icon: 'telescope'
 ---
+
+This app has the ability to catalog, describe, and search for equipment in use by your organization.  For SJAA, this may
+include, but is not limited to: telescopes, mounts, tripods, cameras, eye pieces, binoculars, projectors, computers, batteries,
+and anything else that is property of the club and worth keeping track of.
+
+Adding equipment requires the "equipment write permission."  Permissions can be assigned by administrators with the `permit` permission.
+Once you have the appropriate permission, navigate to the Equipment page by selecting the "Equipment" link in the menu.  The look and feel
+may change over time, but it will look something like this:
+
+<img
+  className="block dark:hidden"
+  src="/images/equipment-page.png"
+  alt="Hero Light"
+/>
+
+On this page you can search for equipment using the filters at the top.  Below, the equipment matching those filters is populated.  You 
+can create a new Equipment entry by clicking on the "New Equipment" button. Equipment has the following properties:
+
+* A [Person](people) "owner."  This represents the person who physically has the equipment or is otherwise responsible for it.
+* A [Role](roles) "owner."  This represents the group or program that the equipment belongs to.  For example, a camera my belong to the Hands-On Imaging Program (a potential Role).
+* An instrument.  A single Instrument "has many" Equipment.  That is, the club may have two pairs of Orion 80mm binoculars, which would be the same instrument, but two different pieces of equipment.
+  * The instrument has a "Kind," which describes what type of object it is.  i.e. Telescope or Eyepiece
+  * The instrument also has a "Model," which describes the brand and specifics of the instrument.  i.e. "Meade LX500"
+* A note.  The note is used to describe anything interesting about the equipment, like its condition or location.
+* Images.  A picture is worth a thousand words, so each equipment record can have many images associated with it.
+* Tags.  Tags help to group like items together.  For example, if different equipment is part of a set, then they could be tagged with the name of the set.  Equipment can have many tags, and they are searchable.
+

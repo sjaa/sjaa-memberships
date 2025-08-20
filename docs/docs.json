@@ -51,6 +51,7 @@
               "essentials/equipment",
               "essentials/donations",
               "essentials/permissions",
+              "essentials/roles",
               "essentials/reports"
             ]
           }

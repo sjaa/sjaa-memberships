@@ -11,27 +11,10 @@
     <div class="col-12 clearfix mb-2" data-clipboard-target="status">
     </div>
   </div>
-  <div class="table-responsive">
-    <table class="table table-hover table-striped table-sm">
-      <tr>
-        <th>Kind</th>
-        <th>Model</th>
-        <th>Owner Person</th>
-        <th>Owner Group</th>
-        <th>Note</th>
-      </tr>
-      <tbody class="table-group-divider">
-        <% @equipment.each do |equip| %>
-          <tr>
-            <td><%=equip.instrument&.kind&.titleize%></td>
-            <td><%=link_to equip.instrument&.model&.upcase, equipment_path(equip), data: {turbo: false} %></td>
-            <td><%=equip.person&.name%></td>
-            <td><%=%></td>
-            <td><%=equip.note%></td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
+  <div class="d-flex flex-wrap">
+    <% @equipment.each do |equip| %>
+      <%= render equip %>
+    <% end %>
   </div>
   <%= pagy_bootstrap_nav(@pagy).html_safe %>
 <% end %>
