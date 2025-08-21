@@ -1,6 +1,8 @@
 <% img = equipment&.images&.first ? url_for(equipment.images.first) : image_url('placeholder.svg') %>
 <div class="card m-2 p-2" style="width: 18rem;">
-  <img class="card-img-top" src="<%=img%>" alt="Equipment photo">
+  <%= link_to equipment, data: {turbo: false} do %>
+    <img class="card-img-top" src="<%=img%>" alt="Equipment photo">
+  <% end %>
   <div class="card-body">
     <hr/>
     <h5 class="card-title"><%=equipment&.instrument&.model%></h5>
