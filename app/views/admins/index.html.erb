@@ -1,14 +1,15 @@
-<p style="color: green"><%= notice %></p>
+<h1>Admins and Permissions</h1>
+<%= link_to "Create Admin", new_admin_path, class: 'btn btn-primary btn-sm' %>
 
-<h1>Admins</h1>
-
-<div id="admins">
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Email</th>
+      <th>Permissions</th>
+      <th></th>
+    </tr>
+  </thead>
   <% @admins.each do |admin| %>
     <%= render admin %>
-    <p>
-      <%= link_to "Show this admin", admin %>
-    </p>
   <% end %>
-</div>
-
-<%= link_to "New admin", new_admin_path %>
+</table>

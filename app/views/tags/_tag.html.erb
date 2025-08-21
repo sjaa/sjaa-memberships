@@ -12,7 +12,7 @@ link = editable ? edit_tag_path(tag) : tag
       <%= icon.html_safe%> <%=tag.name.titleize%>
     </a>
 <% else %>
-    <%= link_to(link, class: 'btn', style: style) do %>
+    <%= link_to(link, class: 'btn', style: style, data: {turbo: false}) do %>
       <%= icon.html_safe%> <%=tag.name.titleize%>
     <% end %>
 <% end %>

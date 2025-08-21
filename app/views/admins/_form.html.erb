@@ -11,17 +11,14 @@
     </div>
   <% end %>
 
-  <div>
-    <%= form.label :email, style: "display: block" %>
-    <%= form.text_field :email %>
+  <div class="input-group">
+    <span class="input-group-text" id="basic-addon1">Email</span>
+    <%= form.text_field :email, class: 'form-control' %>
   </div>
 
-  <div>
-    <%= form.label :password_digest, style: "display: block" %>
-    <%= form.text_field :password_digest %>
-  </div>
+  <%= render partial: 'layouts/combobox', locals: {field: :permissions, objects: admin.permissions, name: :name, value: :id, form_field_id: 'admin[permission_attributes]', select_values: Permission.all, allow_new: false} %>
 
-  <div>
-    <%= form.submit %>
+  <div class="mt-4">
+    <%= form.submit 'Update', class: 'btn btn-primary' %>
   </div>
 <% end %>

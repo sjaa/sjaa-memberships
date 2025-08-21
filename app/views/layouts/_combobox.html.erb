@@ -1,0 +1,33 @@
+<% 
+# locals: {:field, :objects, :name, :value, :form_field_id, :allow_new, :select_values}
+
+allow_new ||= false
+%>
+
+  <div class="mt-4" data-controller="form">
+    <div class="row">
+      <div class="col-12">
+        <%= label_tag field.to_s, field.to_s&.capitalize, class: 'form-label' %>
+        <div data-form-target="fields mt-2 mb-2">
+        <% objects.each do |obj| %>
+          <span id="<%=dom_id obj%>" class="d-inline-block mt-2" style="margin-right: 0.5em;">
+            <%= hidden_field_tag "#{form_field_id}[]", obj.attributes[value.to_s] %>
+            <a data-form-id-param="<%=dom_id obj %>" data-action="form#removeField" class="btn btn-secondary"><%=obj.attributes[name.to_s]%></a>
+          </span>
+        <% end %>
+        </div>
+        <template data-form-target="template">
+          <span id="NEWID" class="d-inline-block mt-2" style="margin-right: 0.5em;">
+            <%= hidden_field_tag "#{form_field_id}[]", 'REPLACEVALUE' %>
+            <a data-form-id-param="NEWID" data-action="form#removeField" class="btn btn-secondary">REPLACENAME</a>
+          </span>
+        </template>
+      </div>
+      <div class="col-12 mt-2">
+        <% options = {placeholder: "Select #{field.to_s&.capitalize}", data: { form_baseid_param: field, form_target: 'source', action: "hw-combobox:selection->form#addField" }} %>
+        <% options[:name_when_new] = "#{form_field_id}[]" if(allow_new) %>
+        <%= combobox_tag "#{form_field_id}[]", select_values.map{|obj| {display: obj.attributes[name.to_s], value: obj.attributes[value.to_s]}}, **options %>
+      </div>
+    </div>
+  </div>
+

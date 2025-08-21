@@ -25,7 +25,7 @@ class AdminsController < ApplicationController
 
     respond_to do |format|
       if @admin.save
-        format.html { redirect_to @admin, notice: "Admin was successfully created." }
+        format.html { redirect_to admins_path, notice: "Admin was successfully created." }
         format.json { render :show, status: :created, location: @admin }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -38,7 +38,7 @@ class AdminsController < ApplicationController
   def update
     respond_to do |format|
       if @admin.update(admin_params)
-        format.html { redirect_to @admin, notice: "Admin was successfully updated." }
+        format.html { redirect_to admins_path, notice: "Admin was successfully updated." }
         format.json { render :show, status: :ok, location: @admin }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -65,6 +65,6 @@ class AdminsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def admin_params
-      params.require(:admin).permit(:email, :password_digest)
+      params.require(:admin).permit(:email, :password_digest, permission_attributes: [])
     end
 end

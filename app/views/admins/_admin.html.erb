@@ -1,12 +1,11 @@
-<div id="<%= dom_id admin %>">
-  <p>
-    <strong>Email:</strong>
-    <%= admin.email %>
-  </p>
-
-  <p>
-    <strong>Password digest:</strong>
-    <%= admin.password_digest %>
-  </p>
-
-</div>
+<tr id="<%= dom_id admin %>">
+  <td>
+    <%= admin&.email%>
+  </td>
+  <td>
+    <%= admin&.permissions&.map{|p| p.name}.join(', ') %>
+  </td>
+  <td>
+    <%= link_to "Edit", edit_admin_path(admin), class: 'btn btn-sm btn-dark' %>
+  </td>
+</tr>
