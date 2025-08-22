@@ -80,6 +80,10 @@ GEM
       tzinfo (~> 2.0)
     addressable (2.8.7)
       public_suffix (>= 2.0.2, < 7.0)
+    airbrake (13.0.5)
+      airbrake-ruby (~> 6.0)
+    airbrake-ruby (6.2.2)
+      rbtree3 (~> 0.6)
     aws-eventstream (1.4.0)
     aws-partitions (1.1147.0)
     aws-sdk-core (3.229.0)
@@ -300,6 +304,7 @@ GEM
       thor (~> 1.0, >= 1.2.2)
       zeitwerk (~> 2.6)
     rake (13.2.1)
+    rbtree3 (0.7.1)
     rdoc (6.10.0)
       psych (>= 4.0.0)
     regexp_parser (2.10.0)
@@ -384,6 +389,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  airbrake
   aws-sdk-s3
   bcrypt (~> 3.1.20)
   bootsnap

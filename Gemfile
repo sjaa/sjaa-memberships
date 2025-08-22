@@ -90,3 +90,4 @@ gem "solid_queue", "1.1.0"
 
 gem "aws-sdk-s3"
 gem 'image_processing'
+gem 'airbrake'
