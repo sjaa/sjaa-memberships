@@ -19,7 +19,8 @@ class Person < ApplicationRecord
   def primary_contact
     # Use ruby functions to select out primary contacts to take advantage of any
     # preloading
-    contacts.to_a.select{|c| c.primary}.first
+    contact_array = contacts.to_a
+    contact_array.select{|c| c.primary}.first || contact_array.first
   end
 
   def email
