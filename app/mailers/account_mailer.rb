@@ -1,5 +1,5 @@
 class AccountMailer < ApplicationMailer
-  default from: 'website@sjaa.net', reply_to: 'allpersonnel@sjaa.net'
+  default from: 'website@sjaa.net', reply_to: 'asksjaa@sjaa.net'
   helper :application
 
   def password_reset(user)

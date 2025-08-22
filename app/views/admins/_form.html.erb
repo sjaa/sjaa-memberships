@@ -16,9 +16,13 @@
     <%= form.text_field :email, class: 'form-control' %>
   </div>
 
+  <div class="input-group">
+    <span class="input-group-text" id="basic-addon2">Password</span>
+    <%= form.password_field :password, class: 'form-control' %>
+  </div>
   <%= render partial: 'layouts/combobox', locals: {field: :permissions, objects: admin.permissions, name: :name, value: :id, form_field_id: 'admin[permission_attributes]', select_values: Permission.all, allow_new: false} %>
 
   <div class="mt-4">
-    <%= form.submit 'Update', class: 'btn btn-primary' %>
+    <%= form.submit admin.id ? 'Update' : 'Create', class: 'btn btn-primary' %>
   </div>
 <% end %>
