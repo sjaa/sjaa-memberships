@@ -8,7 +8,7 @@
       <%= f.combobox :person_id, Person.where(id: Equipment.where.not(person_id: nil).select(:person_id).distinct).map{|p| [p.name, p.id]}, placeholder: 'Person', value: @query_params[:person_id], data: { action: "hw-combobox:selection->search-form#search" } %>
     </div>
     <div class="col-12">
-      <%= f.combobox :person_id, Role.all.map{|p| [p.name, p.id]}, placeholder: 'Role', value: @query_params[:role_d], data: { action: "hw-combobox:selection->search-form#search" } %>
+      <%= f.combobox :role_id, Role.all.map{|p| [p.name, p.id]}, placeholder: 'Role', value: @query_params[:role_id], data: { action: "hw-combobox:selection->search-form#search" } %>
     </div>
     <div class="col-12">
       <%= f.combobox :kind_name, kinds.map{|k| [k.titleize, k]}, placeholder: 'Instrument Kind', value: @query_params[:kind_name], data: { action: "hw-combobox:selection->search-form#search" } %>

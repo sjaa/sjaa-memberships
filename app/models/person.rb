@@ -78,8 +78,8 @@ class Person < ApplicationRecord
   end
 
   # Returns an Array.  Can't be chained with other AR calls
-  def self.inactive_members
-    Person.all - active_members
+  def self.inactive_members(date = Date.today)
+    Person.all.where.not(id: Person.active_members(date))
   end
 
   def self.common_active_membership_query(record, date = Date.today)
