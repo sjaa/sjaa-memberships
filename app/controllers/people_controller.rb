@@ -8,7 +8,6 @@ class PeopleController < ApplicationController
   # GET /people or /people.json
   def index
     people_filter
-    render partial: 'index' if(params[:page])
 
     respond_to do |format|
       format.html
@@ -32,9 +31,7 @@ class PeopleController < ApplicationController
   
   def search
     people_filter
-    respond_to do |format|
-      format.turbo_stream {render turbo_stream: turbo_stream.replace('people', partial: 'index')}
-    end
+    render turbo_stream: turbo_stream.replace('people', partial: 'index')
   end
   
   # GET /people/new
