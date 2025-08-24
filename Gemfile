@@ -3,7 +3,7 @@ source "https://rubygems.org"
 ruby "3.4.1"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
-gem "rails", "~> 7.1.0"
+gem "rails", "~> 7.1.5.2"
 
 # The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
 gem "sprockets-rails"
@@ -91,3 +91,6 @@ gem "solid_queue", "1.1.0"
 gem "aws-sdk-s3"
 gem 'image_processing'
 gem 'airbrake'
+
+# Security udpates
+gem "rack", ">= 3.1.14"
