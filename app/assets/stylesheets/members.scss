@@ -30,3 +30,8 @@ hr.thick {
   background-color: black;
   height: 5px;
 }
+
+.btn-check:checked + .btn {
+  background-color: $primary;
+  color: white;
+}

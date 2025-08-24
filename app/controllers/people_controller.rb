@@ -70,7 +70,7 @@ class PeopleController < ApplicationController
       end
 
       if update_success && !@person.errors.any?
-        format.html { redirect_to edit_person_path(@person), notice: "Profile was successfully updated." }
+        format.html { redirect_to @person, notice: "Profile was successfully updated." }
         format.json { render :show, status: :ok, location: @person }
       else
         flash[:alert] = "Problem updating person: <ul>#{@person.errors.full_messages.map{|er| "<li>#{er}</li>"}.join('  ')}</ul>"
