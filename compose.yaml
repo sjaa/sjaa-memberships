@@ -1,6 +1,7 @@
 services:
   db:
     image: postgres:latest
+    platform: linux/amd64
     container_name: postgres_container
     build:
       context: .
@@ -23,6 +24,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
   app:
     image: ruby
+    platform: linux/amd64
     environment:
       DATABASE_HOST: db
       DATABASE_USER: root
