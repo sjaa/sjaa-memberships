@@ -8,7 +8,9 @@
     <%= favicon_link_tag asset_path('favicon.ico') %>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload", media: "all" %>
+    <%= stylesheet_link_tag "bootstrap.min", "data-turbo-track": "reload", media: "all" %>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
     <%= javascript_importmap_tags %>
     <%= combobox_style_tag %>
   </head>

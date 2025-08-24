@@ -1,7 +1,6 @@
 # Pin npm packages by running ./bin/importmap
 
 pin "application"
-pin "bootstrap", to: "/app/assets/stylesheets/vendor/bootstrap-scss/bootstrap.scss"
 pin "bootstrap.bundle.min"
 pin "@hotwired/turbo-rails", to: "turbo.min.js"
 pin "@hotwired/stimulus", to: "stimulus.min.js"

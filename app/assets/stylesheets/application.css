@@ -1,0 +1,43 @@
+/* Bootstrap colors
+#
+#  red - rgb(220,53,69)
+#  blue - rgb(13, 110, 253)
+#  green - rgb(25, 135, 84)
+#  subtle (adds alpha 0.1)
+*/
+
+fieldset.hw-combobox {
+  width: 100%;
+}
+
+div.hw-combobox__main__wrapper {
+  width: 100%;
+}
+
+.form-label {
+  font-weight: bold;
+}
+
+.active {
+  background-color: rgba(25, 135, 84, 0.1) !important;
+  color: rgb(25, 135, 84) !important;
+  text-align: center;
+  font-weight: bold;
+}
+
+.inactive {
+  background-color: rgba(220,53,69, 0.1) !important;
+  color: rgb(220,53,69) !important;
+  text-align: center;
+  font-weight: bold;
+}
+
+hr.thick {
+  background-color: black;
+  height: 5px;
+}
+
+.btn-check:checked + .btn {
+  background-color: rgb(13, 110, 253);
+  color: white;
+}
