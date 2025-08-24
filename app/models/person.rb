@@ -160,11 +160,10 @@ class Person < ApplicationRecord
   end
 
   def astrobin_attributes=(attributes)
-    _astrobin = nil
-    if(attributes[:id].blank?)
+    _astrobin = self.astrobin
+    if(!_astrobin.present?)
       _astrobin = Astrobin.new(attributes)
     else
-      _astrobin = Astrobin.find(attributes[:id])
       _attributes = attributes.dup
       _attributes.delete(:id)
       _astrobin.update(_attributes)
