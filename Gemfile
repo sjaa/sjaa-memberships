@@ -94,3 +94,7 @@ gem 'airbrake'
 
 # Security udpates
 gem "rack", ">= 3.1.14"
+gem "nokogiri", ">= 1.18.9"
+gem "rack-session", ">= 2.1.1"
+gem "net-imap", ">= 0.5.7"
+gem "uri", ">= 1.0.3"
