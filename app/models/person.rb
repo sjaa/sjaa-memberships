@@ -42,6 +42,11 @@ class Person < ApplicationRecord
     memberships.sort_by{|m| m.end || (DateTime.now + 999.years)}.last
   end
 
+  def is_lifetime_member
+    lm = latest_membership
+    return lm && lm.end.nil?
+  end
+
   def first_membership
     memberships.sort_by{|m| m.start || (DateTime.now + 999.years)}.first
   end

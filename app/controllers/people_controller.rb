@@ -24,6 +24,9 @@ class PeopleController < ApplicationController
   end
 
   def new_membership
+    if(@person&.is_lifetime_member)
+      redirect_to @person, alert: 'You are a LIFETIME member - no need to renew!'
+    end
   end
 
   def create_membership
