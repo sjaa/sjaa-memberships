@@ -2,6 +2,7 @@ module JobsHelper
   # Decode a simplified cron-like schedule
   # Month Day Hour
   def schedule_match(schedule)
+    return true if(schedule.nil?)
     today = DateTime.now
     schedule_mdh = schedule.split(' ')
     today_mdh = [today.month, today.day, today.hour]
