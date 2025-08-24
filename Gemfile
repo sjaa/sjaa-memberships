@@ -6,7 +6,8 @@ ruby "3.4.1"
 gem "rails", "~> 7.1.5.2"
 
 # The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
-gem "sprockets-rails"
+# Propshaft replacement asset pipeline that doesn't require sassc
+gem "propshaft"
 
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
