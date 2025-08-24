@@ -19,6 +19,7 @@ module SjaaMembers
     # Propshaft config
     #config.assets = ActiveSupport::OrderedOptions.new
     #config.assets.paths = [Rails.root.join("app/assets")]
+    config.assets.paths << Rails.root.join("app/javascript")
 
     # Configuration for the application, engines, and railties goes here.
     #

@@ -67,7 +67,7 @@
       </table>
     </div>
     <div class="col-md-4 col-sm-8 mt-4 mb-4" style="max-width: 400px;">
-      <div id="paypal-button-container"></div>
+      <div id="paypal-button-container" data-paypal-mode="<%=Rails.application.config.paypal_mode%>"></div>
     </div>
     <!-- Bootstrap Modal for PayPal Success -->
     <div class="modal fade" id="paypalSuccessModal" tabindex="-1" aria-labelledby="paypalSuccessModalLabel" aria-hidden="true">

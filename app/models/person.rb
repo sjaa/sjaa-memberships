@@ -47,11 +47,12 @@ class Person < ApplicationRecord
   end
 
   def next_membership_start_date
-    if(latest_membership&.is_active?)
-      return (latest_membership.end + 1.day).beginning_of_month
+    lm = latest_membership
+    if(lm&.is_active? && lm.end)
+      return (lm.end + 1.day).beginning_of_month
     end
 
-    return Date.today
+    return lm.end ? Date.today : nil
   end
 
   def is_active?

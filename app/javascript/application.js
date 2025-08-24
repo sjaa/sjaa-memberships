@@ -28,9 +28,9 @@ function loadPayPalButtons() {
   console.log('Executing custom function after Turbolinks load');
   var container = document.getElementById('paypal-button-container')
   if (container) {
-    loadScript('https://www.paypal.com/sdk/js?client-id=<%=ENV['PAYPAL_CLIENT_ID']%>', () => {
+    loadScript(`https://www.paypal.com/sdk/js?client-id=${window.AppConfig.pp_client}`, () => {
       paypal.Buttons({
-        env: '<%=Rails.application.config.paypal_mode%>', // Valid values are sandbox and live.
+        env: container.dataset.paypal_mode, // Valid values are sandbox and live.
         createOrder: async () => {
           // Get the form element
           const form = document.getElementById('new_membership');
