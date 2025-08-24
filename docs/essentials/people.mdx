@@ -37,17 +37,44 @@ has expired.
 ## Roles
 
 Roles are brief descriptors that can be assigned to people.  A person can have many different roles.  Each
-role can be used to denote any number of different things.  For example, every person who paid for a membership
-at some point in time can have the Member role.  Whether they are active or not depends on their payments, but
-the term "Member" is useful to describe how they are related to the club.  Likewise, we can identify officers
+role can be used to denote any number of different things.  For example, we can identify officers
 and position holders with roles.  We could also choose to identify membership in our Google Groups as a role
 assigned to each person.  Each role comes with a description and an email address, for cases where a role represents
-some larger group that we have an email address for (i.e. imagers Google Group).
+some larger group that we have an email address for (i.e. imagers Google Group).  Roles are flexible and can
+be used in whatever way is convenient.
 
-## Signup Flow
+## Signup Flow and Renewal Flow
 
-## Renewal Flow
+### Online
 
+The method to sign up for the first time and to renew a membership are similar.  They both start with a person
+logging into their own account with their email address.  An account already exists for every member in the club,
+but if they have never logged in before, they need to reset their password.  Instructions on how to do this are on
+the login page.  Similarly, new members will click the sign up button on the login page, and receive an email
+with a link to set their password and continue the sign up process.  This confirms that the email provided belongs
+to the correct person.  It is intended to weed out bots and ensure that we can communicate with the new member at the
+given address.
+
+Once logged in, a person can edit their profile or renew their membership by clicking the appropriate buttons at the
+top of their profile.  After clicking the renew button, the person will be taken to the payment screen.  
+New members will be directed to the payment screen automatically.  On this screen will be details about any currently
+active memberships, along with a form to create a new membership (whether renewal or first-time, it looks the same).
+The form displays the estimated start and end date of this new membership, along with the cost.  There is an option
+to donate an extra amount, as well as opt-in for printed copies of The Ephemeris newsletter.  Payment is handled by PayPal
+via the buttons on the page.  
+
+Once payment is confirmed, members are redirected to their profile page, where they can optionally share more information with
+us.  Successful payment also triggers a welcome email that has details about the confirmed transaction, and important
+information about how to access the club's resources.
+
+### Offline
+
+We also accept memberships through the mail or in person.  To record these memberships in the database, an admin 
+needs to find or create the account for the new member via the People dashboard.  Once the appropriate account is identified
+the admin should edit the profile of that account.  On this page, an admin will see a section for "Memberships."  In this
+section, an admin can create a new Membership, and fill in details like the start date, and Epehemeris subscription.  The
+admin can optionally enter other information provided by the prospective member.  Saving the profile will apply the new
+membership in the database.
 
 ## Database Representation
 
@@ -67,3 +94,5 @@ A person has...
 * Zero or more interests (such as: "solar system," "astrophotography," etc)
 * Zero or one referral (i.e. website, search, school, other)
 * Zero or more donations each containing one or more items (or cash)
+
+See [the database page](/development/database) for more information.

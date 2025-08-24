@@ -10,6 +10,7 @@ Rails.application.routes.draw do
   post '/memberships/order', to: 'memberships#create_order', as: :membership_order
   post '/memberships/capture_order', to: 'memberships#capture_order', as: :membership_capture_order
   
+  get '/people/remind/:id', to: 'people#remind', as: :reminder_email
   post '/people/search', to: 'people#search', as: :people_search
   get '/people/search', to: 'people#search'
   post '/donations/search', to: 'donations#search', as: :donations_search

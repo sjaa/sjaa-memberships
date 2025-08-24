@@ -2,7 +2,7 @@ class PeopleController < ApplicationController
   include ReportsHelper
   include Filterable
 
-  before_action :set_person, only: %i[ show edit update destroy new_membership ]
+  before_action :set_person, only: %i[ show edit update destroy new_membership  remind]
   skip_before_action :verify_authenticity_token, only: [:update], if: -> { request.format.json? }
   
   # GET /people or /people.json
@@ -21,6 +21,11 @@ class PeopleController < ApplicationController
   end
 
   def admin
+  end
+
+  def remind
+    AccountMailer.renewal_notice(@person).deliver_now
+    redirect_to @person, notice: 'Reminder email sent.'
   end
 
   def new_membership

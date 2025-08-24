@@ -3,6 +3,10 @@ class PersonPolicy < ApplicationPolicy
     user&.has_permission? :read
   end
 
+  def remind?
+    user&.has_permission? :write
+  end
+
   # Members of SJAA can update their own information, but not do anything else.
   def update?
     user&.has_permission?(:write) || user.id == record.id
