@@ -99,7 +99,9 @@ class DonationsController < ApplicationController
   def donation_params
     params.require(:donation).permit(
     :date, :value, :note, :person_id, :name,
-    items_attributes: [:id, :value, phase_attributes: [:id, :name, :person_id, :date], equipment_attributes: [:id, :note, instrument_attributes: [:kind, :model]]]
+    cash: [:id, :value, :cash],
+    person_attributes: [:email, :first_name, :last_name],
+    items_attributes: [:id, :value, phase_attributes: [:id, :name, :person_id, :date], equipment_attributes: [:id, :note, images: [], instrument_attributes: [:kind, :model]]]
     )
   end
 end

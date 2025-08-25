@@ -8,6 +8,19 @@ class Donation < ApplicationRecord
     items.reduce(0){|sum, item| sum += (item.value || 0)}
   end
 
+  def person_attributes=(fields)
+  end
+
+  def cash=(fields)
+    _fields = fields.dup
+    _id = _fields.delete(:id)
+    item = _id.present? ? DonationItem.find(_id) : DonationItem.new
+    item.update(fields)
+    item.errors.each do |err|
+      self.errors.add err.attribute, err.message
+    end
+  end
+
   def items_attributes=(attrs)
     _items = []
     attrs.each do |item_hash|
