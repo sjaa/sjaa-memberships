@@ -41,3 +41,8 @@ hr.thick {
   background-color: rgb(13, 110, 253);
   color: white;
 }
+
+.sub-object {
+  padding: 10px;
+  border: 2px black solid;
+}

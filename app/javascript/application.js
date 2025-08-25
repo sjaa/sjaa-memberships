@@ -122,7 +122,10 @@ function populateJulianDate() {
     generator.addEventListener("click", () => {
       var target = document.getElementById(generator.dataset.target);
       var name_source = document.getElementById(generator.dataset.nameSource);
+      var first_name_source = document.getElementById(generator.dataset.firstNameSource);
+      var last_name_source = document.getElementById(generator.dataset.lastNameSource);
       var name = name_source.value || 'San Jose'
+      if(first_name_source.value.trim().length > 0 && last_name_source.value.trim().length > 0) name = `${first_name_source.value.trim()} ${last_name_source.value.trim()}`
       var initials = name.split(' ').map(word => word[0]?.toUpperCase()).filter(Boolean).join('')
       var id = `${initials}${generator.dataset.jd}`
       console.log(`Generated ID: ${id}`)

@@ -1,7 +1,6 @@
           
-<div id="<%=id%>" class="row mt-2">
-  <% item_display_name = i ? i+1 : 'New'%>
-  <h3>Item <%= item_display_name%></h3>
+<div id="<%=id%>" class="row mt-2 sub-object">
+  <%# item_display_name = i ? i+1 : 'New'%>
   <div class="col-md-6">
     <%= hidden_field_tag 'donation[items_attributes][][id]', item&.id %>
     <%= label_tag 'donation[items_attributes][][value]', 'Dollar Value', class: 'form-label' %>
@@ -15,9 +14,12 @@
   </div>
   <!-- Instrument -->
   <%= render partial: 'equipment/instrument_form', locals: {equipment: item&.equipment, prefix: 'donation[items_attributes][][equipment_attributes][instrument_attributes]'} %>
+
+  <span><button type="button" data-form-id-param="<%=id%>" data-action="form#removeField" class="btn btn-danger btn-sm mt-2">Remove This Item</button></span>
+
   <!-- Phases -->
-  <div class="mt-4" data-controller="form">
-    <div data-form-target="fields" class="row mt-4">
+  <div class="row mt-4" data-controller="form">
+    <div data-form-target="fields" class="col-12 mt-4">
       <h4>Phases</h4>
       <% item.phases.each do |phase| %>
         <%= render partial: 'donations/phase_form', locals: {phase: phase, people_selector: people_selector, id: "phase_#{phase.id}"} %>
@@ -28,9 +30,6 @@
     </div>
     <div class="col-12 mt-2">
       <button type="button" data-form-baseid-param="new_phase" data-form-replaceid-param="NEW_PHASE_ID" data-action="form#addField" class="btn btn-secondary">Add Phase</button>
-    </div>
-    <div class="col-md-6 mt-4">
-      <button type="button" data-form-id-param="<%=id%>" data-action="form#removeField" class="btn btn-danger">Remove Item <%=item_display_name%></button>
     </div>
   </div>
 </div>

@@ -10,28 +10,62 @@
         </ul>
       </div>
     <% end %>
-    <div class="col-12 mt-2">
-      <%= form.label :note, 'Note', class: 'form-label' %>
-      <%= form.text_area :note, class: 'form-control' %>
-    </div>
+
     <div class="col-md-6 mt-2">
       <% people_selector = Person.all.map{|p| {display: p.name, value: p.id}}%>
-      <%= form.label :person_id, 'Person', class: 'form-label' %>
+      <%= form.label :person_id, 'Donor', class: 'mb-0 form-label' %>
+      <br/>
+      <small>Check if the donor is already in the database using this field.  If not, click "New Person" below.</small>
       <%= form.combobox :person_id, people_selector %>
-      <%= link_to 'New Person', new_person_path, target: :_blank %>
+      <%# link_to 'New Person', new_person_path, target: :_blank %>
+      <a class="btn btn-primary btn-sm mt-2" data-bs-toggle="collapse" href="#newPersonForm" role="button" aria-expanded="false" aria-controls="newPersonForm">
+        New Person
+      </a>
     </div>
+
     <div class="col-md-6 mt-2">
-      <%= form.label :name, 'Identifer', class: 'form-label' %>
+      <%= form.label :name, 'Identifer', class: 'form-label mb-0' %>
+      <br/>
+      <small>Assign a human-readable identifier for this donation.</small>
+      <br/>
+      <br/>
       <div class="input-group">
         <%= form.text_field :name, class: 'form-control', placeholder: 'Identifier' %>
-        <%= button_tag 'Generate', class: 'btn btn-secondary julian-generator', type: 'button', data: {target: 'donation_name', jd: "#{julian_date(Date.today)}", name_source: 'donation_person_id'} %>
+        <%= button_tag 'Generate', class: 'btn btn-secondary julian-generator', type: 'button', data: {target: 'donation_name', jd: "#{julian_date(Date.today)}", name_source: 'donation_person_id', first_name_source: 'donation_person_attributes_first_name', last_name_source: 'donation_person_attributes_last_name'} %>
       </div>
     </div>
+    <div class="row mt-2 collapse" id="newPersonForm">
+      <div class="col-md-6 mt-2">
+        <%= label_tag 'donation[person_attributes][email]', 'New Donor Email', class: 'form-label' %>
+        <%= text_field_tag 'donation[person_attributes][email]', '', class: 'form-control', placeholder: 'Email' %>
+      </div>
+      <div class="col-md-6 mt-2">
+        <%= label_tag 'donation[person_attributes][first_name]', 'New Donor First Name', class: 'form-label' %>
+        <%= text_field_tag 'donation[person_attributes][first_name]', '', class: 'form-control', placeholder: 'First Name' %>
+      </div>
+      <div class="col-md-6 mt-2">
+        <%= label_tag 'donation[person_attributes][last_name]', 'New Donor Last Name', class: 'form-label' %>
+        <%= text_field_tag 'donation[person_attributes][last_name]', '', class: 'form-control', placeholder: 'Last Name' %>
+      </div>
+    </div>
+    <div class="col-md-6 mt-2">
+        <% cash = @donation.items.where(equipment_it: nil).first || DonationItem.new %>
+        <%= hidden_field_tag 'donation[items_attributes][][id]', cash&.id %>
+        <%= label_tag 'donation[items_attributes][][value]', 'Cash Donation', class: 'form-label mb-0' %>
+        <br/>
+        <small>If there is a monetary portion to the donation, aside from equipment, record it here.</small>
+        <%= number_field_tag 'donation[items_attributes][][value]', cash&.value, class: 'form-control', step: '0.01' %>
+    </div>
+    <div class="col-12 mt-2">
+      <%= form.label :note, 'Note', class: 'form-label' %>
+      <small>Any additional information about the donation.</small>
+      <%= form.text_area :note, class: 'form-control' %>
+    </div>
     <!-- Donation Items -->
-    <!-- TODO:  Move Equipment.model into Instrument.model.  Have two form inputs, one for instrument and one for model.  Autocomplete accordingly.  Find or create the unique combination.  Allow new entries. -->
     <div data-controller="form">
       <div data-form-target="fields" class="row mt-4">
         <h2>Items</h2>
+        <span>Any equipment that accompanies this donation should be recorded below.  Add additional equipment items with the "Add Item" button.</span>
         <% donation.items.each_with_index do |item, i| %>
           <%= render partial: 'donations/item_form', locals: {id: "item_#{item.id}", item: item, i: i, people_selector: people_selector}%>
         <% end %>
@@ -44,7 +78,8 @@
       </div>
     </div>
     <div class="col-12 mt-4">
-      <%= form.submit 'Update Donation', class: 'btn btn-primary' %>
+      <hr class="thick"\>
+      <%= form.submit 'Save Donation', class: 'btn btn-primary' %>
     </div>
   </div>
 <% end %>
