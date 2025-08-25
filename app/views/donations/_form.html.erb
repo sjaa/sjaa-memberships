@@ -50,11 +50,15 @@
     </div>
     <div class="col-md-6 mt-2">
         <% cash = @donation.items.where(equipment_it: nil).first || DonationItem.new %>
-        <%= hidden_field_tag 'donation[items_attributes][][id]', cash&.id %>
-        <%= label_tag 'donation[items_attributes][][value]', 'Cash Donation', class: 'form-label mb-0' %>
+        <%= hidden_field_tag 'donation[cash][id]', cash&.id %>
+        <%= hidden_field_tag 'donation[cash][cash]', cash&.cash %>
+        <%= label_tag 'donation[cash][value]', 'Cash Donation', class: 'form-label mb-0' %>
         <br/>
         <small>If there is a monetary portion to the donation, aside from equipment, record it here.</small>
-        <%= number_field_tag 'donation[items_attributes][][value]', cash&.value, class: 'form-control', step: '0.01' %>
+        <div class="input-group">
+          <%= button_tag '$', class: 'btn btn-secondary', type: 'button' %>
+          <%= number_field_tag 'donation[cash][value]', cash&.value, class: 'form-control', step: '0.01' %>
+        </div>
     </div>
     <div class="col-12 mt-2">
       <%= form.label :note, 'Note', class: 'form-label' %>
@@ -74,12 +78,12 @@
         </template>
       </div>
       <div class="col-12 mt-2">
-        <button type="button" data-form-baseid-param="new_item" data-action="form#addField" class="btn btn-secondary">Add Item</button>
+        <button type="button" data-form-baseid-param="new_item" data-action="form#addField" class="btn btn-sm btn-success"><i class="bi bi-plus"></i> Add Item</button>
       </div>
     </div>
     <div class="col-12 mt-4">
-      <hr class="thick"\>
       <%= form.submit 'Save Donation', class: 'btn btn-primary' %>
+      <%= link_to 'Back to Donations', donations_path, class: 'btn btn-secondary' %>
     </div>
   </div>
 <% end %>

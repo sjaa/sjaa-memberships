@@ -44,5 +44,6 @@ hr.thick {
 
 .sub-object {
   padding: 10px;
-  border: 2px black solid;
+  border-top: 2px rgb(80, 80, 80) solid;
+  border-bottom: 2px rgb(80, 80, 80) solid;
 }

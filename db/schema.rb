@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_08_19_043637) do
+ActiveRecord::Schema[7.1].define(version: 2025_08_25_040013) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -103,6 +103,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_08_19_043637) do
     t.decimal "value"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "cash", default: false
     t.index ["donation_id"], name: "index_donation_items_on_donation_id"
     t.index ["equipment_id"], name: "index_donation_items_on_equipment_id"
   end
