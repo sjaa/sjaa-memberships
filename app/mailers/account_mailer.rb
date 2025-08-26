@@ -29,7 +29,7 @@ class AccountMailer < ApplicationMailer
     @membership = membership
     @order = membership&.order
     @order_total = @order&.price || 0
-    @order_donation = @order&.membership_params&.dig(:donation_amount).to_f
+    @order_donation = @order&.membership_params&.dig('donation_amount').to_f
     @person = membership.person
     @renewal = @person.memberships.count > 1
     mail(to: @person.email, bcc: %w(officers@sjaa.net memberships@sjaa.net donations@sjaa.net), subject: "SJAA Membership - Welcome and Thank You! (#{@person&.last_name}, #{@person&.first_name})")
