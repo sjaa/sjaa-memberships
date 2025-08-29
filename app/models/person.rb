@@ -57,6 +57,10 @@ class Person < ApplicationRecord
       return (lm.end + 1.day).beginning_of_month
     end
 
+    if(lm.nil?)
+      return Date.today;
+    end
+
     return lm.end ? Date.today : nil
   end
 
