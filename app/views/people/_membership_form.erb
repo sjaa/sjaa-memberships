@@ -13,9 +13,19 @@
     <%= number_field_tag 'person[membership_attributes][][term_months]', membership.term_months || 12, class: 'form-control' %>
   </div>
   <div class="col-md-6 mt-2">
-    <%= label_tag :membership_kind_id, 'Kind', class: 'form-label' %>
-    <%= combobox_tag 'person[membership_attributes][][kind_id]', MembershipKind.all, value: membership.kind&.id, name_when_new: 'person[membership_attributes][][kind]' %>
+    <%= label_tag :donation_amount, 'Donation', class: 'form-label' %>
+    <div class="input-group">
+      <span class="input-group-text">$</span>
+      <%= number_field_tag 'person[membership_attributes][][donation_amount]', membership.donation_amount, class: 'form-control', style: 'max-width: 120px' %>
+    </div>
   </div>
+  <%# Kind isn't really well defined, so skip it%>
+  <% if 0 %>
+    <div class="col-md-6 mt-2">
+      <%= label_tag :membership_kind_id, 'Kind', class: 'form-label' %>
+      <%= combobox_tag 'person[membership_attributes][][kind_id]', MembershipKind.all, value: membership.kind&.id, name_when_new: 'person[membership_attributes][][kind]' %>
+    </div>
+  <% end %>
   <div class="col-md-6 mt-2">
     <%= label_tag :membership_ephemeris, 'Printed Ephemeris', class: 'form-label' %><br/>
     <%= combobox_tag 'person[membership_attributes][][ephemeris]', [{display: 'Yes', value: 'true'}, {display: 'No', value: 'false'}], value: membership.ephemeris ? 'true' : 'false' %>

@@ -28,6 +28,11 @@ class PeopleController < ApplicationController
     redirect_to @person, notice: 'Reminder email sent.'
   end
 
+  def welcome
+    AccountMailer.welcome(@person.latest_membership).deliver_now
+    redirect_to @person, notice: 'Welcome email sent.'
+  end
+
   def new_membership
     if(@person&.is_lifetime_member)
       redirect_to @person, alert: 'You are a LIFETIME member - no need to renew!'
@@ -111,7 +116,7 @@ class PeopleController < ApplicationController
     interests_attributes: [:name, :id], 
     roles_attributes: [:id], 
     contact_attributes: [:address, :zipcode, :phone, :state_id, :city_id, :city_name, :email, :primary, :person_id, :id], 
-    membership_attributes: [:start, :kind, :kind_id, :term_months, :new, :ephemeris, :id, :person_id],
+    membership_attributes: [:start, :kind, :kind_id, :term_months, :new, :ephemeris, :id, :person_id, :donation_amount],
     astrobin_attributes: [:username, :latest_image, :id])
   end
   
