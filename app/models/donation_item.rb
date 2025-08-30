@@ -1,7 +1,7 @@
 class DonationItem < ApplicationRecord
   belongs_to :donation
-  belongs_to :equipment, ->{ includes(:instrument) }, required: false 
-  has_many :phases, ->{order(date: :asc)}, class_name: 'DonationPhase'
+  belongs_to :equipment, ->{ includes(:instrument) }, required: false, dependent: :destroy
+  has_many :phases, ->{order(date: :asc)}, class_name: 'DonationPhase', dependent: :destroy
 
   def phase_attributes=(attrs)
     _phases = []
@@ -15,9 +15,11 @@ class DonationItem < ApplicationRecord
   end
 
   def equipment_attributes=(equipment_attr)
-    return if(equipment_attr.dig(:kind).nil? || equipment_attr.dig(:model).nil?)
     _equipment = equipment_attr[:id].present? ? Equipment.find(equipment_attr[:id]) : Equipment.new
     _equipment.update(equipment_attr)
+    _equipment.errors.each do |err|
+        self.errors.add err.attribute, err.message
+    end
     self.equipment = _equipment
   end
 end

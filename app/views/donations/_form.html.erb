@@ -36,10 +36,6 @@
     </div>
     <div class="row mt-2 collapse" id="newPersonForm">
       <div class="col-md-6 mt-2">
-        <%= label_tag 'donation[person_attributes][email]', 'New Donor Email', class: 'form-label' %>
-        <%= text_field_tag 'donation[person_attributes][email]', '', class: 'form-control', placeholder: 'Email' %>
-      </div>
-      <div class="col-md-6 mt-2">
         <%= label_tag 'donation[person_attributes][first_name]', 'New Donor First Name', class: 'form-label' %>
         <%= text_field_tag 'donation[person_attributes][first_name]', '', class: 'form-control', placeholder: 'First Name' %>
       </div>
@@ -47,11 +43,15 @@
         <%= label_tag 'donation[person_attributes][last_name]', 'New Donor Last Name', class: 'form-label' %>
         <%= text_field_tag 'donation[person_attributes][last_name]', '', class: 'form-control', placeholder: 'Last Name' %>
       </div>
+      <div class="col-md-6 mt-2">
+        <%= label_tag 'donation[person_attributes][email]', 'New Donor Email', class: 'form-label' %>
+        <%= text_field_tag 'donation[person_attributes][email]', '', class: 'form-control', placeholder: 'Email' %>
+      </div>
     </div>
     <div class="col-md-6 mt-2">
         <% cash = @donation.items.where(equipment_it: nil).first || DonationItem.new %>
         <%= hidden_field_tag 'donation[cash][id]', cash&.id %>
-        <%= hidden_field_tag 'donation[cash][cash]', cash&.cash %>
+        <%= hidden_field_tag 'donation[cash][cash]', true %>
         <%= label_tag 'donation[cash][value]', 'Cash Donation', class: 'form-label mb-0' %>
         <br/>
         <small>If there is a monetary portion to the donation, aside from equipment, record it here.</small>

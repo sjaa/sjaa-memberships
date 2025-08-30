@@ -21,7 +21,9 @@ class DonationsController < ApplicationController
   # GET /donations/new
   def new
     @donation = Donation.new
-    @donation.items << DonationItem.new
+    item = DonationItem.new
+    item.phases << DonationPhase.new
+    @donation.items << item
   end
   
   # GET /donations/1/edit
