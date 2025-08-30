@@ -1,6 +1,11 @@
 <div class="row">
   <div class="col-12">
     <h1>Renewal Reminders</h1>
+    <p>
+    <%= button_to remind_all_path, method: :get, class: 'btn btn-sm btn-primary', data: {turbo_confirm: "This will email #{@people&.size} people.  Proceed?"} do %>
+    <i class="bi bi-bell"></i> Send Renewal Reminders
+    <% end %>
+    </p>
     <p>The list below shows people whose memberships have recently expired (in the last three months) or
     that are about to expire (in the next two months)</p>
   </div>

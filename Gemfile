@@ -91,6 +91,7 @@ gem "solid_queue", "1.1.0"
 gem "aws-sdk-s3"
 gem 'image_processing'
 gem 'airbrake'
+gem "mission_control-jobs"
 
 # Security udpates
 gem "rack", ">= 3.1.14"

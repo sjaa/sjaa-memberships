@@ -1,11 +1,13 @@
 Rails.application.routes.draw do
   resources :tags
+  mount MissionControl::Jobs::Engine, at: "/jobs"
   
   get '/reports/memberships', to: 'reports#memberships', as: :memberships_report
   get '/reports/renewal_reminders', to: 'reports#renewal_reminders', as: :renewal_reminders
   get '/reports/ephemeris', to: 'reports#ephemeris', as: :ephemeris_report
   get '/signup', to: 'sessions#signup', as: :signup
   
+  get '/people/remind_all', to: 'people#remind_all', as: :remind_all
   get '/people/:id/new_membership', to: 'people#new_membership', as: :membership_renewal
   post '/memberships/order', to: 'memberships#create_order', as: :membership_order
   post '/memberships/capture_order', to: 'memberships#capture_order', as: :membership_capture_order

@@ -7,6 +7,10 @@ class PersonPolicy < ApplicationPolicy
     user&.has_permission? :write
   end
 
+  def remind_all?
+    user&.has_permission? :write
+  end
+
   def welcome?
     user&.has_permission? :write
   end

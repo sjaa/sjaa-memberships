@@ -1,5 +1,5 @@
 <h1>SJAA Renewal Reminder</h1>
-<p>Dear <%=@person.first_name || "Valued SJAA Member" %>,</p>
+<p>Dear <%=@person&.first_name || "Valued SJAA Member" %>,</p>
 
 <p>
 Our records indicate that your membership <%= (@expiration_date && (@expiration_date <= DateTime.now)) ? "expired" : "expires" %> 

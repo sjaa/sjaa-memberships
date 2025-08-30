@@ -217,6 +217,16 @@ GEM
       logger
     mini_mime (1.1.5)
     minitest (5.25.4)
+    mission_control-jobs (1.1.0)
+      actioncable (>= 7.1)
+      actionpack (>= 7.1)
+      activejob (>= 7.1)
+      activerecord (>= 7.1)
+      importmap-rails (>= 1.2.1)
+      irb (~> 1.13)
+      railties (>= 7.1)
+      stimulus-rails
+      turbo-rails
     msgpack (1.7.5)
     multi_json (1.15.0)
     mutex_m (0.3.0)
@@ -388,6 +398,7 @@ DEPENDENCIES
   importmap-rails
   jbuilder
   mail
+  mission_control-jobs
   net-imap (>= 0.5.7)
   net-smtp (~> 0.5.1)
   nokogiri (>= 1.18.9)

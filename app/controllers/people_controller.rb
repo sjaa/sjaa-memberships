@@ -28,6 +28,12 @@ class PeopleController < ApplicationController
     redirect_to @person, notice: 'Reminder email sent.'
   end
 
+  def remind_all
+    RenewalRemindersJob.perform_later('enable')
+    flash[:notice] = 'Reminders Sent.'
+    redirect_to people_path
+  end
+
   def welcome
     AccountMailer.welcome(@person.latest_membership).deliver_now
     redirect_to @person, notice: 'Welcome email sent.'
