@@ -16,7 +16,7 @@ class DonationItem < ApplicationRecord
 
   def equipment_attributes=(equipment_attr)
     _equipment = equipment_attr[:id].present? ? Equipment.find(equipment_attr[:id]) : Equipment.new
-    _equipment.update(equipment_attr)
+    _equipment.update(equipment_attr.except(:images))
     _equipment.errors.each do |err|
         self.errors.add err.attribute, err.message
     end

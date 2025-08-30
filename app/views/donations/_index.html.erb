@@ -21,7 +21,7 @@
             <td><%= dollar_format donation.value %></td>
             <td>
               <% donation.items.each do |di| %>
-                <strong><%=di.value ? '$' + sprintf('%.2f', di.value) : ''%></strong> <%= di.equipment&.to_html&.html_safe %> <br/>
+                <strong><%=di.value ? '$' + sprintf('%.2f', di.value) : ''%></strong> <%= di.cash ? 'Cash' : di.equipment&.to_html&.html_safe %> <br/>
                 <% if di.phases.size > 0 %>
                   <ul>
                     <% di.phases.each do |phase| %>

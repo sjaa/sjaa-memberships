@@ -1,5 +1,6 @@
 class DonationsController < ApplicationController
   before_action :set_donation, only: %i[ show edit update destroy ]
+  include Resizable
   
   INCLUDES = [:person, items: [:phases, equipment: :instrument]]
   
@@ -36,6 +37,7 @@ class DonationsController < ApplicationController
     
     respond_to do |format|
       if @donation.save
+        attach_equipment_images
         format.html { redirect_to @donation, notice: "Donation was successfully created." }
         format.json { render :show, status: :created, location: @donation }
       else
@@ -49,6 +51,7 @@ class DonationsController < ApplicationController
   def update
     respond_to do |format|
       if @donation.update(donation_params)
+        attach_equipment_images
         format.html { redirect_to @donation, notice: "Donation was successfully updated." }
         format.json { render :show, status: :ok, location: @donation }
       else
@@ -105,5 +108,12 @@ class DonationsController < ApplicationController
     person_attributes: [:email, :first_name, :last_name],
     items_attributes: [:id, :value, phase_attributes: [:id, :name, :person_id, :date], equipment_attributes: [:id, :note, images: [], instrument_attributes: [:kind, :model]]]
     )
+  end
+
+  def attach_equipment_images
+    @donation.items.each_with_index do |di, i|
+      equipment = di.equipment
+      resize_and_attach(images: donation_params[:items_attributes][i][:equipment_attributes][:images], object: equipment) unless(equipment.nil?)
+    end
   end
 end

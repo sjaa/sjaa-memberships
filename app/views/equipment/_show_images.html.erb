@@ -1,3 +1,4 @@
+<% images ||= [] %>
 <div class="d-flex flex-wrap">
   <% images.each do |image| %>
     <%= image_tag url_for(image), class: "img-thumbnail m-2", width: '200px', style: 'cursor: zoom-in;', data: { bs_toggle: "modal", bs_target: "#lightboxModal", full_image_url: url_for(image) } %>

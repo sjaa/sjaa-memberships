@@ -1,4 +1,4 @@
-<%= form_with(model: donation) do |form| %>
+<%= form_with(model: donation, multipart: true) do |form| %>
   <div class="row">
     <% if donation.errors.any? %>
       <div style="color: red">
@@ -49,7 +49,7 @@
       </div>
     </div>
     <div class="col-md-6 mt-2">
-        <% cash = @donation.items.where(equipment_it: nil).first || DonationItem.new %>
+        <% cash = @donation.items.where(equipment_id: nil).first || DonationItem.new %>
         <%= hidden_field_tag 'donation[cash][id]', cash&.id %>
         <%= hidden_field_tag 'donation[cash][cash]', true %>
         <%= label_tag 'donation[cash][value]', 'Cash Donation', class: 'form-label mb-0' %>

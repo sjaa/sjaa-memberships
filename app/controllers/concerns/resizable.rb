@@ -2,6 +2,8 @@ module Resizable
   extend ActiveSupport::Concern
   
   def resize_and_attach(images: [], object: nil)
+    return if !images.present?
+    return if object.nil?
     images = images.is_a?(Array) ? images : [images]
     images.each do |img|
       next if(img.is_a?(String))
