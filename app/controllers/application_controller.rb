@@ -35,6 +35,7 @@ class ApplicationController < ActionController::Base
   end
 
   def redirect_path_for(user)
-    return user.is_a?(Person) ? edit_person_path(user) : root_path
+    return Rails.application.routes.url_helpers.login_path if(user.nil?)
+    return user.is_a?(Person) ? Rails.application.routes.url_helpers.edit_person_path(user) : root_path
   end
 end

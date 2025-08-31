@@ -16,10 +16,14 @@ module SjaaMembers
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     config.autoload_lib(ignore: %w(assets tasks))
 
+
     # Propshaft config
     #config.assets = ActiveSupport::OrderedOptions.new
     #config.assets.paths = [Rails.root.join("app/assets")]
     config.assets.paths << Rails.root.join("app/javascript")
+
+    # Use app-based auth for mission control
+    config.mission_control.jobs.http_basic_auth_enabled = false
 
     # Configuration for the application, engines, and railties goes here.
     #
