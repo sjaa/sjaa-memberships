@@ -44,9 +44,12 @@ Rails.application.configure do
   config.action_mailer.default_url_options = { host: 'https://127.0.0.1:3001' }
 
   # Use SMTP to send emails
-  config.action_mailer.delivery_method = :smtp
+  ActionMailer::Base.add_delivery_method :smtp_pool, SmtpPoolDelivery
+  config.action_mailer.delivery_method = :smtp_pool
   config.action_mailer.perform_deliveries = true
-  config.action_mailer.smtp_settings = {
+  config.action_mailer.smtp_pool_settings = {
+    pool_size: 1, # Maximum number of connections in the pool
+    pool_timeout: 10, # Seconds to wait for a connection
     address:              ENV['SMTP_ADDRESS'],
     port:                 ENV['SMTP_PORT'],
     domain:               ENV['SMTP_DOMAIN'],
@@ -56,6 +59,7 @@ Rails.application.configure do
     authentication:       :login,
     enable_starttls_auto: true
   }
+
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
 

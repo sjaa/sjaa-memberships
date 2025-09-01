@@ -5,6 +5,7 @@ require "rails/all"
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
+require_relative '../lib/smtp_pool_delivery'
 
 module SjaaMembers
   class Application < Rails::Application
@@ -15,7 +16,8 @@ module SjaaMembers
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     config.autoload_lib(ignore: %w(assets tasks))
-
+    config.autoload_paths += %W(#{config.root}/app/services)
+    config.eager_load_paths += %W(#{config.root}/app/services)
 
     # Propshaft config
     #config.assets = ActiveSupport::OrderedOptions.new

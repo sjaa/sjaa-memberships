@@ -384,6 +384,7 @@ DEPENDENCIES
   bcrypt (~> 3.1.20)
   bootsnap
   capybara
+  connection_pool
   csv
   debug
   dotenv

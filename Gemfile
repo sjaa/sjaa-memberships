@@ -92,6 +92,7 @@ gem "aws-sdk-s3"
 gem 'image_processing'
 gem 'airbrake'
 gem "mission_control-jobs"
+gem 'connection_pool'
 
 # Security udpates
 gem "rack", ">= 3.1.14"
