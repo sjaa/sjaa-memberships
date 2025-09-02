@@ -28,7 +28,7 @@ class PasswordResetsController < ApplicationController
         #redirect_to login_path, notice: 'Please check your email to set your password and complete registration.'
       else
         flash[:alert] = 'Email address not found.'
-        render :new
+        redirect_to login_path
       end
     end
   end
