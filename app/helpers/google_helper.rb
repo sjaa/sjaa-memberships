@@ -21,7 +21,7 @@ module GoogleHelper
     return auth
   end
 
-  def sync(auth: nil, save: true)
+  def sync(auth: nil, save: true, add_only: false)
     # Compute diff
     diff = diff_members_group(auth: auth)
     client = diff[:client]
@@ -49,11 +49,13 @@ module GoogleHelper
     end
 
     # Remove the unmatched people from the member's group
-    diff[:group_unmatched].each do |mh|
-      begin
-        client.delete_member(MEMBERS_GROUP, mh[:email])
-      rescue
-        puts "[W] Skipping delete of #{mh.inspect} from #{MEMBERS_GROUP}"
+    unless(add_only)
+      diff[:group_unmatched].each do |mh|
+        begin
+          client.delete_member(MEMBERS_GROUP, mh[:email])
+        rescue
+          puts "[W] Skipping delete of #{mh.inspect} from #{MEMBERS_GROUP}"
+        end
       end
     end
 

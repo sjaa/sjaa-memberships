@@ -21,7 +21,8 @@
     <% if @commit %>
     See below for details.
     <% else %>
-    <%= link_to 'Sync', google_members_path(diff: true, commit: true), class: 'btn btn-success' %>
+    <%= link_to 'Sync (Add and Remove)', google_members_path(diff: true, commit: true), class: 'btn btn-sm btn-primary' %>
+    <%= link_to 'Sync (Add Only)', google_members_path(diff: true, commit: true, add_only: true), class: 'btn btn-sm btn-success' %>
     <% end %>
     </p>
 
