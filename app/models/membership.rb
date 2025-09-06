@@ -20,4 +20,12 @@ class Membership < ApplicationRecord
       self.end = (self.start + self.term_months.months).end_of_month
     end
   end
+
+  def cost
+    (term_years.to_f * SjaaMembers::YEARLY_MEMBERSHIP_RATE).to_f + (ephemeris ? SjaaMembers::EPHEMERIS_FEE.to_f : 0.0)
+  end
+
+  def total
+    cost + donation_amount.to_f
+  end
 end

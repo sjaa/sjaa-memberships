@@ -97,8 +97,12 @@ class MembershipsController < ApplicationController
       membership.order = order
   
       if order.save && membership.save
-        # Send welcom email
-        AccountMailer.welcome(membership).deliver_now
+        # Send welcome email
+        begin
+          AccountMailer.welcome(membership).deliver_now
+        rescue e
+          logger.error e
+        end
         return render :json => {:status => response.result.status, redirect: edit_person_path(membership.person)}, :status => :ok
       else
         return render :json => {:error => (order.errors.full_messages + membership.errors.full_messages).join('  ')}, :status => :error
