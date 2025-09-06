@@ -1,0 +1,24 @@
+# Test fixtures for memberships
+john_current:
+  person: john
+  start: <%= 11.months.ago.beginning_of_month %>
+  term_months: 12
+  ephemeris: false
+  created_at: <%= 11.months.ago %>
+  updated_at: <%= 11.months.ago %>
+
+john_expired:
+  person: john
+  start: <%= 2.years.ago.beginning_of_month %>
+  term_months: 12
+  ephemeris: true
+  created_at: <%= 2.years.ago %>
+  updated_at: <%= 2.years.ago %>
+
+lifetime_membership:
+  person: lifetime_member
+  start: <%= 5.years.ago.beginning_of_month %>
+  term_months: # null for lifetime
+  ephemeris: false
+  created_at: <%= 5.years.ago %>
+  updated_at: <%= 5.years.ago %>

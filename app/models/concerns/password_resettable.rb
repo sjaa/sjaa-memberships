@@ -8,7 +8,7 @@ module PasswordResettable extend ActiveSupport::Concern
   
     # Checks if the password reset token is still valid (e.g., within 2 hours)
     def password_reset_token_valid?
-      reset_password_sent_at >= 2.hours.ago
+      reset_password_sent_at && reset_password_sent_at >= 2.hours.ago
     end
   
     # Resets the password

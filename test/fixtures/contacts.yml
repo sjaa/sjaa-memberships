@@ -1,0 +1,21 @@
+# Test fixtures for contacts
+john_primary:
+  person: john
+  email: john@example.com
+  primary: true
+  created_at: <%= 1.year.ago %>
+  updated_at: <%= 1.month.ago %>
+
+jane_primary:
+  person: jane  
+  email: jane@example.com
+  primary: true
+  created_at: <%= 1.week.ago %>
+  updated_at: <%= 1.week.ago %>
+
+lifetime_primary:
+  person: lifetime_member
+  email: lifetime@example.com
+  primary: true
+  created_at: <%= 5.years.ago %>
+  updated_at: <%= 1.month.ago %>

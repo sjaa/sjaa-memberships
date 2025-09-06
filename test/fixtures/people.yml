@@ -1,0 +1,27 @@
+# Test fixtures for people
+john:
+  first_name: John
+  last_name: Doe
+  password_digest: <%= BCrypt::Password.create('password123') %>
+  signup_completed: true
+  referral_id: 1
+  created_at: <%= 1.year.ago %>
+  updated_at: <%= 1.month.ago %>
+
+jane:
+  first_name: Jane
+  last_name: Smith
+  password_digest: <%= BCrypt::Password.create('password123') %>
+  signup_completed: false
+  referral_id: 1
+  created_at: <%= 1.week.ago %>
+  updated_at: <%= 1.week.ago %>
+
+lifetime_member:
+  first_name: Life
+  last_name: Member
+  password_digest: <%= BCrypt::Password.create('password123') %>
+  signup_completed: true
+  referral_id: 1
+  created_at: <%= 5.years.ago %>
+  updated_at: <%= 1.month.ago %>

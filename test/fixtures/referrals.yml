@@ -1,0 +1,18 @@
+# Test fixtures for referrals
+internet:
+  name: internet
+  description: Web search
+  created_at: <%= 1.year.ago %>
+  updated_at: <%= 1.year.ago %>
+
+friend:
+  name: friend
+  description: Referred by existing member
+  created_at: <%= 1.year.ago %>
+  updated_at: <%= 1.year.ago %>
+
+event:
+  name: event
+  description: Learned about SJAA at an event
+  created_at: <%= 1.year.ago %>
+  updated_at: <%= 1.year.ago %>
