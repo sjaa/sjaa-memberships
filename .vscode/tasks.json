@@ -35,6 +35,60 @@
         "panel": "new"
       },
       "problemMatcher": []
+    },
+    {
+      "label": "Run Rails Tests",
+      "type": "shell",
+      "command": "docker",
+      "args": [
+        "compose", "run", "--rm", "app",
+        "bundle", "exec", "rails", "test", "--verbose"
+      ],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "problemMatcher": {
+        "owner": "ruby",
+        "fileLocation": ["relative", "/rails"],
+        "pattern": {
+          "regexp": "^(.*):(\\d+):in `.*': (.*)$",
+          "file": 1,
+          "line": 2,
+          "message": 3
+        }
+      }
+    },
+    {
+      "label": "Run Single Test File",
+      "type": "shell",
+      "command": "docker",
+      "args": [
+        "compose", "run", "--rm", "app",
+        "bundle", "exec", "rails", "test", "${relativeFile}", "--verbose"
+      ],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new"
+      },
+      "problemMatcher": {
+        "owner": "ruby",
+        "fileLocation": ["relative", "/rails"],
+        "pattern": {
+          "regexp": "^(.*):(\\d+):in `.*': (.*)$",
+          "file": 1,
+          "line": 2,
+          "message": 3
+        }
+      }
     }
   ]
 }
