@@ -1,0 +1,40 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Start Rails Debug Server",
+      "type": "shell",
+      "command": "docker",
+      "args": [
+        "container", "exec", "-it", "sjaa-memberships-app-1",
+        "bundle", "exec", "rdbg", "--open", "--host", "0.0.0.0", "--port", "1234", "--nonstop",
+        "--", "bin/rails", "server", "-b", "0.0.0.0"
+      ],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Connect to Debug Server",
+      "type": "shell", 
+      "command": "docker",
+      "args": [
+        "container", "exec", "-it", "sjaa-memberships-app-1",
+        "bundle", "exec", "rdbg", "--attach", "127.0.0.1:1234"
+      ],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always", 
+        "focus": true,
+        "panel": "new"
+      },
+      "problemMatcher": []
+    }
+  ]
+}

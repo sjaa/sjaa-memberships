@@ -1,0 +1,17 @@
+{
+  "ruby.useLanguageServer": true,
+  "ruby.intellisense": "rubyLocate",
+  "ruby.format": "rubocop",
+  "files.exclude": {
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "**/tmp": true,
+    "**/log": true,
+    "**/node_modules": true
+  },
+  "search.exclude": {
+    "**/tmp": true,
+    "**/log": true,
+    "**/node_modules": true
+  }
+}
