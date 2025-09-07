@@ -1,0 +1,48 @@
+<div style="max-width: 800px; padding: 10px; border: 1px solid black; margin: 0 auto;">
+  <div style="text-align: center; width: 100%;">
+  <%= image_tag image_url('logo_small.png'), width: '200px', height: '200px' %>
+  </div>
+  <div style="text-align: center; width: 100%;">
+    <p>
+      <strong>San Jose Astronomical Association</strong><br/>
+      <small>
+        PO Box 28243, San Jose, CA 95159-8243<br/>
+        | 408.559-1221 | <%= link_to 'sjaa.net', 'https://www.sjaa.net'%> |
+      </small>
+    </p>
+
+    <h2>Receipt of Charitable Donation</h2>
+
+    <p style="text-align: left;">The San Jose Astronomical Association acknowledges and expresses appreciation for the following contribution from <%= @donor.name %>:</p>
+
+    <ul style="text-align: left;">
+    <% @donation.items.each do |item| %>
+      <li>
+        <%= item.cash ? "$#{item&.value&.round(2)} Cash" : item&.equipment&.to_html&.html_safe%>
+        <% phase = item&.phases&.first %>
+        <% recipient = phase&.person %>
+        <% date = phase&.date %>
+        <% details = [] %>
+        <% details << "Received by #{recipient.name}" if(recipient) %>
+        <% details << "#{date.strftime('%Y %b %d')}" if(date) %>
+        <% unless details.empty? %>
+          <ul>
+            <li><%= details.join(" on ") %></li>
+          </ul>
+        <% end %>
+      </li>
+    <% end %>
+    </ul>
+
+    <p style="text-align: left;">
+    <strong>Donation Received From<br/></strong>
+    <% details = [@donor.name] %>
+    <% details << @donor.primary_contact.address if(@donor&.primary_contact&.address&.present?) %>
+    <% details << "#{@donor.primary_contact.city.name}, #{@donor.primary_contact.state.short_name}" if(@donor&.primary_contact&.city&.present? && @donor&.primary_contact&.state&.present?) %>
+    <% details << @donor.primary_contact.phone if(@donor&.primary_contact&.phone&.present?) %>
+    <%= details.join("<br/>").html_safe %>
+    </p>
+
+    <p><small>San Jose Astronomical Association is a recognized 501(c)3 nonprofit organization. Federal ID number: 94-2629586</small></p>
+  </div>
+</div>

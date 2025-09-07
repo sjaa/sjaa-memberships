@@ -73,6 +73,7 @@ Rails.application.configure do
   config.solid_queue.logger = ActiveSupport::Logger.new(STDOUT)
   # config.active_job.queue_name_prefix = "sjaa_members_production"
 
+  config.action_mailer.asset_host = 'https://membership.sjaa.net'
   config.action_mailer.perform_caching = false
   config.action_mailer.default_url_options = { host: 'https://membership.sjaa.net' }
 

@@ -1,5 +1,5 @@
 class DonationsController < ApplicationController
-  before_action :set_donation, only: %i[ show edit update destroy ]
+  before_action :set_donation, only: %i[ show edit update destroy send_letter ]
   include Resizable
   
   INCLUDES = [:person, items: [:phases, equipment: :instrument]]
@@ -69,6 +69,11 @@ class DonationsController < ApplicationController
       format.html { redirect_to donations_path, status: :see_other, notice: "Donation was successfully destroyed." }
       format.json { head :no_content }
     end
+  end
+
+  def send_letter
+    AccountMailer.donation_letter(@donation).deliver_now
+    redirect_to @donation, notice: 'Donation Letter was sent.'
   end
   
   private

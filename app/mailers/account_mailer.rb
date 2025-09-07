@@ -35,4 +35,11 @@ class AccountMailer < ApplicationMailer
     @renewal = @person.memberships.count > 1
     mail(to: @person.email, bcc: %w(officers@sjaa.net memberships@sjaa.net donations@sjaa.net), subject: "SJAA Membership - Welcome and Thank You! (#{@person&.last_name}, #{@person&.first_name})")
   end
+
+  def donation_letter(donation)
+    @donor = donation&.person
+    @donation = donation
+    return nil if(@donor.nil? || donation.nil? || @donor.email.nil?)
+    mail(to: @donor.email, reply_to: 'donations@sjaa.net', bcc: %w(officers@sjaa.net memberships@sjaa.net donations@sjaa.net), subject: "SJAA Donation (#{@donor&.last_name}, #{@donor&.first_name})")
+  end
 end

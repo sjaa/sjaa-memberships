@@ -60,6 +60,10 @@ class ApplicationPolicy
     true
   end
 
+  def send_letter?
+    true
+  end
+
   class Scope
     def initialize(user, scope)
       @user = user

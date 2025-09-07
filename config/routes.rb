@@ -18,6 +18,7 @@ Rails.application.routes.draw do
   get '/people/search', to: 'people#search'
   post '/donations/search', to: 'donations#search', as: :donations_search
   get '/donations/search', to: 'donations#search'
+  get '/donations/letter/:id', to: 'donations#send_letter', as: :donations_letter
   post '/equipment/search', to: 'equipment#search', as: :equipment_search
   get '/equipment/search', to: 'equipment#search'
   post '/roles/add_person', to: 'roles#add_person', as: :roles_add_person
