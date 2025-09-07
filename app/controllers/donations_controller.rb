@@ -113,6 +113,7 @@ class DonationsController < ApplicationController
   def attach_equipment_images
     @donation.items.each_with_index do |di, i|
       equipment = di.equipment
+      next if(equipment.nil? || donation_params&.dig(:items_attributes)&.dig(i)&.dig(:equipment_attributes)&.dig(:images).nil?)
       resize_and_attach(images: donation_params[:items_attributes][i][:equipment_attributes][:images], object: equipment) unless(equipment.nil?)
     end
   end
