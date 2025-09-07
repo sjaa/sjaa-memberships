@@ -43,8 +43,7 @@ class Person < ApplicationRecord
   end
 
   def is_lifetime_member
-    lm = latest_membership
-    return lm && lm.end.nil?
+    memberships.lifetime.present?
   end
 
   def first_membership

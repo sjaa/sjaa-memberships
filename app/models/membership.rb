@@ -28,4 +28,12 @@ class Membership < ApplicationRecord
   def total
     cost + donation_amount.to_f
   end
+
+  def self.lifetime
+    where(end: nil)
+  end
+
+  def self.not_lifetime
+    where.not(end: nil)
+  end
 end
