@@ -8,6 +8,13 @@ class Donation < ApplicationRecord
     items.reduce(0){|sum, item| sum += (item.value || 0)}
   end
 
+  # Since dates are only recorded in DonationPhases, approximate
+  # the effective date of a donation as the uniquified list of dates
+  # from the first phase of each DonationItem
+  def effective_dates
+    DonationPhase.joins(:donation_item).where(donation_item: items).select(:date).map(&:date).select{|d| !d.nil?}.uniq
+  end
+
   # Find or create person by email and name
   def person_attributes=(person_attr)
     if(person_attr[:email].present?)

@@ -7,7 +7,7 @@ class Equipment < ApplicationRecord
   include ItemCasable
 
   def to_html
-    return "<strong>#{instrument&.kind&.titleize}</strong> #{instrument&.model} #{note&.present? ? '(' + note + ')' : ''}"
+    return "<strong>#{instrument&.kind&.titleize}</strong> #{instrument&.model}"
   end
 
   def instrument_attributes=(instrument_attr)
