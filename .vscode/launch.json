@@ -1,0 +1,11 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Attach to Debug Server",
+      "type": "rdbg",
+      "request": "attach",
+      "debugPort": "127.0.0.1:1234"
+    }
+  ]
+}

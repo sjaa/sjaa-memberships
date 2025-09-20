@@ -57,6 +57,56 @@ docker container exec -it sjaa-memberships-app-1 bin/rails test # Run tests in c
 # docker container exec -it sjaa-memberships-app-1 bin/rails <command>
 ```
 
+## Debugging Setup
+
+### VS Code Remote Debugging with Docker
+
+The application is configured for remote debugging using the `debug` gem with VS Code.
+
+#### Prerequisites
+- VS Code with Ruby LSP or Ruby extension installed
+- Docker container running in development mode
+
+#### Starting Debug Session
+
+1. **Start the application with debugging enabled:**
+```bash
+# Option 1: Using the debug helper script
+docker container exec -it sjaa-memberships-app-1 bin/rails-debug
+
+# Option 2: Using rdbg directly
+docker container exec -it sjaa-memberships-app-1 bundle exec rdbg --open --host 0.0.0.0 --port 1234 -- bin/rails server -b 0.0.0.0
+
+# Option 3: Using environment variables (set in Dockerfile-dev)
+docker compose up  # Debug server auto-starts on port 1234
+```
+
+2. **In VS Code:**
+   - Set breakpoints in your Ruby code by clicking in the gutter
+   - Open the Run and Debug view (Ctrl+Shift+D / Cmd+Shift+D)
+   - Select one of the debug configurations:
+     - "Attach to Rails (Docker)" - Primary option
+     - "Debug Rails (Docker) - Alternative" - Fallback option
+     - "Connect to rdbg (Docker)" - Direct rdbg connection
+   - Click the green play button or press F5
+
+3. **Debugging Commands:**
+   - `debugger` - Add this line in your code to create a breakpoint
+   - Step through code using VS Code's debug controls
+   - Inspect variables in the debug console
+   - Use the debug terminal for REPL interaction
+
+#### Debug Configuration
+- Debug server runs on `localhost:1234`
+- Remote workspace root: `/rails`
+- Local workspace root: your project directory
+
+#### Troubleshooting
+- Ensure port 1234 is not in use by other processes
+- Check Docker logs: `docker compose logs app`
+- Verify debug gem is installed: `docker container exec sjaa-memberships-app-1 gem list debug`
+- Restart containers if debug connection fails: `docker compose restart`
+
 ## Architecture
 
 ### Key Models and Relationships

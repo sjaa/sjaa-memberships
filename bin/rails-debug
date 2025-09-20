@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# Start Rails with remote debugging enabled
+echo "Starting Rails server with debugging on port 1234..."
+echo "Connect VS Code debugger to localhost:1234"
+echo "Waiting for debugger connection..."
+
+exec bundle exec rdbg --open --host 0.0.0.0 --port 1234 --nonstop -- bin/rails server -b 0.0.0.0

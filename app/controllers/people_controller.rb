@@ -8,7 +8,6 @@ class PeopleController < ApplicationController
   # GET /people or /people.json
   def index
     people_filter
-
     respond_to do |format|
       format.html
       format.json

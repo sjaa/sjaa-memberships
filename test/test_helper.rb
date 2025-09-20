@@ -4,7 +4,12 @@ require "rails/test_help"
 
 class ActiveSupport::TestCase
   # Run tests in parallel with specified workers
-  parallelize(workers: :number_of_processors)
+  # Disable parallel execution when debug server is enabled to avoid port conflicts
+  if ENV['RUBY_DEBUG_OPEN']
+    parallelize(workers: 1)
+  else
+    parallelize(workers: :number_of_processors)
+  end
 
   # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
   # fixtures :all  # Commented out to avoid fixture conflicts, create data in tests as needed

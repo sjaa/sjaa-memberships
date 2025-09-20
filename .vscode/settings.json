@@ -1,0 +1,42 @@
+{
+  "ruby.useLanguageServer": true,
+  "ruby.intellisense": "rubyLocate",
+  "ruby.format": "rubocop",
+  "ruby.testFramework": "test-unit",
+  "ruby.lsp.testFramework": "test-unit",
+  "ruby.lsp.enabledFeatures": {
+    "codeActions": true,
+    "diagnostics": true,
+    "documentHighlights": true,
+    "documentLink": true,
+    "documentSymbols": true,
+    "foldingRanges": true,
+    "formatting": true,
+    "hover": true,
+    "inlayHints": true,
+    "onTypeFormatting": true,
+    "selectionRanges": true,
+    "semanticHighlighting": true,
+    "completion": true,
+    "codeLens": true
+  },
+  "testExplorer.showCollapseButton": true,
+  "testExplorer.showExpandButton": true,
+  "testExplorer.showOnRun": true,
+  "testExplorer.addToEditorContextMenu": true,
+  "testExplorer.mergeSuites": false,
+  "testing.openTesting": "neverOpen",
+  "files.exclude": {
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "**/tmp": true,
+    "**/log": true,
+    "**/node_modules": true
+  },
+  "search.exclude": {
+    "**/tmp": true,
+    "**/log": true,
+    "**/node_modules": true
+  },
+  "testing.automaticallyOpenTestResults": "neverOpen"
+}

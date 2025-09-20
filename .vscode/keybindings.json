@@ -1,0 +1,18 @@
+[
+  {
+    "key": "cmd+shift+t",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Run Rails Tests"
+  },
+  {
+    "key": "cmd+t",
+    "command": "workbench.action.tasks.runTask", 
+    "args": "Run Single Test File",
+    "when": "editorTextFocus && resourceExtname == '.rb' && resourcePath =~ /.*test.*/"
+  },
+  {
+    "key": "f5",
+    "command": "testing.runCurrentFile",
+    "when": "editorTextFocus && resourceExtname == '.rb' && resourcePath =~ /.*test.*/"
+  }
+]

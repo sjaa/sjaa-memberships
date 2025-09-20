@@ -18,6 +18,10 @@ The data model in this app allows us to store a lot more robust and accurate inf
 
 All of this data is also structured so as to maximize data integrity, unlike a spreadsheet, where typos can make it hard to get accurate query results.
 
+# Debugger
+
+You can attach rdbg remotely to the docker container running the rails server on port 1234.  Setting breakpoints is flaky, but inserting the line `debugger` will definitely work.
+
 # Debugs
 
 ## Postgres docker doesn't build
