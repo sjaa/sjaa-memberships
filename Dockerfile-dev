@@ -71,9 +71,9 @@ ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 EXPOSE 3000
 EXPOSE 1234
 
-# Set up environment for remote debugging
-ENV RUBY_DEBUG_OPEN=true
+# Set up environment for remote debugging (disabled by default)
+ENV RUBY_DEBUG_OPEN=false
 ENV RUBY_DEBUG_HOST=0.0.0.0
 ENV RUBY_DEBUG_PORT=1234
 
-CMD ["./bin/rails", "server"]
+CMD ["sh", "-c", "RUBY_DEBUG_OPEN=true ruby -r debug/open_nonstop -S ./bin/rails server"]

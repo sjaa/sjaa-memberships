@@ -32,7 +32,7 @@ services:
       PGHOST: db
       PGUSER: root
       PGPASSWORD: root
-      RUBY_DEBUG_OPEN: "true"
+      RUBY_DEBUG_OPEN: "false"
       RUBY_DEBUG_HOST: "0.0.0.0"
       RUBY_DEBUG_PORT: "1234"
     build:

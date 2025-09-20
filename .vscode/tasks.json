@@ -96,7 +96,7 @@
       "command": "docker",
       "args": [
         "container", "exec", "-it", "sjaa-memberships-app-1",
-        "env", "RUBY_DEBUG_PORT=9999", "RUBYOPT=-W0",
+        "env", "RUBYOPT=-W0",
         "bin/rails", "console"
       ],
       "group": "build",
