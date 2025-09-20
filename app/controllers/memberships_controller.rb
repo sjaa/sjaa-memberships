@@ -67,6 +67,7 @@ class MembershipsController < ApplicationController
       order = Order.new
       order.price = price
       order.token = response.result.id
+      order.payment_method = 'paypal'
 
       order.membership_params = mp
 
