@@ -37,7 +37,7 @@ docker container exec -it sjaa-memberships-app-1 bin/rails test test/system/    
 docker container exec -it sjaa-memberships-app-1 bin/rails db:migrate                  # Run pending migrations
 docker container exec -it sjaa-memberships-app-1 bin/rails db:seed                     # Seed database with initial data
 docker container exec -it sjaa-memberships-app-1 bin/rails db:reset                    # Drop, create, migrate, and seed database
-docker container exec -it sjaa-memberships-app-1 bin/rails console                     # Start Rails console for data queries
+docker container exec -it sjaa-memberships-app-1 env RUBY_DEBUG_PORT=9999 RUBYOPT="-W0" bin/rails console  # Start Rails console (avoids debug port conflict, suppresses warnings)
 ```
 
 ### Custom Rake Tasks

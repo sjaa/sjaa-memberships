@@ -89,6 +89,24 @@
           "message": 3
         }
       }
+    },
+    {
+      "label": "Rails Console",
+      "type": "shell",
+      "command": "docker",
+      "args": [
+        "container", "exec", "-it", "sjaa-memberships-app-1",
+        "env", "RUBY_DEBUG_PORT=9999", "RUBYOPT=-W0",
+        "bin/rails", "console"
+      ],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new"
+      },
+      "problemMatcher": []
     }
   ]
 }

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_08_25_040013) do
+ActiveRecord::Schema[7.1].define(version: 2025_09_20_190900) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -204,6 +204,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_08_25_040013) do
     t.json "membership_params"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "payment_method"
     t.index ["token"], name: "index_orders_on_token"
   end
 

@@ -36,4 +36,25 @@ class Membership < ApplicationRecord
   def self.not_lifetime
     where.not(end: nil)
   end
+
+  def order_attributes=(attributes)
+    return if attributes[:payment_method] == 'none' || attributes[:payment_method].blank?
+    
+    _order = self.order || Order.new
+    _attributes = attributes.dup
+    _attributes.delete(:id)
+    
+    # Generate a unique token if creating a new order
+    if _order.new_record?
+      _attributes[:token] = SecureRandom.hex(16)
+      _attributes[:price] = self.total
+    end
+    
+    _order.update(_attributes)
+    _order.errors.each do |err|
+      self.errors.add err.attribute, err.message
+    end
+    
+    self.order = _order
+  end
 end

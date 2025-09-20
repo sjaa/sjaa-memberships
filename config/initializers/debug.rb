@@ -1,9 +1,6 @@
 # Debug configuration for Docker remote debugging
-# Note: Tests use docker compose run with RUBY_DEBUG_OPEN= to disable this
-if Rails.env.development? && 
-   ENV['RUBY_DEBUG_OPEN'] && 
-   !ENV['RUBY_DEBUG_OPEN'].empty? &&
-   ENV['RUBY_DEBUG_OPEN'] != 'false'
-  puts "🐛 Starting debug server on #{ENV['RUBY_DEBUG_HOST']}:#{ENV['RUBY_DEBUG_PORT']}"
-  require 'debug/open_nonstop'
-end
+# The debug gem automatically starts when RUBY_DEBUG_OPEN=true is set
+# The Rails server uses port 1234 for debugging (set in docker compose)
+
+# For console access without debug server port conflicts and rdoc warnings, use:
+# docker container exec -it sjaa-memberships-app-1 env RUBY_DEBUG_PORT=9999 RUBYOPT="-W0" bin/rails console
