@@ -20,7 +20,13 @@ All of this data is also structured so as to maximize data integrity, unlike a s
 
 # Debugger
 
-You can attach rdbg remotely to the docker container running the rails server on port 1234.  Setting breakpoints is flaky, but inserting the line `debugger` will definitely work.
+You can attach rdbg remotely to the docker container running the rails server on port 1234.  Setting breakpoints is flaky, but inserting the line `debugger` will definitely work.  You can also set breakpoints once the debugger is attached:
+
+```
+,b /rails/app/controllers/people_controller.rb 11
+```
+
+See `DEBUGGING.md` for more details.
 
 # Debugs
 
