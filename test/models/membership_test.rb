@@ -141,8 +141,121 @@ class MembershipTest < ActiveSupport::TestCase
     order = Order.create!(price: 75.0, token: 'test_token', paid: false)
     @membership.order = order
     @membership.save!
-    
+
     assert_equal order, @membership.order
+  end
+
+  test 'membership can be created with cash payment order' do
+    order = Order.create!(price: 75.0, token: 'test_token_cash', payment_method: 'cash', paid: false)
+    @membership.order = order
+    @membership.save!
+
+    assert_equal order, @membership.order
+    assert_equal 'cash', @membership.order.payment_method
+  end
+
+  test 'membership can be created with check payment order' do
+    order = Order.create!(price: 75.0, token: 'test_token_check', payment_method: 'check', paid: false)
+    @membership.order = order
+    @membership.save!
+
+    assert_equal order, @membership.order
+    assert_equal 'check', @membership.order.payment_method
+  end
+
+  test 'membership can be created with paypal payment order' do
+    order = Order.create!(price: 75.0, token: 'test_token_paypal', payment_method: 'paypal', paid: false)
+    @membership.order = order
+    @membership.save!
+
+    assert_equal order, @membership.order
+    assert_equal 'paypal', @membership.order.payment_method
+  end
+
+  test 'membership can be created with order with nil payment method' do
+    order = Order.create!(price: 75.0, token: 'test_token_nil', payment_method: nil, paid: false)
+    @membership.order = order
+    @membership.save!
+
+    assert_equal order, @membership.order
+    assert_nil @membership.order.payment_method
+  end
+
+  test 'membership can be created without any order' do
+    @membership.order = nil
+    @membership.save!
+
+    assert_nil @membership.order
+  end
+
+  test 'order_attributes= creates order with cash payment method' do
+    @membership.order_attributes = {
+      payment_method: 'cash'
+    }
+    @membership.save!
+
+    assert_not_nil @membership.order
+    assert_equal 'cash', @membership.order.payment_method
+    assert_equal @membership.total, @membership.order.price
+    assert_not_nil @membership.order.token
+  end
+
+  test 'order_attributes= creates order with check payment method' do
+    @membership.order_attributes = {
+      payment_method: 'check'
+    }
+    @membership.save!
+
+    assert_not_nil @membership.order
+    assert_equal 'check', @membership.order.payment_method
+    assert_equal @membership.total, @membership.order.price
+    assert_not_nil @membership.order.token
+  end
+
+  test 'order_attributes= creates order with paypal payment method' do
+    @membership.order_attributes = {
+      payment_method: 'paypal'
+    }
+    @membership.save!
+
+    assert_not_nil @membership.order
+    assert_equal 'paypal', @membership.order.payment_method
+    assert_equal @membership.total, @membership.order.price
+    assert_not_nil @membership.order.token
+  end
+
+  test 'order_attributes= skips order creation when payment_method is none' do
+    @membership.order_attributes = {
+      payment_method: 'none',
+      price: 75.0
+    }
+    @membership.save!
+
+    assert_nil @membership.order
+  end
+
+  test 'order_attributes= skips order creation when payment_method is blank' do
+    @membership.order_attributes = {
+      payment_method: '',
+      price: 75.0
+    }
+    @membership.save!
+
+    assert_nil @membership.order
+  end
+
+  test 'order_attributes= uses membership total as order price when creating new order' do
+    @membership.term_months = 12
+    @membership.ephemeris = true
+    @membership.donation_amount = 25.0
+
+    @membership.order_attributes = {
+      payment_method: 'cash'
+    }
+    @membership.save!
+
+    assert_not_nil @membership.order
+    assert_equal @membership.total, @membership.order.price
   end
 
   test 'membership can be associated with membership kind' do

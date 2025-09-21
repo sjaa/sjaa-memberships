@@ -28,6 +28,21 @@ You can attach rdbg remotely to the docker container running the rails server on
 
 See `DEBUGGING.md` for more details.
 
+# Testing
+
+In addition to doing your own testing, unit tests should be added and maintained as appropriate.  All unit tests should pass before submitting pull requests.
+To run them in VSCode, use the built-in task: `Run Task > Run Rails Tests`.  This transaltes to:
+
+```sh
+docker compose run --rm app bundle exec rails test --verbose 
+```
+
+Docker containers must be running if using Docker.  Otherwise, just run:
+
+```sh
+bundle exec rails test --verbose 
+```
+
 # Debugs
 
 ## Postgres docker doesn't build
