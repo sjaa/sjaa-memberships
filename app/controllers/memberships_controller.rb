@@ -146,7 +146,7 @@ class MembershipsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def membership_params
-      params.require(:membership).permit(:start, :term_months, :ephemeris, :new, :type, :status_id, :person_id, :ephemeris_amount, :donation_amount)
+      params.require(:membership).permit(:start, :term_months, :ephemeris, :new, :type, :status_id, :person_id, :ephemeris_amount, :donation_amount, :author)
     end
 
     def paypal_init

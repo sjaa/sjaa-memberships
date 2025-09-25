@@ -3,6 +3,9 @@
     <h3 class="p-2 bg-body-tertiary">Membership <%= i ? i+1 : 'New'%></h3>
     <%= hidden_field_tag 'person[membership_attributes][][id]', membership.id %>
     <%= hidden_field_tag 'person[membership_attributes][][person_id]', person&.id %>
+    <% if membership.id.nil? %>
+    <%= hidden_field_tag 'person[membership_attributes][][author]', membership.author.presence || @user&.email %>
+    <% end %>
   </div>
   <div class="col-md-6 mt-2">
     <%= label_tag :membership_start, 'Start Date', class: 'form-label' %>
