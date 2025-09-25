@@ -6,6 +6,8 @@
   <div class="col-12">
     <%= link_to "Back to donations", donations_path, class: 'btn btn-secondary d-inline-block' %>
     <%= link_to "Edit this donation", edit_donation_path(@donation), class: 'btn btn-primary d-inline-block' %>
-    <%= link_to "Delete this donation", @donation, method: :delete, form: { data: {turbo_confirm: 'Are you sure?'} }, class: 'd-inline-block btn btn-danger' %>
+    <p>
+    <%= button_to "Delete this donation", @donation, method: :delete, form: { data: {turbo_confirm: 'Are you sure?'} }, class: 'btn btn-danger' %>
+    </p>
   </div>
 </div>
