@@ -71,4 +71,10 @@
     <th style="border-top: solid gray 3px;">Total</th>
     <td style="border-top: solid gray 3px;"><%= dollar_format(@order_total) %></td>
   </tr>
+  <% if @order&.payment_method %>
+  <tr>
+    <th>Payment Method</th>
+    <td><%= @order&.payment_method&.titleize %></td>
+  </tr>
+  <% end %>
 </table>

@@ -24,6 +24,7 @@ class MembershipsController < ApplicationController
   # POST /memberships or /memberships.json
   def create
     @membership = Membership.new(membership_params)
+    @membership.author = current_user.email if current_user.respond_to?(:email)
 
     respond_to do |format|
       if @membership.save
@@ -96,6 +97,7 @@ class MembershipsController < ApplicationController
       order.paid = response.result.status == 'COMPLETED'
       membership = Membership.new(order.membership_params)
       membership.order = order
+      membership.author = current_user.email if current_user.respond_to?(:email)
   
       if order.save && membership.save
         # Send welcome email
