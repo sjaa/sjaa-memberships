@@ -20,7 +20,7 @@
     </div>
   </div>
   <%# Kind isn't really well defined, so skip it%>
-  <% if 0 %>
+  <% if false %>
     <div class="col-md-6 mt-2">
       <%= label_tag :membership_kind_id, 'Kind', class: 'form-label' %>
       <%= combobox_tag 'person[membership_attributes][][kind_id]', MembershipKind.all, value: membership.kind&.id, name_when_new: 'person[membership_attributes][][kind]' %>
@@ -30,24 +30,16 @@
     <%= label_tag :membership_ephemeris, 'Printed Ephemeris', class: 'form-label' %><br/>
     <%= combobox_tag 'person[membership_attributes][][ephemeris]', [{display: 'Yes', value: 'true'}, {display: 'No', value: 'false'}], value: membership.ephemeris ? 'true' : 'false' %>
   </div>
-  <div class="col-md-12 mt-2">
-    <%= label_tag :payment_method, 'Payment Method', class: 'form-label' %><br/>
-    <div class="form-check form-check-inline">
-      <%= radio_button_tag 'person[membership_attributes][][order_attributes][payment_method]', 'none', (membership.order&.payment_method.blank? ? true : false), class: 'form-check-input', id: "#{id}_payment_none" %>
-      <%= label_tag "#{id}_payment_none", 'None', class: 'form-check-label' %>
-    </div>
-    <div class="form-check form-check-inline">
-      <%= radio_button_tag 'person[membership_attributes][][order_attributes][payment_method]', 'cash', (membership.order&.payment_method == 'cash'), class: 'form-check-input', id: "#{id}_payment_cash" %>
-      <%= label_tag "#{id}_payment_cash", 'Cash', class: 'form-check-label' %>
-    </div>
-    <div class="form-check form-check-inline">
-      <%= radio_button_tag 'person[membership_attributes][][order_attributes][payment_method]', 'check', (membership.order&.payment_method == 'check'), class: 'form-check-input', id: "#{id}_payment_check" %>
-      <%= label_tag "#{id}_payment_check", 'Check', class: 'form-check-label' %>
-    </div>
-    <div class="form-check form-check-inline">
-      <%= radio_button_tag 'person[membership_attributes][][order_attributes][payment_method]', 'paypal', (membership.order&.payment_method == 'paypal'), class: 'form-check-input', id: "#{id}_payment_paypal" %>
-      <%= label_tag "#{id}_payment_paypal", 'PayPal', class: 'form-check-label' %>
-    </div>
+  <div class="col-md-6 mt-2">
+    <%= label_tag :payment_method, 'Payment Method', class: 'form-label' %>
+    <%= select_tag 'person[membership_attributes][][order_attributes][payment_method]',
+                   options_for_select([
+                     ['None', 'none'],
+                     ['Cash', 'cash'],
+                     ['Check', 'check'],
+                     ['PayPal', 'paypal']
+                   ], membership.order&.payment_method || 'none'),
+                   class: 'form-select' %>
   </div>
   <div class="col-md-6 mt-2">
     <%= label_tag :membership_delete, 'Delete', class: 'form-label' %><br/>
