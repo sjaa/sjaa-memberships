@@ -1,13 +1,18 @@
 <div class="row">
   <div class="col-12">
-    <h1>Google Members Group</h1>
+    <h1>Google Group: <%= @group_name %></h1>
     <p>
-      The table below shows the current list of people in the members@sjaa.net
-      Google Group. Use the "Sync" button below to compute the difference between
-      the Group membership, and the active members listed in the membership database.
+      <strong>Group Email:</strong> <%= @group_email %><br/>
+      <strong>Filter:</strong> <%= @members_only ? 'Active Members Only' : 'All People in Role' %>
     </p>
     <p>
-    <%= link_to 'Compute Difference', google_members_path(diff: true), class: 'btn btn-primary' %>
+      The table below shows the current list of people in the <%= @group_email %>
+      Google Group. Use the "Compute Difference" button below to compare the Group membership
+      with the people in the <%= @role ? 'role' : 'membership database' %>.
+    </p>
+    <p>
+    <%= link_to 'Back to Group Selection', google_groups_path, class: 'btn btn-secondary' %>
+    <%= link_to 'Compute Difference', google_group_sync_path(role_id: @role_id, diff: true), class: 'btn btn-primary' %>
     </p>
 
     <% if @diff %>
@@ -21,28 +26,34 @@
     <% if @commit %>
     See below for details.
     <% else %>
-    <%= link_to 'Sync (Add and Remove)', google_members_path(diff: true, commit: true), class: 'btn btn-sm btn-primary' %>
-    <%= link_to 'Sync (Add Only)', google_members_path(diff: true, commit: true, add_only: true), class: 'btn btn-sm btn-success' %>
+    <%= link_to 'Sync (Add and Remove)', google_group_sync_path(role_id: @role_id, diff: true, commit: true), class: 'btn btn-sm btn-primary' %>
+    <%= link_to 'Sync (Add Only)', google_group_sync_path(role_id: @role_id, diff: true, commit: true, add_only: true), class: 'btn btn-sm btn-success' %>
     <% end %>
     </p>
 
-    <h2>Active Members Missing From Google Group</h2>
+    <h2><%= @members_only ? 'Active Members' : 'People in Role' %> Missing From Google Group</h2>
     <div class="table-responsive mt-2">
       <table class="table table-striped">
         <tr>
           <th>Name</th>
           <th>Email(s)</th>
+          <% if @members_only %>
+          <th>Status</th>
+          <% end %>
         </tr>
         <% @unmatched_people.each do |person| %>
           <tr>
             <td><%= link_to person.name, person %></td>
             <td><%=person.contacts.map(&:email).select(&:present?).join('<br/>').html_safe%></td>
+            <% if @members_only %>
+            <td><%=person.status%></td>
+            <% end %>
           </tr>
         <% end %>
       </table>
     </div>
 
-    <h2>Google Group Members That Are Not Active Members</h2>
+    <h2>Google Group Members That Are Not <%= @members_only ? 'Active Members' : 'In Role' %></h2>
     <div class="table-responsive mt-2">
       <table class="table table-striped">
         <tr>
@@ -64,7 +75,7 @@
       </table>
     </div>
 
-    <h2>Google Group Members Who Are Active Members</h2>
+    <h2>Google Group Members Who Are <%= @members_only ? 'Active Members' : 'In Role' %></h2>
     <div class="table-responsive mt-2">
       <table class="table table-striped">
         <tr>
@@ -72,6 +83,9 @@
           <th>Email</th>
           <th>Role</th>
           <th>Type</th>
+          <% if @members_only %>
+          <th>Status</th>
+          <% end %>
         </tr>
         <% @group_matched.each do |mh| %>
           <tr>
@@ -79,6 +93,9 @@
             <td><%=mh[:member].email%></td>
             <td><%=mh[:member].role%></td>
             <td><%=mh[:member].type%></td>
+            <% if @members_only %>
+            <td><%=mh[:person].status%></td>
+            <% end %>
           </tr>
         <% end %>
       </table>

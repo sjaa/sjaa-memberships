@@ -74,9 +74,10 @@
           Join groups to receive updates and participate in group activities.
         </small>
       </p>
-      <% role_ids = person.roles.map(&:id) %>
+      <%= hidden_field_tag "person[joinable_role_ids][]", "" %>
+      <% role_ids = person.roles.select(&:joinable).map(&:id) %>
       <% Role.where(joinable: true).each do |role| %>
-        <%= check_box_tag "person[roles_attributes][][id]", role.id, role_ids.include?(role.id), autocomplete: "off", id: "role_#{role.id}", class: 'btn-check' %>
+        <%= check_box_tag "person[joinable_role_ids][]", role.id, role_ids.include?(role.id), autocomplete: "off", id: "role_#{role.id}", class: 'btn-check' %>
         <label class="btn btn-light" for="role_<%=role.id%>"><%=role.name%></label>
       <% end %>
     </div>

@@ -74,6 +74,8 @@ Rails.application.routes.draw do
   end
   
   resource :sessions
+  get '/google/groups', to: 'google#groups', as: :google_groups
+  get '/google/group_sync', to: 'google#group_sync', as: :google_group_sync
   get '/google/members', to: 'google#members', as: :google_members
   get '/google/auth', to: 'sessions#request_google_authorization', as: :google_auth
   get '/google/callback', to: 'sessions#google_oauth2_callback', as: :google_callback

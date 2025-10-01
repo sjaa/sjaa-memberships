@@ -118,9 +118,10 @@ class PeopleController < ApplicationController
   def person_params
     params.require(:person).permit(
     :first_name, :last_name, :astrobin_id, :notes, :membership_id, :discord_id, :referral_id,
-    interests_attributes: [:name, :id], 
-    roles_attributes: [:id], 
-    contact_attributes: [:address, :zipcode, :phone, :state_id, :city_id, :city_name, :email, :primary, :person_id, :id], 
+    interests_attributes: [:name, :id],
+    roles_attributes: [:id],
+    joinable_role_ids: [],
+    contact_attributes: [:address, :zipcode, :phone, :state_id, :city_id, :city_name, :email, :primary, :person_id, :id],
     membership_attributes: [:start, :kind, :kind_id, :term_months, :new, :ephemeris, :id, :person_id, :donation_amount, :author, order_attributes: [:payment_method]],
     astrobin_attributes: [:username, :latest_image, :id])
   end

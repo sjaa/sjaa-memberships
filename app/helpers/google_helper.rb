@@ -21,9 +21,9 @@ module GoogleHelper
     return auth
   end
 
-  def sync(auth: nil, save: true, add_only: false)
+  def sync(auth: nil, group: MEMBERS_GROUP, members_only: true, save: true, add_only: false)
     # Compute diff
-    diff = diff_members_group(auth: auth)
+    diff = diff_group(auth: auth, group: group, members_only: members_only)
     client = diff[:client]
     diff[:errors] ||= []
 
@@ -48,13 +48,13 @@ module GoogleHelper
       end
     end
 
-    # Remove the unmatched people from the member's group
+    # Remove the unmatched people from the target group
     unless(add_only)
       diff[:group_unmatched].each do |mh|
         begin
-          client.delete_member(MEMBERS_GROUP, mh[:email])
+          client.delete_member(group, mh[:email])
         rescue
-          puts "[W] Skipping delete of #{mh.inspect} from #{MEMBERS_GROUP}"
+          puts "[W] Skipping delete of #{mh.inspect} from #{group}"
         end
       end
     end
@@ -62,35 +62,47 @@ module GoogleHelper
     # Add the missing people
     diff[:unmatched_people].each do |person|
       begin
-        client.insert_member(MEMBERS_GROUP, Google::Apis::AdminDirectoryV1::Member.new(email: person.email)) if(person.email.present?)
+        client.insert_member(group, Google::Apis::AdminDirectoryV1::Member.new(email: person.email)) if(person.email.present?)
       rescue => e
-        diff[:errors] << {source: :remove, email: person.email, error: e}
+        diff[:errors] << {source: :add, email: person.email, error: e}
       end
     end
 
     return diff
   end
 
-  def diff_members_group(auth: nil)
-    results = {
-    }
+  # Generic method to diff any group with role membership or active members
+  def diff_group(auth: nil, group: MEMBERS_GROUP, role: nil, members_only: true)
+    results = {}
 
     # Get a client from googleapis
     client = Google::Apis::AdminDirectoryV1::DirectoryService.new
     client.authorization = auth
-    members = get_members(client: client)
+    members = get_members(client: client, group: group)
     results[:client] = client
 
-    # Diff Members
-    active_people = Person.all.includes(:contacts).joins(:memberships).active_members.uniq.to_a #Person
+    # Determine which people should be in the group
+    if role
+      # Get people in this role
+      people = Person.includes(:contacts).joins(:roles).where(roles: {id: role.id}).uniq.to_a
+
+      # If members_only is true, filter to only active members
+      if members_only
+        people = people.select(&:is_active?)
+      end
+    else
+      # Default behavior: active members only
+      people = Person.all.includes(:contacts).joins(:memberships).active_members.uniq.to_a
+    end
+
     matched_people = []
     results[:group_matched] = [] # {person: p, member: member}
     group_unmatched = members # Member
     
-    # Iterate through active members, and find their e-mail addresses in the Google Group
-    #   Subtract all the found members from the group_unmatched list, and from the active_people list
+    # Iterate through people, and find their e-mail addresses in the Google Group
+    #   Subtract all the found members from the group_unmatched list, and from the people list
     #   Add found members to the "group_matched"
-    active_people.each do |person|
+    people.each do |person|
       emails = person.contacts.map(&:email).select{|e| e.present?}
       emails.each do |email|
         member = group_unmatched.find do |mem| 
@@ -114,7 +126,7 @@ module GoogleHelper
       end
     end
 
-    results[:unmatched_people] = active_people - matched_people
+    results[:unmatched_people] = people - matched_people
 
     # Fill in the group unmatched emails with a person
     unmatched_emails = group_unmatched.map(&:email).map(&:downcase)
@@ -127,6 +139,11 @@ module GoogleHelper
     results[:group_unmatched] = group_unmatched
 
     return results
+  end
+
+  # Backwards compatibility wrapper
+  def diff_members_group(auth: nil)
+    diff_group(auth: auth, group: MEMBERS_GROUP, role: nil, members_only: true)
   end
 
   def get_members(auth: nil, client: nil, group: MEMBERS_GROUP)

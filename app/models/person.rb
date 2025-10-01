@@ -161,32 +161,24 @@ class Person < ApplicationRecord
     self.interests = _interests
   end
 
+  # Setter for users to manage their joinable roles only
+  # Preserves any non-joinable roles that were set by admins
+  def joinable_role_ids=(ids)
+    # Filter out empty strings from hidden field
+    clean_ids = ids.reject(&:blank?)
+    joinable_roles = Role.where(id: clean_ids, joinable: true)
+
+    # Keep non-joinable roles and replace joinable roles
+    non_joinable_roles = self.roles.reject(&:joinable)
+    self.roles = non_joinable_roles + joinable_roles
+  end
+
   # Take an array of the form [{id: 4}, ...]
-  # and find/create/delete
+  # Used by admin interface to manage all roles
   def roles_attributes=(attributes)
-    incoming_role_ids = attributes.map{|h| h[:id]}.compact
+    incoming_role_ids = attributes.map{|h| h[:id]}.compact.reject(&:blank?)
     _roles = Role.where(id: incoming_role_ids).uniq
-
-    # Check if the incoming roles are all joinable (user is managing their own joinable roles)
-    # vs admin managing all roles
-    all_incoming_joinable = _roles.all?(&:joinable)
-
-    if all_incoming_joinable && _roles.any?
-      # User is managing joinable roles - preserve non-joinable roles
-      existing_non_joinable = self.roles.reject(&:joinable)
-      self.roles = existing_non_joinable + _roles
-    elsif incoming_role_ids.empty?
-      # Empty array - check if we should clear joinable roles or all roles
-      # If user has any non-joinable roles, assume we're only clearing joinable
-      if self.roles.any? { |r| !r.joinable }
-        self.roles = self.roles.reject(&:joinable)
-      else
-        self.roles = []
-      end
-    else
-      # Admin is managing all roles
-      self.roles = _roles
-    end
+    self.roles = _roles
   end
 
   def astrobin_attributes=(attributes)

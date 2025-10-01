@@ -86,6 +86,6 @@ class RolesController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def role_params
-      params.require(:role).permit(:discord_id, :name, :short_name, :email, :joinable)
+      params.require(:role).permit(:discord_id, :name, :short_name, :email, :joinable, :members_only)
     end
 end

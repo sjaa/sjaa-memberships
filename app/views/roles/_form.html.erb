@@ -32,6 +32,12 @@
         <%= form.label :joinable, "Members can join this role", class: "form-check-label" %>
       </div>
     </div>
+    <div class="col-md-6 col-xs-12 mt-2">
+      <div class="form-check">
+        <%= form.check_box :members_only, class: 'form-check-input' %>
+        <%= form.label :members_only, "Sync only active members to Google Group", class: "form-check-label" %>
+      </div>
+    </div>
     <div class="col-12 mt-2">
       <%= form.submit class: 'btn btn-primary' %>
     </div>
