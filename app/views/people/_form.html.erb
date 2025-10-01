@@ -65,6 +65,23 @@
     </div>
   </div>
 
+  <!-- Joinable Roles Section (for all users) -->
+  <div class="row mt-4 pb-4 pt-2">
+    <div class="col-12">
+      <h2 class="p-2 bg-body-secondary">Groups</h2>
+      <p>
+        <small class="form-text text-muted">
+          Join groups to receive updates and participate in group activities.
+        </small>
+      </p>
+      <% role_ids = person.roles.map(&:id) %>
+      <% Role.where(joinable: true).each do |role| %>
+        <%= check_box_tag "person[roles_attributes][][id]", role.id, role_ids.include?(role.id), autocomplete: "off", id: "role_#{role.id}", class: 'btn-check' %>
+        <label class="btn btn-light" for="role_<%=role.id%>"><%=role.name%></label>
+      <% end %>
+    </div>
+  </div>
+
 <!--
   <div class="row mt-4 pb-4 pt-2">
     <div class="col-12">

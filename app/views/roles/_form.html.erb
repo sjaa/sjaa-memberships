@@ -26,6 +26,12 @@
       <%= form.label :email, class: "form-label" %>
       <%= form.text_field :email, class: 'form-control' %>
     </div>
+    <div class="col-md-6 col-xs-12 mt-2">
+      <div class="form-check">
+        <%= form.check_box :joinable, class: 'form-check-input' %>
+        <%= form.label :joinable, "Members can join this role", class: "form-check-label" %>
+      </div>
+    </div>
     <div class="col-12 mt-2">
       <%= form.submit class: 'btn btn-primary' %>
     </div>
