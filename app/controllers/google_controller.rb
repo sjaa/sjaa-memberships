@@ -59,7 +59,7 @@ class GoogleController < ApplicationController
 
     begin
       if(@commit)
-        diff_results = sync(auth: @auth, group: @group_email, members_only: @members_only, save: !params[:add_only], add_only: params[:add_only])
+        diff_results = sync(auth: @auth, group: @group_email, role: @role, members_only: @members_only, save: !params[:add_only], add_only: params[:add_only])
       end
 
       if(@diff)

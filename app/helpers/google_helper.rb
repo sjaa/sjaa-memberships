@@ -21,9 +21,9 @@ module GoogleHelper
     return auth
   end
 
-  def sync(auth: nil, group: MEMBERS_GROUP, members_only: true, save: true, add_only: false)
+  def sync(auth: nil, group: MEMBERS_GROUP, role: nil, members_only: true, save: true, add_only: false)
     # Compute diff
-    diff = diff_group(auth: auth, group: group, members_only: members_only)
+    diff = diff_group(auth: auth, group: group, role: role, members_only: members_only)
     client = diff[:client]
     diff[:errors] ||= []
 
@@ -84,15 +84,19 @@ module GoogleHelper
     # Determine which people should be in the group
     if role
       # Get people in this role
-      people = Person.includes(:contacts).joins(:roles).where(roles: {id: role.id}).uniq.to_a
+      query = Person.includes(:contacts).joins(:roles).where(roles: {id: role.id}).distinct
+      puts "[DEBUG] Role query SQL: #{query.to_sql}"
+      people = query.to_a
+      puts "[DEBUG] Found #{people.count} people in role #{role.name} (id: #{role.id})"
 
       # If members_only is true, filter to only active members
       if members_only
         people = people.select(&:is_active?)
+        puts "[DEBUG] After filtering for active members: #{people.count} people"
       end
     else
       # Default behavior: active members only
-      people = Person.all.includes(:contacts).joins(:memberships).active_members.uniq.to_a
+      people = Person.all.includes(:contacts).joins(:memberships).active_members.distinct.to_a
     end
 
     matched_people = []
