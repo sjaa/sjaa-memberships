@@ -1,9 +1,17 @@
 <%= turbo_frame_tag 'equipment' do %>
   <div class="row" data-controller="clipboard">
-    <div class="col-12 mt-2">
-      <%= button_tag 'Copy Link', class: 'btn btn-secondary d-inline-block', style: 'min-width: 100px; margin-right: 20px;',
-          data: {action: 'clipboard#copy', clipboard_text_param: equipment_index_url(@query_params)}  %>
-      <%= link_to "New Equipment", new_equipment_path, class: 'btn btn-primary d-inline-block', data: {turbo: false} %>
+    <div class="col-12 mt-2 d-flex justify-content-between align-items-center">
+      <div>
+        <%= button_tag 'Copy Link', class: 'btn btn-secondary d-inline-block', style: 'min-width: 100px; margin-right: 20px;',
+            data: {action: 'clipboard#copy', clipboard_text_param: equipment_index_url(@query_params)}  %>
+        <%= link_to "New Equipment", new_equipment_path, class: 'btn btn-primary d-inline-block', data: {turbo: false} %>
+      </div>
+      <div class="btn-group" role="group">
+        <%= radio_button_tag 'view_mode', 'cards', @view_mode == 'cards', class: 'd-none', id: 'view_mode_cards', data: {action: "search-form#search"} %>
+        <%= label_tag 'view_mode_cards', 'Cards', class: "btn #{'btn-primary' if @view_mode == 'cards'} #{'btn-outline-primary' if @view_mode != 'cards'}" %>
+        <%= radio_button_tag 'view_mode', 'table', @view_mode == 'table', class: 'd-none', id: 'view_mode_table', data: {action: "search-form#search"} %>
+        <%= label_tag 'view_mode_table', 'Table', class: "btn #{'btn-primary' if @view_mode == 'table'} #{'btn-outline-primary' if @view_mode != 'table'}" %>
+      </div>
     </div>
     <div class="col-12 mt-2">
       <%= pagy_bootstrap_nav(@pagy).html_safe %>
@@ -11,10 +19,56 @@
     <div class="col-12 clearfix mb-2" data-clipboard-target="status">
     </div>
   </div>
-  <div class="d-flex flex-wrap">
-    <% @equipment.each do |equip| %>
-      <%= render equip %>
-    <% end %>
-  </div>
+  <% if @view_mode == 'table' %>
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>Type</th>
+            <th>Model</th>
+            <th>Owner</th>
+            <th>Role</th>
+            <th>Donations</th>
+            <th>Tags</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @equipment.each do |equip| %>
+            <tr>
+              <td>
+                <% img = equip&.images&.first ? url_for(equip.images.first) : image_url('placeholder.svg') %>
+                <%= link_to equip, data: {turbo: false} do %>
+                  <img src="<%=img%>" alt="Equipment photo" style="width: 60px; height: 45px; object-fit: cover;">
+                <% end %>
+              </td>
+              <td><%= equip&.instrument&.kind&.titleize %></td>
+              <td><%= link_to equip&.instrument&.model, equip, data: {turbo: false} %></td>
+              <td><%= link_to(equip.person&.name, equip.person) if equip.person %></td>
+              <td><%= link_to(equip.role&.name, equip.role) if equip.role %></td>
+              <td>
+                <% if equip.donation_summary %>
+                  <small class="text-muted"><%= equip.donation_summary %></small>
+                <% end %>
+              </td>
+              <td>
+                <% equip&.tags.each do |tag| %>
+                  <%= render tag %>
+                <% end %>
+              </td>
+              <td><small class="text-muted"><%= truncate(equip.note, length: 50) %></small></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="d-flex flex-wrap">
+      <% @equipment.each do |equip| %>
+        <%= render equip %>
+      <% end %>
+    </div>
+  <% end %>
   <%= pagy_bootstrap_nav(@pagy).html_safe %>
 <% end %>

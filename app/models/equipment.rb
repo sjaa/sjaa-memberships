@@ -4,6 +4,8 @@ class Equipment < ApplicationRecord
   belongs_to :role, required: false
   has_and_belongs_to_many :tags
   has_many_attached :images
+  has_many :donation_items, dependent: :destroy
+  has_many :donations, through: :donation_items
   include ItemCasable
 
   def to_html
@@ -27,5 +29,18 @@ class Equipment < ApplicationRecord
     end
 
     self.tags = local_tags
+  end
+
+  def donation_summary
+    return nil if donation_items.empty?
+
+    total_value = donation_items.sum { |item| item.value || 0 }
+    donation_count = donations.count
+
+    if donation_count == 1
+      "Donated ($#{total_value})"
+    else
+      "#{donation_count} donations ($#{total_value})"
+    end
   end
 end

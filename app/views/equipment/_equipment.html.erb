@@ -13,6 +13,9 @@
       <%= link_to(equipment.person&.name, equipment.person) if(equipment.person) %>
       <%= link_to(equipment.role&.name, equipment.role) if(equipment.role) %>
     </p>
+    <% if equipment.donation_summary %>
+      <p><small class="text-muted"><%= equipment.donation_summary %></small></p>
+    <% end %>
     <div class="d-flex flex-wrap">
       <% equipment&.tags.each do |tag| %>
         <%= render tag %>

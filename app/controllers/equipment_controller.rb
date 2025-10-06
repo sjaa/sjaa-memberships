@@ -74,18 +74,19 @@ class EquipmentController < ApplicationController
     @query_params.delete(:authenticity_token)
     @query_params.delete(:submit)
     @query_params.select!{|k,v| v.present?}
-    @query_params = @query_params.permit(:kind_name, :model_name, :person_id, :group_id, :note, :role_id, :tag_operation, tags: [])
+    @query_params = @query_params.permit(:kind_name, :model_name, :person_id, :group_id, :note, :role_id, :tag_operation, :view_mode, tags: [])
     qp = @query_params
     qp[:tags] = qp[:tags]&.map(&:strip)&.select{|t| !t.empty?}&.uniq
     logger.info("Tags: #{qp[:tags].inspect}")
-    
-    query = Equipment.all.includes(:instrument)
+
+    query = Equipment.all.includes(:instrument, :person, :role, :tags, donation_items: [:donation])
     query = query.where(instrument: {kind: qp[:kind_name]}) if(qp[:kind_name].present?)
     query = query.where(person_id: qp[:person_id]) if(qp[:person_id].present?)
     query = query.where(role_id: qp[:role_id]) if(qp[:role_id].present?)
     query = and_or_helper(Equipment, query, qp[:tag_operation], :tags, qp[:tags]) if(qp[:tags].present?)
     equipment = query.distinct(:id)
-    
+
+    @view_mode = qp[:view_mode] || 'table'
     @pagy, @equipment = pagy(equipment, limit: 40, params: @query_params.to_h)
   end
   
