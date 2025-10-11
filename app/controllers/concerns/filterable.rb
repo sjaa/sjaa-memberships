@@ -1,6 +1,7 @@
 
 module Filterable
   extend ActiveSupport::Concern
+  include Sanitizable
 
   def and_or_helper(model, query, operation, field, list)
     list.select!{|l| l.present?}
@@ -47,6 +48,7 @@ module Filterable
       qp = _qp
     end
     
+    qp = sanitize qp
     query = Person.all
     query = query.where(discord_id: qp[:discord_id]) if(qp[:discord_id].present?)
     query = query.where(Person.arel_table[:first_name].matches("%#{qp[:first_name]}%")) if(qp[:first_name].present?)
