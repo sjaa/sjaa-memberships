@@ -41,7 +41,7 @@ module Filterable
       @query_params.delete(:submit)
       @query_params.select!{|k,v| v.present?}
       @query_params = @query_params.permit(
-      :has_astrobin, :role_operation, :interest_operation, :first_name, :last_name, :email, :phone, :city, :state, :ephemeris, :active, :discord_id, interests: [], roles: []
+      :search, :has_astrobin, :role_operation, :interest_operation, :first_name, :last_name, :email, :phone, :city, :state, :ephemeris, :active, :discord_id, interests: [], roles: []
       )
       qp = @query_params.to_h
     else
@@ -49,7 +49,28 @@ module Filterable
     end
     
     qp = sanitize qp
-    query = Person.all
+
+    # Everything ORed with everything!
+    if(qp[:search].present?)
+      people = Person.arel_table
+      contacts = Contact.arel_table
+      query = Person.left_joins(:contacts)
+      terms = nil
+
+      qp[:search].split(' ').each_with_index do |term, i|
+        first_name_query = people[:first_name].matches("%#{term}%")
+        query = i == 0 ? query.where(first_name_query) : query.or(Person.where(first_name_query))
+        query = query.or(Person.where(people[:last_name].matches("%#{term}%")))
+        query = query.or(Person.where(contacts[:email].matches("%#{term}%")))
+        query = query.or(Person.where(contacts[:phone].matches("%#{term}%")))
+      end
+
+      query = query.distinct
+      logger.debug "[SEARCH] Query: #{query.to_sql}"
+    else
+      query = Person.all
+    end
+
     query = query.where(discord_id: qp[:discord_id]) if(qp[:discord_id].present?)
     query = query.where(Person.arel_table[:first_name].matches("%#{qp[:first_name]}%")) if(qp[:first_name].present?)
     query = query.where(Person.arel_table[:last_name].matches("%#{qp[:last_name]}%")) if(qp[:last_name].present?)
@@ -75,6 +96,7 @@ module Filterable
     end
     
     @active_memberships = Person.common_active_membership_query(Membership.all).group_by{|m| m.person_id}
+    #@active_memberships = query.active_members.group_by{|m| m.id}
     #@all_people = Person.where(id: query.map(&:id).uniq).includes(:donations, :memberships, :contacts, :interests, :roles)
     @all_people = query.includes(:donations, :memberships, :contacts, :interests, :roles, :astrobin)
     @totals = {total: @all_people.count}
