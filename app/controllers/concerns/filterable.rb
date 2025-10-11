@@ -98,7 +98,7 @@ module Filterable
     @active_memberships = Person.common_active_membership_query(Membership.all).group_by{|m| m.person_id}
     #@active_memberships = query.active_members.group_by{|m| m.id}
     #@all_people = Person.where(id: query.map(&:id).uniq).includes(:donations, :memberships, :contacts, :interests, :roles)
-    @all_people = query.includes(:donations, :memberships, :contacts, :interests, :roles, :astrobin)
+    @all_people = query.includes(:donations, :memberships, :interests, :roles, :astrobin, contacts: [:city, :state])
     @totals = {total: @all_people.count}
     @pagy, @people = pagy(@all_people, limit: 40, params: qp)
   end
