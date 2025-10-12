@@ -11,6 +11,7 @@ class Person < ApplicationRecord
   has_secure_password validations: false # Rethink this... maybe just force a random password when not present
   belongs_to :astrobin, optional: true
   belongs_to :referral, optional: true
+  validates :first_name, :last_name, strip: true
 
   def name
     return "#{first_name} #{last_name}"
