@@ -3,7 +3,7 @@ require 'google/api_client/client_secrets'
 class SessionsController < ApplicationController
   include Rails.application.routes.url_helpers
 
-  skip_before_action :authenticate!, only: [:login, :create, :public_login, :member_lookup, :new_member, :signup, :signup_2]
+  skip_before_action :authenticate!, only: [:login, :create, :new_member, :signup, :signup_request, :signup_response]
   GOOGLE_SCOPES = [
     'https://www.googleapis.com/auth/spreadsheets', 
     'https://www.googleapis.com/auth/admin.directory.group',
@@ -67,43 +67,63 @@ class SessionsController < ApplicationController
     end
   end
 
-  # This is here for reference
-  #  Next steps...
-  #     Create some utilities, like members@sjaa.net management
-  #     Redirect to the google_auth flow if no refresh token is found, or if it doesn't work
-  def dummy_google_scratch
-    require 'google/api_client/client_secrets'
-    # By default looks for a 'client_secrets.json' file, or can accept a path
-    client_secrets = Google::APIClient::ClientSecrets.load 
-    # Alternatively
-    cshash = JSON.parse Base64.decode64(ENV['GOOGLE_WEB_CLIENT_BASE64'])
-    client_secrets = Google::APIClient::ClientSecrets.new cshash
-
-    # Get the auth object
-    auth = client_secrets.to_authorization
-    # Set the code and fetch tokens
-    auth.code = code # From oauth callback
-    auth.fetch_access_token!
-    # OR set the tokens if you have them stored already
-    auth.refresh_token = refresh_token
-
-    # Get a client from googleapis
-    client = Google::Apis::AdminDirectoryV1::DirectoryService.new
-    client.authorization = auth
-    ret = client.list_members('members@sjaa.net')
-    # list_members, insert_member, delete_member, etc
-  end
-
-  def forgot_password
-  end
-
-  def member_login
-  end
-
+  # Renders the sign-up form
   def signup
   end
 
-  def signup_2
+  # Handle the sign up request
+  def signup_request
+    # Check for duplicates
+    user = Admin.find_by(email: params[:email]) || Person.find_by_email(params[:email])
+
+    if(user)
+      redirect_to login_path, alert: "The email address #{params[:email]} is already registered.  Please log in or reset your password to continue."
+      return
+    end
+
+    # Make sure all fields are filled out
+    unless(params[:email].present? && params[:first_name].present? && params[:last_name].present?  && params[:password].present?)
+      redirect_to signup_path, alert: "Please fill in *all* fields."
+      return
+    end
+
+    # Generate encrypted token
+    token = SignupToken.encode(
+      first_name: login_params[:first_name],
+      last_name: login_params[:last_name],
+      email: login_params[:email],
+      password: login_params[:password],
+      expires_at: DateTime.now + 24.hours
+    )
+
+    # Email it out to the person
+    AccountMailer.new_person(login_params[:email], token).deliver_now
+    redirect_to login_path, notice: "Please check your email to complete signup"
+  end
+
+  # Handle the sign up response
+  def signup_response
+    # Verify and decode
+    data = SignupToken.decode(params[:token])
+
+    if(data.nil?)
+      redirect_to login_path, alert: "Confirmation token was corrupted.  Please try signing up again."
+      return
+    end
+
+    logger.debug "Decrypted data: #{data.inspect}"
+    if(DateTime.now > data['expires_at'])
+      redirect_to login_path, alert: "Confirmation token has expired.  Please try signing up again, and confirm your email within 24 hours."
+      return
+    end
+
+    # Create account
+    person = Person.create(first_name: data['first_name'], last_name: data['last_name'], password: data['password'])
+    person.contacts << Contact.create(email: data['email'])
+
+    # Create session (log in)
+    session[:person_id] = person.id
+    redirect_to membership_renewal_path(id: person.id), notice: 'Your password has been set and email confirmed!  Please complete the payment process below to activate your membership.'
   end
 
   # Form handling from login
@@ -143,7 +163,7 @@ class SessionsController < ApplicationController
   private
 
   def login_params
-    params.permit(:email, :password)
+    params.permit(:email, :password, :first_name, :last_name)
   end
 
 end

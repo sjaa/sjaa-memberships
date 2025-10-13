@@ -3,11 +3,11 @@ class SessionPolicy < ApplicationPolicy
     true
   end
 
-  def public_login?
+  def signup_request?
     true
   end
 
-  def member_lookup?
+  def signup_response?
     true
   end
 

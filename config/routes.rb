@@ -6,6 +6,8 @@ Rails.application.routes.draw do
   get '/reports/renewal_reminders', to: 'reports#renewal_reminders', as: :renewal_reminders
   get '/reports/ephemeris', to: 'reports#ephemeris', as: :ephemeris_report
   get '/signup', to: 'sessions#signup', as: :signup
+  post '/signup_request', to: 'sessions#signup_request', as: :signup_request
+  get '/confirm_email/:token', to: 'sessions#signup_response', as: :signup_response
   
   get '/people/remind_all', to: 'people#remind_all', as: :remind_all
   get '/people/:id/new_membership', to: 'people#new_membership', as: :membership_renewal
@@ -24,7 +26,6 @@ Rails.application.routes.draw do
   post '/roles/add_person', to: 'roles#add_person', as: :roles_add_person
   
   post '/password_resets/:id', to: 'password_resets#update', as: :password_reset_form
-  get '/post_signup', to: 'password_resets#signup', as: :post_signup
   resources :password_resets, only: [:new, :create, :edit, :update]
   resources :donation_phases
   resources :donation_items
@@ -81,7 +82,6 @@ Rails.application.routes.draw do
   get '/google/callback', to: 'sessions#google_oauth2_callback', as: :google_callback
   get '/login', to: 'sessions#login', as: :login
   get '/logout', to: 'sessions#destroy', as: :logout
-  #get '/member_login', to: 'sessions#public_login', as: :public_login
   post '/member_lookup', to: 'sessions#member_lookup', as: :member_lookup
   post '/new_member', to: 'sessions#new_member', as: :new_member
   get '/unauthorized', to: 'static_pages#unauthorized', as: :unauthorized

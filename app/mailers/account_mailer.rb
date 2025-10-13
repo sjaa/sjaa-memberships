@@ -8,10 +8,9 @@ class AccountMailer < ApplicationMailer
     mail(to: @user.email, subject: '[SJAA] Password Reset Instructions')
   end
 
-  def new_person(person)
-    @person = person
-    @url = edit_password_reset_url(person.reset_password_token, signup: true)
-    mail(to: @person.email, subject: '[SJAA] Please Confirm Your Email Address')
+  def new_person(email, token)
+    @url = signup_response_url(token)
+    mail(to: email, subject: '[SJAA] Please Confirm Your Email Address')
   end
 
   def sample()
