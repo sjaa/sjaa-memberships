@@ -31,7 +31,7 @@ class ExistingMemberRenewalFlowTest < ApplicationSystemTestCase
     end
     
     # Login as the person
-    login_as_person(@person)
+    login_as(@person.email, 'password123')
   end
 
   test "existing member can access renewal page" do
@@ -244,11 +244,6 @@ class ExistingMemberRenewalFlowTest < ApplicationSystemTestCase
   end
 
   private
-
-  def login_as_person(person)
-    # Simulate logged in session
-    page.set_rack_session(person_id: person.id)
-  end
 
   def setup_successful_paypal_mocks
     # Mock successful PayPal responses

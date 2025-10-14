@@ -25,7 +25,7 @@ rails server                     # Start development server (port 3000)
 ### Testing
 ```bash
 # Run tests through Docker container
-docker container exec -it sjaa-memberships-app-1 bin/rails test                        # Run all tests
+docker container exec -it sjaa-memberships-app-1 bin/rails test:all                    # Run all tests
 docker container exec -it sjaa-memberships-app-1 bin/rails test test/models/           # Run model tests only
 docker container exec -it sjaa-memberships-app-1 bin/rails test test/controllers/      # Run controller tests only
 docker container exec -it sjaa-memberships-app-1 bin/rails test test/system/           # Run system tests only

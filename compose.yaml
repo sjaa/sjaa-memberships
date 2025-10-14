@@ -25,6 +25,9 @@ services:
   app:
     image: ruby
     platform: linux/amd64
+    tmpfs:
+      - /tmp
+    shm_size: '2gb'
     environment:
       DATABASE_HOST: db
       DATABASE_USER: root

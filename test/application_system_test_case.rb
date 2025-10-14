@@ -4,26 +4,47 @@ require "capybara/minitest"
 
 class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   # Try rack_test first, fall back to Chrome if needed
-  if ENV['SYSTEM_TEST_DRIVER'] == 'chrome'
-    driven_by :selenium, using: :headless_chrome, screen_size: [1400, 1400] do |driver_option|
-      driver_option.add_argument('--headless=new')
-      driver_option.add_argument('--no-sandbox')
-      driver_option.add_argument('--disable-dev-shm-usage')
-      driver_option.add_argument('--disable-gpu')
-      driver_option.add_argument('--window-size=1400,1400')
-      driver_option.add_argument('--user-data-dir=/tmp/chrome-test-profile-' + SecureRandom.hex(8))
-      driver_option.add_argument('--disable-extensions')
-      driver_option.add_argument('--disable-plugins')
-      driver_option.add_argument('--disable-images')
-      driver_option.add_argument('--memory-pressure-off')
-    end
-  else
-    driven_by :rack_test
+  #if ENV['SYSTEM_TEST_DRIVER'] == 'chrome'
+   #driven_by :selenium, using: :headless_chrome, screen_size: [1400, 1400] do |driver_option|
+   #  driver_option.add_argument('--headless=new')
+   #  driver_option.add_argument('--no-sandbox')
+   #  driver_option.add_argument('--disable-dev-shm-usage')
+   #  driver_option.add_argument('--disable-gpu')
+   #  driver_option.add_argument('--window-size=1400,1400')
+   #  driver_option.add_argument('--user-data-dir=/tmp/chrome-test-profile-' + SecureRandom.hex(8))
+   #  driver_option.add_argument('--disable-extensions')
+   #  driver_option.add_argument('--disable-plugins')
+   #  driver_option.add_argument('--disable-images')
+   #  driver_option.add_argument('--memory-pressure-off')
+   #end
+  #else
+    #driven_by :rack_test
+  #end
+
+  #driven_by :selenium_chrome_headless
+  #driven_by :selenium, using: :chromium, screen_size: [1400, 1400]
+
+  driven_by :selenium, using: :headless_chrome, screen_size: [1400, 1400] do |driver_options|
+    driver_options.binary = '/usr/bin/chromium'  # Point to chromium binary
+    driver_options.add_argument('--no-sandbox')
+    driver_options.add_argument('--disable-dev-shm-usage')
   end
 
   # Setup any system test helpers here
   def setup
     setup_test_constants
+  end
+
+  def login_as(email, password)
+    # Login through the web interface
+    visit '/login'
+    fill_in 'email', with: email
+    fill_in 'password', with: password
+    click_button 'Login'
+
+    # Debug: See where we ended up
+    puts "Current path after login: #{current_path}"
+    assert page.has_content?('Successful login!'), "Login failed!"
   end
 
   private
