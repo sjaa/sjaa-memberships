@@ -6,7 +6,6 @@ class ExistingMemberRenewalFlowTest < ApplicationSystemTestCase
       first_name: "John",
       last_name: "Doe", 
       password: "password123",
-      signup_completed: true
     )
     
     @contact = Contact.create!(

@@ -28,7 +28,6 @@ class NewMemberSignupFlowTest < ApplicationSystemTestCase
     # Simulate following password reset link from email
     person = Person.find_by(first_name: "Jane", last_name: "Smith")
     assert_not_nil person
-    assert_equal false, person.signup_completed
     assert_not_nil person.reset_password_token
     
     visit edit_password_reset_path(person.reset_password_token, signup: true)
@@ -42,11 +41,7 @@ class NewMemberSignupFlowTest < ApplicationSystemTestCase
     assert_text "Your password has been set!"
     assert_text "Please complete the payment process"
     assert_current_path membership_renewal_path(id: person.id)
-    
-    # Verify person is marked as signup completed
-    person.reload
-    assert_equal true, person.signup_completed
-    
+
     # Verify session is set
     assert_equal person.id, page.get_rack_session[:person_id]
   end
@@ -57,7 +52,6 @@ class NewMemberSignupFlowTest < ApplicationSystemTestCase
       first_name: "John",
       last_name: "Doe", 
       password: "password123",
-      signup_completed: true
     )
     Contact.create!(
       email: "john@example.com",
@@ -82,7 +76,6 @@ class NewMemberSignupFlowTest < ApplicationSystemTestCase
     person = Person.create!(
       first_name: "Jane",
       last_name: "Smith",
-      signup_completed: true,
       password: "password123"
     )
     Contact.create!(
@@ -109,7 +102,6 @@ class NewMemberSignupFlowTest < ApplicationSystemTestCase
     person = Person.create!(
       first_name: "Jane",
       last_name: "Smith", 
-      signup_completed: true,
       password: "password123"
     )
     Contact.create!(
@@ -141,7 +133,6 @@ class NewMemberSignupFlowTest < ApplicationSystemTestCase
     person = Person.create!(
       first_name: "Life",
       last_name: "Member",
-      signup_completed: true, 
       password: "password123"
     )
     Contact.create!(
@@ -178,7 +169,6 @@ class NewMemberSignupFlowTest < ApplicationSystemTestCase
     person = Person.create!(
       first_name: "Jane",
       last_name: "Smith",
-      signup_completed: false
     )
     
     visit post_signup_path(person_id: person.id)
@@ -191,7 +181,6 @@ class NewMemberSignupFlowTest < ApplicationSystemTestCase
     person = Person.create!(
       first_name: "Jane", 
       last_name: "Smith",
-      signup_completed: false
     )
     person.generate_password_reset_token!
     

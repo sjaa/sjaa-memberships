@@ -18,7 +18,6 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
       first_name: 'Jane',
       last_name: 'Smith',
       password: 'password123',
-      signup_completed: true
     )
 
     @contact = Contact.create!(

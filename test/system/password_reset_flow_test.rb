@@ -12,7 +12,6 @@ class PasswordResetFlowTest < ApplicationSystemTestCase
     @person = Person.create!(
       first_name: "John",
       last_name: "Doe",
-      signup_completed: true,
       password: "password123"
     )
     

@@ -7,7 +7,6 @@ class PersonTest < ActiveSupport::TestCase
       first_name: 'John',
       last_name: 'Doe',
       password: 'password123',
-      signup_completed: true,
       referral: @referral
     )
     @contact = Contact.create!(
@@ -52,16 +51,6 @@ class PersonTest < ActiveSupport::TestCase
   test 'find_by_email returns nil for non-existent email' do
     found_person = Person.find_by_email('nonexistent@example.com')
     assert_nil found_person
-  end
-
-  test 'incomplete signup person has signup_completed false' do
-    incomplete_person = Person.create!(
-      first_name: 'Jane',
-      last_name: 'Smith',
-      signup_completed: false
-    )
-    
-    assert_not incomplete_person.signup_completed
   end
 
   test 'person status reflects membership status' do
