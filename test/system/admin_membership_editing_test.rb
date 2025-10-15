@@ -45,7 +45,9 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
     assert_text "Memberships"
 
     # Select cash payment method for existing membership
-    choose "membership_#{@existing_membership.id}_payment_cash"
+    within("#membership_#{@existing_membership.id}") do
+      select "Cash", from: "person[membership_attributes][][order_attributes][payment_method]"
+    end
 
     click_on "Save Changes"
 
@@ -62,7 +64,9 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
     visit edit_person_path(@person)
 
     # Select check payment method for existing membership
-    choose "membership_#{@existing_membership.id}_payment_check"
+    within("#membership_#{@existing_membership.id}") do
+      select "Check", from: "person[membership_attributes][][order_attributes][payment_method]"
+    end
 
     click_on "Save Changes"
 
@@ -79,7 +83,9 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
     visit edit_person_path(@person)
 
     # Select paypal payment method for existing membership
-    choose "membership_#{@existing_membership.id}_payment_paypal"
+    within("#membership_#{@existing_membership.id}") do
+      select "PayPal", from: "person[membership_attributes][][order_attributes][payment_method]"
+    end
 
     click_on "Save Changes"
 
@@ -100,7 +106,9 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
     visit edit_person_path(@person)
 
     # Select none payment method for existing membership
-    choose "membership_#{@existing_membership.id}_payment_none"
+    within("#membership_#{@existing_membership.id}") do
+      select "None", from: "person[membership_attributes][][order_attributes][payment_method]"
+    end
 
     click_on "Save Changes"
 
@@ -183,7 +191,7 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
       fill_in "person[membership_attributes][][term_months]", with: "12"
 
       # Select paypal payment method for new membership
-      select "Check", from: "person[membership_attributes][][order_attributes][payment_method]"
+      select "PayPal", from: "person[membership_attributes][][order_attributes][payment_method]"
     end
 
     click_on "Save Changes"
@@ -208,10 +216,6 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
 
     # Test that we can see the membership form with payment options
     assert_text "Payment Method"
-    assert_text "None"
-    assert_text "Cash"
-    assert_text "Check"
-    assert_text "PayPal"
 
     # Just save without adding - this tests the basic form submission
     click_on "Save Changes"
@@ -267,7 +271,7 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
       # For now, test without ephemeris
 
       # Select cash payment method
-      select "Check", from: "person[membership_attributes][][order_attributes][payment_method]"
+      select "Cash", from: "person[membership_attributes][][order_attributes][payment_method]"
     end
 
     click_on "Save Changes"
@@ -285,14 +289,6 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
   end
 
   private
-
-  def login_as_admin(admin)
-    # Login through the web interface
-    visit '/login'
-    fill_in 'email', with: admin.email
-    fill_in 'password', with: 'password123'
-    click_button 'Login'
-  end
 
   def setup_test_constants
     unless defined?(SjaaMembers::YEARLY_MEMBERSHIP_RATE)

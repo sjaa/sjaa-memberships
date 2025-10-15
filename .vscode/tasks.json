@@ -91,6 +91,77 @@
       }
     },
     {
+      "label": "Run System Tests",
+      "type": "shell",
+      "command": "docker",
+      "args": [
+        "container", "exec", "sjaa-memberships-app-1",
+        "bin/rails", "test", "test/system/", "--verbose"
+      ],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new",
+        "showReuseMessage": true,
+        "clear": true
+      },
+      "problemMatcher": {
+        "owner": "ruby",
+        "fileLocation": ["relative", "/rails"],
+        "pattern": [
+          {
+            "regexp": "^(.*):(\\d+):in `.*': (.*)$",
+            "file": 1,
+            "line": 2,
+            "message": 3
+          },
+          {
+            "regexp": "^Failure:\\s*(.*)\\[(.*?):(\\d+)\\]:$",
+            "file": 2,
+            "line": 3,
+            "message": 1
+          }
+        ]
+      }
+    },
+    {
+      "label": "Run Single System Test",
+      "type": "shell",
+      "command": "docker",
+      "args": [
+        "container", "exec", "sjaa-memberships-app-1",
+        "bin/rails", "test", "${relativeFile}", "--verbose"
+      ],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new",
+        "clear": true
+      },
+      "problemMatcher": {
+        "owner": "ruby",
+        "fileLocation": ["relative", "/rails"],
+        "pattern": [
+          {
+            "regexp": "^(.*):(\\d+):in `.*': (.*)$",
+            "file": 1,
+            "line": 2,
+            "message": 3
+          },
+          {
+            "regexp": "^Failure:\\s*(.*)\\[(.*?):(\\d+)\\]:$",
+            "file": 2,
+            "line": 3,
+            "message": 1
+          }
+        ]
+      }
+    },
+    {
       "label": "Rails Console",
       "type": "shell",
       "command": "docker",
