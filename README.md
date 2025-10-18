@@ -43,6 +43,22 @@ Docker containers must be running if using Docker.  Otherwise, just run:
 bundle exec rails test --verbose 
 ```
 
+# Docker Releases
+
+## How to Release
+
+Option 1: Git Tags (Automatic)
+
+```bash
+  git tag v1.0.0
+  git push origin v1.0.0
+```
+
+Option 2: Manual Trigger
+
+* Go to GitHub Actions → "Build and Release Docker Image" → "Run workflow"
+* Users will get your app via: docker pull ghcr.io/sjaa/sjaa-memberships:v1.0.0
+
 # Debugs
 
 ## Postgres docker doesn't build
