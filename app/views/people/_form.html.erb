@@ -156,6 +156,21 @@
         </div>
       </div>
     </div>
+
+    <!-- Permissions (only for users with "permit" permission) -->
+    <% if @user.has_permission?(:permit) %>
+      <div class="row mt-4 pb-4 pt-2">
+        <div class="col-12">
+          <h2 class="p-2 bg-body-secondary">Permissions</h2>
+          <p>
+            <small class="form-text text-muted">
+              Assign specific permissions to this member. These control what actions they can perform in the system.
+            </small>
+          </p>
+          <%= render partial: 'layouts/combobox', locals: {field: :permissions, objects: person.permissions, name: :name, value: :id, form_field_id: 'person[permission_attributes]', select_values: Permission.all, allow_new: false} %>
+        </div>
+      </div>
+    <% end %>
   <% end %>
 
   <!-- Contacts -->

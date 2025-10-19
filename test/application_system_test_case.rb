@@ -43,7 +43,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     click_button 'Login'
 
     # Debug: See where we ended up
-    puts "Current path after login: #{current_path}"
+    #puts "Current path after login: #{current_path}"
     assert page.has_content?('Successful login!'), "Login failed!"
   end
 

@@ -91,12 +91,12 @@
       }
     },
     {
-      "label": "Run System Tests",
+      "label": "Run All Tests",
       "type": "shell",
       "command": "docker",
       "args": [
-        "container", "exec", "sjaa-memberships-app-1",
-        "bin/rails", "test", "test/system/", "--verbose"
+        "compose", "run", "--rm", "app",
+        "bin/rails", "test:all", "--verbose"
       ],
       "group": "test",
       "presentation": {
@@ -127,19 +127,20 @@
       }
     },
     {
-      "label": "Run Single System Test",
+      "label": "Run System Tests",
       "type": "shell",
       "command": "docker",
       "args": [
-        "container", "exec", "sjaa-memberships-app-1",
-        "bin/rails", "test", "${relativeFile}", "--verbose"
+        "compose", "run", "--rm", "app",
+        "bin/rails", "test", "test/system/", "--verbose"
       ],
       "group": "test",
       "presentation": {
         "echo": true,
         "reveal": "always",
-        "focus": true,
+        "focus": false,
         "panel": "new",
+        "showReuseMessage": true,
         "clear": true
       },
       "problemMatcher": {

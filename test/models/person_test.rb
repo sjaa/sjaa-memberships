@@ -358,4 +358,88 @@ class PersonTest < ActiveSupport::TestCase
     assert_includes @person.roles, role2
     assert_includes @person.roles, role3
   end
+
+  # Permission-related tests
+  test 'person can be assigned permissions' do
+    permission = Permission.create!(name: 'verify_members')
+    @person.permissions << permission
+
+    assert_equal 1, @person.permissions.count
+    assert_includes @person.permissions, permission
+  end
+
+  test 'has_permission? returns true for assigned permissions' do
+    permission = Permission.create!(name: 'verify_members')
+    @person.permissions << permission
+
+    assert @person.has_permission?('verify_members')
+    assert @person.has_permission?(:verify_members)
+  end
+
+  test 'has_permission? returns false for unassigned permissions' do
+    assert_not @person.has_permission?('verify_members')
+    assert_not @person.has_permission?(:verify_members)
+  end
+
+  test 'permission_attributes= assigns permissions correctly' do
+    read_permission = Permission.create!(name: 'read')
+    write_permission = Permission.create!(name: 'write')
+    verify_permission = Permission.create!(name: 'verify_members')
+
+    @person.permission_attributes = [read_permission.id, verify_permission.id]
+
+    assert_equal 2, @person.permissions.count
+    assert_includes @person.permissions, read_permission
+    assert_includes @person.permissions, verify_permission
+    assert_not_includes @person.permissions, write_permission
+  end
+
+  test 'permission_attributes= replaces existing permissions' do
+    read_permission = Permission.create!(name: 'read')
+    write_permission = Permission.create!(name: 'write')
+    verify_permission = Permission.create!(name: 'verify_members')
+
+    # Set initial permissions
+    @person.permissions << [read_permission, write_permission]
+    assert_equal 2, @person.permissions.count
+
+    # Replace with different permissions
+    @person.permission_attributes = [verify_permission.id]
+
+    assert_equal 1, @person.permissions.count
+    assert_includes @person.permissions, verify_permission
+    assert_not_includes @person.permissions, read_permission
+    assert_not_includes @person.permissions, write_permission
+  end
+
+  test 'permission_attributes= handles empty array' do
+    permission = Permission.create!(name: 'verify_members')
+    @person.permissions << permission
+    assert_equal 1, @person.permissions.count
+
+    @person.permission_attributes = []
+
+    assert_equal 0, @person.permissions.count
+  end
+
+  test 'permission_attributes= ignores invalid permission IDs' do
+    valid_permission = Permission.create!(name: 'verify_members')
+
+    @person.permission_attributes = [valid_permission.id, 99999]
+
+    assert_equal 1, @person.permissions.count
+    assert_includes @person.permissions, valid_permission
+  end
+
+  # Verification-related method tests
+  test 'find_by_email is case sensitive' do
+    # Test with exact case
+    found_person = Person.find_by_email(@contact.email)
+    assert_equal @person, found_person
+
+    # Test with different case - should return nil (case sensitive)
+    found_person = Person.find_by_email(@contact.email.upcase)
+    assert_nil found_person
+  end
+
 end

@@ -1,0 +1,36 @@
+<div class="row">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">
+          <% if verification_result[:valid] %>
+            <i class="bi bi-check-circle-fill text-success"></i>
+            <%= verification_result[:message] %>
+          <% else %>
+            <i class="bi bi-x-circle-fill text-danger"></i>
+            <%= verification_result[:message] %>
+          <% end %>
+        </h5>
+
+        <% if verification_result[:expires] %>
+          <p class="card-text">
+            <% if verification_result[:valid] %>
+              <strong>Membership expires:</strong> <%= verification_result[:expires] %>
+            <% else %>
+              <strong>Expired:</strong> <%= verification_result[:expires] %>
+            <% end %>
+          </p>
+        <% end %>
+
+        <% if verification_result[:timestamp] %>
+          <p class="card-text">
+            <small class="text-muted">
+              <i class="bi bi-clock"></i>
+              Verified on <%= verification_result[:timestamp] %>
+            </small>
+          </p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

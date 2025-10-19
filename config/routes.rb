@@ -11,6 +11,8 @@ Rails.application.routes.draw do
   
   get '/people/remind_all', to: 'people#remind_all', as: :remind_all
   get '/people/:id/new_membership', to: 'people#new_membership', as: :membership_renewal
+  get '/people/verify', to: 'people#verify_form', as: :verify_membership_form
+  post '/people/verify', to: 'people#verify', as: :verify_membership
   post '/memberships/order', to: 'memberships#create_order', as: :membership_order
   post '/memberships/capture_order', to: 'memberships#capture_order', as: :membership_capture_order
   
