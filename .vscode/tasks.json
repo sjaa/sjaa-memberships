@@ -166,7 +166,7 @@
       "type": "shell",
       "command": "docker",
       "args": [
-        "container", "exec", "-it", "sjaa-memberships-app-1",
+        "compose", "run", "--rm", "app",
         "env", "RUBYOPT=-W0",
         "bin/rails", "console"
       ],
