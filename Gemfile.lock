@@ -274,7 +274,7 @@ GEM
       activesupport (>= 3.0.0)
     raabro (1.4.0)
     racc (1.8.1)
-    rack (3.2.0)
+    rack (3.2.3)
     rack-session (2.1.1)
       base64 (>= 0.1.0)
       rack (>= 3.0.0)
@@ -323,7 +323,7 @@ GEM
       trailblazer-option (>= 0.1.1, < 0.2.0)
       uber (< 0.2.0)
     retriable (3.1.2)
-    rexml (3.4.0)
+    rexml (3.4.4)
     ruby-vips (2.2.4)
       ffi (~> 1.12)
       logger
@@ -413,9 +413,10 @@ DEPENDENCIES
   pstore
   puma (>= 5.0)
   pundit
-  rack (>= 3.1.14)
+  rack (>= 3.2.3)
   rack-session (>= 2.1.1)
   rails (~> 7.1.5.2)
+  rexml (>= 3.4.2)
   selenium-webdriver
   solid_queue (= 1.1.0)
   stimulus-rails
