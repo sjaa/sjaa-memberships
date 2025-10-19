@@ -28,8 +28,8 @@ RUN apt-get update -qq && \
 
 # Install application gems
 COPY Gemfile Gemfile.lock ./
-RUN --mount=type=cache,target=/tmp/bundle-cache \
-    bundle config set --local deployment 'true' && \
+RUN --mount=type=cache,target=/tmp/bundle-cache,sharing=locked \
+    bundle config set --local deployment 'false' && \
     bundle config set --local without 'development test' && \
     bundle config set --local cache_path '/tmp/bundle-cache' && \
     bundle install --jobs 4 --retry 3 && \
@@ -40,9 +40,7 @@ RUN --mount=type=cache,target=/tmp/bundle-cache \
 COPY . .
 
 # Precompile bootsnap code for faster boot times
-RUN --mount=type=cache,target=/tmp/bundle-cache \
-    bundle config set --local cache_path '/tmp/bundle-cache' && \
-    bundle exec bootsnap precompile app/ lib/
+RUN bundle exec bootsnap precompile app/ lib/
 
 # Precompiling assets for production without requiring secret RAILS_MASTER_KEY
 RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
