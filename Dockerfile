@@ -2,7 +2,7 @@
 
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version and Gemfile
 ARG RUBY_VERSION=3.4.1
-FROM registry.docker.com/library/ruby:$RUBY_VERSION-slim as base
+FROM registry.docker.com/library/ruby:$RUBY_VERSION-slim AS base
 
 # Rails app lives here
 WORKDIR /rails
@@ -14,7 +14,7 @@ ENV RAILS_ENV="production" \
     BUNDLE_WITHOUT="development:test"
 
 # Throw-away build stage to reduce size of final image
-FROM base as build
+FROM base AS build
 
 # Install packages needed to build gems
 RUN apt-get update -qq && \
@@ -28,9 +28,10 @@ RUN apt-get update -qq && \
 
 # Install application gems
 COPY Gemfile Gemfile.lock ./
-RUN --mount=type=cache,target=/usr/local/bundle \
+RUN --mount=type=cache,target=/tmp/bundle-cache \
     bundle config set --local deployment 'true' && \
     bundle config set --local without 'development test' && \
+    bundle config set --local cache_path '/tmp/bundle-cache' && \
     bundle install --jobs 4 --retry 3 && \
     rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
     bundle exec bootsnap precompile --gemfile
@@ -39,7 +40,9 @@ RUN --mount=type=cache,target=/usr/local/bundle \
 COPY . .
 
 # Precompile bootsnap code for faster boot times
-RUN bundle exec bootsnap precompile app/ lib/
+RUN --mount=type=cache,target=/tmp/bundle-cache \
+    bundle config set --local cache_path '/tmp/bundle-cache' && \
+    bundle exec bootsnap precompile app/ lib/
 
 # Precompiling assets for production without requiring secret RAILS_MASTER_KEY
 RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
