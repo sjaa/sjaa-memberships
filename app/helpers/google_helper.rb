@@ -1,8 +1,8 @@
 require 'google/api_client/client_secrets'
 
 module GoogleHelper
-  MEMBERS_GROUP = 'members@sjaa.net'
-  REMOVE_GROUP = 'expired-members@sjaa.net'
+  MEMBERS_GROUP = ENV.fetch('GOOGLE_MEMBERS_GROUP', 'membership-app-test-group@sjaa.net')
+  REMOVE_GROUP = ENV.fetch('GOOGLE_REMOVE_GROUP', 'expired-members@sjaa.net')
 
   def get_auth(user)
     # Make sure there's a valid refresh token available
