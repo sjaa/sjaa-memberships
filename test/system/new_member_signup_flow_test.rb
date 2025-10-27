@@ -173,6 +173,53 @@ class NewMemberSignupFlowTest < ApplicationSystemTestCase
     assert_current_path signup_path
   end
 
+  test "clicking confirmation link twice does not create duplicate person" do
+    visit signup_path
+
+    # Fill out signup form
+    fill_in "first_name", with: "Bob"
+    fill_in "last_name", with: "Jones"
+    fill_in "email", with: "bob@example.com"
+    fill_in "password", with: "password123"
+    click_on "Sign Up"
+
+    # Should redirect to login page with notice
+    assert_text "Please check your email to complete signup"
+    assert_current_path login_path
+
+    # Create token for confirmation
+    token = SignupToken.encode(
+      first_name: "Bob",
+      last_name: "Jones",
+      email: "bob@example.com",
+      password: "password123",
+      expires_at: DateTime.now + 1.hour
+    )
+
+    # Click confirmation link first time
+    visit signup_response_path(token: token)
+
+    # Should create person and redirect to membership renewal
+    assert_text "Your password has been set and email confirmed!"
+    person = Person.find_by(first_name: "Bob", last_name: "Jones")
+    assert_not_nil person
+    assert_current_path membership_renewal_path(id: person.id)
+
+    # Log out
+    visit logout_path
+
+    # Click confirmation link again (simulate duplicate click)
+    visit signup_response_path(token: token)
+
+    # Should redirect to login with error message, not create duplicate
+    assert_text "already exists"
+    assert_text "Please log in to continue"
+    assert_current_path login_path
+
+    # Verify only one person was created
+    assert_equal 1, Person.where(first_name: "Bob", last_name: "Jones").count
+  end
+
 
 
   private

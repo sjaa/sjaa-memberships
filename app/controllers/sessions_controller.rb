@@ -117,6 +117,13 @@ class SessionsController < ApplicationController
       return
     end
 
+    # Check if person already exists with this email
+    existing_person = Person.find_by_email(data['email'])
+    if existing_person
+      redirect_to login_path, alert: "An account with the email #{data['email']} already exists. Please log in to continue."
+      return
+    end
+
     # Create account
     person = Person.create(first_name: data['first_name'], last_name: data['last_name'], password: data['password'])
     person.contacts << Contact.create(email: data['email'])
