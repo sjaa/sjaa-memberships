@@ -9,20 +9,24 @@
     </p>
   </div>
 </div>
-<%= form_with(url: password_resets_path, local: true) do |form| %>
+<%= form_with(url: signup_request_path, local: true) do |form| %>
   <div class="row">
     <%= form.hidden_field :signup, value: true %>
-    <div class="col-6">
-      <%= form.label :first_name, class: 'form-label' %>
+    <div class="col-md-6 mt-2">
+      <%= form.label :first_name, "First Name", class: 'form-label' %>
       <%= form.text_field :first_name, class: 'form-control' %>
     </div>
-    <div class="col-6">
-      <%= form.label :last_name, class: 'form-label' %>
+    <div class="col-md-6 mt-2">
+      <%= form.label :last_name, "Last Name", class: 'form-label' %>
       <%= form.text_field :last_name, class: 'form-control' %>
     </div>
-    <div class="col-12 mt-2">
+    <div class="col-md-6 mt-2">
       <%= form.label :email, class: 'form-label' %>
       <%= form.email_field :email, class: 'form-control' %>
+    </div>
+    <div class="col-md-6 mt-2">
+      <%= form.label :password, class: 'form-label' %>
+      <%= form.password_field :password, class: 'form-control' %>
     </div>
     <div class="col-12 mt-2">
     <%= form.submit 'Sign Up', class: 'btn btn-success mt-2' %>

@@ -51,6 +51,43 @@ class PeopleController < ApplicationController
     people_filter
     render turbo_stream: turbo_stream.replace('people', partial: 'index')
   end
+
+  # GET /people/verify
+  def verify_form
+    @verification_result = nil
+  end
+
+  # POST /people/verify
+  def verify
+    email = params[:email]&.strip&.downcase
+    @verification_result = { timestamp: Time.current.strftime("%B %d, %Y at %I:%M %p") }
+
+    if email.blank?
+      @verification_result[:error] = "Email address is required"
+      render :verify_form, status: :unprocessable_entity
+      return
+    end
+
+    person = Person.find_by_email(email)
+
+    if person.nil?
+      @verification_result[:valid] = false
+      @verification_result[:message] = "No member found with this email address"
+    else
+      latest_membership = person.latest_membership
+      if latest_membership&.is_active?
+        @verification_result[:valid] = true
+        @verification_result[:message] = "Valid Member"
+        @verification_result[:expires] = latest_membership.end&.strftime("%B %Y") || "Lifetime"
+      else
+        @verification_result[:valid] = false
+        @verification_result[:message] = "Membership Expired"
+        @verification_result[:expires] = latest_membership&.end&.strftime("%B %Y")
+      end
+    end
+
+    render :verify_form
+  end
   
   # GET /people/new
   def new
@@ -121,6 +158,7 @@ class PeopleController < ApplicationController
     interests_attributes: [:name, :id],
     roles_attributes: [:id],
     joinable_role_ids: [],
+    permission_attributes: [],
     contact_attributes: [:address, :zipcode, :phone, :state_id, :city_id, :city_name, :email, :primary, :person_id, :id],
     membership_attributes: [:start, :kind, :kind_id, :term_months, :new, :ephemeris, :id, :person_id, :donation_amount, :author, order_attributes: [:payment_method]],
     astrobin_attributes: [:username, :latest_image, :id])
@@ -129,10 +167,10 @@ class PeopleController < ApplicationController
   def policy_handling
     begin
       set_person
-      puts("Authorizing #{@person.inspect}")
+      #puts("Authorizing #{@person.inspect}")
       authorize @person, policy_class: PersonPolicy
     rescue => e
-      puts("Person not set! #{e.message}")
+      #puts("Person not set! #{e.message}")
       authorize self.class, policy_class: PersonPolicy
     end
   end

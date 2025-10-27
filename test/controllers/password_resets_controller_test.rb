@@ -10,7 +10,6 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
     @person = Person.create!(
       first_name: "John",
       last_name: "Doe",
-      signup_completed: true,
       password: "password123"
     )
     
@@ -51,47 +50,11 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Password reset email has been sent.", flash[:notice]
   end
 
-  test "should create new person for signup with password reset" do
-    new_email = "newuser@example.com"
-    
-    assert_difference "Person.count", 1 do
-      assert_difference "Contact.count", 1 do
-        assert_emails 1 do
-          post password_resets_path, params: {
-            email: new_email,
-            signup: "true",
-            first_name: "Jane",
-            last_name: "Smith"
-          }
-        end
-      end
-    end
-    
-    person = Person.last
-    assert_equal "Jane", person.first_name
-    assert_equal "Smith", person.last_name
-    assert_equal false, person.signup_completed
-    assert_not_nil person.reset_password_token
-    assert_redirected_to post_signup_path(person_id: person.id)
-  end
-
-  test "should reject signup for existing email" do
-    post password_resets_path, params: {
-      email: @contact.email,
-      signup: "true",
-      first_name: "Jane",
-      last_name: "Smith"
-    }
-    
-    assert_redirected_to login_path
-    assert_equal "The email #{@contact.email} is already registered.  Please log in or reset your password.", flash[:alert]
-  end
-
   test "should show error for non-existent email without signup" do
     post password_resets_path, params: { email: "nonexistent@example.com" }
     
     assert_redirected_to login_path
-    assert_equal "Email address not found.", flash[:alert]
+    assert_equal "Email address not found.  Please sign up or correct your address.", flash[:alert]
   end
 
   test "should show password reset edit form with valid token" do
@@ -150,30 +113,4 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Your password has been reset!", flash[:notice]
   end
 
-  test "should complete signup flow with password reset" do
-    new_person = Person.create!(
-      first_name: "Jane",
-      last_name: "Smith",
-      signup_completed: false
-    )
-    Contact.create!(
-      email: "jane@example.com",
-      person: new_person,
-      primary: true
-    )
-    new_person.generate_password_reset_token!
-    
-    patch password_reset_path(new_person.reset_password_token), params: {
-      password: "newpassword123",
-      signup: "true"
-    }
-    
-    new_person.reload
-    assert new_person.authenticate("newpassword123")
-    assert_nil new_person.reset_password_token
-    assert_equal true, new_person.signup_completed
-    assert_equal new_person.id, session[:person_id]
-    assert_redirected_to membership_renewal_path(id: new_person.id)
-    assert_equal "Your password has been set!  Please complete the payment process below to activate your membership.", flash[:notice]
-  end
 end

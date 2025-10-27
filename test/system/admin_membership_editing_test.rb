@@ -18,7 +18,6 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
       first_name: 'Jane',
       last_name: 'Smith',
       password: 'password123',
-      signup_completed: true
     )
 
     @contact = Contact.create!(
@@ -36,7 +35,7 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
     )
 
     # Login as admin
-    login_as_admin(@admin)
+    login_as(@admin.email, 'password123')
   end
 
   test "admin can edit person's membership and set cash payment method" do
@@ -46,7 +45,9 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
     assert_text "Memberships"
 
     # Select cash payment method for existing membership
-    choose "membership_#{@existing_membership.id}_payment_cash"
+    within("#membership_#{@existing_membership.id}") do
+      select "Cash", from: "person[membership_attributes][][order_attributes][payment_method]"
+    end
 
     click_on "Save Changes"
 
@@ -63,7 +64,9 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
     visit edit_person_path(@person)
 
     # Select check payment method for existing membership
-    choose "membership_#{@existing_membership.id}_payment_check"
+    within("#membership_#{@existing_membership.id}") do
+      select "Check", from: "person[membership_attributes][][order_attributes][payment_method]"
+    end
 
     click_on "Save Changes"
 
@@ -80,7 +83,9 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
     visit edit_person_path(@person)
 
     # Select paypal payment method for existing membership
-    choose "membership_#{@existing_membership.id}_payment_paypal"
+    within("#membership_#{@existing_membership.id}") do
+      select "PayPal", from: "person[membership_attributes][][order_attributes][payment_method]"
+    end
 
     click_on "Save Changes"
 
@@ -101,7 +106,9 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
     visit edit_person_path(@person)
 
     # Select none payment method for existing membership
-    choose "membership_#{@existing_membership.id}_payment_none"
+    within("#membership_#{@existing_membership.id}") do
+      select "None", from: "person[membership_attributes][][order_attributes][payment_method]"
+    end
 
     click_on "Save Changes"
 
@@ -121,13 +128,14 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
     click_on "Add Membership"
 
     # Fill in new membership details
-    fill_in "person[membership_attributes][][start]", with: Date.current.strftime('%Y-%m-%d')
-    fill_in "person[membership_attributes][][term_months]", with: "24"
-    fill_in "person[membership_attributes][][donation_amount]", with: "50"
+    within("#new_membership_0") do
+      fill_in "person[membership_attributes][][start]", with: Date.current.strftime('%Y-%m-%d')
+      fill_in "person[membership_attributes][][term_months]", with: "24"
+      fill_in "person[membership_attributes][][donation_amount]", with: "50"
 
-    # Select cash payment method for new membership
-    choose "person[membership_attributes][][order_attributes][payment_method]", option: "cash"
-
+      # Select cash payment method for new membership
+      select "Cash", from: "person[membership_attributes][][order_attributes][payment_method]"
+    end
     click_on "Save Changes"
 
     # Verify success
@@ -150,11 +158,13 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
     click_on "Add Membership"
 
     # Fill in new membership details
-    fill_in "person[membership_attributes][][start]", with: Date.current.strftime('%Y-%m-%d')
-    fill_in "person[membership_attributes][][term_months]", with: "12"
+    within("#new_membership_0") do
+      fill_in "person[membership_attributes][][start]", with: Date.current.strftime('%Y-%m-%d')
+      fill_in "person[membership_attributes][][term_months]", with: "12"
 
-    # Select check payment method for new membership
-    choose "person[membership_attributes][][order_attributes][payment_method]", option: "check"
+      # Select check payment method for new membership
+      select "Check", from: "person[membership_attributes][][order_attributes][payment_method]"
+    end
 
     click_on "Save Changes"
 
@@ -176,11 +186,13 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
     click_on "Add Membership"
 
     # Fill in new membership details
-    fill_in "person[membership_attributes][][start]", with: Date.current.strftime('%Y-%m-%d')
-    fill_in "person[membership_attributes][][term_months]", with: "12"
+    within("#new_membership_0") do
+      fill_in "person[membership_attributes][][start]", with: Date.current.strftime('%Y-%m-%d')
+      fill_in "person[membership_attributes][][term_months]", with: "12"
 
-    # Select paypal payment method for new membership
-    choose "person[membership_attributes][][order_attributes][payment_method]", option: "paypal"
+      # Select paypal payment method for new membership
+      select "PayPal", from: "person[membership_attributes][][order_attributes][payment_method]"
+    end
 
     click_on "Save Changes"
 
@@ -204,10 +216,6 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
 
     # Test that we can see the membership form with payment options
     assert_text "Payment Method"
-    assert_text "None"
-    assert_text "Cash"
-    assert_text "Check"
-    assert_text "PayPal"
 
     # Just save without adding - this tests the basic form submission
     click_on "Save Changes"
@@ -228,11 +236,13 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
 
     visit edit_person_path(@person)
 
-    # Verify cash is currently selected
-    assert page.has_checked_field?("membership_#{@existing_membership.id}_payment_cash")
+    within("#membership_#{@existing_membership.id}") do
+      # Verify cash is currently selected
+      assert page.has_select?("person[membership_attributes][][order_attributes][payment_method]", selected: "Cash")
 
-    # Change to check
-    choose "membership_#{@existing_membership.id}_payment_check"
+      # Change to check
+      select "Check", from: "person[membership_attributes][][order_attributes][payment_method]"
+    end
 
     click_on "Save Changes"
 
@@ -252,15 +262,17 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
     click_on "Add Membership"
 
     # Fill in new membership details with specific amounts
-    fill_in "person[membership_attributes][][start]", with: Date.current.strftime('%Y-%m-%d')
-    fill_in "person[membership_attributes][][term_months]", with: "12"
-    fill_in "person[membership_attributes][][donation_amount]", with: "25"
+    within("#new_membership_0") do
+      fill_in "person[membership_attributes][][start]", with: Date.current.strftime('%Y-%m-%d')
+      fill_in "person[membership_attributes][][term_months]", with: "12"
+      fill_in "person[membership_attributes][][donation_amount]", with: "25"
 
-    # Set ephemeris to true (this might not be easily testable without JavaScript)
-    # For now, test without ephemeris
+      # Set ephemeris to true (this might not be easily testable without JavaScript)
+      # For now, test without ephemeris
 
-    # Select cash payment method
-    choose "person[membership_attributes][][order_attributes][payment_method]", option: "cash"
+      # Select cash payment method
+      select "Cash", from: "person[membership_attributes][][order_attributes][payment_method]"
+    end
 
     click_on "Save Changes"
 
@@ -277,14 +289,6 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
   end
 
   private
-
-  def login_as_admin(admin)
-    # Login through the web interface
-    visit '/login'
-    fill_in 'email', with: admin.email
-    fill_in 'password', with: 'password123'
-    click_button 'Login'
-  end
 
   def setup_test_constants
     unless defined?(SjaaMembers::YEARLY_MEMBERSHIP_RATE)

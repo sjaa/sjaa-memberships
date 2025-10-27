@@ -1,7 +1,6 @@
 <%= turbo_frame_tag 'people' do %>
   <div class="row" data-controller="clipboard">
     <div class="col-sm-12 col-md-6 mt-2">
-      <h2>Results</h2>
       <table class="table table-hover table-striped table-sm">
         <% @totals&.each do |type, val| %>
           <tr>

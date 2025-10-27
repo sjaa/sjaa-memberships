@@ -6,6 +6,14 @@
       <span class="h4 text-secondary">
       </span>
     </h1>
+    <% unless @person.latest_membership&.is_active? %>
+      <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        Your membership is currently not active.  
+        <%= link_to "Activate your membership", membership_renewal_path(id: @person.id), class: '' %>
+        today to continue receiving the benefits of membership.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    <% end %>
     <%= link_to "Edit Personal Information", edit_person_path(@person), class: 'btn btn-primary d-inline-block' %>
     <%= render partial: 'renew_button' %>
     <br/>

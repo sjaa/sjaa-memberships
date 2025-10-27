@@ -39,3 +39,5 @@
 /db/reconcile
 
 deploy_private_key
+
+.DS_Store

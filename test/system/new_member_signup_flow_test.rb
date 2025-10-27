@@ -15,66 +15,67 @@ class NewMemberSignupFlowTest < ApplicationSystemTestCase
 
   test "new member can complete full signup flow" do
     visit signup_path
-    
+
     # Fill out signup form
     fill_in "first_name", with: "Jane"
-    fill_in "last_name", with: "Smith" 
+    fill_in "last_name", with: "Smith"
     fill_in "email", with: "jane@example.com"
+    fill_in "password", with: "newpassword123"
     click_on "Sign Up"
-    
-    # Should redirect to post signup page
-    assert_text "Please check your email"
-    
-    # Simulate following password reset link from email
+
+    # Should redirect to login page with notice
+    assert_text "Please check your email to complete signup"
+    assert_current_path login_path
+
+    # Simulate following the email confirmation link
+    # The signup creates an encrypted token, so we need to get it from the email
+    # For testing, we'll create a mock token
+    token = SignupToken.encode(
+      first_name: "Jane",
+      last_name: "Smith",
+      email: "jane@example.com",
+      password: "newpassword123",
+      expires_at: DateTime.now + 1.hour
+    )
+
+    visit signup_response_path(token: token)
+
+    # Should redirect to membership renewal with confirmation message
+    assert_text "Your password has been set and email confirmed!"
+    assert_text "Please complete the payment process"
+
+    # Verify person was created and session is set
     person = Person.find_by(first_name: "Jane", last_name: "Smith")
     assert_not_nil person
-    assert_equal false, person.signup_completed
-    assert_not_nil person.reset_password_token
-    
-    visit edit_password_reset_path(person.reset_password_token, signup: true)
-    
-    # Set password
-    assert_text "Set Your Password"
-    fill_in "password", with: "newpassword123"
-    click_on "Set Password"
-    
-    # Should redirect to membership renewal with message
-    assert_text "Your password has been set!"
-    assert_text "Please complete the payment process"
+    # Verify we're on the membership renewal page (session verification)
     assert_current_path membership_renewal_path(id: person.id)
-    
-    # Verify person is marked as signup completed
-    person.reload
-    assert_equal true, person.signup_completed
-    
-    # Verify session is set
-    assert_equal person.id, page.get_rack_session[:person_id]
   end
 
   test "new member signup handles existing email appropriately" do
     # Create existing person
     existing_person = Person.create!(
       first_name: "John",
-      last_name: "Doe", 
+      last_name: "Doe",
       password: "password123",
-      signup_completed: true
     )
     Contact.create!(
       email: "john@example.com",
       person: existing_person,
       primary: true
     )
-    
+
     visit signup_path
-    
+
     fill_in "first_name", with: "Jane"
     fill_in "last_name", with: "Smith"
     fill_in "email", with: "john@example.com"  # Use existing email
+    fill_in "password", with: "newpassword123"
     click_on "Sign Up"
-    
+
     # Should redirect to login with error message
     assert_text "already registered"
     assert_text "Please log in or reset your password"
+    assert_current_path login_path
   end
 
   test "new member can view membership renewal options" do
@@ -82,7 +83,6 @@ class NewMemberSignupFlowTest < ApplicationSystemTestCase
     person = Person.create!(
       first_name: "Jane",
       last_name: "Smith",
-      signup_completed: true,
       password: "password123"
     )
     Contact.create!(
@@ -91,12 +91,13 @@ class NewMemberSignupFlowTest < ApplicationSystemTestCase
       primary: true
     )
     
-    # Visit membership renewal page
+    # Login as the person and visit membership renewal page
+    login_as("jane@example.com", "password123")
     visit membership_renewal_path(id: person.id)
     
     # Should show membership options
-    assert_text "Membership Renewal"
-    assert_text "$75" # Base membership rate
+    assert_text "Membership Payment"
+    assert_text "Membership Fee" # Base membership rate section
     
     # Check for ephemeris option
     assert_text "Ephemeris"
@@ -109,7 +110,6 @@ class NewMemberSignupFlowTest < ApplicationSystemTestCase
     person = Person.create!(
       first_name: "Jane",
       last_name: "Smith", 
-      signup_completed: true,
       password: "password123"
     )
     Contact.create!(
@@ -118,22 +118,20 @@ class NewMemberSignupFlowTest < ApplicationSystemTestCase
       primary: true
     )
     
+    # Login as the person and visit membership renewal page
+    login_as("jane@example.com", "password123")
     visit membership_renewal_path(id: person.id)
-    
+
     # Base membership should be displayed
-    assert_text SjaaMembers::YEARLY_MEMBERSHIP_RATE.to_s
-    
-    # If ephemeris checkbox exists, check pricing update
-    if page.has_field?("ephemeris_amount")
-      fill_in "ephemeris_amount", with: SjaaMembers::EPHEMERIS_FEE.to_s
-      # Price should update (assuming JavaScript updates are testable)
-    end
-    
-    # If donation field exists
-    if page.has_field?("donation_amount")
-      fill_in "donation_amount", with: "25"
-      # Total should include donation
-    end
+    assert_text "Membership Fee"
+
+    # Check form fields with correct names
+    select "Printed +$#{SjaaMembers::EPHEMERIS_FEE}", from: "membership[ephemeris_amount]"
+    fill_in "membership[donation_amount]", with: "25"
+
+    # Verify form elements are present
+    assert_text "Extra Donation"
+    assert_text "Ephemeris"
   end
 
   test "lifetime member cannot access renewal page" do
@@ -141,7 +139,6 @@ class NewMemberSignupFlowTest < ApplicationSystemTestCase
     person = Person.create!(
       first_name: "Life",
       last_name: "Member",
-      signup_completed: true, 
       password: "password123"
     )
     Contact.create!(
@@ -157,56 +154,26 @@ class NewMemberSignupFlowTest < ApplicationSystemTestCase
       term_months: nil  # lifetime membership
     )
     
+    # Login as the lifetime member
+    login_as("life@example.com", "password123")
     visit membership_renewal_path(id: person.id)
-    
+
     assert_text "LIFETIME member"
     assert_text "no need to renew"
   end
 
   test "new member signup validates required fields" do
     visit signup_path
-    
+
     # Try to submit without required fields
     click_on "Sign Up"
-    
-    # Should show validation errors (implementation dependent)
-    # This test may need adjustment based on actual form validation
+
+    # Should redirect back to signup with error message
+    assert_text "Please fill in *all* fields"
     assert_current_path signup_path
   end
 
-  test "post signup page shows correct information" do
-    person = Person.create!(
-      first_name: "Jane",
-      last_name: "Smith",
-      signup_completed: false
-    )
-    
-    visit post_signup_path(person_id: person.id)
-    
-    assert_text "Jane"
-    assert_text "check your email"
-  end
 
-  test "password reset during signup flow sets correct redirect" do
-    person = Person.create!(
-      first_name: "Jane", 
-      last_name: "Smith",
-      signup_completed: false
-    )
-    person.generate_password_reset_token!
-    
-    visit edit_password_reset_path(person.reset_password_token, signup: true)
-    
-    # Should show signup-specific messaging
-    assert_text "Set Your Password"
-    
-    fill_in "password", with: "password123"
-    click_on "Set Password"
-    
-    # Should redirect to membership renewal, not regular profile edit
-    assert_current_path membership_renewal_path(id: person.id)
-    assert_text "complete the payment process"
-  end
 
   private
 

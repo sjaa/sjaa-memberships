@@ -35,4 +35,12 @@ class PersonPolicy < ApplicationPolicy
   def show?
     user&.has_permission?(:read) || user.id == record.id
   end
+
+  def verify?
+    user&.has_permission?(:read) || user&.has_permission?(:verify_members)
+  end
+
+  def verify_form?
+    verify?
+  end
 end

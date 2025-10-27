@@ -3,104 +3,123 @@
     <h1>People</h1>
   </div>
   <%= form_with url: people_search_path, data: {controller: "search-form", search_form_target: "form", turbo_frame: 'people'} do |f| %>
-    <div class="row">
-      <div class="col-xs-12 mb-3">
-        <h2>Filters</h2>
-        <div class="input-group">
-          <%= f.text_field :first_name, placeholder: 'First Name', value: @query_params[:first_name], class: 'form-control', data: { action: "input->search-form#search" } %>
-          <%= f.text_field :last_name, placeholder: 'Last Name', value: @query_params[:last_name], class: 'form-control', data: { action: "input->search-form#search" } %>
-        </div>
-      </div>
-      <div class="col-md-6 col-xs-12 mb-3">
-        <div class="input-group">
-          <%= f.text_field :email, placeholder: 'Email', value: @query_params[:email], class: 'form-control', data: { action: "input->search-form#search" } %>
-          <%= f.text_field :phone, placeholder: 'Phone', value: @query_params[:phone], class: 'form-control', data: { action: "input->search-form#search" } %>
-        </div>
-      </div>
-      <div class="col-md-6 col-xs-12 mb-3">
-        <div class="input-group">
-          <%= f.text_field :city, placeholder: 'City', value: @query_params[:city], class: 'form-control', data: { action: "input->search-form#search" } %>
-          <%= f.text_field :state, placeholder: 'State', value: @query_params[:state], class: 'form-control', data: { action: "input->search-form#search" } %>
-        </div>
-      </div>
 
-      <!-- Interests -->
-      <div class="col-md-6 col-xs-12 mb-2" data-controller="form">
-        <div class="row">
-          <div class="col-12">
-            <%= label_tag 'interests', 'Interests', class: 'form-label' %>
-            <div data-form-target="fields mt-2 mb-2">
-            </div>
-            <template data-form-target="template">
-              <span id="NEWID" class="d-inline-block mt-2" style="margin-right: 0.5em;">
-                <%= hidden_field_tag 'interests[]', 'REPLACEVALUE' %>
-                <a data-form-id-param="NEWID" data-action="search-form#search form#removeField" class="btn btn-secondary">REPLACENAME</a>
-              </span>
-            </template>
-          </div>
-          <div class="col-12 mt-2">
-            <%= combobox_tag "interests[]", Interest.all.map{|r| {display: r.name.titleize, value: r.id}}, placeholder: 'Select interests', data: { form_baseid_param: 'interest', form_target: 'source', action: "hw-combobox:selection->search-form#search hw-combobox:selection->form#addField" } %>
-            <span style="margin-right: 20px;">
-              <%= radio_button_tag 'interest_operation', 'and', class: 'form-check-input', checked: @query_params[:interest_operation] == 'and', data: {action: "search-form#search"} %>
-              <%= label_tag 'interest_operation_and', 'And', class: 'form-check-label' %>
-            </span>
-            <span style="margin-right: 20px;">
-              <%= radio_button_tag 'interest_operation', 'or', class: 'form-check-input', checked: @query_params[:interest_operation] != 'and', data: {action: "search-form#search"} %>
-              <%= label_tag 'interest_operation_or', 'Or', class: 'form-check-label' %>
-            </span>
-          </div>
-        </div>
-      </div>
+  <div class="input-group mb-3">
+    <span class="input-group-text"><i class="bi bi-search"></i></span>
+    <%= f.text_field :search, placeholder: 'Search Terms', value: @query_params[:search], class: 'form-control', data: { action: "input->search-form#search" } %>
+  </div>
 
-      <!-- Roles -->
-      <div class="col-md-6 col-xs-12 mb-2" data-controller="form">
-        <div class="row">
-          <div class="col-12">
-            <%= label_tag 'Roles', 'Roles', class: 'form-label' %>
-            <div data-form-target="fields mt-2 mb-2">
+  <div class="accordion" id="accordionExample">
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+          <strong>More Filters</strong>
+        </button>
+      </h2>
+      <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+        <div class="accordion-body">
+          <div class="row">
+            <div class="col-xs-12 mb-3">
+              <div class="input-group">
+                <%= f.text_field :first_name, placeholder: 'First Name', value: @query_params[:first_name], class: 'form-control', data: { action: "input->search-form#search" } %>
+                <%= f.text_field :last_name, placeholder: 'Last Name', value: @query_params[:last_name], class: 'form-control', data: { action: "input->search-form#search" } %>
+              </div>
             </div>
-            <template data-form-target="template">
-              <span id="NEWID" class="d-inline-block mt-2" style="margin-right: 0.5em;">
-                <%= hidden_field_tag 'roles[]', 'REPLACEVALUE' %>
-                <a data-form-id-param="NEWID" data-action="search-form#search form#removeField" class="btn btn-secondary">REPLACENAME</a>
-              </span>
-            </template>
+            <div class="col-md-6 col-xs-12 mb-3">
+              <div class="input-group">
+                <%= f.text_field :email, placeholder: 'Email', value: @query_params[:email], class: 'form-control', data: { action: "input->search-form#search" } %>
+                <%= f.text_field :phone, placeholder: 'Phone', value: @query_params[:phone], class: 'form-control', data: { action: "input->search-form#search" } %>
+              </div>
+            </div>
+            <div class="col-md-6 col-xs-12 mb-3">
+              <div class="input-group">
+                <%= f.text_field :city, placeholder: 'City', value: @query_params[:city], class: 'form-control', data: { action: "input->search-form#search" } %>
+                <%= f.text_field :state, placeholder: 'State', value: @query_params[:state], class: 'form-control', data: { action: "input->search-form#search" } %>
+              </div>
+            </div>
+
+            <!-- Interests -->
+            <div class="col-md-6 col-xs-12 mb-2" data-controller="form">
+              <div class="row">
+                <div class="col-12">
+                  <%= label_tag 'interests', 'Interests', class: 'form-label' %>
+                  <div data-form-target="fields mt-2 mb-2">
+                  </div>
+                  <template data-form-target="template">
+                    <span id="NEWID" class="d-inline-block mt-2" style="margin-right: 0.5em;">
+                      <%= hidden_field_tag 'interests[]', 'REPLACEVALUE' %>
+                      <a data-form-id-param="NEWID" data-action="search-form#search form#removeField" class="btn btn-secondary">REPLACENAME</a>
+                    </span>
+                  </template>
+                </div>
+                <div class="col-12 mt-2">
+                  <%= combobox_tag "interests[]", Interest.all.map{|r| {display: r.name.titleize, value: r.id}}, placeholder: 'Select interests', data: { form_baseid_param: 'interest', form_target: 'source', action: "hw-combobox:selection->search-form#search hw-combobox:selection->form#addField" } %>
+                  <span style="margin-right: 20px;">
+                    <%= radio_button_tag 'interest_operation', 'and', class: 'form-check-input', checked: @query_params[:interest_operation] == 'and', data: {action: "search-form#search"} %>
+                    <%= label_tag 'interest_operation_and', 'And', class: 'form-check-label' %>
+                  </span>
+                  <span style="margin-right: 20px;">
+                    <%= radio_button_tag 'interest_operation', 'or', class: 'form-check-input', checked: @query_params[:interest_operation] != 'and', data: {action: "search-form#search"} %>
+                    <%= label_tag 'interest_operation_or', 'Or', class: 'form-check-label' %>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Roles -->
+            <div class="col-md-6 col-xs-12 mb-2" data-controller="form">
+              <div class="row">
+                <div class="col-12">
+                  <%= label_tag 'Roles', 'Roles', class: 'form-label' %>
+                  <div data-form-target="fields mt-2 mb-2">
+                  </div>
+                  <template data-form-target="template">
+                    <span id="NEWID" class="d-inline-block mt-2" style="margin-right: 0.5em;">
+                      <%= hidden_field_tag 'roles[]', 'REPLACEVALUE' %>
+                      <a data-form-id-param="NEWID" data-action="search-form#search form#removeField" class="btn btn-secondary">REPLACENAME</a>
+                    </span>
+                  </template>
+                </div>
+                <div class="col-12 mt-2">
+                  <%= combobox_tag "roles[]", Role.all.map{|r| {display: r.name, value: r.id}}, placeholder: 'Select Roles', data: { form_baseid_param: 'role', form_target: 'source', action: "hw-combobox:selection->search-form#search hw-combobox:selection->form#addField" } %>
+                  <span style="margin-right: 20px;">
+                    <%= radio_button_tag 'role_operation', 'and', class: 'form-check-input', checked: @query_params[:role_operation] == 'and', data: {action: "search-form#search"} %>
+                    <%= label_tag 'role_operation_and', 'And', class: 'form-check-label' %>
+                  </span>
+                  <span style="margin-right: 20px;">
+                    <%= radio_button_tag 'role_operation', 'or', class: 'form-check-input', checked: @query_params[:role_operation] != 'and', data: {action: "search-form#search"} %>
+                    <%= label_tag 'role_operation_or', 'Or', class: 'form-check-label' %>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 col-xs-12 mb-3">
+              <%= f.label :ephemeris, 'Ephemeris Subscription', class: 'form-label' %>
+              <%= f.select :ephemeris, options_for_select([ ['DIGITAL', 'digital'], ['PRINTED', 'printed'] ], selected: @query_params[:ephemeris] || 'either'), {}, {class: 'form-control', data: { action: "change->search-form#search" } } %>
+            </div>
+            <div class="col-md-3 col-xs-12 mb-3">
+              <%= f.label :active, 'Active Members', class: 'form-label' %>
+              <div class="col-12">
+                <span style="margin-right: 20px;">
+                  <%= radio_button_tag 'active', 'yes', class: 'form-check-input', checked: @query_params[:active] == 'yes', data: {action: "search-form#search"} %>
+                  <%= label_tag 'active_yes', 'Yes', class: 'form-check-label' %>
+                </span>
+                <span style="margin-right: 20px;">
+                  <%= radio_button_tag 'active', 'no', class: 'form-check-input', checked: @query_params[:active] == 'no', data: {action: "search-form#search"} %>
+                  <%= label_tag 'active_no', 'No', class: 'form-check-label' %>
+                </span>
+                <span style="margin-right: 20px;">
+                  <%= radio_button_tag 'active', 'either', class: 'form-check-input', checked: !(['yes', 'no'].include?(@query_params[:active])) , data: {action: "search-form#search"} %>
+                  <%= label_tag 'active_either', 'Either', class: 'form-check-label' %>
+                </span>
+              </div>
+            </div>
           </div>
-          <div class="col-12 mt-2">
-            <%= combobox_tag "roles[]", Role.all.map{|r| {display: r.name, value: r.id}}, placeholder: 'Select Roles', data: { form_baseid_param: 'role', form_target: 'source', action: "hw-combobox:selection->search-form#search hw-combobox:selection->form#addField" } %>
-            <span style="margin-right: 20px;">
-              <%= radio_button_tag 'role_operation', 'and', class: 'form-check-input', checked: @query_params[:role_operation] == 'and', data: {action: "search-form#search"} %>
-              <%= label_tag 'role_operation_and', 'And', class: 'form-check-label' %>
-            </span>
-            <span style="margin-right: 20px;">
-              <%= radio_button_tag 'role_operation', 'or', class: 'form-check-input', checked: @query_params[:role_operation] != 'and', data: {action: "search-form#search"} %>
-              <%= label_tag 'role_operation_or', 'Or', class: 'form-check-label' %>
-            </span>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3 col-xs-12 mb-3">
-        <%= f.label :ephemeris, 'Ephemeris Subscription', class: 'form-label' %>
-        <%= f.select :ephemeris, options_for_select([ ['DIGITAL', 'digital'], ['PRINTED', 'printed'] ], selected: @query_params[:ephemeris] || 'either'), {}, {class: 'form-control', data: { action: "change->search-form#search" } } %>
-      </div>
-      <div class="col-md-3 col-xs-12 mb-3">
-        <%= f.label :active, 'Active Members', class: 'form-label' %>
-        <div class="col-12">
-        <span style="margin-right: 20px;">
-          <%= radio_button_tag 'active', 'yes', class: 'form-check-input', checked: @query_params[:active] == 'yes', data: {action: "search-form#search"} %>
-          <%= label_tag 'active_yes', 'Yes', class: 'form-check-label' %>
-        </span>
-        <span style="margin-right: 20px;">
-          <%= radio_button_tag 'active', 'no', class: 'form-check-input', checked: @query_params[:active] == 'no', data: {action: "search-form#search"} %>
-          <%= label_tag 'active_no', 'No', class: 'form-check-label' %>
-        </span>
-        <span style="margin-right: 20px;">
-          <%= radio_button_tag 'active', 'either', class: 'form-check-input', checked: !(['yes', 'no'].include?(@query_params[:active])) , data: {action: "search-form#search"} %>
-          <%= label_tag 'active_either', 'Either', class: 'form-check-label' %>
-        </span>
         </div>
       </div>
     </div>
+  </div>
+
   <% end %>
   <div id="people" class="col-12 mt-2">
     <%= render partial: 'index' %>

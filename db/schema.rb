@@ -10,8 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_10_01_035413) do
+ActiveRecord::Schema[7.1].define(version: 2025_10_19_035544) do
   # These are extensions that must be enabled in order to support this database
+  enable_extension "pg_stat_statements"
   enable_extension "plpgsql"
 
   create_table "active_storage_attachments", force: :cascade do |t|
@@ -222,9 +223,15 @@ ActiveRecord::Schema[7.1].define(version: 2025_10_01_035413) do
     t.string "password_digest"
     t.string "reset_password_token"
     t.datetime "reset_password_sent_at"
-    t.boolean "signup_completed", default: true, null: false
     t.index ["first_name"], name: "index_people_on_first_name"
     t.index ["last_name"], name: "index_people_on_last_name"
+  end
+
+  create_table "people_permissions", id: false, force: :cascade do |t|
+    t.bigint "person_id", null: false
+    t.bigint "permission_id", null: false
+    t.index ["permission_id", "person_id"], name: "index_people_permissions_on_permission_id_and_person_id"
+    t.index ["person_id", "permission_id"], name: "index_people_permissions_on_person_id_and_permission_id"
   end
 
   create_table "people_roles", id: false, force: :cascade do |t|

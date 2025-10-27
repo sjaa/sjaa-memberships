@@ -6,7 +6,6 @@ class MembershipTest < ActiveSupport::TestCase
       first_name: 'John',
       last_name: 'Doe',
       password: 'password123',
-      signup_completed: true
     )
     
     @membership = Membership.new(

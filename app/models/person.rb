@@ -7,10 +7,12 @@ class Person < ApplicationRecord
   has_many :contacts, -> {includes(:city, :state)}, dependent: :destroy
   has_and_belongs_to_many :interests
   has_and_belongs_to_many :roles
+  has_and_belongs_to_many :permissions
   has_many :api_keys, as: :bearer
   has_secure_password validations: false # Rethink this... maybe just force a random password when not present
   belongs_to :astrobin, optional: true
   belongs_to :referral, optional: true
+  validates :first_name, :last_name, strip: true
 
   def name
     return "#{first_name} #{last_name}"
@@ -27,10 +29,9 @@ class Person < ApplicationRecord
     return primary_contact&.email || contacts.first&.email
   end
 
-  # Right now, normal members have no permissions, but they can access their own records
-  # through the policy
+  # People can have permissions directly assigned to them
   def has_permission?(p)
-    false
+    self.permissions.where(name: p).exists?
   end
 
   def self.find_by_email(email)
@@ -264,6 +265,11 @@ class Person < ApplicationRecord
     end
 
     self.memberships = _memberships
+  end
+
+  # Setter for permission management (similar to Admin model)
+  def permission_attributes=(permission_ids)
+    self.permissions = Permission.where(id: permission_ids)
   end
 
   # Passwords for people can be blank if they've never signed up

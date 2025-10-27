@@ -1,0 +1,39 @@
+<div class="row">
+  <div class="col-12">
+    <h1>Membership Verification</h1>
+    <p class="text-muted">Enter an email address to verify membership status</p>
+  </div>
+</div>
+
+<%= turbo_frame_tag "verification_form" do %>
+  <div class="row">
+    <div class="col-md-6">
+      <%= form_with url: verify_membership_path, class: "mb-4", data: { turbo_frame: "verification_form" } do |f| %>
+        <div class="mb-3">
+          <%= f.label :email, "Email Address", class: "form-label" %>
+          <%= f.email_field :email,
+              placeholder: "member@example.com",
+              class: "form-control #{'is-invalid' if @verification_result&.dig(:error)}",
+              value: params[:email],
+              required: true %>
+          <% if @verification_result&.dig(:error) %>
+            <div class="invalid-feedback">
+              <%= @verification_result[:error] %>
+            </div>
+          <% end %>
+        </div>
+
+        <%= f.submit "Verify Membership", class: "btn btn-primary" %>
+      <% end %>
+    </div>
+  </div>
+
+  <% if @verification_result %>
+    <% if @verification_result[:error] %>
+      <%= render 'verification_error', error: @verification_result[:error], timestamp: @verification_result[:timestamp] %>
+    <% else %>
+      <%= render 'verification_results', verification_result: @verification_result %>
+    <% end %>
+  <% end %>
+<% end %>
+
