@@ -7,7 +7,6 @@ class EquipmentTest < ActiveSupport::TestCase
       first_name: 'John',
       last_name: 'Doe',
       password: 'password123',
-      signup_completed: true,
       referral: Referral.create!(name: 'internet', description: 'Web search')
     )
     @equipment = Equipment.create!(
