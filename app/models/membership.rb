@@ -3,6 +3,7 @@ class Membership < ApplicationRecord
   belongs_to :order, required: false
   belongs_to :kind, class_name: 'MembershipKind', required: false
   before_save :update_end_date
+  after_commit :add_to_members_group, on: [:create]
   inheritance_column = :inherits
 
   def is_active?
@@ -39,22 +40,36 @@ class Membership < ApplicationRecord
 
   def order_attributes=(attributes)
     return if attributes[:payment_method] == 'none' || attributes[:payment_method].blank?
-    
+
     _order = self.order || Order.new
     _attributes = attributes.dup
     _attributes.delete(:id)
-    
+
     # Generate a unique token if creating a new order
     if _order.new_record?
       _attributes[:token] = SecureRandom.hex(16)
       _attributes[:price] = self.total
     end
-    
+
     _order.update(_attributes)
     _order.errors.each do |err|
       self.errors.add err.attribute, err.message
     end
-    
+
     self.order = _order
+  end
+
+  private
+
+  def add_to_members_group
+    # Only add to group if this is a new membership that makes the person active
+    # Find an admin with Google credentials to use for the API call
+    admin_email = Admin.where.not(refresh_token: nil).first&.email
+
+    if admin_email.present? && person.present?
+      AddMemberToGroupJob.perform_later(person.id, admin_email)
+    else
+      Rails.logger.warn "[Membership] Could not queue AddMemberToGroupJob - admin_email: #{admin_email}, person_id: #{person&.id}"
+    end
   end
 end

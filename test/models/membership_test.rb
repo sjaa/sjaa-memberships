@@ -1,6 +1,8 @@
 require 'test_helper'
 
 class MembershipTest < ActiveSupport::TestCase
+  include ActiveJob::TestHelper
+
   setup do
     @person = Person.create!(
       first_name: 'John',
@@ -288,12 +290,70 @@ class MembershipTest < ActiveSupport::TestCase
   test 'membership updates end date on multiple saves' do
     @membership.save!
     first_end = @membership.end
-    
+
     # Update start date
     @membership.update!(start: 1.month.from_now.beginning_of_month)
-    
+
     assert_not_equal first_end, @membership.end
     expected_end = (@membership.start + @membership.term_months.months).end_of_month
     assert_in_delta expected_end.to_f, @membership.end.to_f, 1 # Within 1 second tolerance
+  end
+
+  test 'creating membership enqueues AddMemberToGroupJob when admin exists' do
+    # Create an admin with refresh token
+    Admin.create!(
+      email: 'vp@sjaa.net',
+      password: 'password123',
+      refresh_token: 'test_token'
+    )
+
+    new_person = Person.create!(
+      first_name: 'New',
+      last_name: 'Member',
+      password: 'password123'
+    )
+
+    assert_enqueued_with(job: AddMemberToGroupJob) do
+      Membership.create!(
+        person: new_person,
+        start: Date.current,
+        term_months: 12
+      )
+    end
+  end
+
+  test 'creating membership does not enqueue job when no admin with refresh token' do
+    # Ensure no admins exist with refresh tokens
+    Admin.destroy_all
+
+    new_person = Person.create!(
+      first_name: 'New',
+      last_name: 'Member',
+      password: 'password123'
+    )
+
+    assert_no_enqueued_jobs(only: AddMemberToGroupJob) do
+      Membership.create!(
+        person: new_person,
+        start: Date.current,
+        term_months: 12
+      )
+    end
+  end
+
+  test 'updating existing membership does not enqueue AddMemberToGroupJob' do
+    # Create an admin with refresh token
+    Admin.create!(
+      email: 'vp@sjaa.net',
+      password: 'password123',
+      refresh_token: 'test_token'
+    )
+
+    @membership.save!
+
+    # Updating should not enqueue the job (only creation should)
+    assert_no_enqueued_jobs(only: AddMemberToGroupJob) do
+      @membership.update!(term_months: 24)
+    end
   end
 end

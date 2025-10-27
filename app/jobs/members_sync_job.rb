@@ -11,10 +11,10 @@ class MembersSyncJob < ApplicationJob
     puts "MemberSyncJob.args #{args.inspect}"
 
     # Use VP's credentials to access members group
-    admin = Admin.find_by(email: arg[0])
+    admin = Admin.find_by(email: args[0])
 
     if(admin&.refresh_token&.nil?)
-      puts "[E] The input proxy user (#{arg[0]}) could not be found or has not authenticated with Google.  Please use the Google Auth page to grant access to the admin's google account."
+      puts "[E] The input proxy user (#{args[0]}) could not be found or has not authenticated with Google.  Please use the Google Auth page to grant access to the admin's google account."
       return
     end
 
