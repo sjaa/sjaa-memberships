@@ -130,7 +130,7 @@ class AddMemberToGroupJobTest < ActiveJob::TestCase
       AddMemberToGroupJob.perform_now(@person.id, @admin.email)
     end
 
-    assert @api_called, "Expected Google API get_member to be called"
+    assert @api_called, "Expected Google API insert_member to be called"
   end
 
   test "job handles Google API errors gracefully" do
@@ -208,17 +208,18 @@ class AddMemberToGroupJobTest < ActiveJob::TestCase
     # Define stubbed methods on mock_client
     def mock_client.authorization=(auth); end
 
-    def mock_client.get_member(group, email)
-      @get_member_called = true
+    def mock_client.insert_member(group, member)
+      @insert_member_called = true
       @api_called = true
-      OpenStruct.new(email: email)
+      # Raise 409 Conflict error to simulate member already exists
+      raise Google::Apis::ClientError.new('Member already exists', status_code: 409)
     end
 
     # Stub the helper method
     self.stub :get_auth, mock_auth do
       Google::Apis::AdminDirectoryV1::DirectoryService.stub :new, mock_client do
         result = yield
-        @api_called = mock_client.instance_variable_get(:@get_member_called) || false
+        @api_called = mock_client.instance_variable_get(:@insert_member_called) || false
         result
       end
     end
@@ -231,7 +232,7 @@ class AddMemberToGroupJobTest < ActiveJob::TestCase
     # Define stubbed methods on mock_client
     def mock_client.authorization=(auth); end
 
-    def mock_client.get_member(group, email)
+    def mock_client.insert_member(group, member)
       raise Google::Apis::ClientError.new('Server Error', status_code: 500)
     end
 
