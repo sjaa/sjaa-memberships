@@ -44,36 +44,46 @@ class AddMemberToGroupJob < ApplicationJob
 
     begin
       # Get Google API authorization
+      Rails.logger.debug "[AddMemberToGroupJob] Getting Google API authorization for admin: #{admin.email}"
       auth = get_auth(admin)
+      Rails.logger.debug "[AddMemberToGroupJob] Authorization obtained: #{auth.inspect}"
 
       # Create Google API client
       client = Google::Apis::AdminDirectoryV1::DirectoryService.new
       client.authorization = auth
-
-      # Check if member is already in the group
-      begin
-        existing_member = client.get_member(GoogleHelper::MEMBERS_GROUP, email)
-        if existing_member
-          Rails.logger.info "[AddMemberToGroupJob] Person #{person.id} (#{email}) is already in #{GoogleHelper::MEMBERS_GROUP}"
-          return
-        end
-      rescue Google::Apis::ClientError => e
-        # 404 error means member is not in group, which is expected
-        if e.status_code == 404
-          # Continue to add the member
-        else
-          raise e
-        end
-      end
+      Rails.logger.debug "[AddMemberToGroupJob] Google API client created"
 
       # Add member to the group
-      member = Google::Apis::AdminDirectoryV1::Member.new(email: email)
+      # Note: We skip the existence check with get_member because it appears to have issues
+      # with the Google API. Instead, we'll handle duplicate member errors gracefully below.
+      Rails.logger.debug "[AddMemberToGroupJob] Creating Member object for #{email}"
+      member = Google::Apis::AdminDirectoryV1::Member.new(
+        email: email,
+        role: 'MEMBER',
+        type: 'USER'
+      )
+      Rails.logger.debug "[AddMemberToGroupJob] Member object created: #{member.inspect}"
+      Rails.logger.debug "[AddMemberToGroupJob] Member as JSON: #{member.to_json}"
+      Rails.logger.debug "[AddMemberToGroupJob] Calling insert_member with group: #{GoogleHelper::MEMBERS_GROUP}"
+
       client.insert_member(GoogleHelper::MEMBERS_GROUP, member)
 
       Rails.logger.info "[AddMemberToGroupJob] Successfully added #{email} to #{GoogleHelper::MEMBERS_GROUP}"
 
+    rescue Google::Apis::ClientError => e
+      # Handle duplicate member error gracefully (409 Conflict or 'Member already exists' message)
+      if e.status_code == 409 || e.message.include?("Member already exists") || e.message.include?("duplicate")
+        Rails.logger.info "[AddMemberToGroupJob] Person #{person.id} (#{email}) is already in #{GoogleHelper::MEMBERS_GROUP}"
+        return
+      end
+
+      Rails.logger.error "[AddMemberToGroupJob] Failed to add #{email} to #{GoogleHelper::MEMBERS_GROUP}: #{e.class.name} - #{e.message}"
+      Rails.logger.error "[AddMemberToGroupJob] Error details: #{e.inspect}"
+      Rails.logger.error e.backtrace.join("\n")
+      raise e
     rescue => e
-      Rails.logger.error "[AddMemberToGroupJob] Failed to add #{email} to #{GoogleHelper::MEMBERS_GROUP}: #{e.message}"
+      Rails.logger.error "[AddMemberToGroupJob] Failed to add #{email} to #{GoogleHelper::MEMBERS_GROUP}: #{e.class.name} - #{e.message}"
+      Rails.logger.error "[AddMemberToGroupJob] Error details: #{e.inspect}"
       Rails.logger.error e.backtrace.join("\n")
       raise e
     end
