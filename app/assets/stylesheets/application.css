@@ -137,3 +137,8 @@ hr.thick {
     height: 14px;
   }
 }
+
+/* Column visibility toggle */
+.column-hidden {
+  display: none !important;
+}
