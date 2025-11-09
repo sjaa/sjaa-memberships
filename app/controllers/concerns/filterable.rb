@@ -3,6 +3,12 @@ module Filterable
   extend ActiveSupport::Concern
   include Sanitizable
 
+  def tokenize(str)
+    # The regex matches either a quoted phrase (including contents) OR
+    # a sequence of non-whitespace characters (\\S+).  Don't include the quotes
+    str.scan(/"(?:\\"|[^"])*"|\S+/).map{|token| token.gsub(/"/, '')}
+  end
+
   def and_or_helper(model, query, operation, field, list)
     list.select!{|l| l.present?}
     return query if(list.empty?)
@@ -41,7 +47,7 @@ module Filterable
       @query_params.delete(:submit)
       @query_params.select!{|k,v| v.present?}
       @query_params = @query_params.permit(
-      :search, :has_astrobin, :role_operation, :interest_operation, :first_name, :last_name, :email, :phone, :city, :state, :ephemeris, :active, :discord_id, interests: [], roles: []
+      :search, :has_astrobin, :role_operation, :interest_operation, :skill_operation, :first_name, :last_name, :email, :phone, :city, :state, :ephemeris, :active, :volunteer, :mentor, :discord_id, interests: [], roles: [], skills: []
       )
       qp = @query_params.to_h
     else
@@ -54,15 +60,27 @@ module Filterable
     if(qp[:search].present?)
       people = Person.arel_table
       contacts = Contact.arel_table
-      query = Person.left_joins(:contacts)
+      skills = Skill.arel_table
+      query = Person.left_joins(:contacts).left_joins(:skills)
       terms = nil
+      tokens = tokenize(qp[:search])
 
-      qp[:search].split(' ').each_with_index do |term, i|
-        first_name_query = people[:first_name].matches("%#{term}%")
+      tokens.each_with_index do |term, i|
+        # If the term has multiple words, assume it is first and last name
+        subterms = term.split(/\s+/)
+        first_name_query = people[:first_name].matches("%#{subterms.first}%")
         query = i == 0 ? query.where(first_name_query) : query.or(Person.where(first_name_query))
-        query = query.or(Person.where(people[:last_name].matches("%#{term}%")))
+
+        # When there's a last name, we want an "and" match
+        if(subterms.length > 1)
+          query = query.where(people[:last_name].matches("%#{subterms.last}%"))
+        else
+          query = query.or(Person.where(people[:last_name].matches("%#{subterms.last}%")))
+        end
+
         query = query.or(Person.where(contacts[:email].matches("%#{term}%")))
         query = query.or(Person.where(contacts[:phone].matches("%#{term}%")))
+        query = query.or(Person.where(skills[:name].matches("%#{term}%")))
       end
 
       query = query.distinct
@@ -80,12 +98,19 @@ module Filterable
     query = query.joins(contacts: :state).where(State.arel_table[:short_name].matches("%#{qp[:state]}%")) if(qp[:state].present?)
     query = query.where.not(astrobin_id: nil) if(qp[:has_astrobin] == 'true')
     
-    # Handle interests and roles specially
+    # Handle interests, roles, and skills specially
     query = and_or_helper(Person, query, qp[:interest_operation], :interests, qp[:interests]) if(qp[:interests].present?)
     query = and_or_helper(Person, query, qp[:role_operation], :roles, qp[:roles]) if(qp[:roles].present?)
-    
+    query = and_or_helper(Person, query, qp[:skill_operation], :skills, qp[:skills]) if(qp[:skills].present?)
+
     query = query.active_members.where(memberships: {ephemeris: true}) if(qp[:ephemeris] == 'printed')
-    
+
+    # Handle volunteer and mentor filters
+    query = query.where(volunteer: true) if(qp[:volunteer] == 'yes')
+    query = query.where(volunteer: false) if(qp[:volunteer] == 'no')
+    query = query.where(mentor: true) if(qp[:mentor] == 'yes')
+    query = query.where(mentor: false) if(qp[:mentor] == 'no')
+
     # Do the active filter last, as this turns query into an Array
     if(qp[:active] == 'yes')
       # Subtract out the inactive people
@@ -94,11 +119,11 @@ module Filterable
       # Subtract out the active people
       query = query.inactive_members
     end
-    
+
     @active_memberships = Person.common_active_membership_query(Membership.all).group_by{|m| m.person_id}
     #@active_memberships = query.active_members.group_by{|m| m.id}
     #@all_people = Person.where(id: query.map(&:id).uniq).includes(:donations, :memberships, :contacts, :interests, :roles)
-    @all_people = query.includes(:donations, :memberships, :interests, :roles, :astrobin, contacts: [:city, :state])
+    @all_people = query.includes(:donations, :memberships, :interests, :roles, :skills, :astrobin, contacts: [:city, :state])
     @totals = {total: @all_people.count}
     @pagy, @people = pagy(@all_people, limit: 40, params: qp)
   end

@@ -93,6 +93,34 @@
                 </div>
               </div>
             </div>
+
+            <!-- Skills -->
+            <div class="col-md-6 col-xs-12 mb-2" data-controller="form">
+              <div class="row">
+                <div class="col-12">
+                  <%= label_tag 'Skills', 'Skills', class: 'form-label' %>
+                  <div data-form-target="fields mt-2 mb-2">
+                  </div>
+                  <template data-form-target="template">
+                    <span id="NEWID" class="d-inline-block mt-2" style="margin-right: 0.5em;">
+                      <%= hidden_field_tag 'skills[]', 'REPLACEVALUE' %>
+                      <a data-form-id-param="NEWID" data-action="search-form#search form#removeField" class="btn btn-secondary">REPLACENAME</a>
+                    </span>
+                  </template>
+                </div>
+                <div class="col-12 mt-2">
+                  <%= combobox_tag "skills[]", Skill.all.order(:name).map{|s| {display: s.name, value: s.id}}, placeholder: 'Select Skills', data: { form_baseid_param: 'skill', form_target: 'source', action: "hw-combobox:selection->search-form#search hw-combobox:selection->form#addField" } %>
+                  <span style="margin-right: 20px;">
+                    <%= radio_button_tag 'skill_operation', 'and', class: 'form-check-input', checked: @query_params[:skill_operation] == 'and', data: {action: "search-form#search"} %>
+                    <%= label_tag 'skill_operation_and', 'And', class: 'form-check-label' %>
+                  </span>
+                  <span style="margin-right: 20px;">
+                    <%= radio_button_tag 'skill_operation', 'or', class: 'form-check-input', checked: @query_params[:skill_operation] != 'and', data: {action: "search-form#search"} %>
+                    <%= label_tag 'skill_operation_or', 'Or', class: 'form-check-label' %>
+                  </span>
+                </div>
+              </div>
+            </div>
             <div class="col-md-3 col-xs-12 mb-3">
               <%= f.label :ephemeris, 'Ephemeris Subscription', class: 'form-label' %>
               <%= f.select :ephemeris, options_for_select([ ['DIGITAL', 'digital'], ['PRINTED', 'printed'] ], selected: @query_params[:ephemeris] || 'either'), {}, {class: 'form-control', data: { action: "change->search-form#search" } } %>
@@ -111,6 +139,40 @@
                 <span style="margin-right: 20px;">
                   <%= radio_button_tag 'active', 'either', class: 'form-check-input', checked: !(['yes', 'no'].include?(@query_params[:active])) , data: {action: "search-form#search"} %>
                   <%= label_tag 'active_either', 'Either', class: 'form-check-label' %>
+                </span>
+              </div>
+            </div>
+            <div class="col-md-3 col-xs-12 mb-3">
+              <%= f.label :volunteer, 'Volunteer', class: 'form-label' %>
+              <div class="col-12">
+                <span style="margin-right: 20px;">
+                  <%= radio_button_tag 'volunteer', 'yes', class: 'form-check-input', checked: @query_params[:volunteer] == 'yes', data: {action: "search-form#search"} %>
+                  <%= label_tag 'volunteer_yes', 'Yes', class: 'form-check-label' %>
+                </span>
+                <span style="margin-right: 20px;">
+                  <%= radio_button_tag 'volunteer', 'no', class: 'form-check-input', checked: @query_params[:volunteer] == 'no', data: {action: "search-form#search"} %>
+                  <%= label_tag 'volunteer_no', 'No', class: 'form-check-label' %>
+                </span>
+                <span style="margin-right: 20px;">
+                  <%= radio_button_tag 'volunteer', 'either', class: 'form-check-input', checked: !(['yes', 'no'].include?(@query_params[:volunteer])) , data: {action: "search-form#search"} %>
+                  <%= label_tag 'volunteer_either', 'Either', class: 'form-check-label' %>
+                </span>
+              </div>
+            </div>
+            <div class="col-md-3 col-xs-12 mb-3">
+              <%= f.label :mentor, 'Mentor', class: 'form-label' %>
+              <div class="col-12">
+                <span style="margin-right: 20px;">
+                  <%= radio_button_tag 'mentor', 'yes', class: 'form-check-input', checked: @query_params[:mentor] == 'yes', data: {action: "search-form#search"} %>
+                  <%= label_tag 'mentor_yes', 'Yes', class: 'form-check-label' %>
+                </span>
+                <span style="margin-right: 20px;">
+                  <%= radio_button_tag 'mentor', 'no', class: 'form-check-input', checked: @query_params[:mentor] == 'no', data: {action: "search-form#search"} %>
+                  <%= label_tag 'mentor_no', 'No', class: 'form-check-label' %>
+                </span>
+                <span style="margin-right: 20px;">
+                  <%= radio_button_tag 'mentor', 'either', class: 'form-check-input', checked: !(['yes', 'no'].include?(@query_params[:mentor])) , data: {action: "search-form#search"} %>
+                  <%= label_tag 'mentor_either', 'Either', class: 'form-check-label' %>
                 </span>
               </div>
             </div>
