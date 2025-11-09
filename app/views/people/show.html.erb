@@ -166,54 +166,50 @@
     <% active_skills = @person.people_skills.select(&:active?).sort_by { |ps| -[ps.skill_level, ps.interest_level].max } %>
     <% if @person.volunteer || @person.mentor || active_skills.any? %>
       <div class="col-12">
-        <div class="card">
-          <div class="card-header bg-body-secondary">
-            <h5 class="mb-0">Volunteer & Skills</h5>
-          </div>
-          <div class="card-body">
-            <% if active_skills.any? %>
-              <div class="row g-3">
-                <% active_skills.each do |people_skill| %>
-                  <div class="col-md-6 col-lg-4">
-                    <div class="skill-display-card p-3 border rounded">
-                      <h6 class="mb-2"><%= people_skill.skill.name %></h6>
-                      <% if people_skill.skill.description.present? %>
-                        <small class="text-muted d-block mb-2"><%= people_skill.skill.description %></small>
-                      <% end %>
-                      <div class="skill-levels">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                          <small class="text-muted">Skill Level:</small>
-                          <strong class="<%= skill_level_color(people_skill.skill_level) %>"><%= people_skill.skill_level %>/10</strong>
-                        </div>
-                        <div class="progress mb-2" style="height: 6px;">
-                          <div class="progress-bar <%= skill_level_bg(people_skill.skill_level) %>"
-                               style="width: <%= people_skill.skill_level * 10 %>%"></div>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                          <small class="text-muted">Interest:</small>
-                          <strong class="<%= skill_level_color(people_skill.interest_level) %>"><%= people_skill.interest_level %>/10</strong>
-                        </div>
-                        <div class="progress" style="height: 6px;">
-                          <div class="progress-bar <%= skill_level_bg(people_skill.interest_level) %>"
-                               style="width: <%= people_skill.interest_level * 10 %>%"></div>
-                        </div>
-                      </div>
-                    </div>
+        <h5 class="mb-3 p-2 bg-body-secondary rounded">Volunteer & Skills</h5>
+      </div>
+      <% if active_skills.any? %>
+        <% active_skills.each do |people_skill| %>
+          <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm">
+              <div class="card-body">
+                <h6 class="card-title"><%= people_skill.skill.name %></h6>
+                <% if people_skill.skill.description.present? %>
+                  <p class="text-muted small mb-3"><%= people_skill.skill.description %></p>
+                <% end %>
+                <div class="skill-levels">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <small class="text-muted">Skill Level:</small>
+                    <strong class="<%= skill_level_color(people_skill.skill_level) %>"><%= people_skill.skill_level %>/10</strong>
                   </div>
-                <% end %>
+                  <div class="progress mb-2" style="height: 6px;">
+                    <div class="progress-bar <%= skill_level_bg(people_skill.skill_level) %>"
+                         style="width: <%= people_skill.skill_level * 10 %>%"></div>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <small class="text-muted">Interest:</small>
+                    <strong class="<%= skill_level_color(people_skill.interest_level) %>"><%= people_skill.interest_level %>/10</strong>
+                  </div>
+                  <div class="progress" style="height: 6px;">
+                    <div class="progress-bar <%= skill_level_bg(people_skill.interest_level) %>"
+                         style="width: <%= people_skill.interest_level * 10 %>%"></div>
+                  </div>
+                </div>
               </div>
-            <% else %>
-              <p class="text-muted mb-0">
-                <% if @person.volunteer %>
-                  Interested in volunteering but no specific skills indicated yet.
-                <% elsif @person.mentor %>
-                  Willing to mentor but no specific skills indicated yet.
-                <% end %>
-              </p>
+            </div>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="col-12">
+          <div class="alert alert-info" role="alert">
+            <% if @person.volunteer %>
+              Interested in volunteering but no specific skills indicated yet.
+            <% elsif @person.mentor %>
+              Willing to mentor but no specific skills indicated yet.
             <% end %>
           </div>
         </div>
-      </div>
+      <% end %>
     <% end %>
 
     <!-- Membership History -->
@@ -272,15 +268,9 @@
     <!-- Donations (if any) -->
     <% if @person.donations.count > 0 %>
       <div class="col-12">
-        <div class="card">
-          <div class="card-header bg-body-secondary">
-            <h5 class="mb-0">Donations</h5>
-          </div>
-          <div class="card-body">
-            <%= render partial: 'donations/index', locals: {donations: @person.donations} %>
-          </div>
-        </div>
+        <h5 class="mb-3 p-2 bg-body-secondary rounded">Donations</h5>
       </div>
+      <%= render partial: 'donations/index', locals: {donations: @person.donations} %>
     <% end %>
 
     <!-- Admin Actions -->
