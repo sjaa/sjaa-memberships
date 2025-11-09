@@ -71,6 +71,7 @@
         <h2>Items</h2>
         <span>Any equipment that accompanies this donation should be recorded below.  Add additional equipment items with the "Add Item" button.</span>
         <% donation.items.each_with_index do |item, i| %>
+          <% next if(item.cash) %>
           <%= render partial: 'donations/item_form', locals: {id: "item_#{item.id}", item: item, i: i, people_selector: people_selector}%>
         <% end %>
         <template data-form-target="template">
