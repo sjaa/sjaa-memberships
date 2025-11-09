@@ -182,11 +182,11 @@ class ExistingMemberRenewalFlowTest < ApplicationSystemTestCase
       term_months: 12,
       ephemeris: true
     )
-    
+
     visit person_path(@person)
-    
+
     # Should show memberships section
-    assert_text "Memberships"
+    assert_text "Membership History"
     assert_text "PRINT" # From historical membership with ephemeris
   end
 
@@ -196,10 +196,10 @@ class ExistingMemberRenewalFlowTest < ApplicationSystemTestCase
       start: 2.years.ago.beginning_of_month,
       term_months: 12
     )
-    
+
     visit person_path(@person)
-    
-    assert_text "not active"
+
+    assert_text "Membership Inactive"
     assert_text "Renew Membership"
 
     # Visit renewal page
