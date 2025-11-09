@@ -6,6 +6,7 @@ class DonationItem < ApplicationRecord
   def phase_attributes=(attrs)
     _phases = []
     attrs.each do |phase_hash|
+      next if(phase_hash[:name].blank? && phase_hash[:date].blank?)
       _phase = phase_hash[:id].present? ? DonationPhase.find(phase_hash[:id]) : DonationPhase.new
       _phase.update(phase_hash)
       _phases << _phase

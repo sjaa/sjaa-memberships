@@ -47,14 +47,20 @@ class Donation < ApplicationRecord
   def items_attributes=(attrs)
     _items = []
     attrs.each do |item_hash|
+      instrument_attrs = item_hash&.dig(:equipment_attributes)&.dig(:instrument_attributes)
+      next if ((instrument_attrs&.dig(:kind).blank? || instrument_attrs&.dig(:model).blank?) && item_hash[:value].blank?)
       item = item_hash[:id].present? ? DonationItem.find(item_hash[:id]) : DonationItem.new
-      item.update(item_hash)
+      _item_hash = item_hash.dup
+      _item_hash[:phase_attributes] ||= []
+      item.update(_item_hash)
       item.errors.each do |err|
         self.errors.add err.attribute, err.message
       end
       _items << item
     end
 
-    self.items = _items
+    # Preserve existing cash items (items without equipment) since they're managed separately via cash= setter
+    existing_cash_items = self.items.select { |item| item.equipment_id.nil? && item.persisted? }
+    self.items = _items + existing_cash_items
   end
 end

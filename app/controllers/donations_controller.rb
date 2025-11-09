@@ -50,7 +50,12 @@ class DonationsController < ApplicationController
   # PATCH/PUT /donations/1 or /donations/1.json
   def update
     respond_to do |format|
-      if @donation.update(donation_params)
+      # If items_attributes is missing from params, explicitly set it to empty array
+      # to trigger removal of all equipment items while preserving cash items
+      params_to_update = donation_params
+      params_to_update[:items_attributes] ||= []
+
+      if @donation.update(params_to_update)
         attach_equipment_images
         format.html { redirect_to @donation, notice: "Donation was successfully updated." }
         format.json { render :show, status: :ok, location: @donation }
