@@ -201,65 +201,64 @@
   <div class="row mt-4 pb-4 pt-2">
     <div class="col-12">
       <h2 class="p-2 bg-body-secondary">Volunteer Skills</h2>
+
+      <!-- Volunteer/Mentor Checkboxes -->
       <div class="row">
         <div class="col-md-6 mt-2">
-          <%= form.label :volunteer, class: 'form-label' %>
-          <%= form.check_box :volunteer, class: 'form-check-input ms-2' %>
-          <br/>
+          <div class="form-check">
+            <%= form.check_box :volunteer, class: 'form-check-input' %>
+            <%= form.label :volunteer, class: 'form-check-label' %>
+          </div>
           <small class="form-text text-muted">
             Check if you're interested in volunteering with SJAA
           </small>
         </div>
         <div class="col-md-6 mt-2">
-          <%= form.label :mentor, class: 'form-label' %>
-          <%= form.check_box :mentor, class: 'form-check-input ms-2' %>
-          <br/>
+          <div class="form-check">
+            <%= form.check_box :mentor, class: 'form-check-input' %>
+            <%= form.label :mentor, class: 'form-check-label' %>
+          </div>
           <small class="form-text text-muted">
             Check if you're interested in mentoring other members
           </small>
         </div>
       </div>
-      <p class="mt-3">
-        <small class="form-text text-muted">
-          Please indicate your skill level (0-10) and interest level (0-10) for each skill.
-          Skill level 0 means no experience, 10 means expert. Interest level 0 means not interested, 10 means very interested.
-        </small>
-      </p>
-      <% current_skills = person.people_skills.index_by(&:skill_id) %>
-      <div class="table-responsive">
-        <table class="table table-sm">
-          <thead>
-            <tr>
-              <th></th>
-              <th style="width: 75px;">Skill</th>
-              <th style="width: 75px;">Interest</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% Skill.all.order(:name).each do |skill| %>
-              <% people_skill = current_skills[skill.id] %>
-              <tr>
-                <td>
-                  <strong><%= skill.name %></strong>
-                  <% if skill.description.present? %>
-                    <br/><small class="text-muted"><%= skill.description %></small>
-                  <% end %>
-                </td>
-                <td>
-                  <%= hidden_field_tag "person[skills_attributes][][skill_id]", skill.id %>
-                  <%= number_field_tag "person[skills_attributes][][skill_level]",
-                      people_skill&.skill_level || 0,
-                      min: 0, max: 10, class: 'form-control form-control-sm' %>
-                </td>
-                <td>
-                  <%= number_field_tag "person[skills_attributes][][interest_level]",
-                      people_skill&.interest_level || 0,
-                      min: 0, max: 10, class: 'form-control form-control-sm' %>
-                </td>
-              </tr>
+
+      <div class="mt-4" data-controller="skills">
+        <p class="mb-3">
+          <small class="form-text text-muted">
+            Use the sliders to indicate your skill level (0=none, 10=expert) and interest level (0=not interested, 10=very interested)
+          </small>
+        </p>
+
+        <% current_skills = person.people_skills.index_by(&:skill_id) %>
+        <% active_skills = current_skills.select { |_, ps| ps.skill_level > 0 || ps.interest_level > 0 } %>
+
+        <!-- Active Skills (always shown) -->
+        <div id="active-skills" data-skills-target="activeSkills">
+          <% if active_skills.any? %>
+            <h5 class="mb-3">Your Skills</h5>
+            <% Skill.where(id: active_skills.keys).order(:name).each do |skill| %>
+              <%= render partial: 'skill_slider', locals: { skill: skill, people_skill: current_skills[skill.id] } %>
             <% end %>
-          </tbody>
-        </table>
+          <% end %>
+        </div>
+
+        <!-- Hidden Skills (shown on click) -->
+        <div id="additional-skills" class="mt-3" style="display: none;" data-skills-target="additionalSkills">
+          <h5 class="mb-3">Available Skills</h5>
+          <% Skill.where.not(id: active_skills.keys).order(:name).each do |skill| %>
+            <%= render partial: 'skill_slider', locals: { skill: skill, people_skill: current_skills[skill.id] } %>
+          <% end %>
+        </div>
+
+        <!-- Toggle Button -->
+        <button type="button"
+                class="btn btn-outline-secondary mt-3"
+                data-action="click->skills#toggleAdditional"
+                data-skills-target="toggleButton">
+          <span data-skills-target="toggleText">+ Add More Skills</span>
+        </button>
       </div>
     </div>
   </div>

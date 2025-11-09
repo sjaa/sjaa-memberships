@@ -47,3 +47,42 @@ hr.thick {
   border-top: 2px rgb(80, 80, 80) solid;
   border-bottom: 2px rgb(80, 80, 80) solid;
 }
+
+/* Volunteer Skills Styling */
+.skill-card {
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+}
+
+.skill-card.skill-active {
+  border-left-color: #0d6efd;
+  background-color: #f8f9fa;
+}
+
+.skill-card:hover {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.form-range {
+  cursor: pointer;
+}
+
+.form-range::-webkit-slider-thumb {
+  width: 20px;
+  height: 20px;
+}
+
+.form-range::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+}
+
+@media (max-width: 768px) {
+  .skill-card .card-body {
+    padding: 1rem;
+  }
+
+  .skill-card h6 {
+    font-size: 0.95rem;
+  }
+}
