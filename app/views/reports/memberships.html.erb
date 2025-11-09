@@ -8,11 +8,17 @@
         <input type="date" name="end" value="<%= @end_date %>" class="form-control" aria-label="End Date">
         <button type="submit" class="btn btn-primary">Generate Report</button>
       </div>
+      <div class="form-check mt-2">
+        <input type="checkbox" name="new_members_only" value="1" class="form-check-input" id="newMembersOnly" <%= 'checked' if params[:new_members_only] == '1' %>>
+        <label class="form-check-label" for="newMembersOnly">
+          Show only brand new members (no previous membership)
+        </label>
+      </div>
     </form>
     <% new_memberships_count = @report[:new_memberships].count %>
-    <% lost_memberships_count = @report[:lost_memberships].count %>
+    <% lost_memberships_count = @new_members_only ? '--' : @report[:lost_memberships].count %>
     <% new_memberships = @report[:new_memberships].count %>
-    <% returning_members = @report[:previous_memberships].count %>
+    <% returning_members = @new_members_only ? '--' : @report[:previous_memberships].count %>
     <!-- Show total changes in memberships -->
     <%= table class: "table table-bordered mb-3" do %>
     <thead>
@@ -24,13 +30,16 @@
     </thead>
     <tbody>
       <tr>
-        <td><%= @report[:starting_count] %></td>
-        <td><%= @report[:ending_count] %></td>
-        <td><%= @report[:ending_count] - @report[:starting_count] %></td>
+        <td><%= @new_members_only ? '--' : @report[:starting_count] %></td>
+        <td><%= @new_members_only ? '--' : @report[:ending_count] %></td>
+        <td><%= @new_members_only ? '--' : (@report[:ending_count] - @report[:starting_count]) %></td>
       </tr>
     </tbody>
     <% end %>
-    <h2>Memberships Gained <span style="color: green;">(<%=new_memberships_count%>)</span></h2>
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <h2 class="mb-0">Memberships Gained <span style="color: green;">(<%=new_memberships_count%>)</span></h2>
+      <%= link_to "Download CSV", memberships_report_path(start: @start_date, end: @end_date, new_members_only: params[:new_members_only], csv_type: 'gained', format: :csv), class: "btn btn-sm btn-primary" %>
+    </div>
     <!-- Show totals -->
     <%= table class: "table table-bordered mb-3" do %>
       <thead>
@@ -44,7 +53,7 @@
       <tbody>
         <tr>
           <td><%= new_memberships %></td>
-          <td><%= new_memberships - returning_members %></td>
+          <td><%= @new_members_only ? new_memberships : (new_memberships - returning_members) %></td>
           <td><%= returning_members %></td>
           <td><%= dollar_format(@report[:total_donations]) %></td>
         </tr>
@@ -79,28 +88,33 @@
         <% end %>
       </tbody>
     <% end %>
-    <h2>Memberships Lost <span style="color: red;">(<%=lost_memberships_count%>)</span></h2>
-    <%= table class: "table table-hover table-striped table-sm" do %>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Membership Start</th>
-          <th>Membership End</th>
-          <th>First Membership</th>
-        </tr>
-      </thead>
-      <tbody class="table-group-divider">
-        <% @report[:lost_memberships].each do |person, lost_memberships| %>
-        <% lost_membership = lost_memberships.first %>
-        <% first_membership_date = @report[:first_memberships_lost][person.id] %>
-        <tr>
-          <td><%= link_to person.name, person %></td>
-          <td><%= date_format(lost_membership.start) %></td>
-          <td><%= date_format(lost_membership.end) %></td>
-          <td><%= date_format(first_membership_date) %></td>
-        </tr>
-        <% end %>
-      </tbody>
+    <% unless @new_members_only %>
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h2 class="mb-0">Memberships Lost <span style="color: red;">(<%=lost_memberships_count%>)</span></h2>
+        <%= link_to "Download CSV", memberships_report_path(start: @start_date, end: @end_date, csv_type: 'lost', format: :csv), class: "btn btn-sm btn-primary" %>
+      </div>
+      <%= table class: "table table-hover table-striped table-sm" do %>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Membership Start</th>
+            <th>Membership End</th>
+            <th>First Membership</th>
+          </tr>
+        </thead>
+        <tbody class="table-group-divider">
+          <% @report[:lost_memberships].each do |person, lost_memberships| %>
+          <% lost_membership = lost_memberships.first %>
+          <% first_membership_date = @report[:first_memberships_lost][person.id] %>
+          <tr>
+            <td><%= link_to person.name, person %></td>
+            <td><%= date_format(lost_membership.start) %></td>
+            <td><%= date_format(lost_membership.end) %></td>
+            <td><%= date_format(first_membership_date) %></td>
+          </tr>
+          <% end %>
+        </tbody>
+      <% end %>
     <% end %>
   </div>
 </div>

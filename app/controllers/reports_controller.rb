@@ -36,7 +36,39 @@ class ReportsController < ApplicationController
   def memberships
     @start_date = params[:start].present? ? Date.strptime(params[:start]) : Date.today.beginning_of_month
     @end_date = params[:end].present? ? Date.strptime(params[:end]) : Date.today.end_of_month
-    @report = membership_report(date_range: @start_date..@end_date)
+    @new_members_only = params[:new_members_only] == '1'
+    @report = membership_report(date_range: @start_date..@end_date, new_members_only: @new_members_only)
+
+    respond_to do |format|
+      format.html
+      format.csv do
+        csv_type = params[:csv_type] # 'gained' or 'lost'
+
+        csv_data = CSV.generate(headers: true) do |csv|
+          csv << ['First Name', 'Last Name', 'Email']
+
+          people = case csv_type
+          when 'gained'
+            @report[:new_memberships].keys
+          when 'lost'
+            @report[:lost_memberships].keys
+          else
+            []
+          end
+
+          people.each do |person|
+            csv << [
+              person.first_name,
+              person.last_name,
+              person.email
+            ]
+          end
+        end
+
+        filename = "sjaa-memberships-#{csv_type}-#{@start_date}-to-#{@end_date}.csv"
+        send_data csv_data, filename: filename
+      end
+    end
   end
 
   def renewal_reminders
