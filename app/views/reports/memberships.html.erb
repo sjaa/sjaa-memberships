@@ -59,6 +59,7 @@
           <th>End</th>
           <th>Donation</th>
           <th>Previous</th>
+          <th>First Membership</th>
         </tr>
       </thead>
       <tbody class="table-group-divider">
@@ -66,12 +67,14 @@
         <% new_membership = new_memberships.first %>
         <% previous_membership = @report[:previous_memberships][person.id]&.first %>
         <% donation = new_membership.donation_amount || 0 %>
+        <% first_membership_date = @report[:first_memberships_gained][person.id] %>
         <tr>
           <td style="white-space: nowrap;"><%= link_to person.name, person %></td>
           <td style="white-space: nowrap;"><%= date_format(new_membership.start)%></td>
           <td style="white-space: nowrap;"><%= date_format(new_membership.end)%></td>
           <td style="white-space: nowrap;"><%= donation > 0 ? dollar_format(donation) : '' %></td>
           <td style="white-space: nowrap;"><%= previous_membership ? date_format(previous_membership.end) : 'New Member' %></td>
+          <td style="white-space: nowrap;"><%= date_format(first_membership_date) %></td>
         </tr>
         <% end %>
       </tbody>
@@ -83,15 +86,18 @@
           <th>Name</th>
           <th>Membership Start</th>
           <th>Membership End</th>
+          <th>First Membership</th>
         </tr>
       </thead>
       <tbody class="table-group-divider">
         <% @report[:lost_memberships].each do |person, lost_memberships| %>
         <% lost_membership = lost_memberships.first %>
+        <% first_membership_date = @report[:first_memberships_lost][person.id] %>
         <tr>
           <td><%= link_to person.name, person %></td>
           <td><%= date_format(lost_membership.start) %></td>
           <td><%= date_format(lost_membership.end) %></td>
+          <td><%= date_format(first_membership_date) %></td>
         </tr>
         <% end %>
       </tbody>

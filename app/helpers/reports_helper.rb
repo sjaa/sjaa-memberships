@@ -30,6 +30,16 @@ module ReportsHelper
     actually_lost_people = report[:expired_memberships].keys - still_active_expired
     report[:lost_memberships] = report[:expired_memberships].slice(*actually_lost_people)
 
+    # Get first membership start date for new members (for Memberships Gained table)
+    report[:first_memberships_gained] = Membership.where(person_id: report[:new_memberships].keys.map(&:id))
+                                                  .group(:person_id)
+                                                  .minimum(:start)
+
+    # Get first membership start date for lost members (for Memberships Lost table)
+    report[:first_memberships_lost] = Membership.where(person_id: report[:lost_memberships].keys.map(&:id))
+                                                .group(:person_id)
+                                                .minimum(:start)
+
     report[:starting_count] = Person.active_members(date_range.begin).uniq.count
     #report[:starting_members] = Person.active_members(date_range.begin).uniq
     report[:ending_count] = Person.active_members(date_range.end).uniq.count
