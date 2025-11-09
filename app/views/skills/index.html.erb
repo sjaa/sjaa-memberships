@@ -1,0 +1,28 @@
+<p style="color: green"><%= notice %></p>
+
+<h1>Skills</h1>
+
+<div class="table-responsive">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Google Group Email</th>
+        <th>Active Members</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @skills.each do |skill| %>
+        <tr>
+          <td><%= link_to skill.name, skill %></td>
+          <td><%= truncate(skill.description, length: 100) %></td>
+          <td><%= skill.email %></td>
+          <td><%= skill.active_members.count %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<%= link_to "New Skill", new_skill_path, class: "btn btn-success" %>

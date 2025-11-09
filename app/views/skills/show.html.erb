@@ -1,0 +1,66 @@
+<div class="row">
+  <div class="col-12">
+    <h1><%= @skill.name %></h1>
+    <div class="d-flex flex-wrap">
+      <%= link_to "Edit", edit_skill_path(@skill), class: "btn btn-primary btn-sm mb-2" %>&nbsp;
+      <%= button_to "Delete", @skill, method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger btn-sm mb-2" %>&nbsp;
+      <%= link_to "Back to Skills", skills_path, class: "btn btn-secondary btn-sm mb-2" %>&nbsp;
+    </div>
+    <div class="card mb-3 mt-2">
+      <div class="card-body">
+        <h5 class="card-title">Description</h5>
+        <p class="card-text"><%= @skill.description || "No description provided" %></p>
+      </div>
+    </div>
+    <% if @skill.email.present? %>
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Google Group</h5>
+          <p class="card-text">
+            <%= @skill.email %>
+            <br/>
+            <small class="text-muted">Members are automatically synced when they update their skills.</small>
+          </p>
+        </div>
+      </div>
+    <% end %>
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Members with this Skill (<%= @people_with_skill.count %>)</h5>
+        <% if @people_with_skill.any? %>
+          <table class="table table-sm">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Skill Level</th>
+                <th>Interest Level</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @people_with_skill.each do |person| %>
+                <% people_skill = person.people_skills.find_by(skill: @skill) %>
+                <tr>
+                  <td><%= link_to person.name, person %></td>
+                  <td><%= person.email %></td>
+                  <td><%= people_skill.skill_level %>/10</td>
+                  <td><%= people_skill.interest_level %>/10</td>
+                  <td>
+                    <% if person.is_active? %>
+                      <span class="badge bg-success">Active</span>
+                    <% else %>
+                      <span class="badge bg-secondary">Expired</span>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        <% else %>
+          <p class="text-muted">No members have indicated they have this skill yet.</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,36 @@
+<%= form_with(model: skill) do |form| %>
+  <% if skill.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(skill.errors.count, "error") %> prohibited this skill from being saved:</h2>
+
+      <ul>
+        <% skill.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="mb-3">
+    <%= form.label :name, style: "display: block", class: "form-label" %>
+    <%= form.text_field :name, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :description, style: "display: block", class: "form-label" %>
+    <%= form.text_area :description, rows: 3, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :email, "Google Group Email", style: "display: block", class: "form-label" %>
+    <%= form.text_field :email, class: "form-control", placeholder: "skills-example@sjaa.net" %>
+    <small class="form-text text-muted">
+      Optional. If provided, members with this skill will be automatically synced to this Google Group.
+    </small>
+  </div>
+
+  <div>
+    <%= form.submit class: "btn btn-primary" %>
+    <%= link_to "Cancel", skills_path, class: "btn btn-secondary" %>
+  </div>
+<% end %>

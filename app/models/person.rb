@@ -9,6 +9,8 @@ class Person < ApplicationRecord
   has_and_belongs_to_many :roles
   has_and_belongs_to_many :permissions
   has_many :api_keys, as: :bearer
+  has_many :people_skills, dependent: :destroy, autosave: true
+  has_many :skills, through: :people_skills
   has_secure_password validations: false # Rethink this... maybe just force a random password when not present
   belongs_to :astrobin, optional: true
   belongs_to :referral, optional: true
@@ -270,6 +272,60 @@ class Person < ApplicationRecord
   # Setter for permission management (similar to Admin model)
   def permission_attributes=(permission_ids)
     self.permissions = Permission.where(id: permission_ids)
+  end
+
+  # Setter for skills management
+  # Accepts array of hashes: [{skill_id: 1, skill_level: 5, interest_level: 7}, ...]
+  def skills_attributes=(attributes)
+    # Build a hash of incoming skills: skill_id => {skill_level, interest_level}
+    incoming_skills = {}
+    attributes.each do |skill_attr|
+      next if skill_attr[:skill_id].blank?
+
+      skill_id = skill_attr[:skill_id].to_i
+      skill_level = skill_attr[:skill_level].to_i
+      interest_level = skill_attr[:interest_level].to_i
+
+      # Only track skills with non-zero levels
+      if skill_level > 0 || interest_level > 0
+        incoming_skills[skill_id] = {
+          skill_level: skill_level,
+          interest_level: interest_level
+        }
+      end
+    end
+
+    # Build array of people_skills to keep
+    _people_skills = []
+
+    # Reload association to get fresh data from database if person is persisted
+    current_skills = self.persisted? ? self.people_skills.reload.to_a : self.people_skills.to_a
+
+    # Find or create PeopleSkill records for each incoming skill
+    incoming_skills.each do |skill_id, levels|
+      # Try to find existing record
+      people_skill = current_skills.find { |ps| ps.skill_id == skill_id }
+
+      if people_skill
+        # Update existing record
+        people_skill.assign_attributes(
+          skill_level: levels[:skill_level],
+          interest_level: levels[:interest_level]
+        )
+      else
+        # Create new record
+        people_skill = PeopleSkill.new(
+          skill_id: skill_id,
+          skill_level: levels[:skill_level],
+          interest_level: levels[:interest_level]
+        )
+      end
+
+      _people_skills << people_skill
+    end
+
+    # Replace the association
+    self.people_skills = _people_skills
   end
 
   # Passwords for people can be blank if they've never signed up

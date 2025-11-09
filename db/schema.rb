@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_10_19_035544) do
+ActiveRecord::Schema[7.1].define(version: 2025_11_08_000003) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
   enable_extension "plpgsql"
@@ -223,6 +223,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_10_19_035544) do
     t.string "password_digest"
     t.string "reset_password_token"
     t.datetime "reset_password_sent_at"
+    t.boolean "volunteer", default: false
+    t.boolean "mentor", default: false
     t.index ["first_name"], name: "index_people_on_first_name"
     t.index ["last_name"], name: "index_people_on_last_name"
   end
@@ -239,6 +241,18 @@ ActiveRecord::Schema[7.1].define(version: 2025_10_19_035544) do
     t.integer "role_id", null: false
     t.index ["person_id"], name: "index_people_roles_on_person_id"
     t.index ["role_id"], name: "index_people_roles_on_role_id"
+  end
+
+  create_table "people_skills", force: :cascade do |t|
+    t.bigint "person_id", null: false
+    t.bigint "skill_id", null: false
+    t.integer "skill_level", default: 0
+    t.integer "interest_level", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["person_id", "skill_id"], name: "index_people_skills_on_person_id_and_skill_id", unique: true
+    t.index ["person_id"], name: "index_people_skills_on_person_id"
+    t.index ["skill_id"], name: "index_people_skills_on_skill_id"
   end
 
   create_table "permissions", force: :cascade do |t|
@@ -264,6 +278,15 @@ ActiveRecord::Schema[7.1].define(version: 2025_10_19_035544) do
     t.string "discord_id"
     t.boolean "joinable", default: false
     t.boolean "members_only", default: false
+  end
+
+  create_table "skills", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.string "email"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_skills_on_name", unique: true
   end
 
   create_table "solid_queue_blocked_executions", force: :cascade do |t|
@@ -405,6 +428,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_10_19_035544) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "people_skills", "people"
+  add_foreign_key "people_skills", "skills"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_failed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade

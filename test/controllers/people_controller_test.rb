@@ -218,6 +218,168 @@ class PeopleControllerTest < ActionDispatch::IntegrationTest
     assert_select 'p', text: /Expired: #{Regexp.escape(expected_expiration)}/
   end
 
+  # Skills update tests
+  test "update person with volunteer and mentor flags" do
+    login_as_person(@member)
+
+    patch person_path(@member), params: {
+      person: {
+        first_name: @member.first_name,
+        last_name: @member.last_name,
+        volunteer: true,
+        mentor: true
+      }
+    }
+
+    @member.reload
+    assert @member.volunteer
+    assert @member.mentor
+  end
+
+  test "update person with skills via skills_attributes" do
+    login_as_person(@member)
+
+    skill1 = Skill.create!(name: 'Photography', description: 'Astrophotography')
+    skill2 = Skill.create!(name: 'Event Planning', description: 'Organizing events')
+
+    patch person_path(@member), params: {
+      person: {
+        first_name: @member.first_name,
+        last_name: @member.last_name,
+        skills_attributes: [
+          { skill_id: skill1.id, skill_level: 5, interest_level: 7 },
+          { skill_id: skill2.id, skill_level: 3, interest_level: 8 }
+        ]
+      }
+    }
+
+    @member.reload
+    assert_equal 2, @member.skills.count
+    assert_includes @member.skills, skill1
+    assert_includes @member.skills, skill2
+
+    ps1 = @member.people_skills.find_by(skill: skill1)
+    assert_equal 5, ps1.skill_level
+    assert_equal 7, ps1.interest_level
+
+    ps2 = @member.people_skills.find_by(skill: skill2)
+    assert_equal 3, ps2.skill_level
+    assert_equal 8, ps2.interest_level
+  end
+
+  test "update person skills from form with all skills" do
+    login_as_person(@member)
+
+    skill1 = Skill.create!(name: 'Photography', description: 'Astrophotography')
+    skill2 = Skill.create!(name: 'Event Planning', description: 'Organizing events')
+    skill3 = Skill.create!(name: 'Teaching', description: 'Education')
+
+    # Simulate form submission where all skills are present, some with 0 values
+    patch person_path(@member), params: {
+      person: {
+        first_name: @member.first_name,
+        last_name: @member.last_name,
+        skills_attributes: [
+          { skill_id: skill1.id, skill_level: 5, interest_level: 7 },
+          { skill_id: skill2.id, skill_level: 0, interest_level: 0 },
+          { skill_id: skill3.id, skill_level: 0, interest_level: 8 }
+        ]
+      }
+    }
+
+    @member.reload
+    # Should only have skill1 (both > 0) and skill3 (interest > 0)
+    assert_equal 2, @member.skills.count
+    assert_includes @member.skills, skill1
+    assert_not_includes @member.skills, skill2
+    assert_includes @member.skills, skill3
+  end
+
+  test "update person removes previous skills not in new submission" do
+    login_as_person(@member)
+
+    skill1 = Skill.create!(name: 'Photography', description: 'Astrophotography')
+    skill2 = Skill.create!(name: 'Event Planning', description: 'Organizing events')
+    skill3 = Skill.create!(name: 'Teaching', description: 'Education')
+
+    # First, add all three skills
+    @member.skills_attributes = [
+      { skill_id: skill1.id, skill_level: 5, interest_level: 5 },
+      { skill_id: skill2.id, skill_level: 3, interest_level: 7 },
+      { skill_id: skill3.id, skill_level: 4, interest_level: 6 }
+    ]
+    @member.save!
+    assert_equal 3, @member.skills.count
+
+    # Now update to only include skill1 and skill3
+    patch person_path(@member), params: {
+      person: {
+        first_name: @member.first_name,
+        last_name: @member.last_name,
+        skills_attributes: [
+          { skill_id: skill1.id, skill_level: 6, interest_level: 8 },
+          { skill_id: skill2.id, skill_level: 0, interest_level: 0 },
+          { skill_id: skill3.id, skill_level: 5, interest_level: 7 }
+        ]
+      }
+    }
+
+    @member.reload
+    assert_equal 2, @member.skills.count
+    assert_includes @member.skills, skill1
+    assert_not_includes @member.skills, skill2
+    assert_includes @member.skills, skill3
+  end
+
+  test "update person skills with string values from form" do
+    login_as_person(@member)
+
+    skill = Skill.create!(name: 'Photography', description: 'Astrophotography')
+
+    # Form submissions send strings, not integers
+    patch person_path(@member), params: {
+      person: {
+        first_name: @member.first_name,
+        last_name: @member.last_name,
+        skills_attributes: [
+          { skill_id: skill.id.to_s, skill_level: '5', interest_level: '7' }
+        ]
+      }
+    }
+
+    @member.reload
+    ps = @member.people_skills.first
+    assert_equal 5, ps.skill_level
+    assert_equal 7, ps.interest_level
+  end
+
+  test "update person with combined volunteer flags and skills" do
+    login_as_person(@member)
+
+    skill = Skill.create!(name: 'Photography', description: 'Astrophotography')
+
+    patch person_path(@member), params: {
+      person: {
+        first_name: @member.first_name,
+        last_name: @member.last_name,
+        volunteer: '1',
+        mentor: '1',
+        skills_attributes: [
+          { skill_id: skill.id, skill_level: 8, interest_level: 9 }
+        ]
+      }
+    }
+
+    @member.reload
+    assert @member.volunteer
+    assert @member.mentor
+    assert_equal 1, @member.skills.count
+
+    ps = @member.people_skills.first
+    assert_equal 8, ps.skill_level
+    assert_equal 9, ps.interest_level
+  end
+
   private
 
   def login_as_admin(admin)
