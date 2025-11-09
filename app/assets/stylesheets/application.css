@@ -86,3 +86,54 @@ hr.thick {
     font-size: 0.95rem;
   }
 }
+
+/* Profile Display Styling */
+.skill-display-card {
+  background-color: #ffffff;
+  transition: all 0.2s ease;
+}
+
+.skill-display-card:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+}
+
+.skill-display-card h6 {
+  color: #0d6efd;
+  font-weight: 600;
+}
+
+.skill-levels .progress {
+  background-color: #e9ecef;
+}
+
+/* Contact info icons alignment */
+.contact-info svg {
+  vertical-align: text-top;
+}
+
+/* Hero header shadow */
+.card.border-0.shadow-sm {
+  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.075) !important;
+}
+
+/* Ensure cards have equal height */
+.card.h-100 {
+  height: 100% !important;
+}
+
+/* Responsive adjustments for profile */
+@media (max-width: 768px) {
+  .skill-display-card {
+    margin-bottom: 1rem;
+  }
+
+  .card-header h5 {
+    font-size: 1.1rem;
+  }
+
+  .contact-info svg {
+    width: 14px;
+    height: 14px;
+  }
+}

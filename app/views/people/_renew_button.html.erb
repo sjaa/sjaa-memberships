@@ -1,7 +1,6 @@
 <% if @person.latest_membership&.is_active? %>
   <% expiration = @person.latest_membership&.end %>
   <%= link_to "Membership Active", membership_renewal_path(id: @person.id), class: 'btn btn-success d-inline-block' %>
-  <small style="font-size: 1rem;" class="text-muted">Expires: <%= expiration ? date_format(expiration) : 'NEVER' %></small>
 <% else %>
   <%= link_to "Renew Membership", membership_renewal_path(id: @person.id), class: 'btn btn-warning d-inline-block' %>
 <% end %>

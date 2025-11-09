@@ -177,10 +177,10 @@
         <template data-form-target="template">
           <%= render partial: 'contact_form', locals: {id: "NEWID", contact: Contact.new, i: nil, person: person} %>
         </template>
-        <div class="row">
-          <div class="col-12 mt-2">
-            <button type="button" data-form-baseid-param="new_contact" data-action="form#addField" class="btn btn-secondary">Add Contact</button>
-          </div>
+      </div>
+      <div class="row">
+        <div class="col-12 mt-2">
+          <button type="button" data-form-baseid-param="new_contact" data-action="form#addField" class="btn btn-secondary">Add Contact</button>
         </div>
       </div>
     </div>

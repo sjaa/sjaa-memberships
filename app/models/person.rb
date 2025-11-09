@@ -185,6 +185,7 @@ class Person < ApplicationRecord
   end
 
   def astrobin_attributes=(attributes)
+    return if attributes.blank? || attributes[:username].blank?
     _astrobin = self.astrobin
     if(!_astrobin.present?)
       _astrobin = Astrobin.new(attributes)

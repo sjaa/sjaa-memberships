@@ -83,4 +83,19 @@ module ApplicationHelper
     luminance < 128 ? '#ffffff' : '#000000'
   end
 
+  # Helper methods for skill level display
+  def skill_level_color(level)
+    return 'text-muted' if level == 0
+    return 'text-danger' if level <= 3
+    return 'text-warning' if level <= 6
+    'text-success'
+  end
+
+  def skill_level_bg(level)
+    return 'bg-secondary' if level == 0
+    return 'bg-danger' if level <= 3
+    return 'bg-warning' if level <= 6
+    'bg-success'
+  end
+
 end

@@ -1,126 +1,304 @@
-<div class="row">
-  <div class="col-12" id="<%= dom_id @person %>">
-    <h1>
-      <%= @person.first_name %>
-      <%= @person.last_name %>
-      <span class="h4 text-secondary">
-      </span>
-    </h1>
-    <% unless @person.latest_membership&.is_active? %>
-      <div class="alert alert-warning alert-dismissible fade show" role="alert">
-        Your membership is currently not active.  
-        <%= link_to "Activate your membership", membership_renewal_path(id: @person.id), class: '' %>
-        today to continue receiving the benefits of membership.
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-    <% end %>
-    <%= link_to "Edit Personal Information", edit_person_path(@person), class: 'btn btn-primary d-inline-block' %>
-    <%= render partial: 'renew_button' %>
-    <br/>
-    <%= link_to("Send Welcome Email", welcome_email_path(@person), class: 'btn btn-sm btn-secondary mt-2') if(@user.is_a?(Admin))%>
-    <%= link_to("Send Renewal Reminder", reminder_email_path(@person), class: 'btn btn-sm btn-secondary mt-2') if(@user.is_a?(Admin))%>
-    <div class="table-responsive mt-4">
-      <table class="table table-striped table-hover">
-        <tr>
-          <td><strong>Interests</strong></td>
-          <td>
-            <%= @person.interests.map{|i| i.name}.join(', ') %></td>
-        </tr>
-        <tr>
-          <td><strong>Roles</strong></td>
-          <td><%= @person.roles.map{|r| link_to(r.name, role_path(r))}.join('
-              , ').html_safe %></td>
-        </tr>
-        <tr>
-          <td><strong>Notes</strong></td>
-          <td><%= @person.notes %></td>
-        </tr>
-        <tr>
-          <td><strong>Discord</strong></td>
-          <td><%= @person.discord_id %></td>
-        </tr>
-        <tr>
-          <td><strong>Referral</strong></td>
-          <td><%= @person.referral&.name %></td>
-        </tr>
-        <tr>
-          <td><strong>Astrobin</strong></td>
-          <td>
-            <% if @person.astrobin %>
-              <%= link_to(@person.astrobin&.username, "https://www.astrobin.com/users/#{@person.astrobin&.username}", target: :_blank) %> <%= @person.astrobin&.latest_image ? "(#{@person.astrobin&.latest_image})" : '' %></td>
-          <% end %>
-        </tr>
-        <% @person.contacts.each_with_index do |contact, i| %>
-          <tr>
-            <td colspan=2><strong>Contact <%=i+1%></strong><%= contact.primary ? ' (Primary)' : '' %>
-            </td>
-          </tr>
-          <tr>
-            <td><strong>Address</strong></td>
-            <td>
-              <%=contact.address%>, <%=contact.city&.name%>, <%=contact.state&.short_name%>
-              <%=contact.zipcode%>
-            </td>
-          </tr>
-          <tr>
-            <td><strong>Phone</strong></td>
-            <td>
-              <%=contact.phone%>
-            </td>
-          </tr>
-          <tr>
-            <td><strong>Email</strong></td>
-            <td>
-              <%=contact.email%>
-            </td>
-          </tr>
-        <%end%>
-      </table>
-    </div>
-  </div>
-  <div class="row">
-    <% if @person.donations.count > 0 %>
-      <div class="col-12 table-responsive">
-        <h2>Donations</h2>
-        <%= render partial: 'donations/index' , locals: {donations: @person.donations} %>
-      </div>
-    <% end %>
-    <div class="col-xs-12 col-md-6 table-responsive">
-      <h2>Memberships</h2>
-      <table class="table table-striped table-hover">
-        <tr>
-          <th>Duration</th>
-          <th>Kind</th>
-          <th>Donation</th>
-          <th>Ephemeris</th>
-        </tr>
-        <% @person.memberships.each do |membership| %>
-          <tr>
-            <td>
-              <% if membership.term_months.nil? %>
-                LIFETIME
-              <% else %>
-                <%= date_format(membership.start) %> to <%= date_format(membership.end) %>
-                (<%= membership.term_months %> months)
-              <% end %>
-            </td>
-            <td>
-              <%= membership.kind&.name %>
-            </td>
-            <td>
-              <%= dollar_format(membership.donation_amount) %>
-            </td>
-            <td>
-              <%= ephemeris_format membership.ephemeris %>
-            </td>
-          </tr>
-        <% end %>
-      </table>
-    </div>
-  </div>
-  <% if @user.is_a?(Admin) %>
+<div class="container-fluid">
+  <!-- Hero Header -->
+  <div class="row mb-4">
     <div class="col-12">
-      <%= button_to "Delete this person", @person, method: :delete, data: {turbo_confirm: 'Are you TOTALLY sure??' }, class: 'btn btn-danger d-inline-block' %>
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+          <h1 class="mb-3">
+            <%= @person.first_name %> <%= @person.last_name %>
+          </h1>
+
+          <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+            <%= link_to "Edit Profile", edit_person_path(@person), class: 'btn btn-primary' %>
+            <%= render partial: 'renew_button' %>
+          </div>
+
+          <% if @user.is_a?(Admin) %>
+            <div class="btn-group" role="group">
+              <%= link_to "Welcome Email", welcome_email_path(@person), class: 'btn btn-sm btn-outline-secondary' %>
+              <%= link_to "Renewal Reminder", reminder_email_path(@person), class: 'btn btn-sm btn-outline-secondary' %>
+            </div>
+          <% end %>
+
+          <% unless @person.latest_membership&.is_active? %>
+            <div class="alert alert-warning mt-3 mb-0" role="alert">
+              <strong>Membership Inactive:</strong>
+              <%= link_to "Renew your membership", membership_renewal_path(id: @person.id), class: 'alert-link' %>
+              to continue receiving benefits.
+            </div>
+          <% end %>
+        </div>
+      </div>
     </div>
-  <% end %>
+  </div>
+
+  <!-- Profile Information Grid -->
+  <div class="row g-4">
+    <!-- Personal Information -->
+    <div class="col-lg-6">
+      <div class="card h-100">
+        <div class="card-header bg-body-secondary">
+          <h5 class="mb-0">Personal Information</h5>
+        </div>
+        <div class="card-body">
+          <dl class="row mb-0">
+            <% if @person.volunteer || @person.mentor %>
+              <dt class="col-sm-4">Volunteer</dt>
+              <dd class="col-sm-8">
+                <% if @person.volunteer %>
+                  <span class="badge bg-primary me-1">Volunteer</span>
+                <% end %>
+                <% if @person.mentor %>
+                  <span class="badge bg-success">Mentor</span>
+                <% end %>
+              </dd>
+            <% end %>
+
+            <% if @person.interests.any? %>
+              <dt class="col-sm-4">Interests</dt>
+              <dd class="col-sm-8">
+                <% @person.interests.each do |interest| %>
+                  <span class="badge bg-light text-dark me-1 mb-1"><%= interest.name.titleize %></span>
+                <% end %>
+              </dd>
+            <% end %>
+
+            <% if @person.notes.present? %>
+              <dt class="col-sm-4">Notes</dt>
+              <dd class="col-sm-8"><%= simple_format(@person.notes) %></dd>
+            <% end %>
+
+            <% if @person.referral.present? %>
+              <dt class="col-sm-4">Referral</dt>
+              <dd class="col-sm-8"><%= @person.referral.name %></dd>
+            <% end %>
+
+            <% if @person.astrobin&.username&.present? %>
+              <dt class="col-sm-4">Astrobin</dt>
+              <dd class="col-sm-8">
+                <%= link_to @person.astrobin.username, "https://www.astrobin.com/users/#{@person.astrobin.username}", target: :_blank, class: 'text-decoration-none' %>
+                <% if @person.astrobin.latest_image %>
+                  <small class="text-muted">(Image ID: <%= @person.astrobin.latest_image %>)</small>
+                <% end %>
+              </dd>
+            <% end %>
+
+            <% if @user.is_a?(Admin) && @person.discord_id.present? %>
+              <dt class="col-sm-4">Discord ID</dt>
+              <dd class="col-sm-8"><code><%= @person.discord_id %></code></dd>
+            <% end %>
+
+            <% if @person.roles.any? %>
+              <dt class="col-sm-4">Roles</dt>
+              <dd class="col-sm-8">
+                <% @person.roles.each do |role| %>
+                  <%= link_to role.name, role_path(role), class: 'badge bg-info text-dark me-1 mb-1 text-decoration-none' %>
+                <% end %>
+              </dd>
+            <% end %>
+          </dl>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contact Information -->
+    <div class="col-lg-6">
+      <div class="card h-100">
+        <div class="card-header bg-body-secondary">
+          <h5 class="mb-0">Contact Information</h5>
+        </div>
+        <div class="card-body">
+          <% if @person.contacts.any? %>
+            <% @person.contacts.each_with_index do |contact, i| %>
+              <% if i > 0 %><hr><% end %>
+              <div class="contact-info">
+                <% if contact.primary %>
+                  <span class="badge bg-primary mb-2">Primary Contact</span>
+                <% elsif @person.contacts.count > 1 %>
+                  <h6 class="text-muted">Contact <%= i + 1 %></h6>
+                <% end %>
+
+                <% if contact.email.present? %>
+                  <div class="mb-2" data-contact-type="email">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-envelope me-2" viewBox="0 0 16 16">
+                      <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2Zm13 2.383-4.708 2.825L15 11.105V5.383Zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741ZM1 11.105l4.708-2.897L1 5.383v5.722Z"/>
+                    </svg>
+                    <%= mail_to contact.email, contact.email, class: 'text-decoration-none' %>
+                  </div>
+                <% end %>
+
+                <% if contact.phone.present? %>
+                  <div class="mb-2" data-contact-type="phone">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-telephone me-2" viewBox="0 0 16 16">
+                      <path d="M3.654 1.328a.678.678 0 0 0-1.015-.063L1.605 2.3c-.483.484-.661 1.169-.45 1.77a17.568 17.568 0 0 0 4.168 6.608 17.569 17.569 0 0 0 6.608 4.168c.601.211 1.286.033 1.77-.45l1.034-1.034a.678.678 0 0 0-.063-1.015l-2.307-1.794a.678.678 0 0 0-.58-.122l-2.19.547a1.745 1.745 0 0 1-1.657-.459L5.482 8.062a1.745 1.745 0 0 1-.46-1.657l.548-2.19a.678.678 0 0 0-.122-.58L3.654 1.328zM1.884.511a1.745 1.745 0 0 1 2.612.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.678.678 0 0 0 .178.643l2.457 2.457a.678.678 0 0 0 .644.178l2.189-.547a1.745 1.745 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.634 18.634 0 0 1-7.01-4.42 18.634 18.634 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877L1.885.511z"/>
+                    </svg>
+                    <%= link_to contact.phone, "tel:#{contact.phone}", class: 'text-decoration-none' %>
+                  </div>
+                <% end %>
+
+                <% if contact.address.present? || contact.city.present? || contact.state.present? || contact.zipcode.present? %>
+                  <div class="mb-2" data-contact-type="address">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-geo-alt me-2" viewBox="0 0 16 16">
+                      <path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A31.493 31.493 0 0 1 8 14.58a31.481 31.481 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94zM8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10z"/>
+                      <path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                    </svg>
+                    <% if contact.address.present? %>
+                      <%= contact.address %><br>
+                      <span class="ms-4">
+                    <% end %>
+                    <%= [contact.city&.name, contact.state&.short_name].compact.join(', ') %>
+                    <%= contact.zipcode %>
+                    <% if contact.address.present? %>
+                      </span>
+                    <% end %>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+          <% else %>
+            <p class="text-muted mb-0">No contact information on file.</p>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Volunteer Skills -->
+    <% active_skills = @person.people_skills.select(&:active?).sort_by { |ps| -[ps.skill_level, ps.interest_level].max } %>
+    <% if @person.volunteer || @person.mentor || active_skills.any? %>
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header bg-body-secondary">
+            <h5 class="mb-0">Volunteer & Skills</h5>
+          </div>
+          <div class="card-body">
+            <% if active_skills.any? %>
+              <div class="row g-3">
+                <% active_skills.each do |people_skill| %>
+                  <div class="col-md-6 col-lg-4">
+                    <div class="skill-display-card p-3 border rounded">
+                      <h6 class="mb-2"><%= people_skill.skill.name %></h6>
+                      <% if people_skill.skill.description.present? %>
+                        <small class="text-muted d-block mb-2"><%= people_skill.skill.description %></small>
+                      <% end %>
+                      <div class="skill-levels">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                          <small class="text-muted">Skill Level:</small>
+                          <strong class="<%= skill_level_color(people_skill.skill_level) %>"><%= people_skill.skill_level %>/10</strong>
+                        </div>
+                        <div class="progress mb-2" style="height: 6px;">
+                          <div class="progress-bar <%= skill_level_bg(people_skill.skill_level) %>"
+                               style="width: <%= people_skill.skill_level * 10 %>%"></div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                          <small class="text-muted">Interest:</small>
+                          <strong class="<%= skill_level_color(people_skill.interest_level) %>"><%= people_skill.interest_level %>/10</strong>
+                        </div>
+                        <div class="progress" style="height: 6px;">
+                          <div class="progress-bar <%= skill_level_bg(people_skill.interest_level) %>"
+                               style="width: <%= people_skill.interest_level * 10 %>%"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            <% else %>
+              <p class="text-muted mb-0">
+                <% if @person.volunteer %>
+                  Interested in volunteering but no specific skills indicated yet.
+                <% elsif @person.mentor %>
+                  Willing to mentor but no specific skills indicated yet.
+                <% end %>
+              </p>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Membership History -->
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header bg-body-secondary d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Membership History</h5>
+          <% if @person.first_membership %>
+            <small class="text-muted">Member since <%= date_format(@person.first_membership.start) %></small>
+          <% end %>
+        </div>
+        <div class="card-body">
+          <% if @person.memberships.any? %>
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th>Duration</th>
+                    <th>Type</th>
+                    <th class="text-end">Donation</th>
+                    <th class="text-center">Ephemeris</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% @person.memberships.reverse.each do |membership| %>
+                    <tr class="<%= 'table-success' if membership.is_active? %>">
+                      <td>
+                        <% if membership.term_months.nil? %>
+                          <strong>LIFETIME</strong>
+                        <% else %>
+                          <%= date_format(membership.start) %> to <%= date_format(membership.end) %>
+                          <br><small class="text-muted"><%= membership.term_months %> months</small>
+                        <% end %>
+                      </td>
+                      <td><%= membership.kind&.name %></td>
+                      <td class="text-end"><%= dollar_format(membership.donation_amount) %></td>
+                      <td class="text-center"><%= ephemeris_format membership.ephemeris %></td>
+                      <td>
+                        <% if membership.is_active? %>
+                          <span class="badge bg-success">Active</span>
+                        <% end %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          <% else %>
+            <p class="text-muted mb-0">No membership history.</p>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Donations (if any) -->
+    <% if @person.donations.count > 0 %>
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header bg-body-secondary">
+            <h5 class="mb-0">Donations</h5>
+          </div>
+          <div class="card-body">
+            <%= render partial: 'donations/index', locals: {donations: @person.donations} %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Admin Actions -->
+    <% if @user.is_a?(Admin) %>
+      <div class="col-12">
+        <div class="card border-danger">
+          <div class="card-header bg-danger text-white">
+            <h5 class="mb-0">Admin Actions</h5>
+          </div>
+          <div class="card-body">
+            <div class="d-flex flex-wrap gap-2">
+              <%= button_to "Delete Person", @person, method: :delete,
+                  data: {turbo_confirm: 'Are you TOTALLY sure??'},
+                  class: 'btn btn-sm btn-danger' %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
 </div>
