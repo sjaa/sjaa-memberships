@@ -7,7 +7,6 @@
           <h1 class="mb-3">
             <%= @person.first_name %> <%= @person.last_name %>
           </h1>
-
           <% unless @person.latest_membership&.is_active? %>
             <div class="alert alert-warning mb-3 mb-0" role="alert">
               <strong>Membership Inactive:</strong>
@@ -15,12 +14,10 @@
               to continue receiving benefits.
             </div>
           <% end %>
-
           <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
             <%= link_to "Edit Profile", edit_person_path(@person), class: 'btn btn-primary' %>
             <%= render partial: 'renew_button' %>
           </div>
-
           <% if @user.is_a?(Admin) %>
             <div class="btn-group" role="group">
               <%= link_to "Welcome Email", welcome_email_path(@person), class: 'btn btn-sm btn-outline-secondary' %>
@@ -31,10 +28,25 @@
       </div>
     </div>
   </div>
-
   <!-- Profile Information Grid -->
   <div class="row g-4">
     <!-- Personal Information -->
+    <div class="col-lg-3">
+      <div class="card h-100">
+        <div class="card-header bg-body-secondary">
+          <h5 class="mb-0">Profile Picture</h5>
+        </div>
+        <div class="card-body">
+          <% if @person.profile_picture.attached? %>
+            <div class="text-center mb-3">
+              <%= image_tag @person.profile_picture.variant(resize_to_limit: [200, 200]),
+                  class: 'rounded img-thumbnail',
+                  alt: "#{@person.first_name} #{@person.last_name}" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
     <div class="col-lg-6">
       <div class="card h-100">
         <div class="card-header bg-body-secondary">
@@ -53,7 +65,6 @@
                 <% end %>
               </dd>
             <% end %>
-
             <% if @person.interests.any? %>
               <dt class="col-sm-4">Interests</dt>
               <dd class="col-sm-8">
@@ -62,17 +73,14 @@
                 <% end %>
               </dd>
             <% end %>
-
             <% if @person.notes.present? %>
               <dt class="col-sm-4">Notes</dt>
               <dd class="col-sm-8"><%= simple_format(@person.notes) %></dd>
             <% end %>
-
             <% if @person.referral.present? %>
               <dt class="col-sm-4">Referral</dt>
               <dd class="col-sm-8"><%= @person.referral.name %></dd>
             <% end %>
-
             <% if @person.astrobin&.username&.present? %>
               <dt class="col-sm-4">Astrobin</dt>
               <dd class="col-sm-8">
@@ -82,12 +90,10 @@
                 <% end %>
               </dd>
             <% end %>
-
             <% if @user.is_a?(Admin) && @person.discord_id.present? %>
               <dt class="col-sm-4">Discord ID</dt>
               <dd class="col-sm-8"><code><%= @person.discord_id %></code></dd>
             <% end %>
-
             <% if @person.roles.any? %>
               <dt class="col-sm-4">Roles</dt>
               <dd class="col-sm-8">
@@ -100,9 +106,8 @@
         </div>
       </div>
     </div>
-
     <!-- Contact Information -->
-    <div class="col-lg-6">
+    <div class="col-lg-3">
       <div class="card h-100">
         <div class="card-header bg-body-secondary">
           <h5 class="mb-0">Contact Information</h5>
@@ -117,7 +122,6 @@
                 <% elsif @person.contacts.count > 1 %>
                   <h6 class="text-muted">Contact <%= i + 1 %></h6>
                 <% end %>
-
                 <% if contact.email.present? %>
                   <div class="mb-2" data-contact-type="email">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-envelope me-2" viewBox="0 0 16 16">
@@ -126,7 +130,6 @@
                     <%= mail_to contact.email, contact.email, class: 'text-decoration-none' %>
                   </div>
                 <% end %>
-
                 <% if contact.phone.present? %>
                   <div class="mb-2" data-contact-type="phone">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-telephone me-2" viewBox="0 0 16 16">
@@ -135,7 +138,6 @@
                     <%= link_to contact.phone, "tel:#{contact.phone}", class: 'text-decoration-none' %>
                   </div>
                 <% end %>
-
                 <% if contact.address.present? || contact.city.present? || contact.state.present? || contact.zipcode.present? %>
                   <div class="mb-2" data-contact-type="address">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-geo-alt me-2" viewBox="0 0 16 16">
@@ -145,10 +147,10 @@
                     <% if contact.address.present? %>
                       <%= contact.address %><br>
                       <span class="ms-4">
-                    <% end %>
-                    <%= [contact.city&.name, contact.state&.short_name].compact.join(', ') %>
-                    <%= contact.zipcode %>
-                    <% if contact.address.present? %>
+                      <% end %>
+                      <%= [contact.city&.name, contact.state&.short_name].compact.join(', ') %>
+                      <%= contact.zipcode %>
+                      <% if contact.address.present? %>
                       </span>
                     <% end %>
                   </div>
@@ -161,12 +163,11 @@
         </div>
       </div>
     </div>
-
     <!-- Volunteer Skills -->
     <% active_skills = @person.people_skills.select(&:active?).sort_by { |ps| -ps.skill_level.to_i } %>
     <% if @person.volunteer || @person.mentor || active_skills.any? %>
       <div class="col-12">
-        <h5 class="mb-3 p-2 bg-body-secondary rounded">Volunteer & Skills</h5>
+        <h5 class="mb-3 p-2 bg-body-secondary rounded">Skills</h5>
       </div>
       <% if active_skills.any? %>
         <% active_skills.each do |people_skill| %>
@@ -210,7 +211,6 @@
         </div>
       <% end %>
     <% end %>
-
     <!-- Membership History -->
     <div class="col-12">
       <div class="card">
@@ -241,7 +241,8 @@
                           <strong>LIFETIME</strong>
                         <% else %>
                           <%= date_format(membership.start) %> to <%= date_format(membership.end) %>
-                          <br><small class="text-muted"><%= membership.term_months %> months</small>
+                          <br>
+                          <small class="text-muted"><%= membership.term_months %> months</small>
                         <% end %>
                       </td>
                       <td><%= membership.kind&.name %></td>
@@ -263,7 +264,6 @@
         </div>
       </div>
     </div>
-
     <!-- Donations (if any) -->
     <% if @person.donations.count > 0 %>
       <div class="col-12">
@@ -271,7 +271,6 @@
       </div>
       <%= render partial: 'donations/index', locals: {donations: @person.donations} %>
     <% end %>
-
     <!-- Admin Actions -->
     <% if @user.is_a?(Admin) %>
       <div class="col-12">

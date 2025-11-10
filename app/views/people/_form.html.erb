@@ -8,6 +8,19 @@
       <%= form.label :last_name, 'Last Name', class: 'form-label' %>
       <%= form.text_field :last_name, class: 'form-control' %>
     </div>
+    <div class="col-md-12 mt-2">
+      <%= form.label :profile_picture, 'Profile Picture', class: 'form-label mb-0' %>
+      <br/>
+      <small class="form-text text-muted">
+        Optional. Upload a profile picture (JPG, PNG, or GIF).
+      </small>
+      <% if person.profile_picture.attached? %>
+        <div class="mt-2 mb-2">
+          <%= image_tag person.profile_picture.variant(resize_to_limit: [200, 200]), class: 'img-thumbnail' %>
+        </div>
+      <% end %>
+      <%= form.file_field :profile_picture, class: 'form-control', accept: 'image/*' %>
+    </div>
     <div class="col-md-6 mt-2">
       <%= form.label :referral_id, class: 'form-label mb-0' %>
       <br/>
