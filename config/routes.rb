@@ -2,6 +2,10 @@ Rails.application.routes.draw do
   resources :tags
   mount MissionControl::Jobs::Engine, at: "/jobs"
   
+  get '/mentorship', to: 'mentorship#index', as: :mentorship
+  post '/mentorship/search', to: 'mentorship#search', as: :mentorship_search
+  get '/mentorship/search', to: 'mentorship#search'
+
   get '/reports/memberships', to: 'reports#memberships', as: :memberships_report
   get '/reports/renewal_reminders', to: 'reports#renewal_reminders', as: :renewal_reminders
   get '/reports/ephemeris', to: 'reports#ephemeris', as: :ephemeris_report

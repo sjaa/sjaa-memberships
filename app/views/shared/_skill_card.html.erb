@@ -1,0 +1,25 @@
+<div class="card h-100 shadow-sm">
+  <div class="card-body">
+    <h6 class="card-title"><%= people_skill.skill.name %></h6>
+    <% if people_skill.skill.description.present? %>
+      <p class="text-muted small mb-3"><%= people_skill.skill.description %></p>
+    <% end %>
+    <div class="skill-levels">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <small class="text-muted">Skill Level:</small>
+        <span class="badge <%= skill_level_bg(people_skill.skill_level) %>">
+          <%= skill_level_name(people_skill.skill_level) %>
+        </span>
+      </div>
+      <div class="progress" style="height: 8px; background-color: #e9ecef;">
+        <% skill_level_int = PeopleSkill.skill_levels[people_skill.skill_level] %>
+        <div class="progress-bar <%= skill_level_bg(people_skill.skill_level) %>"
+             role="progressbar"
+             style="width: <%= skill_level_int * 33.33 %>%"
+             aria-valuenow="<%= skill_level_int %>"
+             aria-valuemin="0"
+             aria-valuemax="3"></div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -11,6 +11,7 @@ class Person < ApplicationRecord
   has_many :api_keys, as: :bearer
   has_many :people_skills, dependent: :destroy, autosave: true
   has_many :skills, through: :people_skills
+  has_many :active_skills, -> { where('people_skills.skill_level > 0') }, through: :people_skills, source: :skill
   has_one_attached :profile_picture
   has_secure_password validations: false # Rethink this... maybe just force a random password when not present
   belongs_to :astrobin, optional: true

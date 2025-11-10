@@ -1,0 +1,41 @@
+<div class="row">
+  <div class="col-12">
+    <h1>Find a Mentor</h1>
+    <p class="lead text-muted">Search for SJAA members who are willing to mentor and have skills they can share.</p>
+  </div>
+
+  <%= form_with url: mentorship_search_path, data: {controller: "search-form", search_form_target: "form", turbo_frame: 'mentors'} do |f| %>
+    <div class="card mb-4">
+      <div class="card-header bg-body-secondary">
+        <h5 class="mb-0">Filter by Skills</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <!-- Skills Filter -->
+          <div class="col-12 mb-2" data-controller="form">
+            <div class="row">
+              <div class="col-12">
+                <%= label_tag 'Skills', 'Select skills you\'re looking for help with:', class: 'form-label' %>
+                <div data-form-target="fields mt-2 mb-2">
+                </div>
+                <template data-form-target="template">
+                  <span id="NEWID" class="d-inline-block mt-2" style="margin-right: 0.5em;">
+                    <%= hidden_field_tag 'skills[]', 'REPLACEVALUE' %>
+                    <a data-form-id-param="NEWID" data-action="search-form#search form#removeField" class="btn btn-secondary">REPLACENAME</a>
+                  </span>
+                </template>
+              </div>
+              <div class="col-12 mt-2">
+                <%= combobox_tag "skill_selector", Skill.all.order(:name).map{|s| {display: s.name, value: s.id}}, placeholder: 'Select Skills', data: { form_baseid_param: 'skill', form_target: 'source', action: "hw-combobox:selection->search-form#search hw-combobox:selection->form#addField" }, name: nil %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <div id="mentors" class="col-12 mt-2">
+    <%= render partial: 'index' %>
+  </div>
+</div>

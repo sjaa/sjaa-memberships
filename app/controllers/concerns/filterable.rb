@@ -21,11 +21,11 @@ module Filterable
     else
       # Yucky rendering out all the people, but what else to do?
       _models = model.where(id: query.map(&:id).uniq).includes(field)
-      #logger.info("_models.query: #{_models.to_sql}, _models.count: #{_models.count}")
+      logger.info("[AND_OR_HELPER] _models.query: #{_models.to_sql}, _models.count: #{_models.count}")
       _models = _models.select do |_model|
         list_ids = list.map(&:to_i)
         model_ids = _model.association(field).reader.map(&:id)
-        #logger.info("model: #{_model.attributes['name'] || _model.id}, list_ids: #{list_ids.inspect}, model_ids = #{model_ids}")
+        logger.info("[AND_OR_HELPER] model: #{_model.id}, list_ids: #{list_ids.inspect}, model_ids: #{model_ids.inspect}")
 
         (list_ids - model_ids).empty?
       end

@@ -22,6 +22,7 @@ export default class extends Controller {
     var replaceName = event.params.replacename || 'REPLACENAME'
     var value = null
     var name = null
+    var selectedValue = null
 
     console.log(`Adding Field...`)
     console.log(event)
@@ -38,7 +39,21 @@ export default class extends Controller {
           var selectedOption = this.sourceTarget.querySelector('[aria-selected="true"]')
 
           if(selectedOption) {
-            node.innerHTML = node.innerHTML.replace(new RegExp(`${replaceValue}`, 'g'), `${selectedOption.dataset.value}`)
+            selectedValue = selectedOption.dataset.value
+
+            // Check for duplicates - look for existing hidden fields with the same value
+            var existingFields = this.fieldsTarget.querySelectorAll('input[type="hidden"]')
+            for(var i = 0; i < existingFields.length; i++) {
+              if(existingFields[i].value == selectedValue) {
+                console.log(`Duplicate detected: ${selectedValue}`)
+                // Clear the selection and return without adding
+                var clearHandle = this.sourceTarget.getElementsByClassName('hw-combobox__handle')[0]
+                clearHandle.click();
+                return;
+              }
+            }
+
+            node.innerHTML = node.innerHTML.replace(new RegExp(`${replaceValue}`, 'g'), selectedValue)
             node.innerHTML = node.innerHTML.replace(new RegExp(`${replaceName}`, 'g'), `${selectedOption.dataset.autocompletableAs}`)
           } else {
             // New Entry, so grab the text
