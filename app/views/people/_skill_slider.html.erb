@@ -1,26 +1,25 @@
 <% skill_level = people_skill&.skill_level || 0 %>
-<% interest_level = people_skill&.interest_level || 0 %>
 
-<div class="card mb-3 skill-card <%= 'skill-active' if skill_level > 0 || interest_level > 0 %>"
+<div class="card mb-3 skill-card <%= 'skill-active' if skill_level.to_i > 0 %>"
      data-skill-id="<%= skill.id %>">
   <div class="card-body">
     <div class="row align-items-center">
-      <div class="col-12 col-md-4 mb-3 mb-md-0">
+      <div class="col-12 col-md-6 mb-3 mb-md-0">
         <h6 class="mb-1"><%= skill.name %></h6>
         <% if skill.description.present? %>
           <small class="text-muted"><%= skill.description %></small>
         <% end %>
       </div>
 
-      <div class="col-12 col-md-4">
+      <div class="col-12 col-md-6">
         <%= hidden_field_tag "person[skills_attributes][][skill_id]", skill.id %>
 
         <label class="form-label small mb-1">
-          Skill Level: <strong data-skill-target="skillValue-<%= skill.id %>"><%= skill_level %></strong>
+          Skill Level: <strong data-skill-target="skillValue-<%= skill.id %>"><%= skill_level_name(skill_level) %></strong>
         </label>
         <%= range_field_tag "person[skills_attributes][][skill_level]",
             skill_level,
-            min: 0, max: 10, class: 'form-range',
+            min: 0, max: 3, step: 1, class: "form-range skill-level-#{skill_level.to_i}",
             data: {
               action: 'input->skills#updateValue',
               skill_id: skill.id,
@@ -28,25 +27,9 @@
             } %>
         <div class="d-flex justify-content-between">
           <small class="text-muted">None</small>
-          <small class="text-muted">Expert</small>
-        </div>
-      </div>
-
-      <div class="col-12 col-md-4">
-        <label class="form-label small mb-1">
-          Interest: <strong data-skill-target="interestValue-<%= skill.id %>"><%= interest_level %></strong>
-        </label>
-        <%= range_field_tag "person[skills_attributes][][interest_level]",
-            interest_level,
-            min: 0, max: 10, class: 'form-range',
-            data: {
-              action: 'input->skills#updateValue',
-              skill_id: skill.id,
-              skill_type: 'interest'
-            } %>
-        <div class="d-flex justify-content-between">
-          <small class="text-muted">Not interested</small>
-          <small class="text-muted">Very interested</small>
+          <small class="text-muted">Beginner</small>
+          <small class="text-muted">Intermediate</small>
+          <small class="text-muted">Advanced</small>
         </div>
       </div>
     </div>

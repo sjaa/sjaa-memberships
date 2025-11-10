@@ -83,19 +83,66 @@ module ApplicationHelper
     luminance < 128 ? '#ffffff' : '#000000'
   end
 
-  # Helper methods for skill level display
+  # Helper methods for skill level display (0-3 scale)
   def skill_level_color(level)
-    return 'text-muted' if level == 0
-    return 'text-danger' if level <= 3
-    return 'text-warning' if level <= 6
-    'text-success'
+    case level
+    when 0, "none"
+      'text-muted'
+    when 1, "beginner"
+      'text-info'
+    when 2, "intermediate"
+      'text-warning'
+    when 3, "advanced"
+      'text-success'
+    else
+      'text-muted'
+    end
   end
 
   def skill_level_bg(level)
-    return 'bg-secondary' if level == 0
-    return 'bg-danger' if level <= 3
-    return 'bg-warning' if level <= 6
-    'bg-success'
+    case level
+    when 0, "none"
+      'bg-secondary'
+    when 1, "beginner"
+      'bg-info'
+    when 2, "intermediate"
+      'bg-warning'
+    when 3, "advanced"
+      'bg-success'
+    else
+      'bg-secondary'
+    end
+  end
+
+  def skill_level_progress_bar_color(level)
+    # For progress bars, we need to return just the color name (Bootstrap will add progress-bar- prefix)
+    case level
+    when 0, "none"
+      'bg-secondary'
+    when 1, "beginner"
+      'bg-info'
+    when 2, "intermediate"
+      'bg-warning'
+    when 3, "advanced"
+      'bg-success'
+    else
+      'bg-secondary'
+    end
+  end
+
+  def skill_level_name(level)
+    case level
+    when 0, "none"
+      'None'
+    when 1, "beginner"
+      'Beginner'
+    when 2, "intermediate"
+      'Intermediate'
+    when 3, "advanced"
+      'Advanced'
+    else
+      'None'
+    end
   end
 
 end

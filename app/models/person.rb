@@ -276,23 +276,19 @@ class Person < ApplicationRecord
   end
 
   # Setter for skills management
-  # Accepts array of hashes: [{skill_id: 1, skill_level: 5, interest_level: 7}, ...]
+  # Accepts array of hashes: [{skill_id: 1, skill_level: 2}, ...]
   def skills_attributes=(attributes)
-    # Build a hash of incoming skills: skill_id => {skill_level, interest_level}
+    # Build a hash of incoming skills: skill_id => skill_level
     incoming_skills = {}
     attributes.each do |skill_attr|
       next if skill_attr[:skill_id].blank?
 
       skill_id = skill_attr[:skill_id].to_i
       skill_level = skill_attr[:skill_level].to_i
-      interest_level = skill_attr[:interest_level].to_i
 
       # Only track skills with non-zero levels
-      if skill_level > 0 || interest_level > 0
-        incoming_skills[skill_id] = {
-          skill_level: skill_level,
-          interest_level: interest_level
-        }
+      if skill_level > 0
+        incoming_skills[skill_id] = skill_level
       end
     end
 
@@ -303,22 +299,18 @@ class Person < ApplicationRecord
     current_skills = self.persisted? ? self.people_skills.reload.to_a : self.people_skills.to_a
 
     # Find or create PeopleSkill records for each incoming skill
-    incoming_skills.each do |skill_id, levels|
+    incoming_skills.each do |skill_id, skill_level|
       # Try to find existing record
       people_skill = current_skills.find { |ps| ps.skill_id == skill_id }
 
       if people_skill
         # Update existing record
-        people_skill.assign_attributes(
-          skill_level: levels[:skill_level],
-          interest_level: levels[:interest_level]
-        )
+        people_skill.assign_attributes(skill_level: skill_level)
       else
         # Create new record
         people_skill = PeopleSkill.new(
           skill_id: skill_id,
-          skill_level: levels[:skill_level],
-          interest_level: levels[:interest_level]
+          skill_level: skill_level
         )
       end
 

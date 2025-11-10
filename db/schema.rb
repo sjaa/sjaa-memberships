@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_11_08_000003) do
+ActiveRecord::Schema[7.1].define(version: 2025_11_10_011546) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
   enable_extension "plpgsql"
@@ -247,7 +247,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_11_08_000003) do
     t.bigint "person_id", null: false
     t.bigint "skill_id", null: false
     t.integer "skill_level", default: 0
-    t.integer "interest_level", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["person_id", "skill_id"], name: "index_people_skills_on_person_id_and_skill_id", unique: true

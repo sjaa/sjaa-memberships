@@ -216,14 +216,14 @@
       </div>
       <div class="mt-4" data-controller="skills">
         <% current_skills = person.people_skills.index_by(&:skill_id) %>
-        <% active_skills = current_skills.select { |_, ps| ps.skill_level > 0 || ps.interest_level > 0 } %>
+        <% active_skills = current_skills.select { |_, ps| PeopleSkill.skill_levels[ps.skill_level].to_i > 0 } %>
         <!-- Active Skills (always shown) -->
         <div id="active-skills" data-skills-target="activeSkills">
           <% if active_skills.any? %>
             <h5 class="mb-3">Your Skills</h5>
             <p class="mb-3">
               <small class="form-text text-muted">
-                Use the sliders to indicate your skill level (0=none, 10=expert) and interest level (0=not interested, 10=very interested)
+                Use the slider to indicate your skill level: None, Beginner, Intermediate, or Advanced
               </small>
             </p>
             <% Skill.where(id: active_skills.keys).order(:name).each do |skill| %>
@@ -236,7 +236,7 @@
           <h5 class="mb-3">Available Skills</h5>
           <p class="mb-3">
             <small class="form-text text-muted">
-              Use the sliders to indicate your skill level (0=none, 10=expert) and interest level (0=not interested, 10=very interested)
+              Use the slider to indicate your skill level: None, Beginner, Intermediate, or Advanced
             </small>
           </p>
           <% Skill.where.not(id: active_skills.keys).order(:name).each do |skill| %>

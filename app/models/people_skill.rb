@@ -4,16 +4,28 @@ class PeopleSkill < ApplicationRecord
   belongs_to :person
   belongs_to :skill
 
+  # Skill level enum: 0 = None, 1 = Beginner, 2 = Intermediate, 3 = Advanced
+  enum skill_level: {
+    none: 0,
+    beginner: 1,
+    intermediate: 2,
+    advanced: 3
+  }, _prefix: :skill
+
   validates :person_id, uniqueness: { scope: :skill_id }
-  validates :skill_level, numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 10 }
-  validates :interest_level, numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 10 }
+  validates :skill_level, inclusion: { in: skill_levels.keys }
 
   # Callback to sync with Google Groups when skill levels change
   after_commit :sync_to_google_group, on: [:create, :update, :destroy]
 
   # Check if this person-skill combination represents an active participation
   def active?
-    skill_level > 0 || interest_level > 0
+    !skill_none?
+  end
+
+  # Human-readable skill level name
+  def skill_level_name
+    skill_level&.titleize || "None"
   end
 
   private

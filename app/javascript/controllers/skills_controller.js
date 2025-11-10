@@ -15,24 +15,32 @@ export default class extends Controller {
   updateValue(event) {
     const skillId = event.target.dataset.skillId
     const skillType = event.target.dataset.skillType
-    const value = event.target.value
+    const value = parseInt(event.target.value)
 
     const targetName = `${skillType}Value-${skillId}`
     const target = document.querySelector(`[data-skill-target="${targetName}"]`)
 
     if (target) {
-      target.textContent = value
-      target.classList.remove('text-danger', 'text-warning', 'text-success', 'text-muted')
+      // Map numeric value to label (0-3 scale)
+      const labels = ['None', 'Beginner', 'Intermediate', 'Advanced']
+      target.textContent = labels[value] || 'None'
 
-      if (value == 0) {
+      // Update color based on skill level
+      target.classList.remove('text-info', 'text-warning', 'text-success', 'text-muted')
+
+      if (value === 0) {
         target.classList.add('text-muted')
-      } else if (value <= 3) {
-        target.classList.add('text-danger')
-      } else if (value <= 6) {
+      } else if (value === 1) {
+        target.classList.add('text-info')
+      } else if (value === 2) {
         target.classList.add('text-warning')
-      } else {
+      } else if (value === 3) {
         target.classList.add('text-success')
       }
     }
+
+    // Update the range slider color class
+    event.target.classList.remove('skill-level-0', 'skill-level-1', 'skill-level-2', 'skill-level-3')
+    event.target.classList.add(`skill-level-${value}`)
   }
 }

@@ -28,18 +28,18 @@ class FilterableTest < ActionDispatch::IntegrationTest
 
     # Assign skills to people
     # person1 has photography and teaching
-    @person1.people_skills.create!(skill: @skill_photography, skill_level: 5, interest_level: 7)
-    @person1.people_skills.create!(skill: @skill_teaching, skill_level: 3, interest_level: 6)
+    @person1.people_skills.create!(skill: @skill_photography, skill_level: 2)
+    @person1.people_skills.create!(skill: @skill_teaching, skill_level: 1)
 
     # person2 has photography only
-    @person2.people_skills.create!(skill: @skill_photography, skill_level: 8, interest_level: 9)
+    @person2.people_skills.create!(skill: @skill_photography, skill_level: 3)
 
     # person3 has teaching and event planning
-    @person3.people_skills.create!(skill: @skill_teaching, skill_level: 6, interest_level: 5)
-    @person3.people_skills.create!(skill: @skill_event_planning, skill_level: 4, interest_level: 8)
+    @person3.people_skills.create!(skill: @skill_teaching, skill_level: 2)
+    @person3.people_skills.create!(skill: @skill_event_planning, skill_level: 2)
 
     # person4 has event planning only
-    @person4.people_skills.create!(skill: @skill_event_planning, skill_level: 7, interest_level: 9)
+    @person4.people_skills.create!(skill: @skill_event_planning, skill_level: 3)
   end
 
   # Skills filtering tests
@@ -91,7 +91,7 @@ class FilterableTest < ActionDispatch::IntegrationTest
 
   test "filter people by three skills with AND operation" do
     # Add photography to person3 so they have all three skills
-    @person3.people_skills.create!(skill: @skill_photography, skill_level: 2, interest_level: 3)
+    @person3.people_skills.create!(skill: @skill_photography, skill_level: 2)
 
     login_as_admin(@admin)
     post people_search_path, params: {

@@ -55,19 +55,19 @@ class SkillTest < ActiveSupport::TestCase
     assert_equal 'skills-web-design-development@sjaa.net', skill.generate_email
   end
 
-  test 'active_members returns people with skill or interest level > 0' do
+  test 'active_members returns people with skill level > 0' do
     person1 = Person.create!(first_name: 'Alice', last_name: 'Smith', password: 'password123')
     person2 = Person.create!(first_name: 'Bob', last_name: 'Jones', password: 'password123')
     person3 = Person.create!(first_name: 'Charlie', last_name: 'Brown', password: 'password123')
 
-    # Person with skill level only
-    PeopleSkill.create!(person: person1, skill: @skill, skill_level: 5, interest_level: 0)
+    # Person with skill level
+    PeopleSkill.create!(person: person1, skill: @skill, skill_level: 2)
 
-    # Person with interest level only
-    PeopleSkill.create!(person: person2, skill: @skill, skill_level: 0, interest_level: 7)
+    # Person with different skill level
+    PeopleSkill.create!(person: person2, skill: @skill, skill_level: 1)
 
-    # Person with both levels at 0 (should not be included)
-    PeopleSkill.create!(person: person3, skill: @skill, skill_level: 0, interest_level: 0)
+    # Person with skill level 0 (should not be included)
+    PeopleSkill.create!(person: person3, skill: @skill, skill_level: 0)
 
     active = @skill.active_members
     assert_equal 2, active.count
@@ -76,18 +76,32 @@ class SkillTest < ActiveSupport::TestCase
     assert_not_includes active, person3
   end
 
+  test 'active_members does not return duplicates for people with multiple skills' do
+    person = Person.create!(first_name: 'Homer', last_name: 'Simpson', password: 'password123')
+    other_skill = Skill.create!(name: 'Photography', description: 'Astrophotography')
+
+    # Give the person both this skill and another skill
+    PeopleSkill.create!(person: person, skill: @skill, skill_level: 2)
+    PeopleSkill.create!(person: person, skill: other_skill, skill_level: 3)
+
+    active = @skill.active_members
+    # Should only appear once despite having multiple skills
+    assert_equal 1, active.count
+    assert_equal 1, active.to_a.count { |p| p.id == person.id }
+  end
+
   test 'active_sjaa_members filters for active memberships' do
     # Create active member with skill
     active_person = Person.create!(first_name: 'Active', last_name: 'Member', password: 'password123')
     Contact.create!(email: 'active@example.com', person: active_person, primary: true)
     Membership.create!(person: active_person, start: Date.current, term_months: 12)
-    PeopleSkill.create!(person: active_person, skill: @skill, skill_level: 5, interest_level: 0)
+    PeopleSkill.create!(person: active_person, skill: @skill, skill_level: 2)
 
     # Create expired member with skill
     expired_person = Person.create!(first_name: 'Expired', last_name: 'Member', password: 'password123')
     Contact.create!(email: 'expired@example.com', person: expired_person, primary: true)
     Membership.create!(person: expired_person, start: 2.years.ago, term_months: 12)
-    PeopleSkill.create!(person: expired_person, skill: @skill, skill_level: 5, interest_level: 0)
+    PeopleSkill.create!(person: expired_person, skill: @skill, skill_level: 2)
 
     active_sjaa = @skill.active_sjaa_members
     assert_includes active_sjaa, active_person
@@ -96,7 +110,7 @@ class SkillTest < ActiveSupport::TestCase
 
   test 'destroying skill removes people_skills associations' do
     person = Person.create!(first_name: 'Test', last_name: 'User', password: 'password123')
-    PeopleSkill.create!(person: person, skill: @skill, skill_level: 5, interest_level: 5)
+    PeopleSkill.create!(person: person, skill: @skill, skill_level: 2)
 
     assert_equal 1, PeopleSkill.where(skill: @skill).count
 

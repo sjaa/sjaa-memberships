@@ -142,3 +142,46 @@ hr.thick {
 .column-hidden {
   display: none !important;
 }
+
+/* Skill level range slider colors */
+.form-range.skill-level-0::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, #6c757d 0%, #6c757d 100%);
+}
+
+.form-range.skill-level-0::-moz-range-track {
+  background: linear-gradient(to right, #6c757d 0%, #6c757d 100%);
+}
+
+.form-range.skill-level-1::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, #0dcaf0 0%, #0dcaf0 33.33%, #e9ecef 33.33%, #e9ecef 100%);
+}
+
+.form-range.skill-level-1::-moz-range-track {
+  background: linear-gradient(to right, #0dcaf0 0%, #0dcaf0 33.33%, #e9ecef 33.33%, #e9ecef 100%);
+}
+
+.form-range.skill-level-2::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, #ffc107 0%, #ffc107 66.66%, #e9ecef 66.66%, #e9ecef 100%);
+}
+
+.form-range.skill-level-2::-moz-range-track {
+  background: linear-gradient(to right, #ffc107 0%, #ffc107 66.66%, #e9ecef 66.66%, #e9ecef 100%);
+}
+
+.form-range.skill-level-3::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, #198754 0%, #198754 100%);
+}
+
+.form-range.skill-level-3::-moz-range-track {
+  background: linear-gradient(to right, #198754 0%, #198754 100%);
+}
+
+.form-range::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 4px;
+}
+
+.form-range::-moz-range-track {
+  height: 8px;
+  border-radius: 4px;
+}

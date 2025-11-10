@@ -247,8 +247,8 @@ class PeopleControllerTest < ActionDispatch::IntegrationTest
         first_name: @member.first_name,
         last_name: @member.last_name,
         skills_attributes: [
-          { skill_id: skill1.id, skill_level: 5, interest_level: 7 },
-          { skill_id: skill2.id, skill_level: 3, interest_level: 8 }
+          { skill_id: skill1.id, skill_level: 2 },
+          { skill_id: skill2.id, skill_level: 1 }
         ]
       }
     }
@@ -259,12 +259,10 @@ class PeopleControllerTest < ActionDispatch::IntegrationTest
     assert_includes @member.skills, skill2
 
     ps1 = @member.people_skills.find_by(skill: skill1)
-    assert_equal 5, ps1.skill_level
-    assert_equal 7, ps1.interest_level
+    assert_equal 'intermediate', ps1.skill_level
 
     ps2 = @member.people_skills.find_by(skill: skill2)
-    assert_equal 3, ps2.skill_level
-    assert_equal 8, ps2.interest_level
+    assert_equal 'beginner', ps2.skill_level
   end
 
   test "update person skills from form with all skills" do
@@ -280,19 +278,19 @@ class PeopleControllerTest < ActionDispatch::IntegrationTest
         first_name: @member.first_name,
         last_name: @member.last_name,
         skills_attributes: [
-          { skill_id: skill1.id, skill_level: 5, interest_level: 7 },
-          { skill_id: skill2.id, skill_level: 0, interest_level: 0 },
-          { skill_id: skill3.id, skill_level: 0, interest_level: 8 }
+          { skill_id: skill1.id, skill_level: 2 },
+          { skill_id: skill2.id, skill_level: 0 },
+          { skill_id: skill3.id, skill_level: 0 }
         ]
       }
     }
 
     @member.reload
-    # Should only have skill1 (both > 0) and skill3 (interest > 0)
-    assert_equal 2, @member.skills.count
+    # Should only have skill1 (level > 0)
+    assert_equal 1, @member.skills.count
     assert_includes @member.skills, skill1
     assert_not_includes @member.skills, skill2
-    assert_includes @member.skills, skill3
+    assert_not_includes @member.skills, skill3
   end
 
   test "update person removes previous skills not in new submission" do
@@ -304,9 +302,9 @@ class PeopleControllerTest < ActionDispatch::IntegrationTest
 
     # First, add all three skills
     @member.skills_attributes = [
-      { skill_id: skill1.id, skill_level: 5, interest_level: 5 },
-      { skill_id: skill2.id, skill_level: 3, interest_level: 7 },
-      { skill_id: skill3.id, skill_level: 4, interest_level: 6 }
+      { skill_id: skill1.id, skill_level: 2 },
+      { skill_id: skill2.id, skill_level: 1 },
+      { skill_id: skill3.id, skill_level: 2 }
     ]
     @member.save!
     assert_equal 3, @member.skills.count
@@ -317,9 +315,9 @@ class PeopleControllerTest < ActionDispatch::IntegrationTest
         first_name: @member.first_name,
         last_name: @member.last_name,
         skills_attributes: [
-          { skill_id: skill1.id, skill_level: 6, interest_level: 8 },
-          { skill_id: skill2.id, skill_level: 0, interest_level: 0 },
-          { skill_id: skill3.id, skill_level: 5, interest_level: 7 }
+          { skill_id: skill1.id, skill_level: 3 },
+          { skill_id: skill2.id, skill_level: 0 },
+          { skill_id: skill3.id, skill_level: 2 }
         ]
       }
     }
@@ -342,15 +340,14 @@ class PeopleControllerTest < ActionDispatch::IntegrationTest
         first_name: @member.first_name,
         last_name: @member.last_name,
         skills_attributes: [
-          { skill_id: skill.id.to_s, skill_level: '5', interest_level: '7' }
+          { skill_id: skill.id.to_s, skill_level: '2' }
         ]
       }
     }
 
     @member.reload
     ps = @member.people_skills.first
-    assert_equal 5, ps.skill_level
-    assert_equal 7, ps.interest_level
+    assert_equal 'intermediate', ps.skill_level
   end
 
   test "update person with combined volunteer flags and skills" do
@@ -365,7 +362,7 @@ class PeopleControllerTest < ActionDispatch::IntegrationTest
         volunteer: '1',
         mentor: '1',
         skills_attributes: [
-          { skill_id: skill.id, skill_level: 8, interest_level: 9 }
+          { skill_id: skill.id, skill_level: 3 }
         ]
       }
     }
@@ -376,8 +373,7 @@ class PeopleControllerTest < ActionDispatch::IntegrationTest
     assert_equal 1, @member.skills.count
 
     ps = @member.people_skills.first
-    assert_equal 8, ps.skill_level
-    assert_equal 9, ps.interest_level
+    assert_equal 'advanced', ps.skill_level
   end
 
   private

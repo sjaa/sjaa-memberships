@@ -14,10 +14,9 @@ class Skill < ApplicationRecord
     "skills-#{normalized}@sjaa.net"
   end
 
-  # Get all people with this skill who have indicated interest or skill level > 0
+  # Get all people with this skill who have skill level > 0
   def active_members
-    people.joins(:people_skills)
-          .where('people_skills.skill_id = ? AND (people_skills.skill_level > 0 OR people_skills.interest_level > 0)', id)
+    people.where('people_skills.skill_level > 0')
   end
 
   # Get people who are active members of SJAA

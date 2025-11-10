@@ -34,7 +34,6 @@
                 <th>Name</th>
                 <th>Email</th>
                 <th>Skill Level</th>
-                <th>Interest Level</th>
                 <th>Status</th>
               </tr>
             </thead>
@@ -44,8 +43,11 @@
                 <tr>
                   <td><%= link_to person.name, person %></td>
                   <td><%= person.email %></td>
-                  <td><%= people_skill.skill_level %>/10</td>
-                  <td><%= people_skill.interest_level %>/10</td>
+                  <td>
+                    <span class="badge <%= skill_level_bg(people_skill.skill_level) %>">
+                      <%= skill_level_name(people_skill.skill_level) %>
+                    </span>
+                  </td>
                   <td>
                     <% if person.is_active? %>
                       <span class="badge bg-success">Active</span>

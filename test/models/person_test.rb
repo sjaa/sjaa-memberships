@@ -448,8 +448,8 @@ class PersonTest < ActiveSupport::TestCase
     skill2 = Skill.create!(name: 'Event Planning', description: 'Organizing events')
 
     @person.skills_attributes = [
-      { skill_id: skill1.id, skill_level: 5, interest_level: 7 },
-      { skill_id: skill2.id, skill_level: 3, interest_level: 8 }
+      { skill_id: skill1.id, skill_level: 2 },
+      { skill_id: skill2.id, skill_level: 1 }
     ]
     @person.save!
 
@@ -457,12 +457,10 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal 2, @person.skills.count
 
     ps1 = @person.people_skills.find_by(skill: skill1)
-    assert_equal 5, ps1.skill_level
-    assert_equal 7, ps1.interest_level
+    assert_equal 'intermediate', ps1.skill_level
 
     ps2 = @person.people_skills.find_by(skill: skill2)
-    assert_equal 3, ps2.skill_level
-    assert_equal 8, ps2.interest_level
+    assert_equal 'beginner', ps2.skill_level
   end
 
   test 'skills_attributes= updates existing skill associations' do
@@ -470,26 +468,24 @@ class PersonTest < ActiveSupport::TestCase
 
     # Create initial skill association
     @person.skills_attributes = [
-      { skill_id: skill.id, skill_level: 3, interest_level: 5 }
+      { skill_id: skill.id, skill_level: 1 }
     ]
     @person.save!
 
     assert_equal 1, @person.people_skills.count
     ps = @person.people_skills.first
-    assert_equal 3, ps.skill_level
-    assert_equal 5, ps.interest_level
+    assert_equal 'beginner', ps.skill_level
 
     # Update the skill levels
     @person.skills_attributes = [
-      { skill_id: skill.id, skill_level: 8, interest_level: 9 }
+      { skill_id: skill.id, skill_level: 3 }
     ]
     @person.save!
 
     @person.reload
     assert_equal 1, @person.people_skills.count
     ps = @person.people_skills.first
-    assert_equal 8, ps.skill_level
-    assert_equal 9, ps.interest_level
+    assert_equal 'advanced', ps.skill_level
   end
 
   test 'skills_attributes= removes skills not in the list' do
@@ -499,17 +495,17 @@ class PersonTest < ActiveSupport::TestCase
 
     # Add all three skills
     @person.skills_attributes = [
-      { skill_id: skill1.id, skill_level: 5, interest_level: 5 },
-      { skill_id: skill2.id, skill_level: 3, interest_level: 7 },
-      { skill_id: skill3.id, skill_level: 4, interest_level: 6 }
+      { skill_id: skill1.id, skill_level: 2 },
+      { skill_id: skill2.id, skill_level: 1 },
+      { skill_id: skill3.id, skill_level: 2 }
     ]
     @person.save!
     assert_equal 3, @person.people_skills.count
 
     # Update to only include skill1 and skill3
     @person.skills_attributes = [
-      { skill_id: skill1.id, skill_level: 6, interest_level: 8 },
-      { skill_id: skill3.id, skill_level: 5, interest_level: 7 }
+      { skill_id: skill1.id, skill_level: 3 },
+      { skill_id: skill3.id, skill_level: 2 }
     ]
     @person.save!
 
@@ -520,13 +516,13 @@ class PersonTest < ActiveSupport::TestCase
     assert_includes @person.skills, skill3
   end
 
-  test 'skills_attributes= ignores skills with both levels at 0' do
+  test 'skills_attributes= ignores skills with level at 0' do
     skill1 = Skill.create!(name: 'Photography', description: 'Astrophotography')
     skill2 = Skill.create!(name: 'Event Planning', description: 'Organizing events')
 
     @person.skills_attributes = [
-      { skill_id: skill1.id, skill_level: 5, interest_level: 5 },
-      { skill_id: skill2.id, skill_level: 0, interest_level: 0 }
+      { skill_id: skill1.id, skill_level: 2 },
+      { skill_id: skill2.id, skill_level: 0 }
     ]
     @person.save!
 
@@ -535,41 +531,26 @@ class PersonTest < ActiveSupport::TestCase
     assert_not_includes @person.skills, skill2
   end
 
-  test 'skills_attributes= handles skill_level > 0 with interest_level = 0' do
+  test 'skills_attributes= handles all valid skill levels' do
     skill = Skill.create!(name: 'Photography', description: 'Astrophotography')
 
     @person.skills_attributes = [
-      { skill_id: skill.id, skill_level: 7, interest_level: 0 }
+      { skill_id: skill.id, skill_level: 3 }
     ]
     @person.save!
 
     assert_equal 1, @person.people_skills.count
     ps = @person.people_skills.first
-    assert_equal 7, ps.skill_level
-    assert_equal 0, ps.interest_level
-  end
-
-  test 'skills_attributes= handles skill_level = 0 with interest_level > 0' do
-    skill = Skill.create!(name: 'Photography', description: 'Astrophotography')
-
-    @person.skills_attributes = [
-      { skill_id: skill.id, skill_level: 0, interest_level: 8 }
-    ]
-    @person.save!
-
-    assert_equal 1, @person.people_skills.count
-    ps = @person.people_skills.first
-    assert_equal 0, ps.skill_level
-    assert_equal 8, ps.interest_level
+    assert_equal 'advanced', ps.skill_level
   end
 
   test 'skills_attributes= ignores blank skill_id' do
     skill = Skill.create!(name: 'Photography', description: 'Astrophotography')
 
     @person.skills_attributes = [
-      { skill_id: skill.id, skill_level: 5, interest_level: 5 },
-      { skill_id: '', skill_level: 3, interest_level: 3 },
-      { skill_id: nil, skill_level: 4, interest_level: 4 }
+      { skill_id: skill.id, skill_level: 2 },
+      { skill_id: '', skill_level: 1 },
+      { skill_id: nil, skill_level: 2 }
     ]
     @person.save!
 
@@ -581,13 +562,12 @@ class PersonTest < ActiveSupport::TestCase
     skill = Skill.create!(name: 'Photography', description: 'Astrophotography')
 
     @person.skills_attributes = [
-      { skill_id: skill.id.to_s, skill_level: '5', interest_level: '7' }
+      { skill_id: skill.id.to_s, skill_level: '2' }
     ]
     @person.save!
 
     ps = @person.people_skills.first
-    assert_equal 5, ps.skill_level
-    assert_equal 7, ps.interest_level
+    assert_equal 'intermediate', ps.skill_level
   end
 
   test 'skills_attributes= removes all skills with empty array' do
@@ -596,8 +576,8 @@ class PersonTest < ActiveSupport::TestCase
 
     # Add skills
     @person.skills_attributes = [
-      { skill_id: skill1.id, skill_level: 5, interest_level: 5 },
-      { skill_id: skill2.id, skill_level: 3, interest_level: 7 }
+      { skill_id: skill1.id, skill_level: 2 },
+      { skill_id: skill2.id, skill_level: 1 }
     ]
     @person.save!
     assert_equal 2, @person.people_skills.count
