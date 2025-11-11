@@ -13,19 +13,18 @@
               <div class="card-body">
                 <div class="row">
                   <!-- Profile Picture -->
-                  <div class="col-md-2 text-center mb-3 mb-md-0">
+                  <div class="col-md-4 text-center mb-3 mb-md-0">
                     <% if mentor.profile_picture.attached? %>
-                      <%= image_tag mentor.profile_picture.variant(resize_to_limit: [150, 150]),
-                        class: 'rounded img-thumbnail',
-                        alt: "#{mentor.first_name} #{mentor.last_name}" %>
+                      <div class="rounded img-thumbnail" style="width: 100%; height: 100%; margin: 0 auto; min-height: 300px; background-color: #f8f9fa; background-image: url('<%= url_for(mentor.profile_picture.variant(resize_to_limit: [400, 400])) %>'); background-size: cover; background-position: center;">
+                      </div>
                     <% else %>
-                      <div class="rounded bg-secondary text-white d-flex align-items-center justify-content-center" style="width: 150px; height: 150px; margin: 0 auto;">
-                        <i class="bi bi-person-circle" style="font-size: 4rem;"></i>
+                      <div class="rounded bg-secondary text-white d-flex align-items-center justify-content-center" style="width: 100%; min-height: 300px; margin: 0 auto;">
+                        <i class="bi bi-person-circle" style="font-size: 6rem;"></i>
                       </div>
                     <% end %>
                   </div>
                   <!-- Mentor Info -->
-                  <div class="col-md-10">
+                  <div class="col-md-8">
                     <h4 class="mb-2">
                       <%= "#{mentor.first_name} #{mentor.last_name}" %>
                       <button type="button"
