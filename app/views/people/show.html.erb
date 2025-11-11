@@ -43,6 +43,10 @@
                   class: 'rounded img-thumbnail',
                   alt: "#{@person.first_name} #{@person.last_name}" %>
             </div>
+          <% else %>
+            <div class="rounded bg-secondary text-white d-flex align-items-center justify-content-center" style="width: 150px; height: 150px; margin: 0 auto;">
+              <i class="bi bi-person-circle" style="font-size: 4rem;"></i>
+            </div>
           <% end %>
         </div>
       </div>
