@@ -1,0 +1,24 @@
+<h1>SJAA Mentorship Message</h1>
+<p>Dear <%= @mentor&.first_name || "Valued SJAA Mentor" %>,</p>
+
+<p>
+You have received a message through the SJAA Mentorship program from
+<b><%= @requester_name %></b>:
+</p>
+
+<div style="border-left: 4px solid #0066cc; padding-left: 16px; margin: 20px 0; color: #333;">
+  <%= simple_format(@message) %>
+</div>
+
+<p>
+You can reply directly to this email to respond to the requester.
+</p>
+
+<p>
+Thank you for participating in the SJAA Mentorship program and helping fellow members learn and grow in astronomy!
+</p>
+
+<p>
+Clear skies,<br/>
+SJAA Leadership
+</p>

@@ -16,6 +16,26 @@ class MentorshipController < ApplicationController
     render turbo_stream: turbo_stream.replace('mentors', partial: 'index')
   end
 
+  # POST /mentorship/contact/:id
+  def contact
+    @mentor = Person.find(params[:id])
+    @requester = current_user
+    @message = params[:message]
+
+    if @mentor && @message.present?
+      begin
+        AccountMailer.mentor_contact(@mentor, @requester, @message).deliver_now
+        flash[:notice] = "Your message has been sent to #{@mentor.first_name} #{@mentor.last_name}."
+        render json: { success: true, message: flash[:notice] }, status: :ok
+      rescue => e
+        logger.error "[MENTOR_CONTACT] Error sending email: #{e.message}"
+        render json: { success: false, error: "Failed to send message. Please try again." }, status: :unprocessable_entity
+      end
+    else
+      render json: { success: false, error: "Please provide a message." }, status: :unprocessable_entity
+    end
+  end
+
   private
 
   def mentorship_filter

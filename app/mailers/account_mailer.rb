@@ -41,4 +41,20 @@ class AccountMailer < ApplicationMailer
     return nil if(@donor.nil? || donation.nil? || @donor.email.nil?)
     mail(to: @donor.email, reply_to: 'donations@sjaa.net', bcc: %w(officers@sjaa.net memberships@sjaa.net donations@sjaa.net), subject: "SJAA Donation (#{@donor&.last_name}, #{@donor&.first_name})")
   end
+
+  def mentor_contact(mentor, requester, message)
+    @mentor = mentor
+    @requester = requester
+    @message = message
+    return nil if @mentor.nil? || @mentor.email.nil? || @message.blank?
+
+    reply_to_email = @requester&.email || 'asksjaa@sjaa.net'
+    @requester_name = @requester&.class == Person ? "#{@requester.first_name} #{@requester.last_name}" : @requester&.email
+
+    mail(
+      to: @mentor.email,
+      reply_to: reply_to_email,
+      subject: "[SJAA Mentorship] Message from #{@requester_name}"
+    )
+  end
 end

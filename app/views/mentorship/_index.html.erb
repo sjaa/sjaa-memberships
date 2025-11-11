@@ -1,81 +1,120 @@
 <%= turbo_frame_tag 'mentors' do %>
-  <% if @mentors.any? %>
-    <div class="row mb-3">
-      <div class="col-12">
-        <h5 class="text-muted">Found <%= @mentors.count %> mentor<%= @mentors.count == 1 ? '' : 's' %></h5>
-      </div>
-    </div>
-
-    <div class="row g-4">
-      <% @mentors.each do |mentor| %>
+  <div data-controller="mentor-contact">
+    <% if @mentors.any? %>
+      <div class="row mb-3">
         <div class="col-12">
-          <div class="card shadow-sm">
-            <div class="card-body">
-              <div class="row">
-                <!-- Profile Picture -->
-                <div class="col-md-2 text-center mb-3 mb-md-0">
-                  <% if mentor.profile_picture.attached? %>
-                    <%= image_tag mentor.profile_picture.variant(resize_to_limit: [150, 150]),
+          <h5 class="text-muted">Found <%= @mentors.count %> mentor<%= @mentors.count == 1 ? '' : 's' %></h5>
+        </div>
+      </div>
+      <div class="row g-4">
+        <% @mentors.each do |mentor| %>
+          <div class="col-12">
+            <div class="card shadow-sm">
+              <div class="card-body">
+                <div class="row">
+                  <!-- Profile Picture -->
+                  <div class="col-md-2 text-center mb-3 mb-md-0">
+                    <% if mentor.profile_picture.attached? %>
+                      <%= image_tag mentor.profile_picture.variant(resize_to_limit: [150, 150]),
                         class: 'rounded img-thumbnail',
                         alt: "#{mentor.first_name} #{mentor.last_name}" %>
-                  <% else %>
-                    <div class="rounded bg-secondary text-white d-flex align-items-center justify-content-center" style="width: 150px; height: 150px; margin: 0 auto;">
-                      <i class="bi bi-person-circle" style="font-size: 4rem;"></i>
-                    </div>
-                  <% end %>
-                </div>
-
-                <!-- Mentor Info -->
-                <div class="col-md-10">
-                  <h4 class="mb-2">
-                    <%= "#{mentor.first_name} #{mentor.last_name}" %>
-                    <span class="badge bg-success ms-2">Mentor</span>
-                    <% if mentor.volunteer %>
-                      <span class="badge bg-primary ms-1">Volunteer</span>
+                    <% else %>
+                      <div class="rounded bg-secondary text-white d-flex align-items-center justify-content-center" style="width: 150px; height: 150px; margin: 0 auto;">
+                        <i class="bi bi-person-circle" style="font-size: 4rem;"></i>
+                      </div>
                     <% end %>
-                  </h4>
-
-                  <!-- Interests -->
-                  <% if mentor.interests.any? %>
-                    <div class="mb-3">
-                      <strong class="text-muted small">Interests:</strong>
-                      <% mentor.interests.each do |interest| %>
-                        <span class="badge bg-light text-dark me-1"><%= interest.name.titleize %></span>
-                      <% end %>
-                    </div>
-                  <% end %>
-
-                  <!-- Skills -->
-                  <% active_skills = mentor.people_skills.select(&:active?).sort_by { |ps| -ps.skill_level.to_i } %>
-                  <% if active_skills.any? %>
-                    <div class="mb-2">
-                      <strong class="text-muted small">Skills:</strong>
-                    </div>
-                    <div class="row g-3">
-                      <% active_skills.each do |people_skill| %>
-                        <div class="col-md-6 col-lg-4">
-                          <%= render partial: 'shared/skill_card', locals: { people_skill: people_skill } %>
-                        </div>
-                      <% end %>
-                    </div>
-                  <% else %>
-                    <p class="text-muted mb-0"><em>Willing to mentor but no specific skills indicated.</em></p>
-                  <% end %>
+                  </div>
+                  <!-- Mentor Info -->
+                  <div class="col-md-10">
+                    <h4 class="mb-2">
+                      <%= "#{mentor.first_name} #{mentor.last_name}" %>
+                      <button type="button"
+                            class="btn btn-primary btn-sm ms-2"
+                            data-mentor-id="<%= mentor.id %>"
+                            data-mentor-name="<%= mentor.first_name %> <%= mentor.last_name %>"
+                            data-contact-url="<%= mentor_contact_path(mentor) %>"
+                            data-action="mentor-contact#openModal">
+                        <i class="bi bi-envelope me-1"></i>Contact Mentor
+                      </button>
+                    </h4>
+                    <!-- Interests -->
+                    <% if mentor.interests.any? %>
+                      <div class="mb-3">
+                        <strong class="text-muted small">Interests:</strong>
+                        <% mentor.interests.each do |interest| %>
+                          <span class="badge bg-light text-dark me-1"><%= interest.name.titleize %></span>
+                        <% end %>
+                      </div>
+                    <% end %>
+                    <!-- Skills -->
+                    <% active_skills = mentor.people_skills.select(&:active?).sort_by { |ps| -ps.skill_level.to_i } %>
+                    <% if active_skills.any? %>
+                      <div class="mb-2">
+                        <strong class="text-muted small">Skills:</strong>
+                      </div>
+                      <div class="row g-3">
+                        <% active_skills.each do |people_skill| %>
+                          <div class="col-md-6 col-lg-4">
+                            <%= render partial: 'shared/skill_card', locals: { people_skill: people_skill } %>
+                          </div>
+                        <% end %>
+                      </div>
+                    <% else %>
+                      <p class="text-muted mb-0"><em>Willing to mentor but no specific skills indicated.</em></p>
+                    <% end %>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="alert alert-info" role="alert">
+        <h5 class="alert-heading">No mentors found</h5>
+        <% if @query_params[:skills].present? %>
+          <p class="mb-0">Try adjusting your skill filters or selecting "Match Any (OR)" instead of "Match All (AND)".</p>
+        <% else %>
+          <p class="mb-0">Select skills above to find mentors who can help you learn.</p>
+        <% end %>
+      </div>
+    <% end %>
+    <!-- Contact Mentor Modal -->
+    <div class="modal fade" id="mentorContactModal" tabindex="-1" aria-labelledby="mentorContactModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="mentorContactModalLabel">Contact Mentor</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form data-mentor-contact-target="form" data-action="submit->mentor-contact#submitForm">
+              <div class="mb-3">
+                <label for="mentorContactMessage" class="form-label">
+                  <strong>Your Message</strong>
+                </label>
+                <textarea
+                  class="form-control"
+                  id="mentorContactMessage"
+                  name="message"
+                  rows="8"
+                  data-mentor-contact-target="message"
+                  placeholder="Write your message here..."
+                  required></textarea>
+                <div class="form-text">
+                  The mentor will receive your message and can reply directly to your email address.
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary" data-mentor-contact-target="submitButton">
+                  <i class="bi bi-send me-2"></i>Send Message
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-      <% end %>
+      </div>
     </div>
-  <% else %>
-    <div class="alert alert-info" role="alert">
-      <h5 class="alert-heading">No mentors found</h5>
-      <% if @query_params[:skills].present? %>
-        <p class="mb-0">Try adjusting your skill filters or selecting "Match Any (OR)" instead of "Match All (AND)".</p>
-      <% else %>
-        <p class="mb-0">Select skills above to find mentors who can help you learn.</p>
-      <% end %>
-    </div>
-  <% end %>
+  </div>
 <% end %>

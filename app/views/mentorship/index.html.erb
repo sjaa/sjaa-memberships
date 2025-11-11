@@ -4,6 +4,11 @@
     <p class="lead text-muted">Search for SJAA members who are willing to mentor and have skills they can share.</p>
   </div>
 
+  <!-- Alert Container -->
+  <div class="col-12">
+    <div id="alert-container"></div>
+  </div>
+
   <%= form_with url: mentorship_search_path, data: {controller: "search-form", search_form_target: "form", turbo_frame: 'mentors'} do |f| %>
     <div class="card mb-4">
       <div class="card-header bg-body-secondary">

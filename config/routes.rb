@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   get '/mentorship', to: 'mentorship#index', as: :mentorship
   post '/mentorship/search', to: 'mentorship#search', as: :mentorship_search
   get '/mentorship/search', to: 'mentorship#search'
+  post '/mentorship/contact/:id', to: 'mentorship#contact', as: :mentor_contact
 
   get '/reports/memberships', to: 'reports#memberships', as: :memberships_report
   get '/reports/renewal_reminders', to: 'reports#renewal_reminders', as: :renewal_reminders
