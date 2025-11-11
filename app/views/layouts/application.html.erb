@@ -29,9 +29,11 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <% if @user %>
-              <li class="nav-item">
-                <%= link_to 'Mentorship', mentorship_path, class: 'nav-link' %>
-              </li>
+              <% if @user.class != Admin && ENV['SHOW_MENTOR'] %>
+                <li class="nav-item">
+                  <%= link_to 'Mentorship', mentorship_path, class: 'nav-link' %>
+                </li>
+              <% end %>
               <% if @user.is_a?(Admin) %>
                 <li class="nav-item">
                   <%= link_to 'People', people_path, class: 'nav-link' %>
