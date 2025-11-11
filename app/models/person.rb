@@ -12,7 +12,9 @@ class Person < ApplicationRecord
   has_many :people_skills, dependent: :destroy, autosave: true
   has_many :skills, through: :people_skills
   has_many :active_skills, -> { where('people_skills.skill_level > 0') }, through: :people_skills, source: :skill
-  has_one_attached :profile_picture
+  has_one_attached :profile_picture do |attachable|
+    attachable.variant :display, resize_to_limit: [600, nil]
+  end
   has_secure_password validations: false # Rethink this... maybe just force a random password when not present
   belongs_to :astrobin, optional: true
   belongs_to :referral, optional: true
