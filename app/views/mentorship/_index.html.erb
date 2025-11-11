@@ -73,7 +73,7 @@
       <div class="alert alert-info" role="alert">
         <h5 class="alert-heading">No mentors found</h5>
         <% if @query_params[:skills].present? %>
-          <p class="mb-0">Try adjusting your skill filters or selecting "Match Any (OR)" instead of "Match All (AND)".</p>
+          <p class="mb-0">Try adjusting your skill filters.  When more than one skill is selected, mentor results will match all skills listed.</p>
         <% else %>
           <p class="mb-0">Select skills above to find mentors who can help you learn.</p>
         <% end %>
