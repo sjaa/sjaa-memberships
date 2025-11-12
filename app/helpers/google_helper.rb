@@ -21,9 +21,9 @@ module GoogleHelper
     return auth
   end
 
-  def sync(auth: nil, group: MEMBERS_GROUP, role: nil, members_only: true, save: true, add_only: false)
+  def sync(auth: nil, group: MEMBERS_GROUP, group_model: nil, members_only: true, save: true, add_only: false)
     # Compute diff
-    diff = diff_group(auth: auth, group: group, role: role, members_only: members_only)
+    diff = diff_group(auth: auth, group: group, group_model: group_model, members_only: members_only)
     client = diff[:client]
     diff[:errors] ||= []
 
@@ -71,8 +71,8 @@ module GoogleHelper
     return diff
   end
 
-  # Generic method to diff any group with role membership or active members
-  def diff_group(auth: nil, group: MEMBERS_GROUP, role: nil, members_only: true)
+  # Generic method to diff any group with group membership or active members
+  def diff_group(auth: nil, group: MEMBERS_GROUP, group_model: nil, members_only: true)
     results = {}
 
     # Get a client from googleapis
@@ -82,12 +82,12 @@ module GoogleHelper
     results[:client] = client
 
     # Determine which people should be in the group
-    if role
-      # Get people in this role
-      query = Person.includes(:contacts).joins(:roles).where(roles: {id: role.id}).distinct
-      puts "[DEBUG] Role query SQL: #{query.to_sql}"
+    if group_model
+      # Get people in this group
+      query = Person.includes(:contacts).joins(:groups).where(groups: {id: group_model.id}).distinct
+      puts "[DEBUG] Group query SQL: #{query.to_sql}"
       people = query.to_a
-      puts "[DEBUG] Found #{people.count} people in role #{role.name} (id: #{role.id})"
+      puts "[DEBUG] Found #{people.count} people in group #{group_model.name} (id: #{group_model.id})"
 
       # If members_only is true, filter to only active members
       if members_only
@@ -147,7 +147,7 @@ module GoogleHelper
 
   # Backwards compatibility wrapper
   def diff_members_group(auth: nil)
-    diff_group(auth: auth, group: MEMBERS_GROUP, role: nil, members_only: true)
+    diff_group(auth: auth, group: MEMBERS_GROUP, group_model: nil, members_only: true)
   end
 
   def get_members(auth: nil, client: nil, group: MEMBERS_GROUP)

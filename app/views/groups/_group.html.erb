@@ -1,14 +1,14 @@
-<div class="row" id="<%= dom_id role %>">
+<div class="row" id="<%= dom_id group %>">
   <div class="col-12">
-    <h1><%= role&.name %> <small><%=role.short_name.present? ? '(' + role.short_name + ')' : ''%></small></h1>
-    <%= render partial: 'layouts/object_table', locals: {obj: role} %>
+    <h1><%= group&.name %> <small><%=group.short_name.present? ? '(' + group.short_name + ')' : ''%></small></h1>
+    <%= render partial: 'layouts/object_table', locals: {obj: group} %>
     <h2>People</h2>
   </div>
   <div class="col-12">
-    <%= form_with url: roles_add_person_path do |f| %>
+    <%= form_with url: groups_add_person_path do |f| %>
       <div class="row">
         <div class="col-md-6 col-xs-12 mt-2">
-          <%= f.hidden_field :id, value: role.id %>
+          <%= f.hidden_field :id, value: group.id %>
           <%= f.combobox :person_id, Person.all.map{|p| [p.name, p.id]}, placeholder: 'Add Person' %>
         </div>
         <div class="col-md-6 col-xs-12 mt-2">
@@ -19,7 +19,7 @@
   </div>
   <div class="col-12 table-responsive mt-4">
     <table class="table table-striped">
-      <% role.people.each do |person| %>
+      <% group.people.each do |person| %>
         <tr>
           <td><%= link_to person&.name, person_path(person) %></td>
         </tr>

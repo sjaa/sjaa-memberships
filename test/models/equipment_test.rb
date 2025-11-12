@@ -116,7 +116,7 @@ class EquipmentTest < ActiveSupport::TestCase
     assert_nil equipment.person
   end
 
-  test 'equipment can exist without role' do
+  test 'equipment can exist without group' do
     equipment = Equipment.create!(
       instrument: @instrument,
       person: @person,
@@ -124,7 +124,7 @@ class EquipmentTest < ActiveSupport::TestCase
     )
 
     assert equipment.valid?
-    assert_nil equipment.role
+    assert_nil equipment.group
   end
 
   test 'equipment associations work correctly' do

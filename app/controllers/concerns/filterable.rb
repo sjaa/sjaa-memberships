@@ -47,7 +47,7 @@ module Filterable
       @query_params.delete(:submit)
       @query_params.select!{|k,v| v.present?}
       @query_params = @query_params.permit(
-      :search, :has_astrobin, :role_operation, :interest_operation, :skill_operation, :first_name, :last_name, :email, :phone, :city, :state, :ephemeris, :active, :volunteer, :mentor, :discord_id, interests: [], roles: [], skills: []
+      :search, :has_astrobin, :group_operation, :interest_operation, :skill_operation, :first_name, :last_name, :email, :phone, :city, :state, :ephemeris, :active, :volunteer, :mentor, :discord_id, interests: [], groups: [], skills: []
       )
       qp = @query_params.to_h
     else
@@ -98,9 +98,9 @@ module Filterable
     query = query.joins(contacts: :state).where(State.arel_table[:short_name].matches("%#{qp[:state]}%")) if(qp[:state].present?)
     query = query.where.not(astrobin_id: nil) if(qp[:has_astrobin] == 'true')
     
-    # Handle interests, roles, and skills specially
+    # Handle interests, groups, and skills specially
     query = and_or_helper(Person, query, qp[:interest_operation], :interests, qp[:interests]) if(qp[:interests].present?)
-    query = and_or_helper(Person, query, qp[:role_operation], :roles, qp[:roles]) if(qp[:roles].present?)
+    query = and_or_helper(Person, query, qp[:group_operation], :groups, qp[:groups]) if(qp[:groups].present?)
     query = and_or_helper(Person, query, qp[:skill_operation], :skills, qp[:skills]) if(qp[:skills].present?)
 
     query = query.active_members.where(memberships: {ephemeris: true}) if(qp[:ephemeris] == 'printed')
@@ -122,8 +122,8 @@ module Filterable
 
     @active_memberships = Person.common_active_membership_query(Membership.all).group_by{|m| m.person_id}
     #@active_memberships = query.active_members.group_by{|m| m.id}
-    #@all_people = Person.where(id: query.map(&:id).uniq).includes(:donations, :memberships, :contacts, :interests, :roles)
-    @all_people = query.includes(:donations, :memberships, :interests, :roles, :skills, :astrobin, contacts: [:city, :state])
+    #@all_people = Person.where(id: query.map(&:id).uniq).includes(:donations, :memberships, :contacts, :interests, :groups)
+    @all_people = query.includes(:donations, :memberships, :interests, :groups, :skills, :astrobin, contacts: [:city, :state])
     @totals = {total: @all_people.count}
     @pagy, @people = pagy(@all_people, limit: 40, params: qp)
   end

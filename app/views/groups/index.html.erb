@@ -1,7 +1,7 @@
 <div class="row">
   <div class="col-12">
-    <h1>Roles</h1>
-    <%= link_to "New role", new_role_path, class: 'btn btn-primary' %>
+    <h1>Groups</h1>
+    <%= link_to "New group", new_group_path, class: 'btn btn-primary' %>
     <div class="table-responsive">
       <table class="table table-striped">
         <tr>
@@ -10,20 +10,20 @@
           <th>Email</th>
           <th>Discord</th>
         </tr>
-        <% @roles.each do |role| %>
+        <% @groups.each do |group| %>
           <tr>
             <td>
-              <%= link_to "#{role.name} (#{role.short_name})", role %>
+              <%= link_to "#{group.name} (#{group.short_name})", group %>
             </td>
             <td>
-              <% count = role.people.count %>
+              <% count = group.people.count %>
               <%= "#{count} #{'person'.pluralize(count)}" %>
             </td>
             <td>
-              <%= role.email %>
+              <%= group.email %>
             </td>
             <td>
-              <%= role.discord_id %>
+              <%= group.discord_id %>
             </td>
           </tr>
         <% end %>

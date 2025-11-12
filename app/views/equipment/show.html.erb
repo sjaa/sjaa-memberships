@@ -1,9 +1,9 @@
-<% 
+<%
 owners = []
 person = @equipment&.person
-role = @equipment&.role
+group = @equipment&.group
 owners << link_to(person.name, person) if(!person.nil?)
-owners << link_to(role.name, role) if(!role.nil?)
+owners << link_to(group.name, group) if(!group.nil?)
 %>
     <h1><%= @equipment&.instrument&.model%> <small>(<%= @equipment&.instrument&.kind&.titleize %></small>)</h1>
   <div class="d-flex flex-wrap">

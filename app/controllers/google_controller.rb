@@ -11,8 +11,8 @@ class GoogleController < ApplicationController
       return
     end
 
-    # Get all joinable roles with email addresses, plus the hardcoded members group
-    @roles = Role.where(joinable: true).where.not(email: [nil, ''])
+    # Get all joinable groups with email addresses, plus the hardcoded members group
+    @groups = Group.where(joinable: true).where.not(email: [nil, ''])
   end
 
   def group_sync
@@ -23,26 +23,26 @@ class GoogleController < ApplicationController
     end
 
     # Determine which group to sync
-    @role_id = params[:role_id]
+    @group_id = params[:group_id]
     @group_email = nil
-    @role = nil
+    @group = nil
     @members_only = false
 
-    if @role_id.present? && @role_id != 'members'
+    if @group_id.present? && @group_id != 'members'
       begin
-        @role = Role.find(@role_id)
-        @group_email = @role.email
-        @members_only = @role.members_only
-        @group_name = @role.name
+        @group = Group.find(@group_id)
+        @group_email = @group.email
+        @members_only = @group.members_only
+        @group_name = @group.name
 
-        # Validate that the role has an email
+        # Validate that the group has an email
         if @group_email.blank?
-          flash[:alert] = "The selected role does not have a Google Group email address configured."
+          flash[:alert] = "The selected group does not have a Google Group email address configured."
           redirect_to google_groups_path
           return
         end
       rescue ActiveRecord::RecordNotFound
-        flash[:alert] = "The selected role could not be found."
+        flash[:alert] = "The selected group could not be found."
         redirect_to google_groups_path
         return
       end
@@ -51,7 +51,7 @@ class GoogleController < ApplicationController
       @group_email = GoogleHelper::MEMBERS_GROUP
       @members_only = true
       @group_name = "Members"
-      @role_id = 'members'
+      @group_id = 'members'
     end
 
     @diff = params[:diff].present?
@@ -59,11 +59,11 @@ class GoogleController < ApplicationController
 
     begin
       if(@commit)
-        diff_results = sync(auth: @auth, group: @group_email, role: @role, members_only: @members_only, save: !params[:add_only], add_only: params[:add_only])
+        diff_results = sync(auth: @auth, group: @group_email, group_model: @group, members_only: @members_only, save: !params[:add_only], add_only: params[:add_only])
       end
 
       if(@diff)
-        diff_results ||= diff_group(auth: @auth, group: @group_email, role: @role, members_only: @members_only)
+        diff_results ||= diff_group(auth: @auth, group: @group_email, group_model: @group, members_only: @members_only)
         @group_matched = diff_results[:group_matched]
         @unmatched_people = diff_results[:unmatched_people]
         @group_unmatched = diff_results[:group_unmatched]

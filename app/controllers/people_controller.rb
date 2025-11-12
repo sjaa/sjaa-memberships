@@ -156,8 +156,8 @@ class PeopleController < ApplicationController
     params.require(:person).permit(
     :first_name, :last_name, :astrobin_id, :notes, :membership_id, :discord_id, :referral_id, :volunteer, :mentor, :profile_picture,
     interests_attributes: [:name, :id],
-    roles_attributes: [:id],
-    joinable_role_ids: [],
+    groups_attributes: [:id],
+    joinable_group_ids: [],
     permission_attributes: [],
     skills_attributes: [:skill_id, :skill_level, :interest_level],
     contact_attributes: [:address, :zipcode, :phone, :state_id, :city_id, :city_name, :email, :primary, :person_id, :id],

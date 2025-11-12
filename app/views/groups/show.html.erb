@@ -1,0 +1,7 @@
+<%= render partial: 'group', locals: {group: @group, show_people: true} %>
+
+<div>
+  <%= link_to "Edit this group", edit_group_path(@group), class: 'btn btn-primary' %>
+  <%= link_to "Back to groups", groups_path, class: 'btn btn-secondary' %>
+  <%= button_to "Destroy this group", @group, method: :delete, class: 'btn btn-danger d-inline-block', data: {turbo_confirm: 'Are you sure?'} %>
+</div>

@@ -51,10 +51,10 @@
   </div>
 
   <div class="mt-4">
-    <% group_selector = Role.all.map{|p| {display: p.name, value: p.id}}%>
-    <%= form.label :role_id, 'Group Owner', class: 'form-label' %>
-    <%= form.combobox :role_id, group_selector %>
-    <%= link_to 'New Group', new_role_path, target: :_blank %>
+    <% group_selector = Group.all.map{|p| {display: p.name, value: p.id}}%>
+    <%= form.label :group_id, 'Group Owner', class: 'form-label' %>
+    <%= form.combobox :group_id, group_selector %>
+    <%= link_to 'New Group', new_group_path, target: :_blank %>
   </div>
 
   <div class="mt-4">

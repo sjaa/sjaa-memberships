@@ -3,16 +3,16 @@
     <h1>Google Group: <%= @group_name %></h1>
     <p>
       <strong>Group Email:</strong> <%= @group_email %><br/>
-      <strong>Filter:</strong> <%= @members_only ? 'Active Members Only' : 'All People in Role' %>
+      <strong>Filter:</strong> <%= @members_only ? 'Active Members Only' : 'All People in Group' %>
     </p>
     <p>
       The table below shows the current list of people in the <%= @group_email %>
       Google Group. Use the "Compute Difference" button below to compare the Group membership
-      with the people in the <%= @role ? 'role' : 'membership database' %>.
+      with the people in the <%= @group ? 'group' : 'membership database' %>.
     </p>
     <p>
     <%= link_to 'Back to Group Selection', google_groups_path, class: 'btn btn-secondary' %>
-    <%= link_to 'Compute Difference', google_group_sync_path(role_id: @role_id, diff: true), class: 'btn btn-primary' %>
+    <%= link_to 'Compute Difference', google_group_sync_path(group_id: @group_id, diff: true), class: 'btn btn-primary' %>
     </p>
 
     <% if @diff %>
@@ -26,12 +26,12 @@
     <% if @commit %>
     See below for details.
     <% else %>
-    <%= link_to 'Sync (Add and Remove)', google_group_sync_path(role_id: @role_id, diff: true, commit: true), class: 'btn btn-sm btn-primary' %>
-    <%= link_to 'Sync (Add Only)', google_group_sync_path(role_id: @role_id, diff: true, commit: true, add_only: true), class: 'btn btn-sm btn-success' %>
+    <%= link_to 'Sync (Add and Remove)', google_group_sync_path(group_id: @group_id, diff: true, commit: true), class: 'btn btn-sm btn-primary' %>
+    <%= link_to 'Sync (Add Only)', google_group_sync_path(group_id: @group_id, diff: true, commit: true, add_only: true), class: 'btn btn-sm btn-success' %>
     <% end %>
     </p>
 
-    <h2><%= @members_only ? 'Active Members' : 'People in Role' %> Missing From Google Group</h2>
+    <h2><%= @members_only ? 'Active Members' : 'People in Group' %> Missing From Google Group</h2>
     <div class="table-responsive mt-2">
       <table class="table table-striped">
         <tr>
@@ -53,7 +53,7 @@
       </table>
     </div>
 
-    <h2>Google Group Members That Are Not <%= @members_only ? 'Active Members' : 'In Role' %></h2>
+    <h2>Google Group Members That Are Not <%= @members_only ? 'Active Members' : 'In Group' %></h2>
     <div class="table-responsive mt-2">
       <table class="table table-striped">
         <tr>
@@ -75,7 +75,7 @@
       </table>
     </div>
 
-    <h2>Google Group Members Who Are <%= @members_only ? 'Active Members' : 'In Role' %></h2>
+    <h2>Google Group Members Who Are <%= @members_only ? 'Active Members' : 'In Group' %></h2>
     <div class="table-responsive mt-2">
       <table class="table table-striped">
         <tr>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_11_10_011546) do
+ActiveRecord::Schema[7.1].define(version: 2025_11_12_042038) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
   enable_extension "plpgsql"
@@ -134,15 +134,33 @@ ActiveRecord::Schema[7.1].define(version: 2025_11_10_011546) do
     t.integer "person_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "role_id"
+    t.integer "group_id"
+    t.index ["group_id"], name: "index_equipment_on_group_id"
     t.index ["instrument_id"], name: "index_equipment_on_instrument_id"
     t.index ["person_id"], name: "index_equipment_on_person_id"
-    t.index ["role_id"], name: "index_equipment_on_role_id"
   end
 
   create_table "equipment_tags", id: false, force: :cascade do |t|
     t.bigint "equipment_id", null: false
     t.bigint "tag_id", null: false
+  end
+
+  create_table "groups", force: :cascade do |t|
+    t.string "name"
+    t.string "short_name"
+    t.string "email"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "discord_id"
+    t.boolean "joinable", default: false
+    t.boolean "members_only", default: false
+  end
+
+  create_table "groups_people", id: false, force: :cascade do |t|
+    t.integer "person_id", null: false
+    t.integer "group_id", null: false
+    t.index ["group_id"], name: "index_groups_people_on_group_id"
+    t.index ["person_id"], name: "index_groups_people_on_person_id"
   end
 
   create_table "instruments", force: :cascade do |t|
@@ -236,13 +254,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_11_10_011546) do
     t.index ["person_id", "permission_id"], name: "index_people_permissions_on_person_id_and_permission_id"
   end
 
-  create_table "people_roles", id: false, force: :cascade do |t|
-    t.integer "person_id", null: false
-    t.integer "role_id", null: false
-    t.index ["person_id"], name: "index_people_roles_on_person_id"
-    t.index ["role_id"], name: "index_people_roles_on_role_id"
-  end
-
   create_table "people_skills", force: :cascade do |t|
     t.bigint "person_id", null: false
     t.bigint "skill_id", null: false
@@ -266,17 +277,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_11_10_011546) do
     t.string "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-  end
-
-  create_table "roles", force: :cascade do |t|
-    t.string "name"
-    t.string "short_name"
-    t.string "email"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.string "discord_id"
-    t.boolean "joinable", default: false
-    t.boolean "members_only", default: false
   end
 
   create_table "skills", force: :cascade do |t|

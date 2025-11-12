@@ -66,29 +66,29 @@
               </div>
             </div>
 
-            <!-- Roles -->
+            <!-- Groups -->
             <div class="col-md-6 col-xs-12 mb-2" data-controller="form">
               <div class="row">
                 <div class="col-12">
-                  <%= label_tag 'Roles', 'Roles', class: 'form-label' %>
+                  <%= label_tag 'Groups', 'Groups', class: 'form-label' %>
                   <div data-form-target="fields mt-2 mb-2">
                   </div>
                   <template data-form-target="template">
                     <span id="NEWID" class="d-inline-block mt-2" style="margin-right: 0.5em;">
-                      <%= hidden_field_tag 'roles[]', 'REPLACEVALUE' %>
+                      <%= hidden_field_tag 'groups[]', 'REPLACEVALUE' %>
                       <a data-form-id-param="NEWID" data-action="search-form#search form#removeField" class="btn btn-secondary">REPLACENAME</a>
                     </span>
                   </template>
                 </div>
                 <div class="col-12 mt-2">
-                  <%= combobox_tag "roles[]", Role.all.map{|r| {display: r.name, value: r.id}}, placeholder: 'Select Roles', data: { form_baseid_param: 'role', form_target: 'source', action: "hw-combobox:selection->search-form#search hw-combobox:selection->form#addField" } %>
+                  <%= combobox_tag "groups[]", Group.all.map{|r| {display: r.name, value: r.id}}, placeholder: 'Select Groups', data: { form_baseid_param: 'group', form_target: 'source', action: "hw-combobox:selection->search-form#search hw-combobox:selection->form#addField" } %>
                   <span style="margin-right: 20px;">
-                    <%= radio_button_tag 'role_operation', 'and', class: 'form-check-input', checked: @query_params[:role_operation] == 'and', data: {action: "search-form#search"} %>
-                    <%= label_tag 'role_operation_and', 'And', class: 'form-check-label' %>
+                    <%= radio_button_tag 'group_operation', 'and', class: 'form-check-input', checked: @query_params[:group_operation] == 'and', data: {action: "search-form#search"} %>
+                    <%= label_tag 'group_operation_and', 'And', class: 'form-check-label' %>
                   </span>
                   <span style="margin-right: 20px;">
-                    <%= radio_button_tag 'role_operation', 'or', class: 'form-check-input', checked: @query_params[:role_operation] != 'and', data: {action: "search-form#search"} %>
-                    <%= label_tag 'role_operation_or', 'Or', class: 'form-check-label' %>
+                    <%= radio_button_tag 'group_operation', 'or', class: 'form-check-input', checked: @query_params[:group_operation] != 'and', data: {action: "search-form#search"} %>
+                    <%= label_tag 'group_operation_or', 'Or', class: 'form-check-label' %>
                   </span>
                 </div>
               </div>

@@ -1,6 +1,6 @@
 <div id="<%=id%>" class="row mt-2">
   <div class="col-md-6 col-xs-8">
-    <%= combobox_tag "person[roles_attributes][][id]",  Role.all.map{|r| {display: r.name, value: r.id}}, value: role.id %>
+    <%= combobox_tag "person[groups_attributes][][id]",  Group.all.map{|g| {display: g.name, value: g.id}}, value: group.id %>
   </div>
   <div class="col-md-6 col-xs-4">
     <button type="button" data-form-id-param="<%=id%>" data-action="form#removeField" class="btn btn-danger">Remove</button>

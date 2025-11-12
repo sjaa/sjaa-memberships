@@ -44,7 +44,7 @@
                     Data
                   </a>
                   <ul class="dropdown-menu">
-                    <li><%= link_to 'Roles', roles_path, class: 'dropdown-item' %></li>
+                    <li><%= link_to 'Groups', groups_path, class: 'dropdown-item' %></li>
                     <li><%= link_to 'Skills', skills_path, class: 'dropdown-item' %></li>
                     <li><%= link_to 'Tags', tags_path, class: 'dropdown-item' %></li>
                     <% if @user.has_permission? :permit %>

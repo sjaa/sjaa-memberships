@@ -195,168 +195,168 @@ class PersonTest < ActiveSupport::TestCase
     assert_includes @person.contacts, @contact
   end
 
-  # joinable_role_ids= tests (for user self-management)
-  test 'joinable_role_ids= can set joinable roles' do
-    role1 = Role.create!(name: 'Observers', email: 'observers@sjaa.net', joinable: true)
-    role2 = Role.create!(name: 'Volunteers', email: 'volunteers@sjaa.net', joinable: true)
+  # joinable_group_ids= tests (for user self-management)
+  test 'joinable_group_ids= can set joinable groups' do
+    role1 = Group.create!(name: 'Observers', email: 'observers@sjaa.net', joinable: true)
+    role2 = Group.create!(name: 'Volunteers', email: 'volunteers@sjaa.net', joinable: true)
 
-    @person.joinable_role_ids = [role1.id, role2.id]
+    @person.joinable_group_ids = [role1.id, role2.id]
 
-    assert_equal 2, @person.roles.count
-    assert_includes @person.roles, role1
-    assert_includes @person.roles, role2
+    assert_equal 2, @person.groups.count
+    assert_includes @person.groups, role1
+    assert_includes @person.groups, role2
   end
 
-  test 'joinable_role_ids= can remove all joinable roles with empty array' do
-    role1 = Role.create!(name: 'Observers', email: 'observers@sjaa.net', joinable: true)
-    role2 = Role.create!(name: 'Volunteers', email: 'volunteers@sjaa.net', joinable: true)
+  test 'joinable_group_ids= can remove all joinable groups with empty array' do
+    role1 = Group.create!(name: 'Observers', email: 'observers@sjaa.net', joinable: true)
+    role2 = Group.create!(name: 'Volunteers', email: 'volunteers@sjaa.net', joinable: true)
 
-    @person.roles << [role1, role2]
-    assert_equal 2, @person.roles.count
+    @person.groups << [role1, role2]
+    assert_equal 2, @person.groups.count
 
-    # Empty array with hidden field [""] should remove all joinable roles
-    @person.joinable_role_ids = [""]
+    # Empty array with hidden field [""] should remove all joinable groups
+    @person.joinable_group_ids = [""]
 
-    assert_equal 0, @person.roles.count
+    assert_equal 0, @person.groups.count
   end
 
-  test 'joinable_role_ids= filters out empty strings from hidden field' do
-    role1 = Role.create!(name: 'Observers', email: 'observers@sjaa.net', joinable: true)
+  test 'joinable_group_ids= filters out empty strings from hidden field' do
+    role1 = Group.create!(name: 'Observers', email: 'observers@sjaa.net', joinable: true)
 
     # Simulates form submission with hidden field: ["", role1.id]
-    @person.joinable_role_ids = ["", role1.id]
+    @person.joinable_group_ids = ["", role1.id]
 
-    assert_equal 1, @person.roles.count
-    assert_includes @person.roles, role1
+    assert_equal 1, @person.groups.count
+    assert_includes @person.groups, role1
   end
 
-  test 'joinable_role_ids= ignores non-joinable role IDs' do
-    joinable_role = Role.create!(name: 'Observers', email: 'observers@sjaa.net', joinable: true)
-    non_joinable_role = Role.create!(name: 'Board Member', email: 'board@sjaa.net', joinable: false)
+  test 'joinable_group_ids= ignores non-joinable group IDs' do
+    joinable_group = Group.create!(name: 'Observers', email: 'observers@sjaa.net', joinable: true)
+    non_joinable_group = Group.create!(name: 'Board Member', email: 'board@sjaa.net', joinable: false)
 
     # User tries to add themselves to a non-joinable role
-    @person.joinable_role_ids = [joinable_role.id, non_joinable_role.id]
+    @person.joinable_group_ids = [joinable_group.id, non_joinable_group.id]
 
-    # Only joinable role should be added
-    assert_equal 1, @person.roles.count
-    assert_includes @person.roles, joinable_role
-    assert_not_includes @person.roles, non_joinable_role
+    # Only joinable group should be added
+    assert_equal 1, @person.groups.count
+    assert_includes @person.groups, joinable_group
+    assert_not_includes @person.groups, non_joinable_group
   end
 
-  test 'joinable_role_ids= updates existing role assignments correctly' do
-    role1 = Role.create!(name: 'Observers', email: 'observers@sjaa.net', joinable: true)
-    role2 = Role.create!(name: 'Volunteers', email: 'volunteers@sjaa.net', joinable: true)
-    role3 = Role.create!(name: 'Educators', email: 'edu@sjaa.net', joinable: true)
+  test 'joinable_group_ids= updates existing group assignments correctly' do
+    role1 = Group.create!(name: 'Observers', email: 'observers@sjaa.net', joinable: true)
+    role2 = Group.create!(name: 'Volunteers', email: 'volunteers@sjaa.net', joinable: true)
+    role3 = Group.create!(name: 'Educators', email: 'edu@sjaa.net', joinable: true)
 
-    # Set initial roles
-    @person.joinable_role_ids = [role1.id, role2.id]
-    assert_equal 2, @person.roles.count
+    # Set initial groups
+    @person.joinable_group_ids = [role1.id, role2.id]
+    assert_equal 2, @person.groups.count
 
-    # Update to different roles
-    @person.joinable_role_ids = [role2.id, role3.id]
+    # Update to different groups
+    @person.joinable_group_ids = [role2.id, role3.id]
 
-    assert_equal 2, @person.roles.count
-    assert_not_includes @person.roles, role1
-    assert_includes @person.roles, role2
-    assert_includes @person.roles, role3
+    assert_equal 2, @person.groups.count
+    assert_not_includes @person.groups, role1
+    assert_includes @person.groups, role2
+    assert_includes @person.groups, role3
   end
 
-  test 'joinable_role_ids= preserves non-joinable roles when setting joinable roles' do
-    joinable_role = Role.create!(name: 'Observers', email: 'observers@sjaa.net', joinable: true)
-    non_joinable_role = Role.create!(name: 'Board Member', email: 'board@sjaa.net', joinable: false)
+  test 'joinable_group_ids= preserves non-joinable groups when setting joinable groups' do
+    joinable_group = Group.create!(name: 'Observers', email: 'observers@sjaa.net', joinable: true)
+    non_joinable_group = Group.create!(name: 'Board Member', email: 'board@sjaa.net', joinable: false)
 
-    # Add a non-joinable role (admin-set)
-    @person.roles << non_joinable_role
-    assert_equal 1, @person.roles.count
+    # Add a non-joinable group (admin-set)
+    @person.groups << non_joinable_group
+    assert_equal 1, @person.groups.count
 
     # User adds themselves to a joinable role
-    @person.joinable_role_ids = [joinable_role.id]
+    @person.joinable_group_ids = [joinable_group.id]
 
-    assert_equal 2, @person.roles.count
-    assert_includes @person.roles, joinable_role
-    assert_includes @person.roles, non_joinable_role
+    assert_equal 2, @person.groups.count
+    assert_includes @person.groups, joinable_group
+    assert_includes @person.groups, non_joinable_group
   end
 
-  test 'joinable_role_ids= preserves non-joinable roles when removing all joinable roles' do
-    joinable_role = Role.create!(name: 'Observers', email: 'observers@sjaa.net', joinable: true)
-    non_joinable_role = Role.create!(name: 'Board Member', email: 'board@sjaa.net', joinable: false)
+  test 'joinable_group_ids= preserves non-joinable groups when removing all joinable groups' do
+    joinable_group = Group.create!(name: 'Observers', email: 'observers@sjaa.net', joinable: true)
+    non_joinable_group = Group.create!(name: 'Board Member', email: 'board@sjaa.net', joinable: false)
 
-    @person.roles << [joinable_role, non_joinable_role]
-    assert_equal 2, @person.roles.count
+    @person.groups << [joinable_group, non_joinable_group]
+    assert_equal 2, @person.groups.count
 
-    # User removes all joinable roles (empty array with hidden field [""])
-    @person.joinable_role_ids = [""]
+    # User removes all joinable groups (empty array with hidden field [""])
+    @person.joinable_group_ids = [""]
 
-    assert_equal 1, @person.roles.count
-    assert_includes @person.roles, non_joinable_role
-    assert_not_includes @person.roles, joinable_role
+    assert_equal 1, @person.groups.count
+    assert_includes @person.groups, non_joinable_group
+    assert_not_includes @person.groups, joinable_group
   end
 
-  test 'roles_attributes= allows admin to set mix of joinable and non-joinable roles' do
-    joinable_role = Role.create!(name: 'Observers', email: 'observers@sjaa.net', joinable: true)
-    non_joinable_role = Role.create!(name: 'Board Member', email: 'board@sjaa.net', joinable: false)
+  test 'groups_attributes= allows admin to set mix of joinable and non-joinable groups' do
+    joinable_group = Group.create!(name: 'Observers', email: 'observers@sjaa.net', joinable: true)
+    non_joinable_group = Group.create!(name: 'Board Member', email: 'board@sjaa.net', joinable: false)
 
-    # Admin sets both types of roles
-    @person.roles_attributes = [{id: joinable_role.id}, {id: non_joinable_role.id}]
+    # Admin sets both types of groups
+    @person.groups_attributes = [{id: joinable_group.id}, {id: non_joinable_group.id}]
 
-    assert_equal 2, @person.roles.count
-    assert_includes @person.roles, joinable_role
-    assert_includes @person.roles, non_joinable_role
+    assert_equal 2, @person.groups.count
+    assert_includes @person.groups, joinable_group
+    assert_includes @person.groups, non_joinable_group
   end
 
-  test 'roles_attributes= allows admin to remove all roles including non-joinable' do
-    joinable_role = Role.create!(name: 'Observers', email: 'observers@sjaa.net', joinable: true)
-    non_joinable_role = Role.create!(name: 'Board Member', email: 'board@sjaa.net', joinable: false)
+  test 'groups_attributes= allows admin to remove all groups including non-joinable' do
+    joinable_group = Group.create!(name: 'Observers', email: 'observers@sjaa.net', joinable: true)
+    non_joinable_group = Group.create!(name: 'Board Member', email: 'board@sjaa.net', joinable: false)
 
-    @person.roles << [joinable_role, non_joinable_role]
-    assert_equal 2, @person.roles.count
+    @person.groups << [joinable_group, non_joinable_group]
+    assert_equal 2, @person.groups.count
 
-    # Admin sends only non-joinable roles (effectively removing joinable)
-    @person.roles_attributes = [{id: non_joinable_role.id}]
+    # Admin sends only non-joinable groups (effectively removing joinable)
+    @person.groups_attributes = [{id: non_joinable_group.id}]
 
-    assert_equal 1, @person.roles.count
-    assert_includes @person.roles, non_joinable_role
-    assert_not_includes @person.roles, joinable_role
+    assert_equal 1, @person.groups.count
+    assert_includes @person.groups, non_joinable_group
+    assert_not_includes @person.groups, joinable_group
   end
 
-  test 'roles_attributes= handles nil IDs gracefully' do
-    role1 = Role.create!(name: 'Observers', email: 'observers@sjaa.net', joinable: true)
+  test 'groups_attributes= handles nil IDs gracefully' do
+    role1 = Group.create!(name: 'Observers', email: 'observers@sjaa.net', joinable: true)
 
     # Simulates weird form data with nil values
-    @person.roles_attributes = [{id: nil}, {id: role1.id}, {id: nil}]
+    @person.groups_attributes = [{id: nil}, {id: role1.id}, {id: nil}]
 
-    assert_equal 1, @person.roles.count
-    assert_includes @person.roles, role1
+    assert_equal 1, @person.groups.count
+    assert_includes @person.groups, role1
   end
 
-  test 'roles_attributes= handles mixed blank values' do
-    role1 = Role.create!(name: 'Observers', email: 'observers@sjaa.net', joinable: true)
-    role2 = Role.create!(name: 'Volunteers', email: 'volunteers@sjaa.net', joinable: true)
+  test 'groups_attributes= handles mixed blank values' do
+    role1 = Group.create!(name: 'Observers', email: 'observers@sjaa.net', joinable: true)
+    role2 = Group.create!(name: 'Volunteers', email: 'volunteers@sjaa.net', joinable: true)
 
     # Simulates form with various blank values
-    @person.roles_attributes = [{id: ""}, {id: role1.id}, {id: nil}, {id: role2.id}, {id: ""}]
+    @person.groups_attributes = [{id: ""}, {id: role1.id}, {id: nil}, {id: role2.id}, {id: ""}]
 
-    assert_equal 2, @person.roles.count
-    assert_includes @person.roles, role1
-    assert_includes @person.roles, role2
+    assert_equal 2, @person.groups.count
+    assert_includes @person.groups, role1
+    assert_includes @person.groups, role2
   end
 
-  test 'roles_attributes= updates existing role assignments correctly' do
-    role1 = Role.create!(name: 'Observers', email: 'observers@sjaa.net', joinable: true)
-    role2 = Role.create!(name: 'Volunteers', email: 'volunteers@sjaa.net', joinable: true)
-    role3 = Role.create!(name: 'Educators', email: 'edu@sjaa.net', joinable: true)
+  test 'groups_attributes= updates existing group assignments correctly' do
+    role1 = Group.create!(name: 'Observers', email: 'observers@sjaa.net', joinable: true)
+    role2 = Group.create!(name: 'Volunteers', email: 'volunteers@sjaa.net', joinable: true)
+    role3 = Group.create!(name: 'Educators', email: 'edu@sjaa.net', joinable: true)
 
-    # Set initial roles
-    @person.roles << [role1, role2]
-    assert_equal 2, @person.roles.count
+    # Set initial groups
+    @person.groups << [role1, role2]
+    assert_equal 2, @person.groups.count
 
-    # Update to different roles
-    @person.roles_attributes = [{id: role2.id}, {id: role3.id}]
+    # Update to different groups
+    @person.groups_attributes = [{id: role2.id}, {id: role3.id}]
 
-    assert_equal 2, @person.roles.count
-    assert_not_includes @person.roles, role1
-    assert_includes @person.roles, role2
-    assert_includes @person.roles, role3
+    assert_equal 2, @person.groups.count
+    assert_not_includes @person.groups, role1
+    assert_includes @person.groups, role2
+    assert_includes @person.groups, role3
   end
 
   # Permission-related tests

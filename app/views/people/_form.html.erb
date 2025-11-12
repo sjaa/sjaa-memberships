@@ -87,11 +87,11 @@
             Join groups to receive updates and participate in group activities.
           </small>
         </p>
-        <%= hidden_field_tag "person[joinable_role_ids][]", "" %>
-        <% role_ids = person.roles.select(&:joinable).map(&:id) %>
-        <% Role.where(joinable: true).each do |role| %>
-          <%= check_box_tag "person[joinable_role_ids][]", role.id, role_ids.include?(role.id), autocomplete: "off", id: "role_#{role.id}", class: 'btn-check' %>
-          <label class="btn btn-light" for="role_<%=role.id%>"><%=role.name%></label>
+        <%= hidden_field_tag "person[joinable_group_ids][]", "" %>
+        <% group_ids = person.groups.select(&:joinable).map(&:id) %>
+        <% Group.where(joinable: true).each do |group| %>
+          <%= check_box_tag "person[joinable_group_ids][]", group.id, group_ids.include?(group.id), autocomplete: "off", id: "group_#{group.id}", class: 'btn-check' %>
+          <label class="btn btn-light" for="group_<%=group.id%>"><%=group.name%></label>
         <% end %>
       </div>
     </div>
@@ -148,17 +148,17 @@
       <div class="col-12">
         <div data-controller="form">
           <div data-form-target="fields" class="mt-4">
-            <h2 class="p-2 bg-body-secondary">Roles</h2>
-            <% person.roles.each_with_index do |role, i| %>
-              <%= render partial: 'role_form', locals: {id: "role_#{role.id}", role: role, i: i, person: person} %>
+            <h2 class="p-2 bg-body-secondary">Groups</h2>
+            <% person.groups.each_with_index do |group, i| %>
+              <%= render partial: 'group_form', locals: {id: "group_#{group.id}", group: group, i: i, person: person} %>
             <% end %>
             <template data-form-target="template">
-              <%= render partial: 'role_form', locals: {id: "NEWID", role: Role.new } %>
+              <%= render partial: 'group_form', locals: {id: "NEWID", group: Group.new } %>
             </template>
           </div>
           <div class="row">
             <div class="col-12 mt-2">
-              <button type="button" data-form-baseid-param="new_role" data-action="form#addField" class="btn btn-secondary">Add Role</button>
+              <button type="button" data-form-baseid-param="new_group" data-action="form#addField" class="btn btn-secondary">Add Group</button>
             </div>
           </div>
         </div>

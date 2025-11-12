@@ -6,7 +6,7 @@ class Person < ApplicationRecord
   has_many :equipment, -> {includes(:instrument)}, dependent: :destroy
   has_many :contacts, -> {includes(:city, :state)}, dependent: :destroy
   has_and_belongs_to_many :interests
-  has_and_belongs_to_many :roles
+  has_and_belongs_to_many :groups
   has_and_belongs_to_many :permissions
   has_many :api_keys, as: :bearer
   has_many :people_skills, dependent: :destroy, autosave: true
@@ -168,24 +168,24 @@ class Person < ApplicationRecord
     self.interests = _interests
   end
 
-  # Setter for users to manage their joinable roles only
-  # Preserves any non-joinable roles that were set by admins
-  def joinable_role_ids=(ids)
+  # Setter for users to manage their joinable groups only
+  # Preserves any non-joinable groups that were set by admins
+  def joinable_group_ids=(ids)
     # Filter out empty strings from hidden field
     clean_ids = ids.reject(&:blank?)
-    joinable_roles = Role.where(id: clean_ids, joinable: true)
+    joinable_groups = Group.where(id: clean_ids, joinable: true)
 
-    # Keep non-joinable roles and replace joinable roles
-    non_joinable_roles = self.roles.reject(&:joinable)
-    self.roles = non_joinable_roles + joinable_roles
+    # Keep non-joinable groups and replace joinable groups
+    non_joinable_groups = self.groups.reject(&:joinable)
+    self.groups = non_joinable_groups + joinable_groups
   end
 
   # Take an array of the form [{id: 4}, ...]
-  # Used by admin interface to manage all roles
-  def roles_attributes=(attributes)
-    incoming_role_ids = attributes.map{|h| h[:id]}.compact.reject(&:blank?)
-    _roles = Role.where(id: incoming_role_ids).uniq
-    self.roles = _roles
+  # Used by admin interface to manage all groups
+  def groups_attributes=(attributes)
+    incoming_group_ids = attributes.map{|h| h[:id]}.compact.reject(&:blank?)
+    _groups = Group.where(id: incoming_group_ids).uniq
+    self.groups = _groups
   end
 
   def astrobin_attributes=(attributes)

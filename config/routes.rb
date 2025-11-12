@@ -30,7 +30,7 @@ Rails.application.routes.draw do
   get '/donations/letter/:id', to: 'donations#send_letter', as: :donations_letter
   post '/equipment/search', to: 'equipment#search', as: :equipment_search
   get '/equipment/search', to: 'equipment#search'
-  post '/roles/add_person', to: 'roles#add_person', as: :roles_add_person
+  post '/groups/add_person', to: 'groups#add_person', as: :groups_add_person
   
   post '/password_resets/:id', to: 'password_resets#update', as: :password_reset_form
   resources :password_resets, only: [:new, :create, :edit, :update]
@@ -44,7 +44,7 @@ Rails.application.routes.draw do
     resources :contacts
   end
   
-  resources :roles
+  resources :groups
   resources :permissions
   resources :admins
   resources :referrals

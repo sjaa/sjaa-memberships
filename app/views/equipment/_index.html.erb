@@ -28,7 +28,7 @@
             <th>Type</th>
             <th>Model</th>
             <th>Owner</th>
-            <th>Role</th>
+            <th>Group</th>
             <th>Donations</th>
             <th>Tags</th>
             <th>Notes</th>
@@ -46,7 +46,7 @@
               <td><%= equip&.instrument&.kind&.titleize %></td>
               <td><%= link_to equip&.instrument&.model, equip, data: {turbo: false} %></td>
               <td><%= link_to(equip.person&.name, equip.person) if equip.person %></td>
-              <td><%= link_to(equip.role&.name, equip.role) if equip.role %></td>
+              <td><%= link_to(equip.group&.name, equip.group) if equip.group %></td>
               <td>
                 <% if equip.donation_summary %>
                   <small class="text-muted"><%= equip.donation_summary %></small>

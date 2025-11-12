@@ -1,10 +1,10 @@
-<%= form_with(model: role) do |form| %>
+<%= form_with(model: group) do |form| %>
   <div class="row">
-    <% if role.errors.any? %>
+    <% if group.errors.any? %>
       <div style="color: red">
-        <h2><%= pluralize(role.errors.count, "error") %> prohibited this role from being saved:</h2>
+        <h2><%= pluralize(group.errors.count, "error") %> prohibited this group from being saved:</h2>
         <ul>
-          <% role.errors.each do |error| %>
+          <% group.errors.each do |error| %>
             <li><%= error.full_message %></li>
           <% end %>
         </ul>
@@ -29,7 +29,7 @@
     <div class="col-md-6 col-xs-12 mt-2">
       <div class="form-check">
         <%= form.check_box :joinable, class: 'form-check-input' %>
-        <%= form.label :joinable, "Members can join this role", class: "form-check-label" %>
+        <%= form.label :joinable, "Members can join this group", class: "form-check-label" %>
       </div>
     </div>
     <div class="col-md-6 col-xs-12 mt-2">

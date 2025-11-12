@@ -1,7 +1,7 @@
 class Equipment < ApplicationRecord
   belongs_to :instrument
   belongs_to :person, required: false
-  belongs_to :role, required: false
+  belongs_to :group, required: false
   has_and_belongs_to_many :tags
   has_many_attached :images
   has_many :donation_items, dependent: :destroy

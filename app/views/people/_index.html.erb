@@ -67,8 +67,8 @@
                 </div>
                 <div class="col-md-3 col-sm-6">
                   <div class="form-check">
-                    <%= check_box_tag 'column_roles', 'roles', true, class: 'form-check-input', data: { column_visibility_target: 'checkbox', column: 'roles', action: 'change->column-visibility#toggle' } %>
-                    <%= label_tag 'column_roles', 'Roles', class: 'form-check-label' %>
+                    <%= check_box_tag 'column_groups', 'groups', true, class: 'form-check-input', data: { column_visibility_target: 'checkbox', column: 'groups', action: 'change->column-visibility#toggle' } %>
+                    <%= label_tag 'column_groups', 'Groups', class: 'form-check-label' %>
                   </div>
                 </div>
                 <div class="col-md-3 col-sm-6">
@@ -94,7 +94,7 @@
         <th data-column="state">State</th>
         <th data-column="ephemeris">Ephemeris</th>
         <th data-column="interests">Interests</th>
-        <th data-column="roles">Roles</th>
+        <th data-column="groups">Groups</th>
         <th data-column="skills">Skills</th>
         <!--<th>Donations</th>-->
       </tr>
@@ -111,7 +111,7 @@
             <td data-column="state"><%=person.contacts.map{|con| con.state&.short_name}.join('<br/>').html_safe%></td>
             <td data-column="ephemeris"><%=active_membership&.ephemeris ? 'PRINT' : ''%></td>
             <td data-column="interests"><%=person.interests.map{|i| i.name&.titleize}.join(', ')%></td>
-            <td data-column="roles"><%=person.roles.map(&:name).join(', ')%></td>
+            <td data-column="groups"><%=person.groups.map(&:name).join(', ')%></td>
             <td data-column="skills"><%=person.skills.map(&:name).join(', ')%></td>
             <!--<td><%=person.donations.map{|d| dollar_format(d.value)}.join(', ')%></td>-->
           </tr>

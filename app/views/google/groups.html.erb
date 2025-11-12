@@ -13,11 +13,11 @@
         <%= form_with url: google_group_sync_path, method: :get, local: true do |f| %>
           <div class="mb-3">
             <label class="form-label">Group</label>
-            <select name="role_id" class="form-select">
+            <select name="group_id" class="form-select">
               <option value="members">Members (Active Members Only) - members@sjaa.net</option>
-              <% @roles.each do |role| %>
-                <option value="<%= role.id %>">
-                  <%= role.name %><%= role.members_only ? ' (Active Members Only)' : '' %> - <%= role.email %>
+              <% @groups.each do |group| %>
+                <option value="<%= group.id %>">
+                  <%= group.name %><%= group.members_only ? ' (Active Members Only)' : '' %> - <%= group.email %>
                 </option>
               <% end %>
             </select>

@@ -30,7 +30,7 @@ module FakerSeed
     instrument_kind = %w(telescope mount camera binocular)
     instrument_model = ['ASI2600MC', 'MEADE LX5000', 'CELESTRON AVX14', 'STELLARVUE 80ST', 'ASKAR 50MM', 'CELESTRON 10x50']
     instruments = instrument_kind.product(instrument_model).map{|kind, model| Instrument.find_or_create_by(kind: kind, model: model)}
-    roles = {'SJAA Observers' => Faker::Internet.email, 'SJAA Imagers' => Faker::Internet.email, 'SJAA Board' => Faker::Internet.email, 'Member' => nil, 'Expired' => nil}.map{|n,e| Role.find_or_create_by(name: n, email: e, short_name: n.split(' ').map(&:first).join.upcase)}
+    groups = {'SJAA Observers' => Faker::Internet.email, 'SJAA Imagers' => Faker::Internet.email, 'SJAA Board' => Faker::Internet.email, 'Member' => nil, 'Expired' => nil}.map{|n,e| Group.find_or_create_by(name: n, email: e, short_name: n.split(' ').map(&:first).join.upcase)}
     phase_names = %w(offered received letter consigned sold)
     
     # Generate 100 people
@@ -89,11 +89,11 @@ module FakerSeed
           person.equipment << Equipment.find_or_create_by(instrument: instruments.sample, note: Faker::Lorem.sentence)
         end
         
-        proles = []
+        pgroups = []
         rand(0..2).times do
-          proles << roles.sample
+          pgroups << groups.sample
         end
-        person.roles << proles.uniq
+        person.groups << pgroups.uniq
         
         rand(0..5).times do
           donation = Donation.create(

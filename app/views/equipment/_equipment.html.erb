@@ -11,7 +11,7 @@
     </p>
     <p>
       <%= link_to(equipment.person&.name, equipment.person) if(equipment.person) %>
-      <%= link_to(equipment.role&.name, equipment.role) if(equipment.role) %>
+      <%= link_to(equipment.group&.name, equipment.group) if(equipment.group) %>
     </p>
     <% if equipment.donation_summary %>
       <p><small class="text-muted"><%= equipment.donation_summary %></small></p>

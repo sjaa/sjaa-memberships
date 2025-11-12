@@ -98,11 +98,11 @@
               <dt class="col-sm-4">Discord ID</dt>
               <dd class="col-sm-8"><code><%= @person.discord_id %></code></dd>
             <% end %>
-            <% if @person.roles.any? %>
-              <dt class="col-sm-4">Roles</dt>
+            <% if @person.groups.any? %>
+              <dt class="col-sm-4">Groups</dt>
               <dd class="col-sm-8">
-                <% @person.roles.each do |role| %>
-                  <%= link_to role.name, role_path(role), class: 'badge bg-info text-dark me-1 mb-1 text-decoration-none' %>
+                <% @person.groups.each do |group| %>
+                  <%= link_to group.name, group_path(group), class: 'badge bg-info text-dark me-1 mb-1 text-decoration-none' %>
                 <% end %>
               </dd>
             <% end %>

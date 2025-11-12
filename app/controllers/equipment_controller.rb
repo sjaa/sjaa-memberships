@@ -74,15 +74,15 @@ class EquipmentController < ApplicationController
     @query_params.delete(:authenticity_token)
     @query_params.delete(:submit)
     @query_params.select!{|k,v| v.present?}
-    @query_params = @query_params.permit(:kind_name, :model_name, :person_id, :group_id, :note, :role_id, :tag_operation, :view_mode, tags: [])
+    @query_params = @query_params.permit(:kind_name, :model_name, :person_id, :group_id, :note, :tag_operation, :view_mode, tags: [])
     qp = @query_params
     qp[:tags] = qp[:tags]&.map(&:strip)&.select{|t| !t.empty?}&.uniq
     logger.info("Tags: #{qp[:tags].inspect}")
 
-    query = Equipment.all.includes(:instrument, :person, :role, :tags, donation_items: [:donation])
+    query = Equipment.all.includes(:instrument, :person, :group, :tags, donation_items: [:donation])
     query = query.where(instrument: {kind: qp[:kind_name]}) if(qp[:kind_name].present?)
     query = query.where(person_id: qp[:person_id]) if(qp[:person_id].present?)
-    query = query.where(role_id: qp[:role_id]) if(qp[:role_id].present?)
+    query = query.where(group_id: qp[:group_id]) if(qp[:group_id].present?)
     query = and_or_helper(Equipment, query, qp[:tag_operation], :tags, qp[:tags]) if(qp[:tags].present?)
     equipment = query.distinct(:id)
 
@@ -98,6 +98,6 @@ class EquipmentController < ApplicationController
   
   # Only allow a list of trusted parameters through.
   def equipment_params
-    params.require(:equipment).permit(:note, :person_id, :role_id, instrument_attributes: [:kind, :model], images: [], tag_attributes: [])
+    params.require(:equipment).permit(:note, :person_id, :group_id, instrument_attributes: [:kind, :model], images: [], tag_attributes: [])
   end
 end

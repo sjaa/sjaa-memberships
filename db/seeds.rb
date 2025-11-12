@@ -14,5 +14,5 @@ include SjaaPort
 admin = Admin.create(email: 'vp@sjaa.net', password: 'secret')
 admin.permissions += [PERMISSION_HASH['read'], PERMISSION_HASH['write'], PERMISSION_HASH['permit']]
 
-# Actual roles
-roles = {'Member' => nil, 'Contact' => nil}.map{|n,e| Role.create(name: n, email: e, short_name: n.split(' ').map(&:first).join.upcase)}
+# Actual groups
+groups = {'Member' => nil, 'Contact' => nil}.map{|n,e| Group.create(name: n, email: e, short_name: n.split(' ').map(&:first).join.upcase)}
