@@ -1,51 +1,55 @@
-<div id="<%=id%>" class="row m-2">
-  <div class="col-12">
-    <h3 class="p-2 bg-body-tertiary">Membership <%= i ? i+1 : 'New'%></h3>
+<div id="<%=id%>" class="card mb-3">
+  <div class="card-header">
+    <h3 class="h5 mb-0">Membership <%= i ? i+1 : 'New'%></h3>
+  </div>
+  <div class="card-body">
     <%= hidden_field_tag 'person[membership_attributes][][id]', membership.id %>
     <%= hidden_field_tag 'person[membership_attributes][][person_id]', person&.id %>
     <% if membership.id.nil? %>
     <%= hidden_field_tag 'person[membership_attributes][][author]', membership.author.presence || @user&.email %>
     <% end %>
-  </div>
-  <div class="col-md-6 mt-2">
-    <%= label_tag :membership_start, 'Start Date', class: 'form-label' %>
-    <%= date_field_tag 'person[membership_attributes][][start]', membership.start&.strftime('%Y-%m-%d'), class: 'form-control' %>
-  </div>
-  <div class="col-md-6 mt-2">
-    <%= label_tag :membership_term, 'Term in Months', class: 'form-label' %>
-    <%= number_field_tag 'person[membership_attributes][][term_months]', membership.term_months || 12, class: 'form-control' %>
-  </div>
-  <div class="col-md-6 mt-2">
-    <%= label_tag :donation_amount, 'Donation', class: 'form-label' %>
-    <div class="input-group">
-      <span class="input-group-text">$</span>
-      <%= number_field_tag 'person[membership_attributes][][donation_amount]', membership.donation_amount, class: 'form-control', style: 'max-width: 120px' %>
+    <div class="row">
+      <div class="col-md-6 mt-2">
+        <%= label_tag :membership_start, 'Start Date', class: 'form-label' %>
+        <%= date_field_tag 'person[membership_attributes][][start]', membership.start&.strftime('%Y-%m-%d'), class: 'form-control' %>
+      </div>
+      <div class="col-md-6 mt-2">
+        <%= label_tag :membership_term, 'Term in Months', class: 'form-label' %>
+        <%= number_field_tag 'person[membership_attributes][][term_months]', membership.term_months || 12, class: 'form-control' %>
+      </div>
+      <div class="col-md-6 mt-2">
+        <%= label_tag :donation_amount, 'Donation', class: 'form-label' %>
+        <div class="input-group">
+          <span class="input-group-text">$</span>
+          <%= number_field_tag 'person[membership_attributes][][donation_amount]', membership.donation_amount, class: 'form-control', style: 'max-width: 120px' %>
+        </div>
+      </div>
+      <%# Kind isn't really well defined, so skip it%>
+      <% if false %>
+        <div class="col-md-6 mt-2">
+          <%= label_tag :membership_kind_id, 'Kind', class: 'form-label' %>
+          <%= combobox_tag 'person[membership_attributes][][kind_id]', MembershipKind.all, value: membership.kind&.id, name_when_new: 'person[membership_attributes][][kind]' %>
+        </div>
+      <% end %>
+      <div class="col-md-6 mt-2">
+        <%= label_tag :membership_ephemeris, 'Printed Ephemeris', class: 'form-label' %><br/>
+        <%= combobox_tag 'person[membership_attributes][][ephemeris]', [{display: 'Yes', value: 'true'}, {display: 'No', value: 'false'}], value: membership.ephemeris ? 'true' : 'false' %>
+      </div>
+      <div class="col-md-6 mt-2">
+        <%= label_tag :payment_method, 'Payment Method', class: 'form-label' %>
+        <%= select_tag 'person[membership_attributes][][order_attributes][payment_method]',
+                       options_for_select([
+                         ['None', 'none'],
+                         ['Cash', 'cash'],
+                         ['Check', 'check'],
+                         ['PayPal', 'paypal']
+                       ], membership.order&.payment_method || 'none'),
+                       class: 'form-select' %>
+      </div>
+      <div class="col-md-6 mt-2">
+        <%= label_tag :membership_delete, 'Delete', class: 'form-label' %><br/>
+        <button type="button" data-form-id-param="<%=id%>" data-action="form#removeField" class="btn btn-danger">Remove Membership</button>
+      </div>
     </div>
-  </div>
-  <%# Kind isn't really well defined, so skip it%>
-  <% if false %>
-    <div class="col-md-6 mt-2">
-      <%= label_tag :membership_kind_id, 'Kind', class: 'form-label' %>
-      <%= combobox_tag 'person[membership_attributes][][kind_id]', MembershipKind.all, value: membership.kind&.id, name_when_new: 'person[membership_attributes][][kind]' %>
-    </div>
-  <% end %>
-  <div class="col-md-6 mt-2">
-    <%= label_tag :membership_ephemeris, 'Printed Ephemeris', class: 'form-label' %><br/>
-    <%= combobox_tag 'person[membership_attributes][][ephemeris]', [{display: 'Yes', value: 'true'}, {display: 'No', value: 'false'}], value: membership.ephemeris ? 'true' : 'false' %>
-  </div>
-  <div class="col-md-6 mt-2">
-    <%= label_tag :payment_method, 'Payment Method', class: 'form-label' %>
-    <%= select_tag 'person[membership_attributes][][order_attributes][payment_method]',
-                   options_for_select([
-                     ['None', 'none'],
-                     ['Cash', 'cash'],
-                     ['Check', 'check'],
-                     ['PayPal', 'paypal']
-                   ], membership.order&.payment_method || 'none'),
-                   class: 'form-select' %>
-  </div>
-  <div class="col-md-6 mt-2">
-    <%= label_tag :membership_delete, 'Delete', class: 'form-label' %><br/>
-    <button type="button" data-form-id-param="<%=id%>" data-action="form#removeField" class="btn btn-danger">Remove Membership</button>
   </div>
 </div>

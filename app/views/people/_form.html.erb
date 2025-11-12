@@ -143,22 +143,28 @@
   </div>
   -->
   <% if @user.is_a?(Admin) %>
-    <!-- Roles -->
-    <div class="row mt-4 pb-4 pt-2">
+    <!-- Groups -->
+    <div class="row mt-4">
       <div class="col-12">
-        <div data-controller="form">
-          <div data-form-target="fields" class="mt-4">
-            <h2 class="p-2 bg-body-secondary">Groups</h2>
-            <% person.groups.each_with_index do |group, i| %>
-              <%= render partial: 'group_form', locals: {id: "group_#{group.id}", group: group, i: i, person: person} %>
-            <% end %>
-            <template data-form-target="template">
-              <%= render partial: 'group_form', locals: {id: "NEWID", group: Group.new } %>
-            </template>
+        <div class="card">
+          <div class="card-header">
+            <h2 class="h4 mb-0">Groups</h2>
           </div>
-          <div class="row">
-            <div class="col-12 mt-2">
-              <button type="button" data-form-baseid-param="new_group" data-action="form#addField" class="btn btn-secondary">Add Group</button>
+          <div class="card-body">
+            <div data-controller="form">
+              <div data-form-target="fields">
+                <% person.groups.each_with_index do |group, i| %>
+                  <%= render partial: 'group_form', locals: {id: "group_#{group.id}", group: group, i: i, person: person} %>
+                <% end %>
+                <template data-form-target="template">
+                  <%= render partial: 'group_form', locals: {id: "NEWID", group: Group.new } %>
+                </template>
+              </div>
+              <div class="row">
+                <div class="col-12 mt-3">
+                  <button type="button" data-form-baseid-param="new_group" data-action="form#addField" class="btn btn-outline-secondary">+ Add Group</button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -166,47 +172,63 @@
     </div>
     <!-- Permissions (only for users with "permit" permission) -->
     <% if @user.has_permission?(:permit) %>
-      <div class="row mt-4 pb-4 pt-2">
+      <div class="row mt-4">
         <div class="col-12">
-          <h2 class="p-2 bg-body-secondary">Permissions</h2>
-          <p>
-            <small class="form-text text-muted">
-              Assign specific permissions to this member. These control what actions they can perform in the system.
-            </small>
-          </p>
-          <%= render partial: 'layouts/combobox', locals: {field: :permissions, objects: person.permissions, name: :name, value: :id, form_field_id: 'person[permission_attributes]', select_values: Permission.all, allow_new: false} %>
+          <div class="card">
+            <div class="card-header">
+              <h2 class="h4 mb-0">Permissions</h2>
+            </div>
+            <div class="card-body">
+              <p>
+                <small class="form-text text-muted">
+                  Assign specific permissions to this member. These control what actions they can perform in the system.
+                </small>
+              </p>
+              <%= render partial: 'layouts/combobox', locals: {field: :permissions, objects: person.permissions, name: :name, value: :id, form_field_id: 'person[permission_attributes]', select_values: Permission.all, allow_new: false} %>
+            </div>
+          </div>
         </div>
       </div>
     <% end %>
   <% end %>
   <!-- Contacts -->
-  <% if @user.is_a?(Admin) %>
-    <div class="row mt-4 pb-4 pt-2" data-controller="form">
-      <div class="col-12" data-form-target="fields">
-        <h2 class="p-2 bg-body-secondary">Contacts</h2>
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card mb-3">
+        <div class="card-header">
+          <h2 class="h4 mb-0">Contacts</h2>
+        </div>
+      </div>
+      <% if @user.is_a?(Admin) %>
+        <div data-controller="form">
+          <div data-form-target="fields">
+            <% person.contacts.each_with_index do |contact, i| %>
+              <%= render partial: 'contact_form', locals: {id: "contact_#{contact.id}", contact: contact, i: i, person: person} %>
+            <% end %>
+            <template data-form-target="template">
+              <%= render partial: 'contact_form', locals: {id: "NEWID", contact: Contact.new, i: nil, person: person} %>
+            </template>
+          </div>
+          <div class="mt-3">
+            <button type="button" data-form-baseid-param="new_contact" data-action="form#addField" class="btn btn-outline-secondary">+ Add Contact</button>
+          </div>
+        </div>
+      <% else %>
         <% person.contacts.each_with_index do |contact, i| %>
           <%= render partial: 'contact_form', locals: {id: "contact_#{contact.id}", contact: contact, i: i, person: person} %>
         <% end %>
-        <template data-form-target="template">
-          <%= render partial: 'contact_form', locals: {id: "NEWID", contact: Contact.new, i: nil, person: person} %>
-        </template>
-      </div>
-      <div class="row">
-        <div class="col-12 mt-2">
-          <button type="button" data-form-baseid-param="new_contact" data-action="form#addField" class="btn btn-secondary">Add Contact</button>
-        </div>
-      </div>
+      <% end %>
     </div>
-  <% else %>
-    <% person.contacts.each_with_index do |contact, i| %>
-      <%= render partial: 'contact_form', locals: {id: "contact_#{contact.id}", contact: contact, i: i, person: person} %>
-    <% end %>
-  <% end %>
+  </div>
   <!-- Volunteer Skills Section -->
-  <div class="row mt-4 pb-4 pt-2">
+  <div class="row mt-4">
     <div class="col-12">
-      <h2 class="p-2 bg-body-secondary">Volunteer Skills</h2>
-      <!-- Volunteer/Mentor Checkboxes -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="h4 mb-0">Volunteer Skills</h2>
+        </div>
+        <div class="card-body">
+          <!-- Volunteer/Mentor Checkboxes -->
       <div class="row">
         <div class="col-md-6 mt-2">
           <div class="form-check">
@@ -264,15 +286,21 @@
           <span data-skills-target="toggleText">+ Add More Skills</span>
         </button>
       </div>
+        </div>
+      </div>
     </div>
   </div>
   <% if @user.is_a?(Admin) %>
     <!-- Memberships -->
-    <div class="row mt-4 pb-4 pt-2">
+    <div class="row mt-4">
       <div class="col-12">
+        <div class="card mb-3">
+          <div class="card-header">
+            <h2 class="h4 mb-0">Memberships</h2>
+          </div>
+        </div>
         <div data-controller="form">
-          <div data-form-target="fields" class="mt-4">
-            <h2 class="p-2 bg-body-secondary">Memberships</h2>
+          <div data-form-target="fields">
             <% person.memberships.each_with_index do |membership, i| %>
               <%= render partial: 'membership_form', locals: {id: "membership_#{membership.id}", membership: membership, i: i, person: person} %>
             <% end %>
@@ -280,10 +308,8 @@
               <%= render partial: 'membership_form', locals: {id: "NEWID", membership: Membership.new, i: nil, person: person} %>
             </template>
           </div>
-          <div class="row">
-            <div class="col-12 mt-2">
-              <button type="button" data-form-baseid-param="new_membership" data-action="form#addField" class="btn btn-secondary">Add Membership</button>
-            </div>
+          <div class="mt-3">
+            <button type="button" data-form-baseid-param="new_membership" data-action="form#addField" class="btn btn-outline-secondary">+ Add Membership</button>
           </div>
         </div>
       </div>
