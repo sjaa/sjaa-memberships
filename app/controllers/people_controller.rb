@@ -1,6 +1,7 @@
 class PeopleController < ApplicationController
   include ReportsHelper
   include Filterable
+  include GoogleHelper
 
   before_action :set_person, only: %i[ show edit update destroy new_membership  remind]
   skip_before_action :verify_authenticity_token, only: [:update], if: -> { request.format.json? }
@@ -116,6 +117,9 @@ class PeopleController < ApplicationController
   
   # PATCH/PUT /people/1 or /people/1.json
   def update
+    # Track which groups the person belonged to before the update
+    old_group_ids = @person.groups.pluck(:id)
+
     respond_to do |format|
       begin
         update_success = @person.update(person_params)
@@ -125,6 +129,12 @@ class PeopleController < ApplicationController
       end
 
       if update_success && !@person.errors.any?
+        # Sync Google Groups if groups changed
+        new_group_ids = @person.groups.pluck(:id)
+        if old_group_ids.sort != new_group_ids.sort
+          sync_google_groups_for_person(@person, old_group_ids, new_group_ids)
+        end
+
         format.html { redirect_to @person, notice: "Profile was successfully updated." }
         format.json { render :show, status: :ok, location: @person }
       else
@@ -149,6 +159,66 @@ class PeopleController < ApplicationController
   # Use callbacks to share common setup or constraints between actions.
   def set_person
     @person = Person.find(params[:id])
+  end
+
+  # Sync person's Google Groups memberships based on group changes
+  def sync_google_groups_for_person(person, old_group_ids, new_group_ids)
+    # Only sync if we have a person with an email
+    return unless person.email.present?
+
+    # Find an admin with Google credentials
+    admin = @user.is_a?(Admin) && @user.refresh_token.present? ? @user : Admin.where.not(refresh_token: nil).first
+    return unless admin&.refresh_token.present?
+
+    begin
+      # Get Google API authorization
+      auth = get_auth(admin)
+      client = Google::Apis::AdminDirectoryV1::DirectoryService.new
+      client.authorization = auth
+
+      # Determine which groups were added and removed
+      added_group_ids = new_group_ids - old_group_ids
+      removed_group_ids = old_group_ids - new_group_ids
+
+      # Get the actual group records that have Google Group emails
+      groups_to_add = Group.where(id: added_group_ids).where.not(email: [nil, ''])
+      groups_to_remove = Group.where(id: removed_group_ids).where.not(email: [nil, ''])
+
+      # Add person to new groups
+      groups_to_add.each do |group|
+        begin
+          member = Google::Apis::AdminDirectoryV1::Member.new(
+            email: person.email,
+            role: 'MEMBER',
+            type: 'USER'
+          )
+          client.insert_member(group.email, member)
+          Rails.logger.info "[PeopleController] Added #{person.email} to Google Group: #{group.email}"
+        rescue Google::Apis::ClientError => e
+          # Ignore duplicate member errors
+          unless e.status_code == 409 || e.message.include?("Member already exists")
+            Rails.logger.error "[PeopleController] Failed to add #{person.email} to #{group.email}: #{e.message}"
+          end
+        end
+      end
+
+      # Remove person from old groups
+      groups_to_remove.each do |group|
+        begin
+          client.delete_member(group.email, person.email)
+          Rails.logger.info "[PeopleController] Removed #{person.email} from Google Group: #{group.email}"
+        rescue Google::Apis::ClientError => e
+          # Ignore "member not found" errors
+          unless e.status_code == 404 || e.message.include?("Resource Not Found")
+            Rails.logger.error "[PeopleController] Failed to remove #{person.email} from #{group.email}: #{e.message}"
+          end
+        end
+      end
+
+    rescue => e
+      Rails.logger.error "[PeopleController] Failed to sync Google Groups for person #{person.id}: #{e.message}"
+      # Don't fail the update if Google sync fails
+    end
   end
   
   # Only allow a list of trusted parameters through.

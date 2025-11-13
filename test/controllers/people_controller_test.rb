@@ -1,6 +1,8 @@
 require "test_helper"
+require "minitest/mock"
 
 class PeopleControllerTest < ActionDispatch::IntegrationTest
+  include GoogleHelper
   setup do
     @admin = Admin.create!(
       email: "admin@sjaa.net",
@@ -376,6 +378,268 @@ class PeopleControllerTest < ActionDispatch::IntegrationTest
     assert_equal 'advanced', ps.skill_level
   end
 
+  # Google Groups sync tests
+  test "update does not sync Google Groups when person has no email" do
+    person_no_email = Person.create!(
+      first_name: "No",
+      last_name: "Email",
+      password: "password123"
+    )
+    # Create a contact but without an email to test the edge case
+    Contact.create!(person: person_no_email, primary: true)
+    login_as_admin(@admin)
+
+    group = Group.create!(name: "Test Group", email: "test@sjaa.net", joinable: true)
+
+    stub_google_api_not_called do
+      patch person_path(person_no_email), params: {
+        person: {
+          first_name: "No",
+          last_name: "Email",
+          joinable_group_ids: [group.id]
+        }
+      }
+    end
+
+    assert_response :redirect
+  end
+
+  test "update does not sync when no admin has Google credentials" do
+    @admin.update(refresh_token: nil)
+    login_as_person(@member)
+
+    group = Group.create!(name: "Test Group", email: "test@sjaa.net", joinable: true)
+
+    stub_google_api_not_called do
+      patch person_path(@member), params: {
+        person: {
+          first_name: @member.first_name,
+          last_name: @member.last_name,
+          joinable_group_ids: [group.id]
+        }
+      }
+    end
+
+    assert_response :redirect
+  end
+
+  test "update adds person to Google Group when group is added" do
+    @admin.update!(refresh_token: "test_refresh_token")
+    login_as_person(@member)
+
+    group = Group.create!(name: "Observers", email: "observers@sjaa.net", joinable: true)
+
+    stub_google_api_add_member(@member.email, group.email) do
+      patch person_path(@member), params: {
+        person: {
+          first_name: @member.first_name,
+          last_name: @member.last_name,
+          joinable_group_ids: [group.id]
+        }
+      }
+    end
+
+    @member.reload
+    assert_includes @member.groups, group
+    assert_response :redirect
+  end
+
+  test "update removes person from Google Group when group is removed" do
+    @admin.update!(refresh_token: "test_refresh_token")
+    group = Group.create!(name: "Observers", email: "observers@sjaa.net", joinable: true)
+    @member.groups << group
+    login_as_person(@member)
+
+    stub_google_api_remove_member(@member.email, group.email) do
+      patch person_path(@member), params: {
+        person: {
+          first_name: @member.first_name,
+          last_name: @member.last_name,
+          joinable_group_ids: []
+        }
+      }
+    end
+
+    @member.reload
+    assert_not_includes @member.groups, group
+    assert_response :redirect
+  end
+
+  test "update skips sync for groups without Google email" do
+    @admin.update!(refresh_token: "test_refresh_token")
+    login_as_person(@member)
+
+    group_no_email = Group.create!(name: "Local Group", email: nil, joinable: true)
+
+    stub_google_api_not_called do
+      patch person_path(@member), params: {
+        person: {
+          first_name: @member.first_name,
+          last_name: @member.last_name,
+          joinable_group_ids: [group_no_email.id]
+        }
+      }
+    end
+
+    @member.reload
+    assert_includes @member.groups, group_no_email
+    assert_response :redirect
+  end
+
+  test "update skips sync when groups haven't changed" do
+    @admin.update!(refresh_token: "test_refresh_token")
+    group = Group.create!(name: "Observers", email: "observers@sjaa.net", joinable: true)
+    @member.groups << group
+    login_as_person(@member)
+
+    stub_google_api_not_called do
+      patch person_path(@member), params: {
+        person: {
+          first_name: "Updated",
+          last_name: @member.last_name,
+          joinable_group_ids: [group.id]
+        }
+      }
+    end
+
+    @member.reload
+    assert_equal "Updated", @member.first_name
+    assert_response :redirect
+  end
+
+  test "update adds to multiple Google Groups simultaneously" do
+    @admin.update!(refresh_token: "test_refresh_token")
+    login_as_person(@member)
+
+    group1 = Group.create!(name: "Observers", email: "observers@sjaa.net", joinable: true)
+    group2 = Group.create!(name: "Board", email: "board@sjaa.net", joinable: true)
+
+    stub_google_api_add_multiple(@member.email, [group1.email, group2.email]) do
+      patch person_path(@member), params: {
+        person: {
+          first_name: @member.first_name,
+          last_name: @member.last_name,
+          joinable_group_ids: [group1.id, group2.id]
+        }
+      }
+    end
+
+    @member.reload
+    assert_includes @member.groups, group1
+    assert_includes @member.groups, group2
+    assert_response :redirect
+  end
+
+  test "update removes from multiple Google Groups simultaneously" do
+    @admin.update!(refresh_token: "test_refresh_token")
+    group1 = Group.create!(name: "Observers", email: "observers@sjaa.net", joinable: true)
+    group2 = Group.create!(name: "Board", email: "board@sjaa.net", joinable: true)
+    @member.groups << [group1, group2]
+    login_as_person(@member)
+
+    stub_google_api_remove_multiple(@member.email, [group1.email, group2.email]) do
+      patch person_path(@member), params: {
+        person: {
+          first_name: @member.first_name,
+          last_name: @member.last_name,
+          joinable_group_ids: []
+        }
+      }
+    end
+
+    @member.reload
+    assert_not_includes @member.groups, group1
+    assert_not_includes @member.groups, group2
+    assert_response :redirect
+  end
+
+  test "update handles mixed add and remove operations" do
+    @admin.update!(refresh_token: "test_refresh_token")
+    group_old = Group.create!(name: "Old Group", email: "old@sjaa.net", joinable: true)
+    group_new = Group.create!(name: "New Group", email: "new@sjaa.net", joinable: true)
+    @member.groups << group_old
+    login_as_person(@member)
+
+    stub_google_api_add_and_remove(@member.email, [group_new.email], [group_old.email]) do
+      patch person_path(@member), params: {
+        person: {
+          first_name: @member.first_name,
+          last_name: @member.last_name,
+          joinable_group_ids: [group_new.id]
+        }
+      }
+    end
+
+    @member.reload
+    assert_includes @member.groups, group_new
+    assert_not_includes @member.groups, group_old
+    assert_response :redirect
+  end
+
+  test "update handles duplicate member error gracefully" do
+    @admin.update!(refresh_token: "test_refresh_token")
+    login_as_person(@member)
+
+    group = Group.create!(name: "Observers", email: "observers@sjaa.net", joinable: true)
+
+    stub_google_api_duplicate_error do
+      patch person_path(@member), params: {
+        person: {
+          first_name: @member.first_name,
+          last_name: @member.last_name,
+          joinable_group_ids: [group.id]
+        }
+      }
+    end
+
+    @member.reload
+    assert_includes @member.groups, group
+    assert_response :redirect
+  end
+
+  test "update handles member not found error gracefully" do
+    @admin.update!(refresh_token: "test_refresh_token")
+    group = Group.create!(name: "Observers", email: "observers@sjaa.net", joinable: true)
+    @member.groups << group
+    login_as_person(@member)
+
+    stub_google_api_not_found_error do
+      patch person_path(@member), params: {
+        person: {
+          first_name: @member.first_name,
+          last_name: @member.last_name,
+          joinable_group_ids: []
+        }
+      }
+    end
+
+    @member.reload
+    assert_not_includes @member.groups, group
+    assert_response :redirect
+  end
+
+  test "update succeeds even when Google API fails" do
+    @admin.update!(refresh_token: "test_refresh_token")
+    login_as_person(@member)
+
+    group = Group.create!(name: "Observers", email: "observers@sjaa.net", joinable: true)
+
+    stub_google_api_general_error do
+      patch person_path(@member), params: {
+        person: {
+          first_name: "Updated Name",
+          last_name: @member.last_name,
+          joinable_group_ids: [group.id]
+        }
+      }
+    end
+
+    @member.reload
+    assert_equal "Updated Name", @member.first_name
+    assert_includes @member.groups, group
+    assert_response :redirect
+  end
+
   private
 
   def login_as_admin(admin)
@@ -384,5 +648,145 @@ class PeopleControllerTest < ActionDispatch::IntegrationTest
 
   def login_as_person(person)
     post sessions_path, params: { email: person.primary_contact.email, password: 'password123' }
+  end
+
+  # Google API mocking helpers
+  def stub_google_api_not_called
+    Google::Apis::AdminDirectoryV1::DirectoryService.stub :new, -> { raise "Google API should not be called" } do
+      yield
+    end
+  end
+
+  def stub_google_api_add_member(person_email, group_email)
+    mock_auth = Object.new
+    mock_client = Object.new
+
+    def mock_client.authorization=(auth); end
+    def mock_client.insert_member(group, member)
+      nil  # Success
+    end
+
+    self.stub :get_auth, mock_auth do
+      Google::Apis::AdminDirectoryV1::DirectoryService.stub :new, mock_client do
+        yield
+      end
+    end
+  end
+
+  def stub_google_api_remove_member(person_email, group_email)
+    mock_auth = Object.new
+    mock_client = Object.new
+
+    def mock_client.authorization=(auth); end
+    def mock_client.delete_member(group, email)
+      nil  # Success
+    end
+
+    self.stub :get_auth, mock_auth do
+      Google::Apis::AdminDirectoryV1::DirectoryService.stub :new, mock_client do
+        yield
+      end
+    end
+  end
+
+  def stub_google_api_add_multiple(person_email, group_emails)
+    mock_auth = Object.new
+    mock_client = Object.new
+
+    def mock_client.authorization=(auth); end
+    def mock_client.insert_member(group, member)
+      nil  # Success
+    end
+
+    self.stub :get_auth, mock_auth do
+      Google::Apis::AdminDirectoryV1::DirectoryService.stub :new, mock_client do
+        yield
+      end
+    end
+  end
+
+  def stub_google_api_remove_multiple(person_email, group_emails)
+    mock_auth = Object.new
+    mock_client = Object.new
+
+    def mock_client.authorization=(auth); end
+    def mock_client.delete_member(group, email)
+      nil  # Success
+    end
+
+    self.stub :get_auth, mock_auth do
+      Google::Apis::AdminDirectoryV1::DirectoryService.stub :new, mock_client do
+        yield
+      end
+    end
+  end
+
+  def stub_google_api_add_and_remove(person_email, groups_to_add, groups_to_remove)
+    mock_auth = Object.new
+    mock_client = Object.new
+
+    def mock_client.authorization=(auth); end
+    def mock_client.insert_member(group, member)
+      nil  # Success
+    end
+    def mock_client.delete_member(group, email)
+      nil  # Success
+    end
+
+    self.stub :get_auth, mock_auth do
+      Google::Apis::AdminDirectoryV1::DirectoryService.stub :new, mock_client do
+        yield
+      end
+    end
+  end
+
+  def stub_google_api_duplicate_error
+    mock_auth = Object.new
+    mock_client = Object.new
+
+    def mock_client.authorization=(auth); end
+    def mock_client.insert_member(group, member)
+      error = Google::Apis::ClientError.new('Member already exists', status_code: 409)
+      raise error
+    end
+
+    self.stub :get_auth, mock_auth do
+      Google::Apis::AdminDirectoryV1::DirectoryService.stub :new, mock_client do
+        yield
+      end
+    end
+  end
+
+  def stub_google_api_not_found_error
+    mock_auth = Object.new
+    mock_client = Object.new
+
+    def mock_client.authorization=(auth); end
+    def mock_client.delete_member(group, email)
+      error = Google::Apis::ClientError.new('Resource Not Found: memberKey', status_code: 404)
+      raise error
+    end
+
+    self.stub :get_auth, mock_auth do
+      Google::Apis::AdminDirectoryV1::DirectoryService.stub :new, mock_client do
+        yield
+      end
+    end
+  end
+
+  def stub_google_api_general_error
+    mock_auth = Object.new
+    mock_client = Object.new
+
+    def mock_client.authorization=(auth); end
+    def mock_client.insert_member(group, member)
+      raise StandardError.new('Google API connection failed')
+    end
+
+    self.stub :get_auth, mock_auth do
+      Google::Apis::AdminDirectoryV1::DirectoryService.stub :new, mock_client do
+        yield
+      end
+    end
   end
 end
