@@ -98,10 +98,11 @@
               <dt class="col-sm-4">Discord ID</dt>
               <dd class="col-sm-8"><code><%= @person.discord_id %></code></dd>
             <% end %>
-            <% if @person.groups.any? %>
+            <% displayed_groups = @user.is_a?(Admin) ? @person.groups : @person.groups.select(&:joinable) %>
+            <% if displayed_groups.any? %>
               <dt class="col-sm-4">Groups</dt>
               <dd class="col-sm-8">
-                <% @person.groups.each do |group| %>
+                <% displayed_groups.each do |group| %>
                   <%= link_to group.name, group_path(group), class: 'badge bg-info text-dark me-1 mb-1 text-decoration-none' %>
                 <% end %>
               </dd>

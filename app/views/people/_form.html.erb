@@ -61,7 +61,7 @@
         <%= number_field_tag 'person[astrobin_attributes][latest_image]', person&.astrobin&.latest_image, class: 'form-control' %>
       </div>
     <% end %>
-    <div class="col-md-12 mt-2">
+    <div class="col-md-12 mt-2" data-controller="group-toggle">
       <%= form.label :interests, 'Interests', class: 'form-label mb-0' %>
       <p>
         <small class="form-text text-muted">
@@ -70,85 +70,75 @@
         </small>
       </p>
       <% interest_ids = person.interests.map(&:id) %>
-      <% Interest.all.each do |interest|%>
-        <%= check_box_tag "person[interests_attributes][][id]", interest.id, interest_ids.include?(interest.id), autocomplete: "off", id: "interest_#{interest.id}", class: 'btn-check' %>
-        <label class="btn btn-light" for="interest_<%=interest.id%>"><%=interest.name.titleize%></label>
+      <% Interest.all.order(:name).each do |interest|%>
+        <% is_selected = interest_ids.include?(interest.id) %>
+        <%= check_box_tag "person[interests_attributes][][id]", interest.id, is_selected, autocomplete: "off", id: "interest_#{interest.id}", class: 'btn-check', data: { group_toggle_target: 'checkbox' } %>
+        <label class="btn <%= is_selected ? 'btn-success' : 'btn-outline-secondary' %> mb-2"
+               for="interest_<%=interest.id%>"
+               data-group-toggle-target="label"
+               data-action="click->group-toggle#toggle"
+               style="cursor: pointer; transition: all 0.2s ease;">
+          <span data-group-toggle-target="icon">
+            <% if is_selected %>
+              ✓
+            <% else %>
+              +
+            <% end %>
+          </span>
+          <%=interest.name.titleize%>
+        </label>
       <% end %>
     </div>
   </div>
-  <%# TODO: Enable when groups are controllable via Google %>
-  <% if false %>
-    <!-- Joinable Roles Section (for all users) -->
-    <div class="row mt-4 pb-4 pt-2">
-      <div class="col-12">
-        <h2 class="p-2 bg-body-secondary">Groups</h2>
-        <p>
-          <small class="form-text text-muted">
-            Join groups to receive updates and participate in group activities.
-          </small>
-        </p>
-        <%= hidden_field_tag "person[joinable_group_ids][]", "" %>
-        <% group_ids = person.groups.select(&:joinable).map(&:id) %>
-        <% Group.where(joinable: true).each do |group| %>
-          <%= check_box_tag "person[joinable_group_ids][]", group.id, group_ids.include?(group.id), autocomplete: "off", id: "group_#{group.id}", class: 'btn-check' %>
-          <label class="btn btn-light" for="group_<%=group.id%>"><%=group.name%></label>
-        <% end %>
-      </div>
-    </div>
-  <% end %>
-  <!--
-  <div class="row mt-4 pb-4 pt-2">
+  <!-- Joinable Groups Section (for all users) -->
+  <div class="row mt-4">
     <div class="col-12">
-      <div data-controller="form">
-        <div data-form-target="fields">
-          <h2 class="p-2 bg-body-secondary">Interests</h2>
-          <p>
-            Please tell us what areas of astronomy you are interested in.  This information will help us better
-            serve our members, and shape our offerings.
-          </p>
-          <% interests = person&.interests&.empty? ? [Interest.new()] : person.interests %>
-          <% interests.each_with_index do |interest, i| %>
-            <% id = "interest_#{interest.id}"%>
-            <div id="<%=id%>" class="row">
-              <div class="col-md-6 col-xs-8 mt-2">
-                <% options = {value: interest.id} %>
-                <% options[:name_when_new] = "person[interests_attributes][][name]" if(@user.is_a?(Admin)) %>
-                <%= combobox_tag "person[interests_attributes][][id]",  Interest.all.map{|i| {display: i.name&.titleize, value: i.id}}, **options %>
-              </div>
-              <div class="col-md-6 col-xs-4 mt-2">
-                <button type="button" data-form-id-param="<%=id%>" data-action="form#removeField" class="btn btn-danger">Remove Interest</button>
-              </div>
-            </div>
-          <% end %>
-          <template data-form-target="template">
-            <div id="NEWID" class="row">
-              <div class="col-md-6 col-xs-8 mt-2">
-                <% options = {} %>
-                <% options[:name_when_new] = "person[interests_attributes][][name]" if(@user.is_a?(Admin)) %>
-                <%= combobox_tag "person[interests_attributes][][id]",  Interest.all.map{|i| {display: i.name&.titleize, value: i.id}}, **options %>
-              </div>
-              <div class="col-md-6 col-xs-4 mt-2">
-                <button type="button" data-form-id-param="NEWID" data-action="form#removeField" class="btn btn-danger">Remove</button>
-              </div>
-            </div>
-          </template>
+      <div class="card">
+        <div class="card-header">
+          <h2 class="h4 mb-0">Groups</h2>
         </div>
-        <div class="row">
-          <div class="col-12 mt-2">
-            <button type="button" data-form-baseid-param="new_interest" data-action="form#addField" class="btn btn-secondary">Add Interest</button>
-          </div>
+        <div class="card-body" data-controller="group-toggle">
+          <p>
+            <small class="form-text text-muted">
+              Join groups to receive updates and participate in group activities. Click to join or leave a group.
+            </small>
+          </p>
+          <%= hidden_field_tag "person[joinable_group_ids][]", "" %>
+          <% group_ids = person.groups.select(&:joinable).map(&:id) %>
+          <% Group.where(joinable: true).order(:name).each do |group| %>
+            <% is_joined = group_ids.include?(group.id) %>
+            <%= check_box_tag "person[joinable_group_ids][]", group.id, is_joined, autocomplete: "off", id: "group_#{group.id}", class: 'btn-check', data: { group_toggle_target: 'checkbox' } %>
+            <label class="btn <%= is_joined ? 'btn-success' : 'btn-outline-secondary' %> mb-2"
+                   for="group_<%=group.id%>"
+                   data-group-toggle-target="label"
+                   data-action="click->group-toggle#toggle"
+                   style="cursor: pointer; transition: all 0.2s ease;">
+              <span data-group-toggle-target="icon">
+                <% if is_joined %>
+                  ✓
+                <% else %>
+                  +
+                <% end %>
+              </span>
+              <%= group.name %>
+              <% if group.members_only %>
+                <span class="badge bg-primary ms-1">Members Only</span>
+              <% else %>
+                <span class="badge bg-info ms-1">Public</span>
+              <% end %>
+            </label>
+          <% end %>
         </div>
       </div>
     </div>
   </div>
-  -->
   <% if @user.is_a?(Admin) %>
     <!-- Groups -->
     <div class="row mt-4">
       <div class="col-12">
         <div class="card">
           <div class="card-header">
-            <h2 class="h4 mb-0">Groups</h2>
+            <h2 class="h4 mb-0">Admin Groups</h2>
           </div>
           <div class="card-body">
             <div data-controller="form">

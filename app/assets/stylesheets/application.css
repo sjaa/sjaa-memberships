@@ -185,3 +185,19 @@ hr.thick {
   height: 8px;
   border-radius: 4px;
 }
+
+/* Group toggle button hover effects */
+.btn-outline-secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-success:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(25, 135, 84, 0.3);
+}
+
+/* Ensure smooth transitions for group buttons */
+label.btn {
+  transition: all 0.2s ease;
+}
