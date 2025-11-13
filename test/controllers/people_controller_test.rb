@@ -640,6 +640,201 @@ class PeopleControllerTest < ActionDispatch::IntegrationTest
     assert_response :redirect
   end
 
+  # Members-only group enforcement tests
+  test "update allows active member to join members_only group" do
+    login_as_person(@member)
+
+    members_only_group = Group.create!(
+      name: "Members Only Group",
+      email: "members-only@sjaa.net",
+      joinable: true,
+      members_only: true
+    )
+
+    patch person_path(@member), params: {
+      person: {
+        first_name: @member.first_name,
+        last_name: @member.last_name,
+        joinable_group_ids: [members_only_group.id]
+      }
+    }
+
+    @member.reload
+    assert_includes @member.groups, members_only_group
+    assert_response :redirect
+  end
+
+  test "update removes non-active member from members_only group" do
+    # Create an expired member
+    expired_person = Person.create!(
+      first_name: "Expired",
+      last_name: "Member",
+      password: "password123"
+    )
+    Contact.create!(
+      email: "expired-test@example.com",
+      person: expired_person,
+      primary: true
+    )
+    Membership.create!(
+      person: expired_person,
+      start: 2.years.ago,
+      term_months: 12,
+      ephemeris: false
+    )
+
+    members_only_group = Group.create!(
+      name: "Members Only Group",
+      email: "members-only@sjaa.net",
+      joinable: true,
+      members_only: true
+    )
+
+    login_as_person(expired_person)
+
+    patch person_path(expired_person), params: {
+      person: {
+        first_name: expired_person.first_name,
+        last_name: expired_person.last_name,
+        joinable_group_ids: [members_only_group.id]
+      }
+    }
+
+    expired_person.reload
+    assert_not_includes expired_person.groups, members_only_group
+    assert_response :redirect
+
+    # Should show warning in notice because they tried to join but were blocked
+    assert_match /Members Only Group/, flash[:notice]
+    assert_match /membership has expired/, flash[:notice]
+    assert_match /renew your membership/, flash[:notice]
+  end
+
+  test "update allows non-active member to join public group" do
+    # Create an expired member
+    expired_person = Person.create!(
+      first_name: "Expired",
+      last_name: "Member2",
+      password: "password123"
+    )
+    Contact.create!(
+      email: "expired2@example.com",
+      person: expired_person,
+      primary: true
+    )
+    Membership.create!(
+      person: expired_person,
+      start: 2.years.ago,
+      term_months: 12,
+      ephemeris: false
+    )
+
+    public_group = Group.create!(
+      name: "Public Group",
+      email: "public@sjaa.net",
+      joinable: true,
+      members_only: false
+    )
+
+    login_as_person(expired_person)
+
+    patch person_path(expired_person), params: {
+      person: {
+        first_name: expired_person.first_name,
+        last_name: expired_person.last_name,
+        joinable_group_ids: [public_group.id]
+      }
+    }
+
+    expired_person.reload
+    assert_includes expired_person.groups, public_group
+    assert_response :redirect
+  end
+
+  test "update removes members_only groups when membership expires" do
+    # Create a member with an expired membership
+    expiring_person = Person.create!(
+      first_name: "Expiring",
+      last_name: "Member",
+      password: "password123"
+    )
+    Contact.create!(
+      email: "expiring@example.com",
+      person: expiring_person,
+      primary: true
+    )
+    # Create a membership that expired 1 month ago (started 13 months ago, 12 month term)
+    Membership.create!(
+      person: expiring_person,
+      start: 13.months.ago,
+      term_months: 12,
+      ephemeris: false
+    )
+
+    members_only_group = Group.create!(
+      name: "Members Only Group",
+      email: "members-only@sjaa.net",
+      joinable: true,
+      members_only: true
+    )
+    public_group = Group.create!(
+      name: "Public Group",
+      email: "public@sjaa.net",
+      joinable: true,
+      members_only: false
+    )
+
+    # Add person to both groups initially (simulating they joined while active)
+    expiring_person.groups << [members_only_group, public_group]
+    expiring_person.save!
+
+    login_as_person(expiring_person)
+
+    # Update the person (any update triggers the enforcement)
+    patch person_path(expiring_person), params: {
+      person: {
+        first_name: "Updated",
+        last_name: expiring_person.last_name,
+        joinable_group_ids: [members_only_group.id, public_group.id]
+      }
+    }
+
+    expiring_person.reload
+    assert_not_includes expiring_person.groups, members_only_group, "Expired member should be removed from members_only group"
+    assert_includes expiring_person.groups, public_group, "Expired member should remain in public group"
+    assert_response :redirect
+
+    # Verify warning message is shown in notice
+    assert_match /Members Only Group/, flash[:notice]
+    assert_match /membership has expired/, flash[:notice]
+    assert_match /renew your membership/, flash[:notice]
+  end
+
+  test "update shows no warning when no groups removed" do
+    login_as_person(@member)
+
+    public_group = Group.create!(
+      name: "Public Group",
+      email: "public@sjaa.net",
+      joinable: true,
+      members_only: false
+    )
+
+    patch person_path(@member), params: {
+      person: {
+        first_name: "Updated",
+        last_name: @member.last_name,
+        joinable_group_ids: [public_group.id]
+      }
+    }
+
+    @member.reload
+    assert_includes @member.groups, public_group
+    assert_response :redirect
+    assert_equal "Profile was successfully updated.", flash[:notice]
+    assert_no_match /membership has expired/, flash[:notice], "Should not show warning when no groups are removed"
+  end
+
   private
 
   def login_as_admin(admin)

@@ -129,13 +129,24 @@ class PeopleController < ApplicationController
       end
 
       if update_success && !@person.errors.any?
+        # Enforce members_only restriction on groups
+        removed_groups = enforce_members_only_groups
+
         # Sync Google Groups if groups changed
         new_group_ids = @person.groups.pluck(:id)
         if old_group_ids.sort != new_group_ids.sort
           sync_google_groups_for_person(@person, old_group_ids, new_group_ids)
         end
 
-        format.html { redirect_to @person, notice: "Profile was successfully updated." }
+        # Build appropriate flash message
+        if removed_groups.any?
+          group_names = removed_groups.map(&:name).join(', ')
+          notice_message = "Profile was successfully updated. However, you were removed from the following members-only groups because your membership has expired: <strong>#{group_names}</strong>. Please renew your membership to rejoin these groups."
+        else
+          notice_message = "Profile was successfully updated."
+        end
+
+        format.html { redirect_to @person, notice: notice_message }
         format.json { render :show, status: :ok, location: @person }
       else
         flash[:alert] = "Problem updating person: <ul>#{@person.errors.full_messages.map{|er| "<li>#{er}</li>"}.join('  ')}</ul>"
@@ -159,6 +170,36 @@ class PeopleController < ApplicationController
   # Use callbacks to share common setup or constraints between actions.
   def set_person
     @person = Person.find(params[:id])
+  end
+
+  # Enforce members_only restriction on groups
+  # Removes any members_only groups if the person doesn't have an active membership
+  # Returns array of removed groups
+  def enforce_members_only_groups
+    # Check if person has an active membership
+    is_active = @person.is_active?
+
+    # Reload to get the freshest group associations after update
+    @person.reload
+
+    # Get all groups the person is currently in
+    current_groups = @person.groups.to_a
+
+    # Find groups that are members_only and person is not active
+    restricted_groups = current_groups.select { |group| group.members_only && !is_active }
+
+    if restricted_groups.any?
+      # Remove the person from members_only groups
+      @person.groups = current_groups - restricted_groups
+      @person.save!
+
+      # Log which groups were removed
+      removed_group_names = restricted_groups.map(&:name).join(', ')
+      Rails.logger.info "[PeopleController] Removed non-active member #{@person.id} from members_only groups: #{removed_group_names}"
+    end
+
+    # Return the list of removed groups
+    restricted_groups
   end
 
   # Sync person's Google Groups memberships based on group changes
