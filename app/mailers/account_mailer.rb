@@ -35,11 +35,26 @@ class AccountMailer < ApplicationMailer
     mail(to: @person.email, bcc: %w(officers@sjaa.net memberships@sjaa.net donations@sjaa.net), subject: "SJAA Membership - Welcome and Thank You! (#{@person&.last_name}, #{@person&.first_name})")
   end
 
-  def donation_letter(donation)
+  def donation_letter(donation, custom_message: nil, cc_emails: nil)
     @donor = donation&.person
     @donation = donation
+    @custom_message = custom_message
     return nil if(@donor.nil? || donation.nil? || @donor.email.nil?)
-    mail(to: @donor.email, reply_to: 'donations@sjaa.net', bcc: %w(officers@sjaa.net memberships@sjaa.net donations@sjaa.net), subject: "SJAA Donation (#{@donor&.last_name}, #{@donor&.first_name})")
+
+    # Attach logo as inline image
+    attachments.inline['logo_small.png'] = File.read(Rails.root.join('app', 'assets', 'images', 'logo_small.png'))
+
+    mail_options = {
+      to: @donor.email,
+      reply_to: 'donations@sjaa.net',
+      bcc: %w(officers@sjaa.net memberships@sjaa.net donations@sjaa.net),
+      subject: "SJAA Donation (#{@donor&.last_name}, #{@donor&.first_name})"
+    }
+
+    # Add CC emails if provided
+    mail_options[:cc] = cc_emails if cc_emails.present?
+
+    mail(mail_options)
   end
 
   def mentor_contact(mentor, requester, message)

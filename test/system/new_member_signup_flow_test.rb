@@ -24,7 +24,7 @@ class NewMemberSignupFlowTest < ApplicationSystemTestCase
     click_on "Sign Up"
 
     # Should redirect to login page with notice
-    assert_text "Please check your email to complete signup"
+    assert_text "We sent you an email to complete the sign up process"
     assert_current_path login_path
 
     # Simulate following the email confirmation link
@@ -184,7 +184,7 @@ class NewMemberSignupFlowTest < ApplicationSystemTestCase
     click_on "Sign Up"
 
     # Should redirect to login page with notice
-    assert_text "Please check your email to complete signup"
+    assert_text "We sent you an email to complete the sign up process"
     assert_current_path login_path
 
     # Create token for confirmation

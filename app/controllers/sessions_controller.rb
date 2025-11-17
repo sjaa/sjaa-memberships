@@ -98,7 +98,7 @@ class SessionsController < ApplicationController
 
     # Email it out to the person
     AccountMailer.new_person(login_params[:email], token).deliver_now
-    redirect_to login_path, notice: "Please check your email to complete signup"
+    redirect_to login_path, notice: "We sent you an email to complete the sign up process.  It may take a few minutes to arrive, but please check your email to complete signup."
   end
 
   # Handle the sign up response
