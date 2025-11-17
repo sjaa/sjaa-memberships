@@ -24,6 +24,8 @@ services:
       - postgres_data:/var/lib/postgresql/data
   app:
     image: ruby
+    env_file:
+      - .env
     platform: linux/amd64
     tmpfs:
       - /tmp
@@ -38,9 +40,14 @@ services:
       RUBY_DEBUG_OPEN: "false"
       RUBY_DEBUG_HOST: "0.0.0.0"
       RUBY_DEBUG_PORT: "1234"
+      GITHUB_USERNAME: ${GITHUB_USERNAME}
+      GITHUB_TOKEN: ${GITHUB_TOKEN}
     build:
       context: .
       dockerfile: Dockerfile-dev
+      args:
+        GITHUB_USERNAME: ${GITHUB_USERNAME}
+        GITHUB_TOKEN: ${GITHUB_TOKEN}
     depends_on:
       db:
         condition: service_healthy

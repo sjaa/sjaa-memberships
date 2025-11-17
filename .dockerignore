@@ -3,12 +3,16 @@
 # Ignore git directory.
 /.git/
 
-# Ignore bundler config.
+# Ignore bundler config and vendor directory
 /.bundle
+/vendor/bundle
 
 # Ignore all environment files (except templates).
 /.env*
 !/.env*.erb
+
+# Note: We don't ignore Gemfile/Gemfile.lock here because they need to be copied
+# separately in the Dockerfile for proper layer caching
 
 # Ignore all default key files.
 /config/master.key

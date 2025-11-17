@@ -101,3 +101,9 @@ gem "nokogiri", ">= 1.18.9"
 gem "rack-session", ">= 2.1.1"
 gem "net-imap", ">= 0.5.7"
 gem "uri", ">= 1.0.3"
+
+# To authenticate to the GitHub Packages RubyGems registry, use one of the following methods:
+# bundle config set --global https://rubygems.pkg.github.com/sjaa USERNAME:TOKEN
+source "https://rubygems.pkg.github.com/sjaa" do
+  gem "sjaa-ruby-calendar-aggregator", "0.2.1"
+end

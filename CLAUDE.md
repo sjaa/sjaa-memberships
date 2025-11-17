@@ -48,6 +48,16 @@ docker container exec -it sjaa-memberships-app-1 bin/rails patch PATCH_FILE=file
 docker container exec -it sjaa-memberships-app-1 bin/rails csv_compare CSV1=file1.csv CSV2=file2.csv  # Compare membership lists
 ```
 
+### Background Jobs
+```bash
+# Calendar sync job - syncs events from aggregator to Google Calendar
+docker container exec -it sjaa-memberships-app-1 bin/rails runner "CalendarSyncJob.perform_now('admin@sjaa.net')"
+docker container exec -it sjaa-memberships-app-1 bin/rails runner "CalendarSyncJob.perform_now('admin@sjaa.net', 'custom-calendar@group.calendar.google.com')"
+
+# Queue the job to run asynchronously
+docker container exec -it sjaa-memberships-app-1 bin/rails runner "CalendarSyncJob.perform_later('admin@sjaa.net')"
+```
+
 ### Docker Development
 ```bash
 docker compose up                 # Start all services (app + postgres)
@@ -56,6 +66,22 @@ docker container exec -it sjaa-memberships-app-1 bin/rails test # Run tests in c
 # Note: All Rails commands should be executed through the Docker container:
 # docker container exec -it sjaa-memberships-app-1 bin/rails <command>
 ```
+
+### Updating Gemfile and Gemfile.lock
+When you update `Gemfile` (add/remove/update gems), follow these steps to update `Gemfile.lock`:
+
+```bash
+# 1. Rebuild the Docker image (this installs gems and updates Gemfile.lock inside the image)
+docker compose build app
+
+# 2. Extract the updated Gemfile.lock from the built image to your local filesystem
+docker create --name temp ruby:latest && docker cp temp:/rails/Gemfile.lock ./ && docker rm temp
+
+# 3. Restart containers with the updated configuration
+docker compose up -d
+```
+
+**Why this is necessary**: The project uses a bind mount (`./:/rails`) which overlays your local directory onto the container's `/rails` directory at runtime. This means the `Gemfile.lock` updated during the Docker build gets replaced by your local version when the container starts. Extracting it ensures your local copy stays in sync with what was installed in the image.
 
 ## Debugging Setup
 
@@ -152,6 +178,27 @@ Uses Solid Queue for background job processing:
 - Email notifications (welcome emails, renewal reminders)
 - Google Workspace synchronization
 - PayPal payment processing
+- Calendar event synchronization (CalendarSyncJob)
+
+#### Calendar Sync Job
+The `CalendarSyncJob` syncs events from multiple sources (Google Calendar, Meetup.com) to the SJAA All Events calendar.
+
+**Configuration:**
+1. Copy `config/calendar_aggregator.yml.example` to `config/calendar_aggregator.yml`
+2. Update the configuration with your calendar sources
+3. Set environment variable: `SJAA_ALL_EVENTS_CALENDAR_ID=your-calendar-id@group.calendar.google.com`
+
+**Features:**
+- Fetches 3 months of events from configured sources
+- Creates new events in Google Calendar
+- Updates existing events based on metadata
+- Marks cancelled events with `[CANCELLED]` prefix
+- Supports both timed and all-day events
+- Comprehensive logging and error handling
+
+**Requirements:**
+- Admin account with valid Google Calendar refresh token
+- Calendar aggregator configuration file (optional, uses defaults if not present)
 
 ### Email System
 Configured for SMTP delivery using Google's servers with app passwords. Development can use Mailtrap for testing.
