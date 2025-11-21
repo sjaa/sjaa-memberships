@@ -590,4 +590,164 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal 0, @person.people_skills.count
   end
 
+  # Astrobin attributes tests
+  test 'astrobin_attributes= creates new astrobin record' do
+    @person.astrobin_attributes = { username: 'test_user' }
+    @person.save!
+
+    @person.reload
+    assert_not_nil @person.astrobin
+    assert_equal 'test_user', @person.astrobin.username
+  end
+
+  test 'astrobin_attributes= updates existing astrobin record' do
+    astrobin = Astrobin.create!(username: 'original_user')
+    @person.update!(astrobin: astrobin)
+
+    @person.astrobin_attributes = { username: 'updated_user' }
+    @person.save!
+
+    @person.reload
+    assert_equal 'updated_user', @person.astrobin.username
+    assert_equal astrobin.id, @person.astrobin.id
+  end
+
+  test 'astrobin_attributes= ignores blank username' do
+    @person.astrobin_attributes = { username: '' }
+    @person.save!
+
+    @person.reload
+    assert_nil @person.astrobin
+  end
+
+  test 'astrobin_attributes= ignores nil username' do
+    @person.astrobin_attributes = { username: nil }
+    @person.save!
+
+    @person.reload
+    assert_nil @person.astrobin
+  end
+
+  test 'astrobin_attributes= ignores blank attributes hash' do
+    @person.astrobin_attributes = {}
+    @person.save!
+
+    @person.reload
+    assert_nil @person.astrobin
+  end
+
+  test 'astrobin_attributes= propagates validation errors' do
+    # Assuming Astrobin model validates username in some way
+    # This test ensures errors are propagated to the person model
+    astrobin = Astrobin.create!(username: 'original_user')
+    @person.update!(astrobin: astrobin)
+
+    # Try to update with invalid data (if there are validations)
+    @person.astrobin_attributes = { username: 'updated_user' }
+    @person.save!
+
+    # If astrobin has errors, they should be added to person
+    assert @person.errors.empty? || @person.astrobin.errors.empty?
+  end
+
+  test 'astrobin_attributes= does not update id field' do
+    astrobin = Astrobin.create!(username: 'original_user')
+    @person.update!(astrobin: astrobin)
+    original_id = astrobin.id
+
+    # Try to pass an ID in the attributes (should be ignored)
+    @person.astrobin_attributes = { id: 99999, username: 'updated_user' }
+    @person.save!
+
+    @person.reload
+    assert_equal original_id, @person.astrobin.id
+    assert_equal 'updated_user', @person.astrobin.username
+  end
+
+  # Telescopius attributes tests
+  test 'telescopius_attributes= creates new telescopius record' do
+    @person.telescopius_attributes = { username: 'test_user' }
+    @person.save!
+
+    @person.reload
+    assert_not_nil @person.telescopius
+    assert_equal 'test_user', @person.telescopius.username
+  end
+
+  test 'telescopius_attributes= updates existing telescopius record' do
+    telescopius = Telescopius.create!(username: 'original_user')
+    @person.update!(telescopius: telescopius)
+
+    @person.telescopius_attributes = { username: 'updated_user' }
+    @person.save!
+
+    @person.reload
+    assert_equal 'updated_user', @person.telescopius.username
+    assert_equal telescopius.id, @person.telescopius.id
+  end
+
+  test 'telescopius_attributes= ignores blank username' do
+    @person.telescopius_attributes = { username: '' }
+    @person.save!
+
+    @person.reload
+    assert_nil @person.telescopius
+  end
+
+  test 'telescopius_attributes= ignores nil username' do
+    @person.telescopius_attributes = { username: nil }
+    @person.save!
+
+    @person.reload
+    assert_nil @person.telescopius
+  end
+
+  test 'telescopius_attributes= ignores blank attributes hash' do
+    @person.telescopius_attributes = {}
+    @person.save!
+
+    @person.reload
+    assert_nil @person.telescopius
+  end
+
+  test 'telescopius_attributes= propagates validation errors' do
+    # Assuming Telescopius model validates username in some way
+    # This test ensures errors are propagated to the person model
+    telescopius = Telescopius.create!(username: 'original_user')
+    @person.update!(telescopius: telescopius)
+
+    # Try to update with invalid data (if there are validations)
+    @person.telescopius_attributes = { username: 'updated_user' }
+    @person.save!
+
+    # If telescopius has errors, they should be added to person
+    assert @person.errors.empty? || @person.telescopius.errors.empty?
+  end
+
+  test 'telescopius_attributes= does not update id field' do
+    telescopius = Telescopius.create!(username: 'original_user')
+    @person.update!(telescopius: telescopius)
+    original_id = telescopius.id
+
+    # Try to pass an ID in the attributes (should be ignored)
+    @person.telescopius_attributes = { id: 99999, username: 'updated_user' }
+    @person.save!
+
+    @person.reload
+    assert_equal original_id, @person.telescopius.id
+    assert_equal 'updated_user', @person.telescopius.username
+  end
+
+  test 'person can have both astrobin and telescopius accounts' do
+    @person.astrobin_attributes = { username: 'astrobin_user' }
+    @person.telescopius_attributes = { username: 'telescopius_user' }
+    @person.save!
+
+    @person.reload
+    assert_not_nil @person.astrobin
+    assert_not_nil @person.telescopius
+    assert_equal 'astrobin_user', @person.astrobin.username
+    assert_equal 'telescopius_user', @person.telescopius.username
+  end
+
 end

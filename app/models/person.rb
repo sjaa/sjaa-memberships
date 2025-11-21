@@ -17,6 +17,7 @@ class Person < ApplicationRecord
   end
   has_secure_password validations: false # Rethink this... maybe just force a random password when not present
   belongs_to :astrobin, optional: true
+  belongs_to :telescopius, optional: true
   belongs_to :referral, optional: true
   validates :first_name, :last_name, strip: true
 
@@ -202,6 +203,22 @@ class Person < ApplicationRecord
       end
     end
     self.astrobin = _astrobin
+  end
+
+  def telescopius_attributes=(attributes)
+    return if attributes.blank? || attributes[:username].blank?
+    _telescopius = self.telescopius
+    if(!_telescopius.present?)
+      _telescopius = Telescopius.new(attributes)
+    else
+      _attributes = attributes.dup
+      _attributes.delete(:id)
+      _telescopius.update(_attributes)
+      _telescopius.errors.each do |err|
+        self.errors.add err.attribute, err.message
+      end
+    end
+    self.telescopius = _telescopius
   end
 
   def contact_attributes=(attributes)

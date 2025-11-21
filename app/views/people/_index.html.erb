@@ -37,7 +37,7 @@
                 </div>
                 <div class="col-md-3 col-sm-6">
                   <div class="form-check">
-                    <%= check_box_tag 'column_phone', 'phone', true, class: 'form-check-input', data: { column_visibility_target: 'checkbox', column: 'phone', action: 'change->column-visibility#toggle' } %>
+                    <%= check_box_tag 'column_phone', 'phone', false, class: 'form-check-input', data: { column_visibility_target: 'checkbox', column: 'phone', action: 'change->column-visibility#toggle' } %>
                     <%= label_tag 'column_phone', 'Phone', class: 'form-check-label' %>
                   </div>
                 </div>
@@ -49,7 +49,7 @@
                 </div>
                 <div class="col-md-3 col-sm-6">
                   <div class="form-check">
-                    <%= check_box_tag 'column_state', 'state', true, class: 'form-check-input', data: { column_visibility_target: 'checkbox', column: 'state', action: 'change->column-visibility#toggle' } %>
+                    <%= check_box_tag 'column_state', 'state', false, class: 'form-check-input', data: { column_visibility_target: 'checkbox', column: 'state', action: 'change->column-visibility#toggle' } %>
                     <%= label_tag 'column_state', 'State', class: 'form-check-label' %>
                   </div>
                 </div>
@@ -67,14 +67,26 @@
                 </div>
                 <div class="col-md-3 col-sm-6">
                   <div class="form-check">
-                    <%= check_box_tag 'column_groups', 'groups', true, class: 'form-check-input', data: { column_visibility_target: 'checkbox', column: 'groups', action: 'change->column-visibility#toggle' } %>
+                    <%= check_box_tag 'column_groups', 'groups', false, class: 'form-check-input', data: { column_visibility_target: 'checkbox', column: 'groups', action: 'change->column-visibility#toggle' } %>
                     <%= label_tag 'column_groups', 'Groups', class: 'form-check-label' %>
                   </div>
                 </div>
                 <div class="col-md-3 col-sm-6">
                   <div class="form-check">
-                    <%= check_box_tag 'column_skills', 'skills', true, class: 'form-check-input', data: { column_visibility_target: 'checkbox', column: 'skills', action: 'change->column-visibility#toggle' } %>
+                    <%= check_box_tag 'column_skills', 'skills', false, class: 'form-check-input', data: { column_visibility_target: 'checkbox', column: 'skills', action: 'change->column-visibility#toggle' } %>
                     <%= label_tag 'column_skills', 'Skills', class: 'form-check-label' %>
+                  </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                  <div class="form-check">
+                    <%= check_box_tag 'column_astrobin', 'astrobin', false, class: 'form-check-input', data: { column_visibility_target: 'checkbox', column: 'astrobin', action: 'change->column-visibility#toggle' } %>
+                    <%= label_tag 'column_astrobin', 'Astrobin', class: 'form-check-label' %>
+                  </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                  <div class="form-check">
+                    <%= check_box_tag 'column_telescopius', 'telescopius', false, class: 'form-check-input', data: { column_visibility_target: 'checkbox', column: 'telescopius', action: 'change->column-visibility#toggle' } %>
+                    <%= label_tag 'column_telescopius', 'Telescopius', class: 'form-check-label' %>
                   </div>
                 </div>
               </div>
@@ -89,13 +101,15 @@
         <th>Status</th>
         <th>Name</th>
         <th>Email</th>
-        <th data-column="phone">Phone</th>
+        <th data-column="phone" class="column-hidden">Phone</th>
         <th data-column="city">City</th>
-        <th data-column="state">State</th>
+        <th data-column="state" class="column-hidden">State</th>
         <th data-column="ephemeris">Ephemeris</th>
         <th data-column="interests">Interests</th>
-        <th data-column="groups">Groups</th>
-        <th data-column="skills">Skills</th>
+        <th data-column="groups" class="column-hidden">Groups</th>
+        <th data-column="skills" class="column-hidden">Skills</th>
+        <th data-column="astrobin" class="column-hidden">Astrobin</th>
+        <th data-column="telescopius" class="column-hidden">Telescopius</th>
         <!--<th>Donations</th>-->
       </tr>
       <tbody class="table-group-divider">
@@ -106,13 +120,15 @@
             <td class="<%=active.downcase%>"><%=active%></td>
             <td><%=link_to "#{person.first_name} #{person.last_name}", person_path(person.id), data: {turbo: false} %></td>
             <td><%=person.contacts.map(&:email).join('<br/>').html_safe%></td>
-            <td data-column="phone"><%=person.contacts.map(&:phone).join('<br/>').html_safe%></td>
+            <td data-column="phone" class="column-hidden"><%=person.contacts.map(&:phone).join('<br/>').html_safe%></td>
             <td data-column="city"><%=person.contacts.map{|con| con.city&.name}.join('<br/>').html_safe%></td>
-            <td data-column="state"><%=person.contacts.map{|con| con.state&.short_name}.join('<br/>').html_safe%></td>
+            <td data-column="state" class="column-hidden"><%=person.contacts.map{|con| con.state&.short_name}.join('<br/>').html_safe%></td>
             <td data-column="ephemeris"><%=active_membership&.ephemeris ? 'PRINT' : ''%></td>
             <td data-column="interests"><%=person.interests.map{|i| i.name&.titleize}.join(', ')%></td>
-            <td data-column="groups"><%=person.groups.map(&:name).join(', ')%></td>
-            <td data-column="skills"><%=person.skills.map(&:name).join(', ')%></td>
+            <td data-column="groups" class="column-hidden"><%=person.groups.map(&:name).join(', ')%></td>
+            <td data-column="skills" class="column-hidden"><%=person.skills.map(&:name).join(', ')%></td>
+            <td data-column="astrobin" class="column-hidden"><%=person.astrobin&.username%></td>
+            <td data-column="telescopius" class="column-hidden"><%=person.telescopius&.username%></td>
             <!--<td><%=person.donations.map{|d| dollar_format(d.value)}.join(', ')%></td>-->
           </tr>
         <% end %>
