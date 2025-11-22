@@ -540,6 +540,78 @@ class FilterableTest < ActionDispatch::IntegrationTest
     assert_includes response_body, "Diana"
   end
 
+  test "filter people by has_astrobin with string 'true'" do
+    # Create Astrobin accounts for person1 and person2
+    astrobin1 = Astrobin.create!(username: 'alice_astro')
+    astrobin2 = Astrobin.create!(username: 'bob_astro')
+    @person1.update!(astrobin: astrobin1)
+    @person2.update!(astrobin: astrobin2)
+
+    login_as_admin(@admin)
+    post people_search_path, params: { has_astrobin: 'true' }
+
+    assert_response :success
+    response_body = @response.body
+    assert_includes response_body, "Alice"
+    assert_includes response_body, "Bob"
+    assert_not_includes response_body, "Charlie"
+    assert_not_includes response_body, "Diana"
+  end
+
+  test "filter people by has_astrobin with string 'false'" do
+    # Create Astrobin accounts for person1 and person2
+    astrobin1 = Astrobin.create!(username: 'alice_astro')
+    astrobin2 = Astrobin.create!(username: 'bob_astro')
+    @person1.update!(astrobin: astrobin1)
+    @person2.update!(astrobin: astrobin2)
+
+    login_as_admin(@admin)
+    post people_search_path, params: { has_astrobin: 'false' }
+
+    assert_response :success
+    response_body = @response.body
+    assert_not_includes response_body, "Alice"
+    assert_not_includes response_body, "Bob"
+    assert_includes response_body, "Charlie"
+    assert_includes response_body, "Diana"
+  end
+
+  test "filter people by has_astrobin with boolean true" do
+    # Create Astrobin accounts for person1 and person2
+    astrobin1 = Astrobin.create!(username: 'alice_astro')
+    astrobin2 = Astrobin.create!(username: 'bob_astro')
+    @person1.update!(astrobin: astrobin1)
+    @person2.update!(astrobin: astrobin2)
+
+    login_as_admin(@admin)
+    post people_search_path, params: { has_astrobin: true }
+
+    assert_response :success
+    response_body = @response.body
+    assert_includes response_body, "Alice"
+    assert_includes response_body, "Bob"
+    assert_not_includes response_body, "Charlie"
+    assert_not_includes response_body, "Diana"
+  end
+
+  test "filter people by has_astrobin with boolean false" do
+    # Create Astrobin accounts for person1 and person2
+    astrobin1 = Astrobin.create!(username: 'alice_astro')
+    astrobin2 = Astrobin.create!(username: 'bob_astro')
+    @person1.update!(astrobin: astrobin1)
+    @person2.update!(astrobin: astrobin2)
+
+    login_as_admin(@admin)
+    post people_search_path, params: { has_astrobin: false }
+
+    assert_response :success
+    response_body = @response.body
+    assert_not_includes response_body, "Alice"
+    assert_not_includes response_body, "Bob"
+    assert_includes response_body, "Charlie"
+    assert_includes response_body, "Diana"
+  end
+
   test "filter people by astrobin_username" do
     astrobin1 = Astrobin.create!(username: 'alice_astro')
     astrobin2 = Astrobin.create!(username: 'bob_imaging')
@@ -661,6 +733,78 @@ class FilterableTest < ActionDispatch::IntegrationTest
     assert_includes response_body, "Bob"
     assert_includes response_body, "Charlie"
     assert_includes response_body, "Diana"
+  end
+
+  test "filter people by has_telescopius with string 'true'" do
+    # Create Telescopius accounts for person3 and person4
+    telescopius3 = Telescopius.create!(username: 'charlie_tele')
+    telescopius4 = Telescopius.create!(username: 'diana_tele')
+    @person3.update!(telescopius: telescopius3)
+    @person4.update!(telescopius: telescopius4)
+
+    login_as_admin(@admin)
+    post people_search_path, params: { has_telescopius: 'true' }
+
+    assert_response :success
+    response_body = @response.body
+    assert_not_includes response_body, "Alice"
+    assert_not_includes response_body, "Bob"
+    assert_includes response_body, "Charlie"
+    assert_includes response_body, "Diana"
+  end
+
+  test "filter people by has_telescopius with string 'false'" do
+    # Create Telescopius accounts for person3 and person4
+    telescopius3 = Telescopius.create!(username: 'charlie_tele')
+    telescopius4 = Telescopius.create!(username: 'diana_tele')
+    @person3.update!(telescopius: telescopius3)
+    @person4.update!(telescopius: telescopius4)
+
+    login_as_admin(@admin)
+    post people_search_path, params: { has_telescopius: 'false' }
+
+    assert_response :success
+    response_body = @response.body
+    assert_includes response_body, "Alice"
+    assert_includes response_body, "Bob"
+    assert_not_includes response_body, "Charlie"
+    assert_not_includes response_body, "Diana"
+  end
+
+  test "filter people by has_telescopius with boolean true" do
+    # Create Telescopius accounts for person3 and person4
+    telescopius3 = Telescopius.create!(username: 'charlie_tele')
+    telescopius4 = Telescopius.create!(username: 'diana_tele')
+    @person3.update!(telescopius: telescopius3)
+    @person4.update!(telescopius: telescopius4)
+
+    login_as_admin(@admin)
+    post people_search_path, params: { has_telescopius: true }
+
+    assert_response :success
+    response_body = @response.body
+    assert_not_includes response_body, "Alice"
+    assert_not_includes response_body, "Bob"
+    assert_includes response_body, "Charlie"
+    assert_includes response_body, "Diana"
+  end
+
+  test "filter people by has_telescopius with boolean false" do
+    # Create Telescopius accounts for person3 and person4
+    telescopius3 = Telescopius.create!(username: 'charlie_tele')
+    telescopius4 = Telescopius.create!(username: 'diana_tele')
+    @person3.update!(telescopius: telescopius3)
+    @person4.update!(telescopius: telescopius4)
+
+    login_as_admin(@admin)
+    post people_search_path, params: { has_telescopius: false }
+
+    assert_response :success
+    response_body = @response.body
+    assert_includes response_body, "Alice"
+    assert_includes response_body, "Bob"
+    assert_not_includes response_body, "Charlie"
+    assert_not_includes response_body, "Diana"
   end
 
   test "filter people by telescopius_username" do

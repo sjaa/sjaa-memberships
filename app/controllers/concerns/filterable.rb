@@ -100,16 +100,26 @@ module Filterable
     query = query.joins(:telescopius).where(Telescopius.arel_table[:username].matches("%#{qp[:telescopius_username]}%")) if(qp[:telescopius_username].present?)
 
     # Filter by has_astrobin - check both for non-null ID and non-blank username
-    if(qp[:has_astrobin] == 'yes')
+    # Normalize true/false to yes/no for API compatibility
+    astrobin_filter = qp[:has_astrobin]
+    astrobin_filter = 'yes' if astrobin_filter == 'true' || astrobin_filter == true
+    astrobin_filter = 'no' if astrobin_filter == 'false' || astrobin_filter == false
+
+    if(astrobin_filter == 'yes')
       query = query.joins(:astrobin).where.not(Astrobin.arel_table[:username].eq(nil)).where.not(Astrobin.arel_table[:username].eq(''))
-    elsif(qp[:has_astrobin] == 'no')
+    elsif(astrobin_filter == 'no')
       query = query.left_joins(:astrobin).where(Astrobin.arel_table[:username].eq(nil).or(Astrobin.arel_table[:username].eq('')))
     end
 
     # Filter by has_telescopius - check both for non-null ID and non-blank username
-    if(qp[:has_telescopius] == 'yes')
+    # Normalize true/false to yes/no for API compatibility
+    telescopius_filter = qp[:has_telescopius]
+    telescopius_filter = 'yes' if telescopius_filter == 'true' || telescopius_filter == true
+    telescopius_filter = 'no' if telescopius_filter == 'false' || telescopius_filter == false
+
+    if(telescopius_filter == 'yes')
       query = query.joins(:telescopius).where.not(Telescopius.arel_table[:username].eq(nil)).where.not(Telescopius.arel_table[:username].eq(''))
-    elsif(qp[:has_telescopius] == 'no')
+    elsif(telescopius_filter == 'no')
       query = query.left_joins(:telescopius).where(Telescopius.arel_table[:username].eq(nil).or(Telescopius.arel_table[:username].eq('')))
     end
     
