@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   post '/mentorship/contact/:id', to: 'mentorship#contact', as: :mentor_contact
 
   get '/reports/memberships', to: 'reports#memberships', as: :memberships_report
+  post '/reports/create_google_group', to: 'reports#create_google_group', as: :create_google_group_report
   get '/reports/renewal_reminders', to: 'reports#renewal_reminders', as: :renewal_reminders
   get '/reports/ephemeris', to: 'reports#ephemeris', as: :ephemeris_report
   get '/signup', to: 'sessions#signup', as: :signup
