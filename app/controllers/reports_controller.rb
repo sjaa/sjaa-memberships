@@ -174,7 +174,7 @@ class ReportsController < ApplicationController
         settings_service.authorization = auth
 
         group_settings = Google::Apis::GroupssettingsV1::Groups.new(
-          who_can_post_message: 'OWNERS_AND_MANAGERS'
+          who_can_post_message: 'ALL_MANAGERS_CAN_POST'
         )
 
         settings_service.update_group(group_email, group_settings)
