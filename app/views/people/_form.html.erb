@@ -101,47 +101,50 @@
     </div>
   </div>
   <!-- Joinable Groups Section (for all users) -->
-  <div class="row mt-4">
-    <div class="col-12">
-      <div class="card">
-        <div class="card-header">
-          <h2 class="h4 mb-0">Groups</h2>
-        </div>
-        <div class="card-body" data-controller="group-toggle">
-          <p>
-            <small class="form-text text-muted">
-              Join groups to receive updates and participate in group activities. Click to join or leave a group.
-            </small>
-          </p>
-          <%= hidden_field_tag "person[joinable_group_ids][]", "" %>
-          <% group_ids = person.groups.select(&:joinable).map(&:id) %>
-          <% Group.where(joinable: true).order(:name).each do |group| %>
-            <% is_joined = group_ids.include?(group.id) %>
-            <%= check_box_tag "person[joinable_group_ids][]", group.id, is_joined, autocomplete: "off", id: "group_#{group.id}", class: 'btn-check', data: { group_toggle_target: 'checkbox' } %>
-            <label class="btn <%= is_joined ? 'btn-success' : 'btn-outline-secondary' %> mb-2"
-                   for="group_<%=group.id%>"
-                   data-group-toggle-target="label"
-                   data-action="click->group-toggle#toggle"
-                   style="cursor: pointer; transition: all 0.2s ease;">
-              <span data-group-toggle-target="icon">
-                <% if is_joined %>
-                  ✓
+  <% joinable_groups = Group.where(joinable: true).order(:name) %>
+  <% if joinable_groups.any? %>
+    <div class="row mt-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="h4 mb-0">Groups</h2>
+          </div>
+          <div class="card-body" data-controller="group-toggle">
+            <p>
+              <small class="form-text text-muted">
+                Join groups to receive updates and participate in group activities. Click on the group names below to yoin or leave them.  If you see a green box with a checkmark, you are joining that group.  Please save your profile for changes to take effect.
+              </small>
+            </p>
+            <%= hidden_field_tag "person[joinable_group_ids][]", "" %>
+            <% group_ids = person.groups.select(&:joinable).map(&:id) %>
+            <% joinable_groups.each do |group| %>
+              <% is_joined = group_ids.include?(group.id) %>
+              <%= check_box_tag "person[joinable_group_ids][]", group.id, is_joined, autocomplete: "off", id: "group_#{group.id}", class: 'btn-check', data: { group_toggle_target: 'checkbox' } %>
+              <label class="btn <%= is_joined ? 'btn-success' : 'btn-outline-secondary' %> mb-2"
+                     for="group_<%=group.id%>"
+                     data-group-toggle-target="label"
+                     data-action="click->group-toggle#toggle"
+                     style="cursor: pointer; transition: all 0.2s ease;">
+                <span data-group-toggle-target="icon">
+                  <% if is_joined %>
+                    ✓
+                  <% else %>
+                    +
+                  <% end %>
+                </span>
+                <%= group.name %>
+                <% if group.members_only %>
+                  <span class="badge bg-primary ms-1">Members Only</span>
                 <% else %>
-                  +
+                  <span class="badge bg-info ms-1">Public</span>
                 <% end %>
-              </span>
-              <%= group.name %>
-              <% if group.members_only %>
-                <span class="badge bg-primary ms-1">Members Only</span>
-              <% else %>
-                <span class="badge bg-info ms-1">Public</span>
-              <% end %>
-            </label>
-          <% end %>
+              </label>
+            <% end %>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  <% end %>
   <% if @user.is_a?(Admin) %>
     <!-- Groups -->
     <div class="row mt-4">
