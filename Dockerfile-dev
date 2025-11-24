@@ -37,9 +37,6 @@ COPY Gemfile Gemfile.lock ./
 RUN bundle config set --global https://rubygems.pkg.github.com/sjaa ${GITHUB_USERNAME}:${GITHUB_TOKEN} && \
     bundle config set deployment false && \
     bundle install && \
-    cd /usr/local/bundle/ruby/3.4.0/gems/levenshtein-ffi-*/ext/levenshtein && \
-    make && \
-    cd - && \
     rm -rf "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git
 
 # Copy application code
