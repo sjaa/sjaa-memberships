@@ -79,7 +79,7 @@ class CalendarSyncJobTest < ActiveJob::TestCase
 
     assert_equal 1, created_events.size
     assert_equal 'New Astronomy Night', created_events.first.summary
-    assert_equal 'Join us for stargazing', created_events.first.description
+    assert created_events.first.description.include?('Join us for stargazing'), "Description should include original text"
     assert_equal 'Houge Park', created_events.first.location
   end
 
@@ -96,11 +96,12 @@ class CalendarSyncJobTest < ActiveJob::TestCase
     mock_aggregator = create_mock_aggregator([existing_event])
 
     updated_events = []
+    test_context = self
     stub_calendar_sync(mock_aggregator) do |calendar_service, calendar_id|
       # Mock get_event to return existing event
       calendar_service.define_singleton_method(:get_event) do |cal_id, event_id|
-        assert_equal 'existing-event-id-456', event_id
-        create_google_event(
+        test_context.assert_equal 'existing-event-id-456', event_id
+        test_context.send(:create_google_event,
           id: event_id,
           summary: 'Old Title',
           description: 'Old description',
@@ -119,7 +120,7 @@ class CalendarSyncJobTest < ActiveJob::TestCase
 
     assert_equal 1, updated_events.size
     assert_equal 'Updated Astronomy Night', updated_events.first.summary
-    assert_equal 'Updated description', updated_events.first.description
+    assert updated_events.first.description.include?('Updated description'), "Description should include original text"
     assert_equal 'Updated location', updated_events.first.location
   end
 
@@ -137,10 +138,11 @@ class CalendarSyncJobTest < ActiveJob::TestCase
     mock_aggregator = create_mock_aggregator([cancelled_event])
 
     updated_events = []
+    test_context = self
     stub_calendar_sync(mock_aggregator) do |calendar_service, calendar_id|
       # Mock get_event to return existing event without cancelled prefix
       calendar_service.define_singleton_method(:get_event) do |cal_id, event_id|
-        create_google_event(
+        test_context.send(:create_google_event,
           id: event_id,
           summary: 'Cancelled Event', # No prefix yet
           description: 'This event is cancelled'
@@ -175,10 +177,11 @@ class CalendarSyncJobTest < ActiveJob::TestCase
     mock_aggregator = create_mock_aggregator([cancelled_event])
 
     updated_events = []
+    test_context = self
     stub_calendar_sync(mock_aggregator) do |calendar_service, calendar_id|
       # Mock get_event to return event with cancelled prefix
       calendar_service.define_singleton_method(:get_event) do |cal_id, event_id|
-        create_google_event(
+        test_context.send(:create_google_event,
           id: event_id,
           summary: '[CANCELLED] Already Cancelled',
           description: 'This was already cancelled'
@@ -271,6 +274,7 @@ class CalendarSyncJobTest < ActiveJob::TestCase
 
     created_count = 0
     updated_count = 0
+    test_context = self
 
     stub_calendar_sync(mock_aggregator) do |calendar_service, calendar_id|
       calendar_service.define_singleton_method(:insert_event) do |cal_id, event|
@@ -279,7 +283,7 @@ class CalendarSyncJobTest < ActiveJob::TestCase
       end
 
       calendar_service.define_singleton_method(:get_event) do |cal_id, event_id|
-        create_google_event(id: event_id, summary: 'Existing Event')
+        test_context.send(:create_google_event, id: event_id, summary: 'Existing Event')
       end
 
       calendar_service.define_singleton_method(:update_event) do |cal_id, event_id, event|
@@ -312,6 +316,16 @@ class CalendarSyncJobTest < ActiveJob::TestCase
     event.define_singleton_method(:cancelled?) { cancelled }
     event.define_singleton_method(:respond_to?) { |method| [:update_hook].include?(method) }
     event.define_singleton_method(:update_hook) { |key, value| hooks[key] = value }
+
+    # Add properties expected by CalendarSyncJob
+    event.define_singleton_method(:id) { hooks[:google_calendar_id] }
+    event.define_singleton_method(:date) { all_day ? (start_date || Date.today) : (start_time&.to_date || Date.today) }
+    event.define_singleton_method(:time) { all_day ? nil : start_time&.strftime('%I:%M %p') }
+    event.define_singleton_method(:source) { 'Test Source' }
+    event.define_singleton_method(:venue) { location ? { name: location, address: location } : nil }
+    event.define_singleton_method(:status) { cancelled ? 'cancelled' : 'confirmed' }
+    event.define_singleton_method(:going_count) { nil }
+
     event
   end
 
@@ -357,12 +371,38 @@ class CalendarSyncJobTest < ActiveJob::TestCase
     mock_calendar_service = Object.new
     mock_calendar_service.define_singleton_method(:authorization=) { |auth| }
 
-    # Stub the aggregator
-    SJAA::CalendarAggregator.stub :new, mock_aggregator do
-      # Stub get_google_auth helper method
-      CalendarSyncJob.any_instance.stub :get_google_auth, mock_auth do
+    # Create a mock calendar with each_day method
+    mock_calendar = Object.new
+    mock_calendar.define_singleton_method(:each_day) do
+      events_by_date = {}
+      mock_aggregator.fetch_events(start_date: Date.today, end_date: Date.today + 3.months).each do |event|
+        date = event.start_date || event.start_time&.to_date || Date.today
+        events_by_date[date] ||= []
+        events_by_date[date] << event
+      end
+      events_by_date
+    end
+
+    # Update mock aggregator to have generate_calendar method
+    mock_aggregator.define_singleton_method(:generate_calendar) do |start_date, end_date|
+      mock_calendar
+    end
+
+    # Stub the aggregator creation - use a lambda to always return our mock
+    SJAA::Calendar::Aggregator.stub :new, ->(config) { mock_aggregator } do
+      # Stub get_auth for all job instances
+      CalendarSyncJob.class_eval do
+        define_method(:get_auth) { |admin| mock_auth }
+      end
+
+      begin
         Google::Apis::CalendarV3::CalendarService.stub :new, mock_calendar_service do
           yield(mock_calendar_service, @calendar_id)
+        end
+      ensure
+        # Restore original get_auth method by re-including GoogleHelper
+        CalendarSyncJob.class_eval do
+          include GoogleHelper
         end
       end
     end

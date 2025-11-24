@@ -15,7 +15,7 @@ class CalendarSyncJob < ApplicationJob
     
     calendar_id ||= ENV.fetch('SJAA_ALL_EVENTS_CALENDAR_ID')
     admin = Admin.find_by(email: admin_email)
-    commit = false
+    commit = true
     
     # Validate admin has refresh token
     if admin&.refresh_token.nil?
@@ -156,9 +156,9 @@ class CalendarSyncJob < ApplicationJob
   # Handle cancelled events
   def handle_cancelled_event(calendar_service, calendar_id, agg_event, existing_event_id, stats, commit=false)
     return unless existing_event_id
-    
+
     # Fetch existing event and update title to reflect cancellation
-    event = calendar_service.get_event(calendar_id, existing_event_id, commit=false)
+    event = calendar_service.get_event(calendar_id, existing_event_id)
     
     # Update title with CANCELLED prefix if not already present
     unless event.summary.start_with?('[CANCELLED]')
@@ -214,7 +214,7 @@ class CalendarSyncJob < ApplicationJob
     if e.status_code == 404
       # Event no longer exists, create it instead
       Rails.logger.warn "[CalendarSyncJob] Event #{event_id} not found, creating new event"
-      create_new_event(calendar_service, calendar_id, agg_event, stats)
+      create_new_event(calendar_service, calendar_id, agg_event, stats, commit)
     else
       raise
     end

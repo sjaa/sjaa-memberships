@@ -25,46 +25,46 @@ rails server                     # Start development server (port 3000)
 ### Testing
 ```bash
 # Run tests through Docker container
-docker container exec -it sjaa-memberships-app-1 bin/rails test:all                    # Run all tests
-docker container exec -it sjaa-memberships-app-1 bin/rails test test/models/           # Run model tests only
-docker container exec -it sjaa-memberships-app-1 bin/rails test test/controllers/      # Run controller tests only
-docker container exec -it sjaa-memberships-app-1 bin/rails test test/system/           # Run system tests only
+docker compose run --rm app bin/rails test:all                    # Run all tests
+docker compose run --rm app bin/rails test test/models/           # Run model tests only
+docker compose run --rm app bin/rails test test/controllers/      # Run controller tests only
+docker compose run --rm app bin/rails test test/system/           # Run system tests only
 ```
 
 ### Database Operations
 ```bash
 # Database commands through Docker container
-docker container exec -it sjaa-memberships-app-1 bin/rails db:migrate                  # Run pending migrations
-docker container exec -it sjaa-memberships-app-1 bin/rails db:seed                     # Seed database with initial data
-docker container exec -it sjaa-memberships-app-1 bin/rails db:reset                    # Drop, create, migrate, and seed database
-docker container exec -it sjaa-memberships-app-1 env RUBYOPT="-W0" bin/rails console  # Start Rails console (suppresses rdoc warnings)
+docker compose run --rm app bin/rails db:migrate                  # Run pending migrations
+docker compose run --rm app bin/rails db:seed                     # Seed database with initial data
+docker compose run --rm app bin/rails db:reset                    # Drop, create, migrate, and seed database
+docker compose run --rm app env RUBYOPT="-W0" bin/rails console  # Start Rails console (suppresses rdoc warnings)
 ```
 
 ### Custom Rake Tasks
 ```bash
 # Custom rake tasks through Docker container
-docker container exec -it sjaa-memberships-app-1 bin/rails generate_data                # Generate fake test data (100 people)
-docker container exec -it sjaa-memberships-app-1 bin/rails patch PATCH_FILE=file.csv COMMIT=true  # Port data from SJAA database
-docker container exec -it sjaa-memberships-app-1 bin/rails csv_compare CSV1=file1.csv CSV2=file2.csv  # Compare membership lists
+docker compose run --rm app bin/rails generate_data                # Generate fake test data (100 people)
+docker compose run --rm app bin/rails patch PATCH_FILE=file.csv COMMIT=true  # Port data from SJAA database
+docker compose run --rm app bin/rails csv_compare CSV1=file1.csv CSV2=file2.csv  # Compare membership lists
 ```
 
 ### Background Jobs
 ```bash
 # Calendar sync job - syncs events from aggregator to Google Calendar
-docker container exec -it sjaa-memberships-app-1 bin/rails runner "CalendarSyncJob.perform_now('admin@sjaa.net')"
-docker container exec -it sjaa-memberships-app-1 bin/rails runner "CalendarSyncJob.perform_now('admin@sjaa.net', 'custom-calendar@group.calendar.google.com')"
+docker compose run --rm app bin/rails runner "CalendarSyncJob.perform_now('admin@sjaa.net')"
+docker compose run --rm app bin/rails runner "CalendarSyncJob.perform_now('admin@sjaa.net', 'custom-calendar@group.calendar.google.com')"
 
-# Queue the job to run asynchronously
-docker container exec -it sjaa-memberships-app-1 bin/rails runner "CalendarSyncJob.perform_later('admin@sjaa.net')"
+# Queuecompose run --rm app
+docker compose run --rm app bin/rails runner "CalendarSyncJob.perform_later('admin@sjaa.net')"
 ```
 
 ### Docker Development
 ```bash
 docker compose up                 # Start all services (app + postgres)
-docker container exec -it sjaa-memberships-app-1 bin/rails test # Run tests in container
+docker compose run --rm app bin/rails test # Run tests in container
 
 # Note: All Rails commands should be executed through the Docker container:
-# docker container exec -it sjaa-memberships-app-1 bin/rails <command>
+# docker compose run --rm app bin/rails <command>
 ```
 
 ### Updating Gemfile and Gemfile.lock
