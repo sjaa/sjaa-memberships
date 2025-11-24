@@ -47,7 +47,7 @@ module Filterable
       @query_params.delete(:submit)
       @query_params.select!{|k,v| v.present?}
       @query_params = @query_params.permit(
-      :search, :has_astrobin, :group_operation, :interest_operation, :skill_operation, :first_name, :last_name, :email, :phone, :city, :state, :ephemeris, :active, :volunteer, :mentor, :discord_id, interests: [], groups: [], skills: []
+      :search, :has_astrobin, :has_telescopius, :astrobin_username, :telescopius_username, :group_operation, :interest_operation, :skill_operation, :first_name, :last_name, :email, :phone, :city, :state, :ephemeris, :active, :volunteer, :mentor, :discord_id, interests: [], groups: [], skills: []
       )
       qp = @query_params.to_h
     else
@@ -96,7 +96,32 @@ module Filterable
     query = query.joins(:contacts).where(Contact.arel_table[:phone].matches("%#{qp[:phone]}%")) if(qp[:phone].present?)
     query = query.joins(contacts: :city).where(City.arel_table[:name].matches("%#{qp[:city]}%")) if(qp[:city].present?)
     query = query.joins(contacts: :state).where(State.arel_table[:short_name].matches("%#{qp[:state]}%")) if(qp[:state].present?)
-    query = query.where.not(astrobin_id: nil) if(qp[:has_astrobin] == 'true')
+    query = query.joins(:astrobin).where(Astrobin.arel_table[:username].matches("%#{qp[:astrobin_username]}%")) if(qp[:astrobin_username].present?)
+    query = query.joins(:telescopius).where(Telescopius.arel_table[:username].matches("%#{qp[:telescopius_username]}%")) if(qp[:telescopius_username].present?)
+
+    # Filter by has_astrobin - check both for non-null ID and non-blank username
+    # Normalize true/false to yes/no for API compatibility
+    astrobin_filter = qp[:has_astrobin]
+    astrobin_filter = 'yes' if astrobin_filter == 'true' || astrobin_filter == true
+    astrobin_filter = 'no' if astrobin_filter == 'false' || astrobin_filter == false
+
+    if(astrobin_filter == 'yes')
+      query = query.joins(:astrobin).where.not(Astrobin.arel_table[:username].eq(nil)).where.not(Astrobin.arel_table[:username].eq(''))
+    elsif(astrobin_filter == 'no')
+      query = query.left_joins(:astrobin).where(Astrobin.arel_table[:username].eq(nil).or(Astrobin.arel_table[:username].eq('')))
+    end
+
+    # Filter by has_telescopius - check both for non-null ID and non-blank username
+    # Normalize true/false to yes/no for API compatibility
+    telescopius_filter = qp[:has_telescopius]
+    telescopius_filter = 'yes' if telescopius_filter == 'true' || telescopius_filter == true
+    telescopius_filter = 'no' if telescopius_filter == 'false' || telescopius_filter == false
+
+    if(telescopius_filter == 'yes')
+      query = query.joins(:telescopius).where.not(Telescopius.arel_table[:username].eq(nil)).where.not(Telescopius.arel_table[:username].eq(''))
+    elsif(telescopius_filter == 'no')
+      query = query.left_joins(:telescopius).where(Telescopius.arel_table[:username].eq(nil).or(Telescopius.arel_table[:username].eq('')))
+    end
     
     # Handle interests, groups, and skills specially
     query = and_or_helper(Person, query, qp[:interest_operation], :interests, qp[:interests]) if(qp[:interests].present?)
@@ -123,7 +148,7 @@ module Filterable
     @active_memberships = Person.common_active_membership_query(Membership.all).group_by{|m| m.person_id}
     #@active_memberships = query.active_members.group_by{|m| m.id}
     #@all_people = Person.where(id: query.map(&:id).uniq).includes(:donations, :memberships, :contacts, :interests, :groups)
-    @all_people = query.includes(:donations, :memberships, :interests, :groups, :skills, :astrobin, contacts: [:city, :state])
+    @all_people = query.includes(:donations, :memberships, :interests, :groups, :skills, :astrobin, :telescopius, contacts: [:city, :state])
     @totals = {total: @all_people.count}
     @pagy, @people = pagy(@all_people, limit: 40, params: qp)
   end

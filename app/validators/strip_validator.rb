@@ -7,6 +7,7 @@ class StripValidator < ActiveModel::EachValidator
     
     # Remove extra internal whitespace if option is set
     stripped_value = stripped_value.squeeze(' ') if options[:squeeze]
+    stripped_value = stripped_value.downcase if options[:downcase]
     
     # Update the attribute with cleaned value
     record.send("#{attribute}=", stripped_value)

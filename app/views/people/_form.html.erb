@@ -22,14 +22,6 @@
       <%= form.file_field :profile_picture, class: 'form-control', accept: 'image/*' %>
     </div>
     <div class="col-md-6 mt-2">
-      <%= form.label :referral_id, class: 'form-label mb-0' %>
-      <br/>
-      <small class="form-text text-muted">
-        Optional.  Please tell us how you heard of us.
-      </small>
-      <%= form.combobox :referral_id, Referral.all %>
-    </div>
-    <div class="col-md-6 mt-2">
       <%= hidden_field_tag 'person[astrobin_attributes][id]', person.astrobin&.id %>
       <%= form.label :astrobin_username, 'Astrobin Username', class: 'form-label mb-0' %>
       <br/>
@@ -38,6 +30,24 @@
         account name.  We will use this to highlight your images to our members.
       </small>
       <%= text_field_tag 'person[astrobin_attributes][username]', person.astrobin&.username, class: 'form-control' %>
+    </div>
+    <div class="col-md-6 mt-2">
+      <%= hidden_field_tag 'person[telescopius_attributes][id]', person.telescopius&.id %>
+      <%= form.label :telescopius_username, 'Telescopius Username', class: 'form-label mb-0' %>
+      <br/>
+      <small class="form-text text-muted">
+        Optional.  If you use Telescopius, feel free to share your images with us by providing your
+        account name.  We will use this to highlight your images to our members.
+      </small>
+      <%= text_field_tag 'person[telescopius_attributes][username]', person.telescopius&.username, class: 'form-control' %>
+    </div>
+    <div class="col-md-6 mt-2">
+      <%= form.label :referral_id, class: 'form-label mb-0' %>
+      <br/>
+      <small class="form-text text-muted">
+        Optional.  Please tell us how you heard of us.
+      </small>
+      <%= form.combobox :referral_id, Referral.all %>
     </div>
     <div class="col-12 mt-2">
       <%= form.label :notes, class: 'form-label mb-0' %>

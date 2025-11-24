@@ -64,6 +64,14 @@ class ApplicationPolicy
     true
   end
 
+  def preview_letter?
+    true
+  end
+
+  def send_letter_with_options?
+    true
+  end
+
   class Scope
     def initialize(user, scope)
       @user = user

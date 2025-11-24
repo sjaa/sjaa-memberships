@@ -37,6 +37,12 @@
                 <%= f.text_field :state, placeholder: 'State', value: @query_params[:state], class: 'form-control', data: { action: "input->search-form#search" } %>
               </div>
             </div>
+            <div class="col-md-6 col-xs-12 mb-3">
+              <div class="input-group">
+                <%= f.text_field :astrobin_username, placeholder: 'Astrobin Username', value: @query_params[:astrobin_username], class: 'form-control', data: { action: "input->search-form#search" } %>
+                <%= f.text_field :telescopius_username, placeholder: 'Telescopius Username', value: @query_params[:telescopius_username], class: 'form-control', data: { action: "input->search-form#search" } %>
+              </div>
+            </div>
 
             <!-- Interests -->
             <div class="col-md-6 col-xs-12 mb-2" data-controller="form">
@@ -173,6 +179,40 @@
                 <span style="margin-right: 20px;">
                   <%= radio_button_tag 'mentor', 'either', class: 'form-check-input', checked: !(['yes', 'no'].include?(@query_params[:mentor])) , data: {action: "search-form#search"} %>
                   <%= label_tag 'mentor_either', 'Either', class: 'form-check-label' %>
+                </span>
+              </div>
+            </div>
+            <div class="col-md-3 col-xs-12 mb-3">
+              <%= f.label :has_astrobin, 'Has Astrobin', class: 'form-label' %>
+              <div class="col-12">
+                <span style="margin-right: 20px;">
+                  <%= radio_button_tag 'has_astrobin', 'yes', class: 'form-check-input', checked: @query_params[:has_astrobin] == 'yes', data: {action: "search-form#search"} %>
+                  <%= label_tag 'has_astrobin_yes', 'Yes', class: 'form-check-label' %>
+                </span>
+                <span style="margin-right: 20px;">
+                  <%= radio_button_tag 'has_astrobin', 'no', class: 'form-check-input', checked: @query_params[:has_astrobin] == 'no', data: {action: "search-form#search"} %>
+                  <%= label_tag 'has_astrobin_no', 'No', class: 'form-check-label' %>
+                </span>
+                <span style="margin-right: 20px;">
+                  <%= radio_button_tag 'has_astrobin', 'either', class: 'form-check-input', checked: !(['yes', 'no'].include?(@query_params[:has_astrobin])) , data: {action: "search-form#search"} %>
+                  <%= label_tag 'has_astrobin_either', 'Either', class: 'form-check-label' %>
+                </span>
+              </div>
+            </div>
+            <div class="col-md-3 col-xs-12 mb-3">
+              <%= f.label :has_telescopius, 'Has Telescopius', class: 'form-label' %>
+              <div class="col-12">
+                <span style="margin-right: 20px;">
+                  <%= radio_button_tag 'has_telescopius', 'yes', class: 'form-check-input', checked: @query_params[:has_telescopius] == 'yes', data: {action: "search-form#search"} %>
+                  <%= label_tag 'has_telescopius_yes', 'Yes', class: 'form-check-label' %>
+                </span>
+                <span style="margin-right: 20px;">
+                  <%= radio_button_tag 'has_telescopius', 'no', class: 'form-check-input', checked: @query_params[:has_telescopius] == 'no', data: {action: "search-form#search"} %>
+                  <%= label_tag 'has_telescopius_no', 'No', class: 'form-check-label' %>
+                </span>
+                <span style="margin-right: 20px;">
+                  <%= radio_button_tag 'has_telescopius', 'either', class: 'form-check-input', checked: !(['yes', 'no'].include?(@query_params[:has_telescopius])) , data: {action: "search-form#search"} %>
+                  <%= label_tag 'has_telescopius_either', 'Either', class: 'form-check-label' %>
                 </span>
               </div>
             </div>

@@ -1,5 +1,5 @@
 class DonationsController < ApplicationController
-  before_action :set_donation, only: %i[ show edit update destroy send_letter ]
+  before_action :set_donation, only: %i[ show edit update destroy send_letter send_letter_with_options preview_letter ]
   include Resizable
   
   INCLUDES = [:person, items: [:phases, equipment: :instrument]]
@@ -79,6 +79,45 @@ class DonationsController < ApplicationController
   def send_letter
     AccountMailer.donation_letter(@donation).deliver_now
     redirect_to @donation, notice: 'Donation Letter was sent.'
+  end
+
+  def send_letter_with_options
+    custom_message = params[:custom_message]
+    cc_emails = params[:cc_emails]&.split(',')&.map(&:strip)&.reject(&:blank?)
+
+    AccountMailer.donation_letter(@donation, custom_message: custom_message, cc_emails: cc_emails).deliver_now
+
+    respond_to do |format|
+      format.turbo_stream do
+        flash.now[:success] = 'Donation letter sent successfully!'
+        render turbo_stream: [
+          turbo_stream.prepend('flash-messages', partial: 'shared/flash')
+        ]
+      end
+      format.html { redirect_to @donation, flash: { success: 'Donation Letter was sent.' } }
+    end
+  rescue => e
+    Rails.logger.error "Error sending donation letter: #{e.message}"
+    respond_to do |format|
+      format.turbo_stream do
+        flash.now[:alert] = 'Failed to send donation letter. Please try again.'
+        render turbo_stream: [
+          turbo_stream.prepend('flash-messages', partial: 'shared/flash')
+        ], status: :unprocessable_entity
+      end
+      format.html { redirect_to @donation, alert: 'Failed to send donation letter. Please try again.' }
+    end
+  end
+
+  def preview_letter
+    @custom_message = params[:custom_message]
+    @donor = @donation.person
+
+    # For preview, we need to create a mock attachments object
+    # since we're rendering outside of the mailer context
+    @logo_url = view_context.asset_path('logo_small.png')
+
+    render 'account_mailer/donation_letter', layout: false
   end
   
   private

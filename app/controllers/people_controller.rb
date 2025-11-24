@@ -273,7 +273,8 @@ class PeopleController < ApplicationController
     skills_attributes: [:skill_id, :skill_level, :interest_level],
     contact_attributes: [:address, :zipcode, :phone, :state_id, :city_id, :city_name, :email, :primary, :person_id, :id],
     membership_attributes: [:start, :kind, :kind_id, :term_months, :new, :ephemeris, :id, :person_id, :donation_amount, :author, order_attributes: [:payment_method]],
-    astrobin_attributes: [:username, :latest_image, :id])
+    astrobin_attributes: [:username, :latest_image, :id],
+    telescopius_attributes: [:username, :id])
   end
   
   def policy_handling

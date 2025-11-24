@@ -35,7 +35,7 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
     assert_not_nil @admin.reset_password_token
     assert_not_nil @admin.reset_password_sent_at
     assert_redirected_to login_path
-    assert_equal "Password reset email has been sent.", flash[:notice]
+    assert_equal "Password reset email has been sent.  It may take up to 5 minutes to receive it.", flash[:notice]
   end
 
   test "should create password reset for existing person" do
@@ -47,7 +47,7 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
     assert_not_nil @person.reset_password_token
     assert_not_nil @person.reset_password_sent_at
     assert_redirected_to login_path
-    assert_equal "Password reset email has been sent.", flash[:notice]
+    assert_equal "Password reset email has been sent.  It may take up to 5 minutes to receive it.", flash[:notice]
   end
 
   test "should show error for non-existent email without signup" do

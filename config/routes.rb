@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   post '/mentorship/contact/:id', to: 'mentorship#contact', as: :mentor_contact
 
   get '/reports/memberships', to: 'reports#memberships', as: :memberships_report
+  post '/reports/create_google_group', to: 'reports#create_google_group', as: :create_google_group_report
   get '/reports/renewal_reminders', to: 'reports#renewal_reminders', as: :renewal_reminders
   get '/reports/ephemeris', to: 'reports#ephemeris', as: :ephemeris_report
   get '/signup', to: 'sessions#signup', as: :signup
@@ -28,6 +29,8 @@ Rails.application.routes.draw do
   post '/donations/search', to: 'donations#search', as: :donations_search
   get '/donations/search', to: 'donations#search'
   get '/donations/letter/:id', to: 'donations#send_letter', as: :donations_letter
+  post '/donations/:id/send_letter', to: 'donations#send_letter_with_options', as: :send_donation_letter
+  get '/donations/:id/preview_letter', to: 'donations#preview_letter', as: :preview_donation_letter
   post '/equipment/search', to: 'equipment#search', as: :equipment_search
   get '/equipment/search', to: 'equipment#search'
   post '/groups/add_person', to: 'groups#add_person', as: :groups_add_person

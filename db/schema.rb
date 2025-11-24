@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_11_12_042038) do
+ActiveRecord::Schema[7.1].define(version: 2025_11_21_053919) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
   enable_extension "plpgsql"
@@ -243,6 +243,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_11_12_042038) do
     t.datetime "reset_password_sent_at"
     t.boolean "volunteer", default: false
     t.boolean "mentor", default: false
+    t.integer "telescopius_id"
     t.index ["first_name"], name: "index_people_on_first_name"
     t.index ["last_name"], name: "index_people_on_last_name"
   end
@@ -423,6 +424,13 @@ ActiveRecord::Schema[7.1].define(version: 2025_11_12_042038) do
     t.datetime "updated_at", null: false
     t.string "icon"
     t.index ["name"], name: "index_tags_on_name"
+  end
+
+  create_table "telescopius", force: :cascade do |t|
+    t.string "username"
+    t.integer "latest_image"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"

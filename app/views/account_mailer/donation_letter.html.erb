@@ -1,6 +1,12 @@
 <div style="max-width: 800px; padding: 10px; border: 1px solid black; margin: 0 auto;">
   <div style="text-align: center; width: 100%;">
-  <%= image_tag image_url('logo_small.png'), width: '200px', height: '200px' %>
+  <% if defined?(attachments) && attachments['logo_small.png'] %>
+    <%= image_tag attachments['logo_small.png'].url, width: '200px', height: '200px' %>
+  <% elsif defined?(@logo_url) %>
+    <%= image_tag @logo_url, width: '200px', height: '200px' %>
+  <% else %>
+    <%= image_tag 'logo_small.png', width: '200px', height: '200px' %>
+  <% end %>
   </div>
   <div style="text-align: center; width: 100%;">
     <p>
@@ -14,7 +20,13 @@
     <h2 style="padding-bottom: 0px; margin-bottom: 0px;">Receipt of Charitable Donation</h2>
     <p style="padding-top: 0px; margin-top: 0px;"><%= @donation.effective_dates.sort.map{|date| date.strftime('%Y %B %d')}.join(', ') %></p>
 
-    <p style="text-align: left;">The San Jose Astronomical Association acknowledges and expresses appreciation for the following contribution from <%= @donor.name %>:</p>
+    <% if @custom_message.present? %>
+      <div style="text-align: left; padding: 15px; background-color: #f8f9fa; border-left: 4px solid #0d6efd; margin-bottom: 20px;">
+        <%= simple_format(@custom_message) %>
+      </div>
+    <% end %>
+
+    <p style="text-align: left;">The San Jose Astronomical Association acknowledges and expresses appreciation for the following donation from <%= @donor.name %>:</p>
 
     <ul style="text-align: left;">
     <% @donation.items.each do |item| %>

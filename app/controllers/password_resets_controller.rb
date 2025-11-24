@@ -11,7 +11,7 @@ class PasswordResetsController < ApplicationController
     if user
       user.generate_password_reset_token!
       AccountMailer.password_reset(user).deliver_now
-      redirect_to login_path, notice: 'Password reset email has been sent.'
+      redirect_to login_path, notice: 'Password reset email has been sent.  It may take up to 5 minutes to receive it.'
     else
       flash[:alert] = 'Email address not found.  Please sign up or correct your address.'
       redirect_to login_path

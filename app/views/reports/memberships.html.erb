@@ -38,7 +38,10 @@
     <% end %>
     <div class="d-flex justify-content-between align-items-center mb-2">
       <h2 class="mb-0">Memberships Gained <span style="color: green;">(<%=new_memberships_count%>)</span></h2>
-      <%= link_to "Download CSV", memberships_report_path(start: @start_date, end: @end_date, new_members_only: params[:new_members_only], csv_type: 'gained', format: :csv), class: "btn btn-sm btn-primary" %>
+      <div>
+        <%= link_to "Download CSV", memberships_report_path(start: @start_date, end: @end_date, new_members_only: params[:new_members_only], csv_type: 'gained', format: :csv), class: "btn btn-sm btn-primary" %>
+        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#createGroupModal" data-section="gained">Create Group</button>
+      </div>
     </div>
     <!-- Show totals -->
     <%= table class: "table table-bordered mb-3" do %>
@@ -91,7 +94,10 @@
     <% unless @new_members_only %>
       <div class="d-flex justify-content-between align-items-center mb-2">
         <h2 class="mb-0">Memberships Lost <span style="color: red;">(<%=lost_memberships_count%>)</span></h2>
-        <%= link_to "Download CSV", memberships_report_path(start: @start_date, end: @end_date, csv_type: 'lost', format: :csv), class: "btn btn-sm btn-primary" %>
+        <div>
+          <%= link_to "Download CSV", memberships_report_path(start: @start_date, end: @end_date, csv_type: 'lost', format: :csv), class: "btn btn-sm btn-primary" %>
+          <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#createGroupModal" data-section="lost">Create Group</button>
+        </div>
       </div>
       <%= table class: "table table-hover table-striped table-sm" do %>
         <thead>
@@ -116,5 +122,34 @@
         </tbody>
       <% end %>
     <% end %>
+  </div>
+</div>
+
+<!-- Modal for Creating Google Group -->
+<div class="modal fade" id="createGroupModal" tabindex="-1" aria-labelledby="createGroupModalLabel" aria-hidden="true" data-controller="create-group">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <%= form_with url: create_google_group_report_path, method: :post, data: { create_group_target: "form", action: "submit->create-group#submitForm" } do |f| %>
+        <div class="modal-header">
+          <h5 class="modal-title" id="createGroupModalLabel">Create Google Group</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <%= f.label :group_name, "Group Name", class: "form-label" %>
+            <%= f.text_field :group_name, class: "form-control", placeholder: "e.g., new-members-january-2025", required: true, data: { create_group_target: "groupName" } %>
+            <div class="form-text">Enter the name for the new Google Group (without @sjaa.net)</div>
+          </div>
+          <%= f.hidden_field :section, data: { create_group_target: "section" } %>
+          <%= f.hidden_field :start_date, value: @start_date %>
+          <%= f.hidden_field :end_date, value: @end_date %>
+          <%= f.hidden_field :new_members_only, value: params[:new_members_only] %>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <%= f.submit "Create Group", class: "btn btn-primary", data: { create_group_target: "submitButton" } %>
+        </div>
+      <% end %>
+    </div>
   </div>
 </div>

@@ -94,6 +94,12 @@
                 <% end %>
               </dd>
             <% end %>
+            <% if @person.telescopius&.username&.present? %>
+              <dt class="col-sm-4">Telescopius</dt>
+              <dd class="col-sm-8">
+                <%= link_to @person.telescopius.username, "https://telescopius.com/profile/#{@person.telescopius.username}", target: :_blank, class: 'text-decoration-none' %>
+              </dd>
+            <% end %>
             <% if @user.is_a?(Admin) && @person.discord_id.present? %>
               <dt class="col-sm-4">Discord ID</dt>
               <dd class="col-sm-8"><code><%= @person.discord_id %></code></dd>

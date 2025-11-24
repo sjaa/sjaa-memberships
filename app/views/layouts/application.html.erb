@@ -108,14 +108,9 @@
       </div>
     </nav>
     <div class="container-fluid mt-2" style="max-width: 1200px; min-height: 70vh;">
-      <% {'warning' => notice, 'success' => flash[:success], 'danger' => flash[:alert]}.each do |style, msg| %>
-        <% if msg %>
-          <div class="alert alert-<%=style%> alert-dismissible fade show" role="alert">
-            <%=msg.html_safe%>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        <% end %>
-      <% end %>
+      <div id="flash-messages">
+        <%= render 'shared/flash' %>
+      </div>
       <%= yield %>
     </div>
 

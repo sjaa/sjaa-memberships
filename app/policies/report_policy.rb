@@ -7,6 +7,10 @@ class ReportPolicy < ApplicationPolicy
     user&.has_permission? :read
   end
 
+  def create_google_group?
+    user&.has_permission? :write
+  end
+
   def memberships?
     user&.has_permission? :read
   end
