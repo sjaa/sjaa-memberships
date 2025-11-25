@@ -27,7 +27,7 @@ class CalendarSyncJobTest < ActiveJob::TestCase
 
     # Job should log error and return early without calling Google API
     stub_google_calendar_api_not_called do
-      CalendarSyncJob.perform_now(admin_no_token.email, @calendar_id)
+      CalendarSyncJob.perform_now(admin_no_token.email, @calendar_id, 90, true)
     end
 
     assert true # If we got here, no API calls were made
@@ -35,7 +35,7 @@ class CalendarSyncJobTest < ActiveJob::TestCase
 
   test "job requires valid admin email" do
     stub_google_calendar_api_not_called do
-      CalendarSyncJob.perform_now('nonexistent@sjaa.net', @calendar_id)
+      CalendarSyncJob.perform_now('nonexistent@sjaa.net', @calendar_id, 90, true)
     end
 
     assert true # If we got here, no API calls were made
@@ -46,9 +46,72 @@ class CalendarSyncJobTest < ActiveJob::TestCase
 
     stub_calendar_sync(mock_aggregator) do |calendar_service, calendar_id|
       assert_equal @calendar_id, calendar_id
+      CalendarSyncJob.perform_now(@admin.email, nil, 90, true)
     end
+  end
 
-    CalendarSyncJob.perform_now(@admin.email)
+  test "job uses default 90 days when days parameter not provided" do
+    mock_aggregator = create_mock_aggregator([])
+    expected_end_date = Date.today + 90.days
+    test_context = self
+
+    stub_calendar_sync(mock_aggregator) do |calendar_service, calendar_id|
+      # The mock_aggregator's generate_calendar method will be called with start and end dates
+      # We'll verify it was called with the correct date range
+      mock_aggregator.define_singleton_method(:generate_calendar) do |start_date, end_date|
+        test_context.assert_equal Date.today, start_date, "Start date should be today"
+        test_context.assert_equal expected_end_date, end_date, "End date should be 90 days from today"
+
+        # Return mock calendar
+        mock_calendar = Object.new
+        mock_calendar.define_singleton_method(:each_day) { {} }
+        mock_calendar
+      end
+
+      CalendarSyncJob.perform_now(@admin.email, calendar_id, 90, true)
+    end
+  end
+
+  test "job uses custom days parameter when provided" do
+    mock_aggregator = create_mock_aggregator([])
+    custom_days = 30
+    expected_end_date = Date.today + custom_days.days
+    test_context = self
+
+    stub_calendar_sync(mock_aggregator) do |calendar_service, calendar_id|
+      mock_aggregator.define_singleton_method(:generate_calendar) do |start_date, end_date|
+        test_context.assert_equal Date.today, start_date, "Start date should be today"
+        test_context.assert_equal expected_end_date, end_date, "End date should be #{custom_days} days from today"
+
+        # Return mock calendar
+        mock_calendar = Object.new
+        mock_calendar.define_singleton_method(:each_day) { {} }
+        mock_calendar
+      end
+
+      CalendarSyncJob.perform_now(@admin.email, calendar_id, custom_days, true)
+    end
+  end
+
+  test "job syncs 180 days when specified" do
+    mock_aggregator = create_mock_aggregator([])
+    custom_days = 180
+    expected_end_date = Date.today + custom_days.days
+    test_context = self
+
+    stub_calendar_sync(mock_aggregator) do |calendar_service, calendar_id|
+      mock_aggregator.define_singleton_method(:generate_calendar) do |start_date, end_date|
+        test_context.assert_equal Date.today, start_date
+        test_context.assert_equal expected_end_date, end_date, "Should sync 180 days when specified"
+
+        # Return mock calendar
+        mock_calendar = Object.new
+        mock_calendar.define_singleton_method(:each_day) { {} }
+        mock_calendar
+      end
+
+      CalendarSyncJob.perform_now(@admin.email, calendar_id, custom_days, true)
+    end
   end
 
   test "job creates new events from aggregator" do
@@ -74,7 +137,7 @@ class CalendarSyncJobTest < ActiveJob::TestCase
         created_event
       end
 
-      CalendarSyncJob.perform_now(@admin.email, calendar_id)
+      CalendarSyncJob.perform_now(@admin.email, calendar_id, 90, true)
     end
 
     assert_equal 1, created_events.size
@@ -99,7 +162,7 @@ class CalendarSyncJobTest < ActiveJob::TestCase
     test_context = self
     stub_calendar_sync(mock_aggregator) do |calendar_service, calendar_id|
       # Mock get_event to return existing event
-      calendar_service.define_singleton_method(:get_event) do |cal_id, event_id|
+      calendar_service.define_singleton_method(:get_event) do |cal_id, event_id, **options|
         test_context.assert_equal 'existing-event-id-456', event_id
         test_context.send(:create_google_event,
           id: event_id,
@@ -115,7 +178,7 @@ class CalendarSyncJobTest < ActiveJob::TestCase
         event
       end
 
-      CalendarSyncJob.perform_now(@admin.email, calendar_id)
+      CalendarSyncJob.perform_now(@admin.email, calendar_id, 90, true)
     end
 
     assert_equal 1, updated_events.size
@@ -141,7 +204,7 @@ class CalendarSyncJobTest < ActiveJob::TestCase
     test_context = self
     stub_calendar_sync(mock_aggregator) do |calendar_service, calendar_id|
       # Mock get_event to return existing event without cancelled prefix
-      calendar_service.define_singleton_method(:get_event) do |cal_id, event_id|
+      calendar_service.define_singleton_method(:get_event) do |cal_id, event_id, **options|
         test_context.send(:create_google_event,
           id: event_id,
           summary: 'Cancelled Event', # No prefix yet
@@ -155,7 +218,7 @@ class CalendarSyncJobTest < ActiveJob::TestCase
         event
       end
 
-      CalendarSyncJob.perform_now(@admin.email, calendar_id)
+      CalendarSyncJob.perform_now(@admin.email, calendar_id, 90, true)
     end
 
     assert_equal 1, updated_events.size
@@ -180,7 +243,7 @@ class CalendarSyncJobTest < ActiveJob::TestCase
     test_context = self
     stub_calendar_sync(mock_aggregator) do |calendar_service, calendar_id|
       # Mock get_event to return event with cancelled prefix
-      calendar_service.define_singleton_method(:get_event) do |cal_id, event_id|
+      calendar_service.define_singleton_method(:get_event) do |cal_id, event_id, **options|
         test_context.send(:create_google_event,
           id: event_id,
           summary: '[CANCELLED] Already Cancelled',
@@ -194,7 +257,7 @@ class CalendarSyncJobTest < ActiveJob::TestCase
         event
       end
 
-      CalendarSyncJob.perform_now(@admin.email, calendar_id)
+      CalendarSyncJob.perform_now(@admin.email, calendar_id, 90, true)
     end
 
     assert_equal 0, updated_events.size, "Should not update event that already has [CANCELLED] prefix"
@@ -220,7 +283,7 @@ class CalendarSyncJobTest < ActiveJob::TestCase
         event
       end
 
-      CalendarSyncJob.perform_now(@admin.email, calendar_id)
+      CalendarSyncJob.perform_now(@admin.email, calendar_id, 90, true)
     end
 
     assert_equal 1, created_events.size
@@ -246,7 +309,7 @@ class CalendarSyncJobTest < ActiveJob::TestCase
     created_events = []
     stub_calendar_sync(mock_aggregator) do |calendar_service, calendar_id|
       # Mock get_event to raise 404 error
-      calendar_service.define_singleton_method(:get_event) do |cal_id, event_id|
+      calendar_service.define_singleton_method(:get_event) do |cal_id, event_id, **options|
         raise Google::Apis::ClientError.new('Not Found', status_code: 404)
       end
 
@@ -256,7 +319,7 @@ class CalendarSyncJobTest < ActiveJob::TestCase
         event
       end
 
-      CalendarSyncJob.perform_now(@admin.email, calendar_id)
+      CalendarSyncJob.perform_now(@admin.email, calendar_id, 90, true)
     end
 
     assert_equal 1, created_events.size
@@ -282,7 +345,7 @@ class CalendarSyncJobTest < ActiveJob::TestCase
         event
       end
 
-      calendar_service.define_singleton_method(:get_event) do |cal_id, event_id|
+      calendar_service.define_singleton_method(:get_event) do |cal_id, event_id, **options|
         test_context.send(:create_google_event, id: event_id, summary: 'Existing Event')
       end
 
@@ -291,7 +354,7 @@ class CalendarSyncJobTest < ActiveJob::TestCase
         event
       end
 
-      CalendarSyncJob.perform_now(@admin.email, calendar_id)
+      CalendarSyncJob.perform_now(@admin.email, calendar_id, 90, true)
     end
 
     assert_equal 1, created_count, "Should create 1 new event"
@@ -363,6 +426,11 @@ class CalendarSyncJobTest < ActiveJob::TestCase
   end
 
   # Stub the complete calendar sync flow
+  # This stubs out all external API calls including:
+  # - Google Calendar API (for creating/updating events)
+  # - Meetup API (via the SJAA::Calendar::Aggregator gem)
+  # - Google Sheets API (if used by the aggregator)
+  # All external data is replaced with mock_aggregator which returns test data
   def stub_calendar_sync(mock_aggregator)
     mock_auth = Object.new
     mock_auth.define_singleton_method(:refresh_token=) { |token| }
@@ -388,7 +456,11 @@ class CalendarSyncJobTest < ActiveJob::TestCase
       mock_calendar
     end
 
-    # Stub the aggregator creation - use a lambda to always return our mock
+    # Stub the aggregator creation - this prevents any real API calls to:
+    # - Meetup.com (via Meetup source in the aggregator)
+    # - Google Calendar (via Google Calendar sources in the aggregator)
+    # - Any other configured sources
+    # Instead, the mock_aggregator will return our test events
     SJAA::Calendar::Aggregator.stub :new, ->(config) { mock_aggregator } do
       # Stub get_auth for all job instances
       CalendarSyncJob.class_eval do

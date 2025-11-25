@@ -6,9 +6,24 @@
       "type": "shell",
       "command": "docker",
       "args": [
-        "container", "exec", "-it", "sjaa-memberships-app-1",
-        "bundle", "exec", "rdbg", "--open", "--host", "0.0.0.0", "--port", "1234", "--nonstop",
-        "--", "bin/rails", "server", "-b", "0.0.0.0"
+        "container",
+        "exec",
+        "-it",
+        "sjaa-memberships-app-1",
+        "bundle",
+        "exec",
+        "rdbg",
+        "--open",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "1234",
+        "--nonstop",
+        "--",
+        "bin/rails",
+        "server",
+        "-b",
+        "0.0.0.0"
       ],
       "group": "build",
       "presentation": {
@@ -21,16 +36,23 @@
     },
     {
       "label": "Connect to Debug Server",
-      "type": "shell", 
+      "type": "shell",
       "command": "docker",
       "args": [
-        "container", "exec", "-it", "sjaa-memberships-app-1",
-        "bundle", "exec", "rdbg", "--attach", "127.0.0.1:1234"
+        "container",
+        "exec",
+        "-it",
+        "sjaa-memberships-app-1",
+        "bundle",
+        "exec",
+        "rdbg",
+        "--attach",
+        "127.0.0.1:1234"
       ],
       "group": "build",
       "presentation": {
         "echo": true,
-        "reveal": "always", 
+        "reveal": "always",
         "focus": true,
         "panel": "new"
       },
@@ -41,8 +63,15 @@
       "type": "shell",
       "command": "docker",
       "args": [
-        "compose", "run", "--rm", "app",
-        "bundle", "exec", "rails", "test", "--verbose"
+        "compose",
+        "run",
+        "--rm",
+        "app",
+        "bundle",
+        "exec",
+        "rails",
+        "test",
+        "--verbose"
       ],
       "group": "test",
       "presentation": {
@@ -55,7 +84,10 @@
       },
       "problemMatcher": {
         "owner": "ruby",
-        "fileLocation": ["relative", "/rails"],
+        "fileLocation": [
+          "relative",
+          "/rails"
+        ],
         "pattern": {
           "regexp": "^(.*):(\\d+):in `.*': (.*)$",
           "file": 1,
@@ -69,8 +101,16 @@
       "type": "shell",
       "command": "docker",
       "args": [
-        "compose", "run", "--rm", "app",
-        "bundle", "exec", "rails", "test", "${relativeFile}", "--verbose"
+        "compose",
+        "run",
+        "--rm",
+        "app",
+        "bundle",
+        "exec",
+        "rails",
+        "test",
+        "${relativeFile}",
+        "--verbose"
       ],
       "group": "test",
       "presentation": {
@@ -81,7 +121,10 @@
       },
       "problemMatcher": {
         "owner": "ruby",
-        "fileLocation": ["relative", "/rails"],
+        "fileLocation": [
+          "relative",
+          "/rails"
+        ],
         "pattern": {
           "regexp": "^(.*):(\\d+):in `.*': (.*)$",
           "file": 1,
@@ -95,8 +138,13 @@
       "type": "shell",
       "command": "docker",
       "args": [
-        "compose", "run", "--rm", "app",
-        "bin/rails", "test:all", "--verbose"
+        "compose",
+        "run",
+        "--rm",
+        "app",
+        "bin/rails",
+        "test:all",
+        "--verbose"
       ],
       "group": "test",
       "presentation": {
@@ -109,7 +157,10 @@
       },
       "problemMatcher": {
         "owner": "ruby",
-        "fileLocation": ["relative", "/rails"],
+        "fileLocation": [
+          "relative",
+          "/rails"
+        ],
         "pattern": [
           {
             "regexp": "^(.*):(\\d+):in `.*': (.*)$",
@@ -131,8 +182,14 @@
       "type": "shell",
       "command": "docker",
       "args": [
-        "compose", "run", "--rm", "app",
-        "bin/rails", "test", "test/system/", "--verbose"
+        "compose",
+        "run",
+        "--rm",
+        "app",
+        "bin/rails",
+        "test",
+        "test/system/",
+        "--verbose"
       ],
       "group": "test",
       "presentation": {
@@ -145,7 +202,10 @@
       },
       "problemMatcher": {
         "owner": "ruby",
-        "fileLocation": ["relative", "/rails"],
+        "fileLocation": [
+          "relative",
+          "/rails"
+        ],
         "pattern": [
           {
             "regexp": "^(.*):(\\d+):in `.*': (.*)$",
@@ -167,9 +227,35 @@
       "type": "shell",
       "command": "docker",
       "args": [
-        "compose", "run", "--rm", "app",
-        "env", "RUBYOPT=-W0",
-        "bin/rails", "console"
+        "compose",
+        "run",
+        "--rm",
+        "app",
+        "env",
+        "RUBYOPT=-W0",
+        "bin/rails",
+        "console"
+      ],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Update Gemfile.lock",
+      "type": "shell",
+      "command": "docker",
+      "args": [
+        "compose",
+        "run",
+        "--rm",
+        "app",
+        "bundle",
+        "install"
       ],
       "group": "build",
       "presentation": {

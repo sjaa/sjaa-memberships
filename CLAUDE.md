@@ -51,11 +51,11 @@ docker compose run --rm app bin/rails csv_compare CSV1=file1.csv CSV2=file2.csv 
 ### Background Jobs
 ```bash
 # Calendar sync job - syncs events from aggregator to Google Calendar
-docker compose run --rm app bin/rails runner "CalendarSyncJob.perform_now('admin@sjaa.net')"
-docker compose run --rm app bin/rails runner "CalendarSyncJob.perform_now('admin@sjaa.net', 'custom-calendar@group.calendar.google.com')"
+docker compose run --rm app bin/rails runner "CalendarSyncJob.perform_now('vp@sjaa.net')"
+docker compose run --rm app bin/rails runner "CalendarSyncJob.perform_now('vp@sjaa.net', 'custom-calendar@group.calendar.google.com')"
 
 # Queuecompose run --rm app
-docker compose run --rm app bin/rails runner "CalendarSyncJob.perform_later('admin@sjaa.net')"
+docker compose run --rm app bin/rails runner "CalendarSyncJob.perform_later('vp@sjaa.net')"
 ```
 
 ### Docker Development

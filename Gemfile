@@ -105,5 +105,5 @@ gem "uri", ">= 1.0.3"
 # To authenticate to the GitHub Packages RubyGems registry, use one of the following methods:
 # bundle config set --global https://rubygems.pkg.github.com/sjaa USERNAME:TOKEN
 source "https://rubygems.pkg.github.com/sjaa" do
-  gem "sjaa-ruby-calendar-aggregator", "0.3.0"
+  gem "sjaa-ruby-calendar-aggregator", "0.5.0"
 end

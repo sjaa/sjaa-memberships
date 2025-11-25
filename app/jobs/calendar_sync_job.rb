@@ -3,19 +3,20 @@ class CalendarSyncJob < ApplicationJob
 
   queue_as :default
   
-  # CalendarSyncJob.perform_later(admin_email, calendar_id)
+  # CalendarSyncJob.perform_later(admin_email, calendar_id, days, commit)
   #   admin_email - Email of admin with valid refresh token for calendar access
   #   calendar_id - Google Calendar ID to update (defaults to ENV variable)
+  #   days - Number of days to sync (defaults to 90 days / ~3 months)
+  #   commit - Whether to commit changes to Google Calendar (defaults to false for dry-run)
   #
-  # This job fetches 3 months of events from the SJAA calendar aggregator
-  # and syncs them to a Google Calendar, creating new events, updating existing
-  # ones, and marking cancelled events.
-  def perform(admin_email, calendar_id = nil)
+  # This job fetches events from the SJAA calendar aggregator for the specified
+  # time period and syncs them to a Google Calendar, creating new events, updating
+  # existing ones, and marking cancelled events.
+  def perform(admin_email, calendar_id = nil, days = 90, commit = false)
     require 'sjaa-ruby-calendar-aggregator'
-    
-    calendar_id ||= ENV.fetch('SJAA_ALL_EVENTS_CALENDAR_ID')
+
+    calendar_id ||= ENV.fetch('SJAA_MERGED_CALENDAR_ID')
     admin = Admin.find_by(email: admin_email)
-    commit = true
     
     # Validate admin has refresh token
     if admin&.refresh_token.nil?
@@ -28,9 +29,9 @@ class CalendarSyncJob < ApplicationJob
     calendar_service = Google::Apis::CalendarV3::CalendarService.new
     calendar_service.authorization = auth
     
-    # Fetch events from aggregator for next 3 months
+    # Fetch events from aggregator for specified number of days
     today = Date.today
-    end_date = today + 3.months
+    end_date = today + days.days
     
     Rails.logger.info "[CalendarSyncJob] Fetching aggregated events from #{today} to #{end_date}"
     
@@ -45,8 +46,13 @@ class CalendarSyncJob < ApplicationJob
 
     # Add a Google Calendar source (you'll need to provide a real API key and calendar ID)
     config.add_google_calendar(
-    name: "SJAA Main Calendar",
+    name: "SJAA 2025 All Events",
     calendar_id: "c_4779ddc46fda914aaa8045b916044a480265c50bb4642df9420923706837a63e@group.calendar.google.com"
+    )
+
+    config.add_google_calendar(
+    name: "SJAA Aggregate Calendar",
+    calendar_id: "c_3ba3a0dda51b1e570c0fad01aa5bd96f1e27e5c05b5d3fd0fa581974a6305ecc@group.calendar.google.com"
     )
 
     # Add a Meetup source
@@ -140,8 +146,9 @@ class CalendarSyncJob < ApplicationJob
   
   # Sync a single event to Google Calendar
   def sync_event(calendar_service, calendar_id, agg_event, stats, commit=false)
-    # Check if event already exists in Google Calendar via id
-    existing_event_id = agg_event.id
+    # Check if event already exists in Google Calendar
+    # First try the event's direct ID, then check all source_events for matching IDs
+    existing_event_id = find_existing_event_id(calendar_service, calendar_id, agg_event)
 
     # Check if event is cancelled based on status
     if agg_event&.status&.downcase&.include?('cancelled')
@@ -150,6 +157,51 @@ class CalendarSyncJob < ApplicationJob
       update_existing_event(calendar_service, calendar_id, agg_event, existing_event_id, stats, commit)
     else
       create_new_event(calendar_service, calendar_id, agg_event, stats, commit)
+    end
+  end
+
+  # Find an existing event ID by checking the aggregated event's ID and all source event IDs
+  def find_existing_event_id(calendar_service, calendar_id, agg_event)
+    # Debug logging
+    Rails.logger.debug "[CalendarSyncJob] Looking for existing event: '#{agg_event.title}'"
+    Rails.logger.debug "[CalendarSyncJob]   Direct ID: #{agg_event.id.inspect}"
+
+    # First try the direct event ID
+    if agg_event.id && event_exists?(calendar_service, calendar_id, agg_event.id)
+      Rails.logger.debug "[CalendarSyncJob]   Found via direct ID: #{agg_event.id}"
+      return agg_event.id
+    end
+
+    # If the event has source_events, try each of their IDs
+    if agg_event.respond_to?(:source_events) && agg_event.source_events.present?
+      Rails.logger.debug "[CalendarSyncJob]   Checking #{agg_event.source_events.size} source events"
+      agg_event.source_events.each do |source_event|
+        source_id = source_event.respond_to?(:id) ? source_event.id : source_event[:id]
+        Rails.logger.debug "[CalendarSyncJob]     Trying source ID: #{source_id.inspect}"
+        if source_id && event_exists?(calendar_service, calendar_id, source_id)
+          Rails.logger.debug "[CalendarSyncJob]   Found via source ID: #{source_id}"
+          return source_id
+        end
+      end
+    else
+      Rails.logger.debug "[CalendarSyncJob]   No source_events available"
+    end
+
+    # No matching event found
+    Rails.logger.debug "[CalendarSyncJob]   No existing event found"
+    nil
+  end
+
+  # Check if an event exists in Google Calendar
+  def event_exists?(calendar_service, calendar_id, event_id)
+    # Request full event details including summary, description, etc.
+    calendar_service.get_event(calendar_id, event_id, fields: '*')
+    true
+  rescue Google::Apis::ClientError => e
+    if e.status_code == 404
+      false
+    else
+      raise
     end
   end
   
@@ -225,9 +277,10 @@ class CalendarSyncJob < ApplicationJob
     event = Google::Apis::CalendarV3::Event.new(
     summary: agg_event.title,
     description: build_event_description(agg_event),
-    location: agg_event.venue&.dig(:address)
+    location: agg_event.venue&.dig(:address),
+    visibility: 'public'
     )
-    
+
     # Set start and end times
     if agg_event.all_day?
       event.start = Google::Apis::CalendarV3::EventDateTime.new(
@@ -239,7 +292,7 @@ class CalendarSyncJob < ApplicationJob
     else
       start_time = parse_event_time(agg_event)
       end_time = start_time + 2.hours # Default 2 hour duration
-      
+
       event.start = Google::Apis::CalendarV3::EventDateTime.new(
       date_time: start_time.to_datetime.rfc3339,
       time_zone: 'America/Los_Angeles'
@@ -249,17 +302,17 @@ class CalendarSyncJob < ApplicationJob
       time_zone: 'America/Los_Angeles'
       )
     end
-    
+
     # Create the event
     if commit
       created_event = calendar_service.insert_event(calendar_id, event)
+      stats[:created] << created_event
       Rails.logger.info "[CalendarSyncJob] Created event: #{created_event.summary} (ID: #{created_event.id})"
     else
       # In dry-run mode, just track the event object we would create
+      stats[:created] << event
       Rails.logger.info "[CalendarSyncJob] Would create event: #{event.summary}"
     end
-
-    stats[:created] << event
   rescue => e
     Rails.logger.error "[CalendarSyncJob] Failed to create event '#{agg_event.title}': #{e.message}"
     raise
@@ -268,16 +321,27 @@ class CalendarSyncJob < ApplicationJob
   # Build a comprehensive description from event data
   def build_event_description(agg_event)
     description_parts = []
-    
+
+    # Add Meetup URL at the top if this is a Meetup event
+    if agg_event.respond_to?(:source_events) && agg_event.source_events.present?
+      agg_event.source_events.each do |source_event|
+        # Check if this is a Meetup source event with a URL
+        if source_event.class.name.include?('Meetup') && source_event.respond_to?(:url) && source_event.url.present?
+          description_parts << source_event.url
+          break # Only add the first Meetup URL found
+        end
+      end
+    end
+
     # Add original description if present
     description_parts << agg_event.description if agg_event.description.present?
-    
+
     # Add source information
     description_parts << "Source: #{agg_event.source}" if agg_event.source
-    
+
     # Add attendance count if available
     description_parts << "Going: #{agg_event.going_count}" if agg_event.going_count
-    
+
     # Add venue details if available
     if agg_event.venue
       venue_info = []
@@ -285,10 +349,10 @@ class CalendarSyncJob < ApplicationJob
       venue_info << agg_event.venue[:address] if agg_event.venue[:address]
       description_parts << "Venue: #{venue_info.join(', ')}" unless venue_info.empty?
     end
-    
+
     # Add status if notable
     description_parts << "Status: #{agg_event.status}" if agg_event.status.present?
-    
+
     description_parts.join("\n\n")
   end
   
@@ -296,9 +360,9 @@ class CalendarSyncJob < ApplicationJob
   def parse_event_time(agg_event)
     # The event has a date and formatted_time
     # formatted_time might be like "7:00 PM" or "All Day"
-    if agg_event.time.present?
+    if agg_event.start_time.present?
       # Combine date with time
-      Time.zone.parse("#{agg_event.date} #{agg_event.time}")
+      Time.parse("#{agg_event.start_time}")
     else
       # Default to noon on the event date
       agg_event.date.to_time.change(hour: 12)
