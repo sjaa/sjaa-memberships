@@ -1,5 +1,5 @@
 {
-  "ruby.testExecution.command": "docker container exec sjaa-memberships-app-1 bundle exec rails test",
+  "ruby.testExecution.command": "docker compose run --rm app bundle exec rails test",
   "ruby.testExecution.pattern": "test/**/*_test.rb",
   "ruby.testExecution.environment": {
     "RAILS_ENV": "test"

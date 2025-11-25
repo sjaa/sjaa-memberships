@@ -46,7 +46,5 @@ VS Code is configured for remote debugging with the Rails app running in Docker.
 
 ## File Structure:
 
-- **`.vscode/settings.json`** - Ruby LSP and testing configuration  
 - **`.vscode/tasks.json`** - Test and debug tasks for Docker integration
 - **`.vscode/launch.json`** - Debug server connection configuration
-- **`.vscode/keybindings.json`** - Keyboard shortcuts for testing and debugging

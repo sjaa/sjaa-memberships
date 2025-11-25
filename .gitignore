@@ -41,3 +41,7 @@
 deploy_private_key
 
 .DS_Store
+
+.vscode/settings.json
+.vscode/extensions.json
+.vscode/keybindings.json
