@@ -17,11 +17,11 @@
               <h5 class="mb-1"><%= event.title %></h5>
               <p class="mb-1 text-muted">
                 <i class="bi bi-calendar-event"></i>
-                <%= event.time.strftime('%A, %B %e, %Y') %>
+                <%= event.time.in_time_zone("Pacific Time (US & Canada)").strftime('%A, %B %e, %Y') %>
               </p>
               <p class="mb-0 text-muted">
                 <i class="bi bi-clock"></i>
-                <%= event.time.strftime('%l:%M %p') %>
+                <%= event.time.in_time_zone("Pacific Time (US & Canada)").strftime('%l:%M %p %Z') %>
               </p>
             </div>
           </div>
