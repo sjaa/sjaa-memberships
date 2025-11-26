@@ -36,6 +36,10 @@ class ApplicationPolicy
     user&.has_permission? :write
   end
 
+  def import_csv?
+    user&.has_permission? :write
+  end
+
   def new?
     user&.has_permission? :write
   end

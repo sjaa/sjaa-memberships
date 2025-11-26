@@ -54,8 +54,23 @@ docker compose run --rm app bin/rails csv_compare CSV1=file1.csv CSV2=file2.csv 
 docker compose run --rm app bin/rails runner "CalendarSyncJob.perform_now('vp@sjaa.net')"
 docker compose run --rm app bin/rails runner "CalendarSyncJob.perform_now('vp@sjaa.net', 'custom-calendar@group.calendar.google.com')"
 
-# Queuecompose run --rm app
+# Queue jobs for later processing
 docker compose run --rm app bin/rails runner "CalendarSyncJob.perform_later('vp@sjaa.net')"
+
+# Process queued jobs with custom worker (auto-stops when queue is empty)
+docker compose run --rm app bin/rails runner lib/solid_queue_simple_worker.rb
+
+# Process specific queues
+docker compose run --rm app bin/rails runner "lib/solid_queue_simple_worker.rb -q default"
+
+# With debug logging
+docker compose run --rm app bin/rails runner "lib/solid_queue_simple_worker.rb -d"
+
+# Clear all queued jobs without running them
+docker compose run --rm app bin/rails runner "SolidQueue::Job.delete_all"
+
+# Clear only pending jobs
+docker compose run --rm app bin/rails runner "SolidQueue::Job.where(finished_at: nil).delete_all"
 ```
 
 ### Docker Development

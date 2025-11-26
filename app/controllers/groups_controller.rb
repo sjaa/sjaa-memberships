@@ -1,5 +1,6 @@
 class GroupsController < ApplicationController
-  before_action :set_group, only: %i[ show edit update destroy add_person ]
+  before_action :set_group, only: %i[ show edit update destroy add_person import_csv ]
+  include GoogleHelper
 
   # GET /groups or /groups.json
   def index
@@ -75,6 +76,61 @@ class GroupsController < ApplicationController
     respond_to do |format|
       format.html { redirect_to groups_path, status: :see_other, notice: "Group was successfully destroyed." }
       format.json { head :no_content }
+    end
+  end
+
+  # POST /groups/1/import_csv
+  def import_csv
+    unless params[:csv_file].present?
+      redirect_to @group, alert: "Please select a CSV file to upload."
+      return
+    end
+
+    # Get Google API authorization
+    auth = get_auth(@user)
+    if auth.nil?
+      redirect_to @group, alert: "You must authenticate with Google first."
+      return
+    end
+
+    csv_content = params[:csv_file].read
+
+    # Check if this should be run as a background job
+    if params[:background].present?
+      ImportGroupCsvJob.perform_later(@group.id, csv_content, @user.id)
+      redirect_to @group, notice: "CSV import has been queued as a background job. Check the logs for progress."
+      return
+    end
+
+    # Run synchronously
+    begin
+      importer = GroupCsvImporter.new(group: @group, auth: auth, csv_content: csv_content)
+      result = importer.import
+
+      unless result[:success]
+        redirect_to @group, alert: result[:error]
+        return
+      end
+
+      # Build success message
+      results = result[:results]
+      message = []
+      message << "Successfully added #{results[:added].count} member(s) to #{@group.email}." if results[:added].any?
+      message << "#{results[:skipped].count} member(s) were already in the group." if results[:skipped].any?
+      message << "Added #{results[:added_to_db].count} member(s) to the database group." if results[:added_to_db].any?
+      message << "#{results[:errors].count} error(s) occurred." if results[:errors].any?
+
+      if results[:errors].any?
+        error_details = results[:errors].map { |e| "#{e[:email]}: #{e[:error]}" }.join(", ")
+        redirect_to @group, alert: "#{message.join(' ')} Errors: #{error_details}"
+      else
+        redirect_to @group, notice: message.join(' ')
+      end
+
+    rescue => e
+      Rails.logger.error "CSV Import Error: #{e.class.name} - #{e.message}"
+      Rails.logger.error e.backtrace.join("\n")
+      redirect_to @group, alert: "An error occurred while importing: #{e.message}"
     end
   end
 

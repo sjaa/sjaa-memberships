@@ -34,6 +34,7 @@ Rails.application.routes.draw do
   post '/equipment/search', to: 'equipment#search', as: :equipment_search
   get '/equipment/search', to: 'equipment#search'
   post '/groups/add_person', to: 'groups#add_person', as: :groups_add_person
+  post '/groups/:id/import_csv', to: 'groups#import_csv', as: :import_csv_group
   
   post '/password_resets/:id', to: 'password_resets#update', as: :password_reset_form
   resources :password_resets, only: [:new, :create, :edit, :update]
