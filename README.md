@@ -373,3 +373,11 @@ To embed a Ruby page in an iframe without using JavaScript, you'll need to ensur
     ```
 
 By following these steps, you should be able to embed a Ruby page in an iframe without using JavaScript. Does this help clarify the process?
+
+# Chrome
+
+Chrome is needed for some testing and for meetup integration.  Install it in heroku with:
+
+```bash
+heroku buildpacks:add -i 1 heroku-community/chrome-for-testing
+```
