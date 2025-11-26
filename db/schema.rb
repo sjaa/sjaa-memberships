@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_11_21_053919) do
+ActiveRecord::Schema[7.1].define(version: 2025_11_26_025814) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
   enable_extension "plpgsql"
@@ -183,6 +183,17 @@ ActiveRecord::Schema[7.1].define(version: 2025_11_21_053919) do
     t.integer "person_id", null: false
     t.index ["interest_id", "person_id"], name: "index_interests_people_on_interest_id_and_person_id"
     t.index ["person_id", "interest_id"], name: "index_interests_people_on_person_id_and_interest_id"
+  end
+
+  create_table "meetup_events", force: :cascade do |t|
+    t.string "meetup_id"
+    t.string "url"
+    t.string "image_url"
+    t.string "title"
+    t.datetime "time"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["meetup_id"], name: "index_meetup_events_on_meetup_id", unique: true
   end
 
   create_table "membership_kinds", force: :cascade do |t|

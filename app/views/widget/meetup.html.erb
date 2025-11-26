@@ -1,0 +1,41 @@
+<div class="meetup-widget">
+  <h4 class="mb-3">Upcoming Meetup Events</h4>
+
+  <% if @events.any? %>
+    <div class="list-group">
+      <% @events.each do |event| %>
+        <a href="<%= event.url %>" target="_blank" rel="noopener noreferrer" class="list-group-item list-group-item-action">
+          <div class="d-flex w-100 align-items-start gap-3">
+            <% if event.image_url.present? %>
+              <img src="<%= event.image_url %>" alt="<%= event.title %>" class="rounded" style="width: 80px; height: 80px; object-fit: cover; flex-shrink: 0;">
+            <% else %>
+              <div class="text-center bg-light rounded d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; flex-shrink: 0;">
+                <i class="bi bi-moon-stars-fill text-secondary" style="font-size: 2.5rem;"></i>
+              </div>
+            <% end %>
+            <div class="flex-grow-1">
+              <h5 class="mb-1"><%= event.title %></h5>
+              <p class="mb-1 text-muted">
+                <i class="bi bi-calendar-event"></i>
+                <%= event.time.strftime('%A, %B %e, %Y') %>
+              </p>
+              <p class="mb-0 text-muted">
+                <i class="bi bi-clock"></i>
+                <%= event.time.strftime('%l:%M %p') %>
+              </p>
+            </div>
+          </div>
+        </a>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="alert alert-info" role="alert">
+      <i class="bi bi-info-circle"></i>
+      No upcoming Meetup events scheduled.
+    </div>
+  <% end %>
+
+  <div class="mt-3 text-center">
+    <small class="text-muted">Powered by SJAA Memberships</small>
+  </div>
+</div>

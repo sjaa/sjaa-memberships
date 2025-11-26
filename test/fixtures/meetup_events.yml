@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  meetup_id: MyString
+  url: MyString
+  image_url: MyString
+  title: MyString
+  time: 2025-11-26 02:58:14
+
+two:
+  meetup_id: MyString
+  url: MyString
+  image_url: MyString
+  title: MyString
+  time: 2025-11-26 02:58:14

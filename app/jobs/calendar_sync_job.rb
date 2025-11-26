@@ -82,6 +82,9 @@ class CalendarSyncJob < ApplicationJob
     aggregated_events.each do |agg_event|
       begin
         sync_event(calendar_service, calendar_id, agg_event, stats, commit)
+
+        # Also save Meetup events to database for widget display
+        save_meetup_event(agg_event) if is_meetup_event?(agg_event)
       rescue => e
         stats[:errors] << {event: agg_event, error: e}
         Rails.logger.error "[CalendarSyncJob] Error syncing event '#{agg_event.title}': #{e.message}"
@@ -370,5 +373,61 @@ class CalendarSyncJob < ApplicationJob
   rescue
     # Fallback to noon if parsing fails
     agg_event.date.to_time.change(hour: 12)
+  end
+
+  # Check if an aggregated event has a Meetup source
+  def is_meetup_event?(agg_event)
+    return false unless agg_event.respond_to?(:source_events) && agg_event.source_events.present?
+
+    agg_event.source_events.any? do |source_event|
+      source_event.class.name.include?('Meetup')
+    end
+  end
+
+  # Save or update a Meetup event in the database
+  def save_meetup_event(agg_event)
+    return unless agg_event.respond_to?(:source_events) && agg_event.source_events.present?
+
+    # Find the Meetup source event
+    meetup_source = agg_event.source_events.find do |source_event|
+      source_event.class.name.include?('Meetup')
+    end
+
+    return unless meetup_source
+
+    # Extract Meetup event data
+    meetup_id = meetup_source.respond_to?(:id) ? meetup_source.id : nil
+    url = meetup_source.respond_to?(:url) ? meetup_source.url : nil
+    image_url = meetup_source&.image_url || meetup_source&.image_highres_url
+
+    # Skip if we don't have a valid meetup_id
+    return unless meetup_id.present?
+
+    # Calculate event time
+    event_time = if agg_event.all_day?
+      agg_event.date.to_time.change(hour: 12) # Default to noon for all-day events
+    else
+      parse_event_time(agg_event)
+    end
+
+    # Find or initialize the MeetupEvent record
+    meetup_event = MeetupEvent.find_or_initialize_by(meetup_id: meetup_id)
+
+    # Update attributes
+    meetup_event.assign_attributes(
+      url: url,
+      image_url: image_url,
+      title: agg_event.title,
+      time: event_time
+    )
+
+    # Save the record
+    if meetup_event.save
+      Rails.logger.info "[CalendarSyncJob] Saved Meetup event: #{meetup_event.title} (ID: #{meetup_id})"
+    else
+      Rails.logger.error "[CalendarSyncJob] Failed to save Meetup event: #{meetup_event.errors.full_messages.join(', ')}"
+    end
+  rescue => e
+    Rails.logger.error "[CalendarSyncJob] Error saving Meetup event: #{e.message}"
   end
 end

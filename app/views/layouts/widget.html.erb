@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>SJAA Widget</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="turbo-prefetch" content="false">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload", media: "all" %>
+    <%= stylesheet_link_tag "bootstrap.min", "data-turbo-track": "reload", media: "all" %>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <%= javascript_importmap_tags %>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background: transparent;
+      }
+      .widget-container {
+        padding: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="widget-container">
+      <%= yield %>
+    </div>
+  </body>
+</html>

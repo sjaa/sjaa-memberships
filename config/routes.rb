@@ -97,5 +97,8 @@ Rails.application.routes.draw do
   post '/member_lookup', to: 'sessions#member_lookup', as: :member_lookup
   post '/new_member', to: 'sessions#new_member', as: :new_member
   get '/unauthorized', to: 'static_pages#unauthorized', as: :unauthorized
-  
+
+  # Widgets
+  get '/widgets/meetup', to: 'widget#meetup', as: :widget_meetup
+
 end
