@@ -112,13 +112,6 @@ The application is configured for remote debugging using the `debug` gem with VS
 
 1. **Start the application with debugging enabled:**
 ```bash
-# Option 1: Using the debug helper script
-docker container exec -it sjaa-memberships-app-1 bin/rails-debug
-
-# Option 2: Using rdbg directly
-docker container exec -it sjaa-memberships-app-1 bundle exec rdbg --open --host 0.0.0.0 --port 1234 -- bin/rails server -b 0.0.0.0
-
-# Option 3: Using environment variables (set in Dockerfile-dev)
 docker compose up  # Debug server auto-starts on port 1234
 ```
 

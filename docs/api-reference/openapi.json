@@ -230,6 +230,14 @@
           "discord_id": {
             "description": "Filter by given Discord user ID.",
             "type": "string"
+          },
+          "has_discord": {
+            "description": "Filter by the presence of a Discord user ID.",
+            "type": "boolean"
+          },
+          "has_telescopius": {
+            "description": "Filter by the presence of a Telescopius user ID.",
+            "type": "boolean"
           }
         }
       },

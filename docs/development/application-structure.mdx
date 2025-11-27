@@ -1,0 +1,647 @@
+---
+title: 'Application Structure'
+description: 'Understanding the codebase layout and organization'
+icon: 'folder-tree'
+---
+
+## Overview
+
+This is a Ruby on Rails 7.1+ application following the Model-View-Controller (MVC) architectural pattern. The codebase is organized into standard Rails directories, each with a specific purpose.
+
+This guide helps you navigate the code and understand where different pieces of functionality live.
+
+## Directory Structure
+
+```
+sjaa-memberships/
+├── app/              # Main application code
+├── config/           # Configuration files
+├── db/               # Database schema and migrations
+├── lib/              # Custom libraries and tasks
+├── test/             # Test suite
+├── public/           # Static files
+├── docs/             # Documentation (this site)
+└── bin/              # Executable scripts
+```
+
+## App Directory (Main Code)
+
+The `app/` directory contains the core application logic, organized by responsibility:
+
+### Models (`app/models/`)
+
+Models represent your data and business logic. Each model typically corresponds to a database table.
+
+**Core Models:**
+- [person.rb](../../app/models/person.rb) - Central model for members
+- [membership.rb](../../app/models/membership.rb) - Membership periods and renewals
+- [admin.rb](../../app/models/admin.rb) - Administrative users
+- [donation.rb](../../app/models/donation.rb) - Financial contributions
+- [contact.rb](../../app/models/contact.rb) - Email, phone, address information
+- [equipment.rb](../../app/models/equipment.rb) - Physical equipment items
+- [instrument.rb](../../app/models/instrument.rb) - Equipment types/models
+- [group.rb](../../app/models/group.rb) - Member groups and categories
+
+**Supporting Models:**
+- [api_key.rb](../../app/models/api_key.rb) - API authentication tokens
+- [meetup_event.rb](../../app/models/meetup_event.rb) - Events from Meetup.com
+- [status.rb](../../app/models/status.rb) - Membership status types
+
+**Key Concepts:**
+
+```ruby
+# Models define relationships between data
+class Person < ApplicationRecord
+  has_many :memberships
+  has_many :donations
+  has_many :contacts
+  belongs_to :status
+end
+
+# Models contain business logic
+def active_member?
+  status.name == 'member' && !membership_expired?
+end
+```
+
+**Finding code:**
+- Look here for data validation rules
+- Database queries and scopes
+- Relationships between entities
+- Business logic calculations
+
+### Controllers (`app/controllers/`)
+
+Controllers handle HTTP requests and coordinate between models and views.
+
+**Main Controllers:**
+- [people_controller.rb](../../app/controllers/people_controller.rb) - Member CRUD operations
+- [memberships_controller.rb](../../app/controllers/memberships_controller.rb) - Membership management
+- [admins_controller.rb](../../app/controllers/admins_controller.rb) - Admin user management
+- [equipment_controller.rb](../../app/controllers/equipment_controller.rb) - Equipment tracking
+- [donations_controller.rb](../../app/controllers/donations_controller.rb) - Donation records
+- [groups_controller.rb](../../app/controllers/groups_controller.rb) - Group management
+
+**Special Controllers:**
+- [google_controller.rb](../../app/controllers/google_controller.rb) - Google Workspace integration
+- [api_keys_controller.rb](../../app/controllers/api_keys_controller.rb) - API token management
+- [widgets_controller.rb](../../app/controllers/widgets_controller.rb) - Embeddable widgets
+- [sessions_controller.rb](../../app/controllers/sessions_controller.rb) - Authentication
+
+**API Controllers (`app/controllers/api/`):**
+- [people_controller.rb](../../app/controllers/api/people_controller.rb) - RESTful API for member data
+- [keys_controller.rb](../../app/controllers/api/keys_controller.rb) - API key management
+
+**Controller Pattern:**
+
+```ruby
+class PeopleController < ApplicationController
+  before_action :authorize_admin  # Authentication
+
+  def index
+    @people = Person.all          # Fetch data from model
+    authorize @people             # Check permissions (Pundit)
+  end
+
+  def create
+    @person = Person.new(person_params)
+    if @person.save
+      redirect_to @person         # Redirect on success
+    else
+      render :new                 # Re-render form on error
+    end
+  end
+end
+```
+
+**Finding code:**
+- Look here for request handling logic
+- Form processing and validation
+- Redirects and responses
+- Before/after action filters
+
+### Views (`app/views/`)
+
+Views contain the HTML templates that render the user interface. Rails uses ERB (Embedded Ruby) for templating.
+
+**View Organization:**
+```
+app/views/
+├── people/           # Views for PeopleController
+│   ├── index.html.erb
+│   ├── show.html.erb
+│   ├── new.html.erb
+│   └── edit.html.erb
+├── memberships/
+├── layouts/          # Page layouts
+│   ├── application.html.erb  # Main layout
+│   └── widget.html.erb        # Widget layout
+└── shared/           # Reusable partials
+    └── _navbar.html.erb
+```
+
+**View Pattern:**
+
+```erb
+<!-- app/views/people/index.html.erb -->
+<h1>Members</h1>
+
+<% @people.each do |person| %>
+  <div class="person">
+    <%= person.full_name %>
+    <%= link_to 'View', person_path(person) %>
+  </div>
+<% end %>
+```
+
+**Key Concepts:**
+- `<% %>` - Execute Ruby code (no output)
+- `<%= %>` - Execute Ruby code and output result
+- Partials (`_filename.html.erb`) - Reusable components
+- Helpers - Ruby methods available in views
+
+**Finding code:**
+- Look here for HTML structure
+- User interface elements
+- Form markup
+- Display logic
+
+### Jobs (`app/jobs/`)
+
+Background jobs handle asynchronous tasks that don't need to complete immediately.
+
+**Key Jobs:**
+- [calendar_sync_job.rb](../../app/jobs/calendar_sync_job.rb) - Sync events to Google Calendar
+- [renewal_reminders_job.rb](../../app/jobs/renewal_reminders_job.rb) - Send renewal emails
+- [welcome_email_job.rb](../../app/jobs/welcome_email_job.rb) - Welcome new members
+
+**Job Pattern:**
+
+```ruby
+class CalendarSyncJob < ApplicationJob
+  queue_as :default
+
+  def perform(admin_email, calendar_id = nil)
+    # Long-running task executed in background
+    sync_events_to_calendar(admin_email, calendar_id)
+  end
+end
+
+# Trigger the job
+CalendarSyncJob.perform_later('admin@example.com')
+```
+
+**Finding code:**
+- Look here for scheduled tasks
+- Email sending logic
+- API integrations that run periodically
+- Long-running operations
+
+### Mailers (`app/mailers/`)
+
+Mailers handle email generation and sending.
+
+**Key Mailers:**
+- [person_mailer.rb](../../app/mailers/person_mailer.rb) - Member-related emails
+- [admin_mailer.rb](../../app/mailers/admin_mailer.rb) - Admin notifications
+
+**Email Templates:** `app/views/person_mailer/`
+- `welcome_email.html.erb` - Welcome email template
+- `renewal_reminder.html.erb` - Renewal reminder template
+
+**Mailer Pattern:**
+
+```ruby
+class PersonMailer < ApplicationMailer
+  def welcome_email(person)
+    @person = person
+    mail(to: person.email, subject: 'Welcome to SJAA!')
+  end
+end
+
+# Send the email
+PersonMailer.welcome_email(@person).deliver_later
+```
+
+### Policies (`app/policies/`)
+
+Policies define authorization rules using [Pundit](https://github.com/varvet/pundit). They determine what actions users can perform.
+
+**Key Policies:**
+- [person_policy.rb](../../app/policies/person_policy.rb) - Member access control
+- [admin_policy.rb](../../app/policies/admin_policy.rb) - Admin management permissions
+- [equipment_policy.rb](../../app/policies/equipment_policy.rb) - Equipment access control
+
+**Policy Pattern:**
+
+```ruby
+class PersonPolicy < ApplicationPolicy
+  def index?
+    admin.has_permission?('read')  # Can view list?
+  end
+
+  def update?
+    admin.has_permission?('write') # Can edit?
+  end
+
+  def destroy?
+    admin.has_permission?('permit') # Can delete?
+  end
+end
+
+# Usage in controller
+authorize @person, :update?  # Raises error if not allowed
+```
+
+**Permission Levels:**
+- `read` - View data
+- `write` - Edit data
+- `permit` - Manage permissions
+- `verify_members` - Verify membership status
+
+### Helpers (`app/helpers/`)
+
+Helpers contain utility methods available in views.
+
+**Key Helpers:**
+- [application_helper.rb](../../app/helpers/application_helper.rb) - Global helper methods
+- [people_helper.rb](../../app/helpers/people_helper.rb) - People-specific helpers
+- [equipment_helper.rb](../../app/helpers/equipment_helper.rb) - Equipment display helpers
+
+**Helper Pattern:**
+
+```ruby
+module PeopleHelper
+  def status_badge(person)
+    color = person.active? ? 'success' : 'secondary'
+    content_tag(:span, person.status.name, class: "badge bg-#{color}")
+  end
+end
+
+# Usage in view
+<%= status_badge(@person) %>
+```
+
+### Assets (`app/assets/` and `app/javascript/`)
+
+Assets include stylesheets, JavaScript, and images.
+
+**Stylesheets (`app/assets/stylesheets/`):**
+- `application.css` - Main stylesheet manifest
+- Custom CSS files for specific features
+
+**JavaScript (`app/javascript/`):**
+- `application.js` - JavaScript entry point
+- Stimulus controllers for interactive features
+- Turbo for dynamic page updates
+
+**Images (`app/assets/images/`):**
+- Static images and icons
+
+## Configuration (`config/`)
+
+Configuration files control how the application behaves.
+
+**Key Files:**
+- [routes.rb](../../config/routes.rb) - URL routing definitions
+- [database.yml](../../config/database.yml) - Database connection settings
+- [environments/](../../config/environments/) - Environment-specific settings
+  - `development.rb` - Development settings
+  - `production.rb` - Production settings
+  - `test.rb` - Test settings
+
+**Routes Pattern:**
+
+```ruby
+# config/routes.rb
+Rails.application.routes.draw do
+  resources :people do
+    resources :memberships  # Nested routes
+  end
+
+  namespace :api do
+    resources :people, only: [:index, :update]
+  end
+
+  get '/verify', to: 'people#verify'  # Custom route
+end
+```
+
+**URL Structure:**
+- `/people` → `PeopleController#index`
+- `/people/123` → `PeopleController#show`
+- `/people/123/edit` → `PeopleController#edit`
+- `/api/people` → `Api::PeopleController#index`
+
+**Other Configuration:**
+- [initializers/](../../config/initializers/) - Code that runs at startup
+- [locales/](../../config/locales/) - Translation files
+- [credentials.yml.enc](../../config/credentials.yml.enc) - Encrypted secrets
+
+## Database (`db/`)
+
+Database schema, migrations, and seed data.
+
+**Key Files:**
+- [schema.rb](../../db/schema.rb) - Current database structure (auto-generated)
+- [seeds.rb](../../db/seeds.rb) - Initial data for new databases
+- [migrate/](../../db/migrate/) - Migration files that modify the schema
+
+**Migration Pattern:**
+
+```ruby
+# db/migrate/20250101120000_create_people.rb
+class CreatePeople < ActiveRecord::Migration[7.1]
+  def change
+    create_table :people do |t|
+      t.string :first_name
+      t.string :last_name
+      t.references :status, foreign_key: true
+      t.timestamps
+    end
+  end
+end
+```
+
+**Key Concepts:**
+- Never edit `schema.rb` directly - it's auto-generated
+- Create migrations to change the database structure
+- Run `rails db:migrate` to apply migrations
+- Migrations are timestamped and run in order
+
+## Library Code (`lib/`)
+
+Custom code that doesn't fit into the standard Rails structure.
+
+**Key Files:**
+- [tasks/](../../lib/tasks/) - Custom Rake tasks
+  - `generate_data.rake` - Generate test data
+  - `csv_compare.rake` - Compare CSV files
+- [solid_queue_simple_worker.rb](../../lib/solid_queue_simple_worker.rb) - Background job worker
+- [calendar_aggregator.rb](../../lib/calendar_aggregator.rb) - Calendar sync logic
+
+**Rake Task Pattern:**
+
+```ruby
+# lib/tasks/generate_data.rake
+namespace :db do
+  desc 'Generate fake member data'
+  task generate_data: :environment do
+    100.times do
+      Person.create!(
+        first_name: Faker::Name.first_name,
+        last_name: Faker::Name.last_name
+      )
+    end
+  end
+end
+
+# Run with: rails db:generate_data
+```
+
+## Tests (`test/`)
+
+Comprehensive test suite covering all application functionality.
+
+**Test Organization:**
+```
+test/
+├── models/           # Model tests
+├── controllers/      # Controller tests
+├── system/           # End-to-end browser tests
+├── mailers/          # Email tests
+├── jobs/             # Background job tests
+└── fixtures/         # Test data
+```
+
+**Test Pattern:**
+
+```ruby
+# test/models/person_test.rb
+require 'test_helper'
+
+class PersonTest < ActiveSupport::TestCase
+  test "full name combines first and last name" do
+    person = Person.new(first_name: 'John', last_name: 'Doe')
+    assert_equal 'John Doe', person.full_name
+  end
+
+  test "active member has valid membership" do
+    person = people(:active_member)  # From fixtures
+    assert person.active_member?
+  end
+end
+```
+
+**Test Types:**
+- **Model tests** - Business logic and validations
+- **Controller tests** - Request handling and responses
+- **System tests** - Full user workflows in browser
+- **Integration tests** - Multiple components working together
+
+## Public Files (`public/`)
+
+Static files served directly without Rails processing.
+
+```
+public/
+├── 404.html          # Error pages
+├── 500.html
+├── favicon.ico
+└── robots.txt
+```
+
+Files in `public/` are served at the root URL:
+- `public/robots.txt` → `/robots.txt`
+- `public/favicon.ico` → `/favicon.ico`
+
+## Finding Your Way Around
+
+### I need to add a new feature...
+
+1. **Start with routes** (`config/routes.rb`) - Define the URL
+2. **Create/modify controller** (`app/controllers/`) - Handle the request
+3. **Create/modify model** (`app/models/`) - Add business logic
+4. **Create/modify views** (`app/views/`) - Build the UI
+5. **Add policy** (`app/policies/`) - Control access
+6. **Write tests** (`test/`) - Verify it works
+
+### I need to understand how X works...
+
+**Authentication:**
+- `app/controllers/sessions_controller.rb` - Login/logout
+- `app/controllers/application_controller.rb` - `authorize_admin` method
+- `app/models/admin.rb` - Admin model with permissions
+
+**Membership Management:**
+- `app/models/person.rb` - Member data and status
+- `app/models/membership.rb` - Membership periods
+- `app/controllers/memberships_controller.rb` - Renewal flow
+- `app/jobs/renewal_reminders_job.rb` - Automated reminders
+
+**Google Integration:**
+- `app/controllers/google_controller.rb` - OAuth and sync operations
+- `app/jobs/calendar_sync_job.rb` - Calendar synchronization
+- `lib/calendar_aggregator.rb` - Event aggregation logic
+
+**Email System:**
+- `app/mailers/person_mailer.rb` - Email definitions
+- `app/views/person_mailer/` - Email templates
+- `config/environments/production.rb` - SMTP settings
+
+**API:**
+- `app/controllers/api/` - API endpoints
+- `app/models/api_key.rb` - Authentication
+- `config/routes.rb` - API routes (under `/api`)
+
+### I need to modify the database...
+
+1. **Generate migration:** `rails generate migration DescriptionOfChange`
+2. **Edit migration file** in `db/migrate/`
+3. **Run migration:** `rails db:migrate`
+4. **Update model** in `app/models/` if needed
+5. **Update tests** to reflect changes
+
+### I need to debug an issue...
+
+**Check these places in order:**
+1. **Server logs** - `docker compose logs app`
+2. **Controller** - Where the request is handled
+3. **Model** - Where business logic lives
+4. **View** - What's being rendered
+5. **Routes** - How URLs map to controllers
+6. **Policy** - Authorization rules
+7. **Database** - Data issues via Rails console
+
+## Common Patterns
+
+### Creating a New Model
+
+```bash
+# Generate model with attributes
+rails generate model Equipment name:string serial_number:string person:references
+
+# This creates:
+# - app/models/equipment.rb
+# - db/migrate/TIMESTAMP_create_equipment.rb
+# - test/models/equipment_test.rb
+# - test/fixtures/equipment.yml
+```
+
+### Creating a New Controller
+
+```bash
+# Generate controller with actions
+rails generate controller Equipment index show new create edit update destroy
+
+# This creates:
+# - app/controllers/equipment_controller.rb
+# - app/views/equipment/ (directory with view files)
+# - test/controllers/equipment_controller_test.rb
+# - app/helpers/equipment_helper.rb
+```
+
+### Adding a Background Job
+
+```bash
+# Generate job
+rails generate job CalendarSync
+
+# This creates:
+# - app/jobs/calendar_sync_job.rb
+# - test/jobs/calendar_sync_job_test.rb
+```
+
+## Request Flow
+
+Understanding how a request flows through the application:
+
+```
+1. Browser makes request
+   ↓
+2. Routes (config/routes.rb) match URL to controller action
+   ↓
+3. Controller receives request
+   ↓
+4. Before actions run (authentication, authorization)
+   ↓
+5. Controller action executes
+   - Fetches data from models
+   - Checks permissions via policies
+   - Processes form data
+   ↓
+6. View is rendered (or redirect/JSON response)
+   ↓
+7. Response sent to browser
+```
+
+**Example:** Viewing a member profile
+
+```
+GET /people/123
+  ↓ routes.rb routes to PeopleController#show
+  ↓ authorize_admin checks authentication
+  ↓ show action fetches Person.find(123)
+  ↓ PersonPolicy.show? checks permissions
+  ↓ app/views/people/show.html.erb renders
+  ↓ HTML sent to browser
+```
+
+## Key Rails Conventions
+
+### Naming Conventions
+
+- **Models:** Singular, CamelCase (`Person`, `ApiKey`)
+- **Controllers:** Plural, CamelCase (`PeopleController`, `ApiKeysController`)
+- **Tables:** Plural, snake_case (`people`, `api_keys`)
+- **Files:** snake_case (`person.rb`, `api_key.rb`)
+
+### Directory Mapping
+
+```
+Model: Person
+  → File: app/models/person.rb
+  → Table: people
+  → Controller: app/controllers/people_controller.rb
+  → Views: app/views/people/
+  → Tests: test/models/person_test.rb
+```
+
+### RESTful Actions
+
+Standard controller actions follow REST conventions:
+
+- `index` - List all records (GET `/people`)
+- `show` - Display one record (GET `/people/123`)
+- `new` - Show form for new record (GET `/people/new`)
+- `create` - Save new record (POST `/people`)
+- `edit` - Show form for editing (GET `/people/123/edit`)
+- `update` - Save changes (PATCH `/people/123`)
+- `destroy` - Delete record (DELETE `/people/123`)
+
+## Summary
+
+The Rails application structure is organized by responsibility:
+
+- **Models** (`app/models/`) - Data and business logic
+- **Controllers** (`app/controllers/`) - Request handling
+- **Views** (`app/views/`) - User interface
+- **Jobs** (`app/jobs/`) - Background tasks
+- **Policies** (`app/policies/`) - Authorization
+- **Tests** (`test/`) - Quality assurance
+- **Config** (`config/`) - Application settings
+- **Database** (`db/`) - Schema and migrations
+
+Key principles:
+- **Convention over Configuration** - Follow Rails naming conventions
+- **DRY (Don't Repeat Yourself)** - Reuse code via helpers, partials, and inheritance
+- **Separation of Concerns** - Keep models, views, and controllers focused
+- **RESTful Design** - Use standard CRUD actions where possible
+
+When you need to find something, think about what it does:
+- **Data/Logic** → Models
+- **User Interface** → Views
+- **Request Handling** → Controllers
+- **Background Processing** → Jobs
+- **Access Control** → Policies
+- **URL Routing** → Config/Routes

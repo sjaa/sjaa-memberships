@@ -1,102 +1,702 @@
 ---
-title: 'Environment'
-description: 'How to get a local development environment'
+title: 'Development Environment'
+description: 'Setting up and maintaining a local development environment'
+icon: 'laptop-code'
 ---
+
+## Prerequisites
+
+Before setting up your development environment, ensure you have:
+
+1. **Docker Desktop** - Download from [docker.com](https://www.docker.com/products/docker-desktop/)
+   - No subscription required, choose the free tier
+   - Required for running the containerized application
+2. **VS Code** (Recommended) - For the best development experience with integrated tasks
+3. **Git** - For cloning and managing the repository
+4. **.env file** - Contains application secrets (contact developers for access)
+
+The preferred and supported way to maintain a replicable development environment is with Docker. While you can set up your own environment without Docker, this is not covered in this documentation.
 
 ## Initial Setup
 
-The prefered and supported way to maintain a replicable development environment is with Docker.  Download Docker from their
-website: https://www.docker.com/products/docker-desktop/ .  No subscription is required, just choose the free-est options.  You can,
-of course, setup your own environment without Docker, but this is not covered in this documentation.
+### First-Time Setup
 
-Once installed, simply run the following commands from the root source code folder to get started:
-
+1. **Clone the repository:**
 ```sh
-docker-compose build
-docker-compose up
+git clone https://github.com/sjaa/sjaa-memberships.git
+cd sjaa-memberships
 ```
 
-Next, you will need a `.env` file that contains some application secrets.  For security reasons this is not part of the repo, but
-can be obtained by contacting the developers for appropriate uses.
+2. **Build the Docker containers:**
+```sh
+docker compose build
+```
 
-The first time `docker-compose up` is run, your database will be initialized with a single admin: `vp@sjaa.net`.  To generate more sample data, run the following rake
-task.  Make sure your docker containers are running.
+3. **Obtain the .env file:**
+   - Contact the developers for the `.env` file containing application secrets
+   - Place it in the root directory of the project
+   - This file is not checked into version control for security reasons
+
+4. **Start the containers:**
+```sh
+docker compose up
+```
+
+5. **Initialize the database:**
+   - On first run, the database is automatically initialized with a single admin account: `vp@sjaa.net`
+   - To generate sample data for development:
 
 ```sh
 docker container exec -it sjaa-memberships-app-1 bin/rake generate_data
 ```
 
-Now, you should be able to navigate to https://127.0.0.1:3001 to view your local copy of the application, complete with sample data.  You may get a warning from your
-browser that the connection is not secure.  This is because we use a self-signed certificate in development.  It is safe to click through those
-warnings to access the app.
+6. **Access the application:**
+   - Navigate to https://127.0.0.1:3001
+   - You'll see a browser warning about the self-signed certificate
+   - This is normal in development - click through the warning to proceed
 
-## Console
+## VS Code Tasks (Recommended)
 
+**The easiest way to run common development tasks is through VS Code's built-in task runner.**
+
+All tasks are pre-configured in [.vscode/tasks.json](.vscode/tasks.json) and run commands inside the Docker container automatically.
+
+### Running Tasks
+
+Access tasks through the Command Palette:
+1. Press **Cmd+Shift+P** (macOS) or **Ctrl+Shift+P** (Windows/Linux)
+2. Type "**Tasks: Run Task**"
+3. Select from the list of available tasks
+
+Or use the keyboard shortcut **Cmd+Shift+B** (macOS) or **Ctrl+Shift+B** (Windows/Linux) to run the default build task.
+
+### Available VS Code Tasks
+
+#### Rails Console
+**Task Name:** `Rails Console`
+
+Opens an interactive Rails console for debugging and exploring the application.
+
+**What it does:**
 ```sh
-docker container exec -it sjaa-memberships-app-1 bin/rails c 
+docker container exec -it sjaa-memberships-app-1 env RUBY_DEBUG_OPEN= bin/rails console
 ```
 
-## Use Cases
+**When to use:**
+- Explore the database and ActiveRecord models
+- Test code snippets interactively
+- Debug data or relationships
+- Run one-off commands
 
-The app should serve as a secure store for the membership data, and should facilitate a variety of use cases:
+**Example session:**
+```ruby
+# Find a person by email
+Person.joins(:contacts).where(contacts: {email: 'test@example.com'}).first
 
-1. Lookup a person's membership status
-    ```ruby
-    p = Person.find 42
-    p.active_membership
-    => 
-    [#<Membership:0x0000ffff8b1b3358
-      id: 3568,
-      start: Mon, 04 Aug 2025 00:00:00.000000000 UTC +00:00,
-      term_months: 12,
-      ephemeris: false,
-      person_id: 1992,
-      created_at: Sat, 09 Aug 2025 22:39:12.523926000 UTC +00:00,
-      updated_at: Sat, 09 Aug 2025 22:39:12.523926000 UTC +00:00,
-      kind_id: nil,
-      donation_amount: nil,
-      order_id: nil,
-      end: Mon, 31 Aug 2026 23:59:59.999999000 UTC +00:00>]
-    ```
-1. Get a person's contact information
-    ```ruby
-    Person.find_by(last_name: 'Nomo').contacts
-    => 
-    [#<Contact:0x0000ffff80a67220
-      id: 126,
-      address: "123 Fake St",
-      city_id: 5,
-      state_id: 1,
-      zipcode: "95555",
-      phone: "123-456-7890",
-      email: "jorge.conseco@att.net",
-      primary: true,
-      person_id: 126]
-    ```
-1. Lookup the donation history for any given member
-    ```ruby
-    Person.find_by(id: 42).donations
-    ```
-2. Lookup a person's membership renewal history
-    ```ruby
-    Person.find_by(id: 42).memberships
-    ```
-2. Lookup when a person first joined
-    ```ruby
-    Person.find_by(id: 42).memberships.order(start: :asc).first.start
-    => Sat, 21 Sep 2019 00:00:00.000000000 UTC +00:00
-    ```
-1. Lookup when a person's membership expires
-    ```ruby
-    membership = Person.find_by(id: 42).memberships.order(start: :desc).first
-    expiration = membership.start + membership.term_months.months
-    => Mon, 24 Nov 2025 00:00:00.000000000 UTC +00:00
-    ```
-1. Find members whose memberships have lapsed
-    ```ruby
-    # All expired memberships
-    Person.lapsed_members
+# Check membership status
+Person.find_by(last_name: 'Smith').status.name
 
-    # Expired memberships who still have the "member" standing
-    Person.lapsed_members(status: 'member')
-    ```
+# Get all active members
+Person.active_members
+```
+
+#### Run All Tests
+**Task Name:** `Run All Tests`
+
+Runs the complete test suite (models, controllers, system tests).
+
+**What it does:**
+```sh
+docker compose run --rm app bin/rails test:all
+```
+
+**When to use:**
+- Before committing changes
+- After major refactoring
+- To ensure everything works together
+- CI/CD validation locally
+
+**Expected output:**
+- Green dots (.) for passing tests
+- F for failures
+- E for errors
+- Final summary with test count and timing
+
+#### Run Rails Tests
+**Task Name:** `Run Rails Tests`
+
+Runs only unit and integration tests (excludes system tests for faster execution).
+
+**What it does:**
+```sh
+docker compose run --rm app bin/rails test
+```
+
+**When to use:**
+- Quick validation during development
+- Testing models and controllers only
+- Faster feedback loop than full test suite
+
+**Runs:**
+- Model tests (`test/models/`)
+- Controller tests (`test/controllers/`)
+- Helper tests (`test/helpers/`)
+- Mailer tests (`test/mailers/`)
+
+#### Run Single Test File
+**Task Name:** `Run Single Test File`
+
+Runs tests from a specific file. VS Code prompts you to enter the test file path.
+
+**What it does:**
+```sh
+docker compose run --rm app bin/rails test test/models/person_test.rb
+```
+
+**When to use:**
+- Focused testing on specific functionality
+- Debugging a single failing test
+- Iterating on new test cases
+- Faster than running entire suite
+
+**Example paths:**
+- `test/models/person_test.rb`
+- `test/controllers/people_controller_test.rb`
+- `test/system/memberships_test.rb`
+
+**Tip:** You can also run a single test method:
+```sh
+docker compose run --rm app bin/rails test test/models/person_test.rb:42
+```
+(where 42 is the line number of the test method)
+
+#### Run System Tests
+**Task Name:** `Run System Tests`
+
+Runs browser-based integration tests using Capybara and Selenium.
+
+**What it does:**
+```sh
+docker compose run --rm app bin/rails test:system
+```
+
+**When to use:**
+- Testing full user workflows
+- Validating JavaScript interactions
+- End-to-end feature verification
+- Before deploying major UI changes
+
+**Note:** System tests take longer as they start a headless browser for each test.
+
+#### Start Rails Debug Server
+**Task Name:** `Start Rails Debug Server`
+
+Starts the Rails server with remote debugging enabled on port 1234.
+
+**What it does:**
+```sh
+timeout 15 docker container exec sjaa-memberships-app-1 env RUBY_DEBUG_OPEN= bin/rails console
+```
+
+**When to use:**
+- When you need to set breakpoints in your code
+- Step-through debugging of complex logic
+- Inspecting variable state during execution
+
+**After starting:**
+1. Set breakpoints in your code (click in the gutter)
+2. Open Run and Debug view (Cmd+Shift+D / Ctrl+Shift+D)
+3. Select "Attach to Rails (Docker)"
+4. Press F5 to attach the debugger
+
+See [Debugging](#debugging) section for detailed instructions.
+
+#### Update Gemfile.lock
+**Task Name:** `Update Gemfile.lock`
+
+Rebuilds the Docker image and extracts the updated Gemfile.lock after changing gems.
+
+**What it does:**
+```sh
+docker compose build app && \
+docker create --name temp sjaa-memberships-app-1 && \
+docker cp temp:/rails/Gemfile.lock ./ && \
+docker rm temp && \
+docker compose up -d
+```
+
+**When to use:**
+- After adding gems to Gemfile
+- After updating gem versions
+- After removing gems
+
+**Why this is necessary:** The bind mount (`./:/rails`) overlays your local directory onto the container at runtime. The Gemfile.lock updated during build gets replaced by your local version. This task extracts it to keep them in sync.
+
+## Command-Line Tasks
+
+If you prefer working directly with the command line, here are the essential commands:
+
+### Starting and Stopping
+
+```sh
+# Start all services (app + postgres)
+docker compose up
+
+# Start in background
+docker compose up -d
+
+# Stop all services
+docker compose down
+
+# Restart services
+docker compose restart
+```
+
+### Database Operations
+
+```sh
+# Run pending migrations
+docker compose run --rm app bin/rails db:migrate
+
+# Reset database (drop, create, migrate, seed)
+docker compose run --rm app bin/rails db:reset
+
+# Seed database with initial data
+docker compose run --rm app bin/rails db:seed
+
+# Open Rails console
+docker compose run --rm app env RUBY_DEBUG_OPEN= bin/rails console
+
+# Open database console
+docker compose run --rm app bin/rails dbconsole
+```
+
+### Running Tests
+
+```sh
+# All tests
+docker compose run --rm app bin/rails test:all
+
+# Just Rails tests (no system tests)
+docker compose run --rm app bin/rails test
+
+# Model tests only
+docker compose run --rm app bin/rails test test/models/
+
+# Controller tests only
+docker compose run --rm app bin/rails test test/controllers/
+
+# System tests only
+docker compose run --rm app bin/rails test test/system/
+
+# Single test file
+docker compose run --rm app bin/rails test test/models/person_test.rb
+
+# Single test method (by line number)
+docker compose run --rm app bin/rails test test/models/person_test.rb:42
+```
+
+### Background Jobs
+
+```sh
+# Run Calendar Sync Job
+docker compose run --rm app bin/rails runner "CalendarSyncJob.perform_now('vp@sjaa.net')"
+
+# Run Renewal Reminders Job
+docker compose run --rm app bin/rails runner "RenewalRemindersJob.perform_now('enable', '* 1 *')"
+
+# Process queued jobs with custom worker
+docker compose run --rm app bin/rails runner lib/solid_queue_simple_worker.rb
+
+# Process specific queue
+docker compose run --rm app bin/rails runner "lib/solid_queue_simple_worker.rb -q default"
+
+# With debug logging
+docker compose run --rm app bin/rails runner "lib/solid_queue_simple_worker.rb -d"
+
+# Clear all queued jobs
+docker compose run --rm app bin/rails runner "SolidQueue::Job.delete_all"
+
+# Clear only pending jobs
+docker compose run --rm app bin/rails runner "SolidQueue::Job.where(finished_at: nil).delete_all"
+```
+
+### Custom Rake Tasks
+
+```sh
+# Generate fake test data (100 people)
+docker compose run --rm app bin/rails generate_data
+
+# Port data from SJAA database
+docker compose run --rm app bin/rails patch PATCH_FILE=file.csv COMMIT=true
+
+# Compare membership lists
+docker compose run --rm app bin/rails csv_compare CSV1=file1.csv CSV2=file2.csv
+```
+
+### Updating Dependencies
+
+When you update the Gemfile (add/remove/update gems):
+
+```sh
+# 1. Rebuild the Docker image (installs gems, updates Gemfile.lock)
+docker compose build app
+
+# 2. Extract updated Gemfile.lock from image to local filesystem
+docker create --name temp sjaa-memberships-app-1 && \
+docker cp temp:/rails/Gemfile.lock ./ && \
+docker rm temp
+
+# 3. Restart containers with updated configuration
+docker compose up -d
+```
+
+**Or use the VS Code task:** "Update Gemfile.lock" (recommended)
+
+## Debugging
+
+The application supports remote debugging using the `debug` gem with VS Code.
+
+### Starting a Debug Session
+
+**Option 1: VS Code Task (Recommended)**
+1. Run the "Start Rails Debug Server" task
+2. Set breakpoints in your code (click in the gutter)
+3. Open Run and Debug view (Cmd+Shift+D / Ctrl+Shift+D)
+4. Select "Attach to Rails (Docker)"
+5. Press F5 to attach
+```
+
+### Debug Configuration
+
+The debug server runs on `localhost:1234` with these settings:
+- **Remote workspace root:** `/rails`
+- **Local workspace root:** Your project directory
+- **Port:** 1234
+
+### Debugging Commands
+
+Once attached to the debugger:
+- **Step Over** - Execute current line, don't enter functions
+- **Step Into** - Enter function calls
+- **Step Out** - Exit current function
+- **Continue** - Run until next breakpoint
+- **Restart** - Restart the debug session
+
+**In code:** Add `debugger` anywhere to create a breakpoint:
+```ruby
+def some_method
+  debugger  # Execution will pause here
+  # ... rest of method
+end
+```
+
+### VS Code Debug Configurations
+
+Three debug configurations are available in [.vscode/launch.json](.vscode/launch.json):
+
+1. **Attach to Rails (Docker)** - Primary option
+2. **Debug Rails (Docker) - Alternative** - Fallback option
+3. **Connect to rdbg (Docker)** - Direct rdbg connection
+
+### Troubleshooting Debugging
+
+**Problem:** Can't connect to debugger
+- Ensure port 1234 is not in use: `lsof -i :1234`
+- Check Docker logs: `docker compose logs app`
+- Verify debug gem is installed: `docker compose run --rm app gem list debug`
+- Restart containers: `docker compose restart`
+
+**Problem:** Breakpoints not hitting
+- Ensure debug server is running
+- Verify breakpoint is in executed code path
+- Check that source maps are correctly configured
+- Try adding `debugger` statement directly in code
+
+## Common Workflows
+
+### Adding a New Feature
+
+1. **Create a new branch:**
+```sh
+git checkout -b feature/my-new-feature
+```
+
+2. **Make your changes** in your editor
+
+3. **Write tests** for the new functionality
+
+4. **Run tests** using VS Code task "Run All Tests" or:
+```sh
+docker compose run --rm app bin/rails test:all
+```
+
+5. **Test manually** in the browser at https://127.0.0.1:3001
+
+6. **Commit and push:**
+```sh
+git add .
+git commit -m "Add new feature: description"
+git push origin feature/my-new-feature
+```
+
+### Fixing a Bug
+
+1. **Reproduce the bug** in development environment
+
+2. **Write a failing test** that exposes the bug
+
+3. **Use the debugger** to understand what's happening:
+   - Add `debugger` statement where bug occurs
+   - Run "Start Rails Debug Server" task
+   - Attach debugger and step through code
+
+4. **Fix the bug** based on findings
+
+5. **Verify test passes** using "Run All Tests" task
+
+6. **Commit the fix** with descriptive message
+
+### Database Schema Changes
+
+1. **Generate migration:**
+```sh
+docker compose run --rm app bin/rails generate migration AddFieldToPeople field:string
+```
+
+2. **Edit the migration file** in `db/migrate/`
+
+3. **Run the migration:**
+```sh
+docker compose run --rm app bin/rails db:migrate
+```
+
+4. **Update models and tests** to reflect schema changes
+
+5. **Test thoroughly** before committing
+
+### Adding or Updating Gems
+
+1. **Edit Gemfile** to add/update/remove gems
+
+2. **Update Gemfile.lock** using VS Code task "Update Gemfile.lock" or:
+```sh
+docker compose build app && \
+docker create --name temp sjaa-memberships-app-1 && \
+docker cp temp:/rails/Gemfile.lock ./ && \
+docker rm temp && \
+docker compose up -d
+```
+
+3. **Verify application still works**
+
+4. **Run tests** to catch any issues
+
+5. **Commit both Gemfile and Gemfile.lock**
+
+## Best Practices
+
+### Container Management
+
+**Start containers in background:**
+```sh
+docker compose up -d
+```
+
+**Check container logs:**
+```sh
+docker compose logs app      # View all logs
+docker compose logs -f app   # Follow logs in real-time
+```
+
+**Restart after configuration changes:**
+```sh
+docker compose restart
+```
+
+**Clean up unused containers/images:**
+```sh
+docker system prune
+```
+
+### Testing
+
+**Run tests frequently:**
+- Use "Run Rails Tests" task during development (faster)
+- Use "Run All Tests" task before committing
+- Use "Run Single Test File" task when focusing on specific feature
+
+**Write tests first:**
+- Test-driven development helps catch issues early
+- Tests serve as documentation
+- Easier to refactor with good test coverage
+
+**Keep tests fast:**
+- Use fixtures or factories efficiently
+- Minimize database calls in tests
+- Run system tests only when needed
+
+### Database
+
+**Regular backups in development:**
+```sh
+docker compose exec db pg_dump -U postgres sjaa_memberships_development > backup.sql
+```
+
+**Reset when needed:**
+- After major schema changes
+- When test data becomes inconsistent
+- Use VS Code task "Generate Test Data" after reset
+
+**Don't commit .env:**
+- Contains secrets and credentials
+- Already in .gitignore
+- Get from developers for legitimate use
+
+## Troubleshooting
+
+### Port Already in Use
+
+**Problem:** Error about port 3001 or 5432 already in use
+
+**Solution:**
+```sh
+# Find process using port
+lsof -i :3001
+
+# Kill the process (use PID from above)
+kill -9 <PID>
+
+# Or change port in docker-compose.yml
+```
+
+### Database Connection Errors
+
+**Problem:** Can't connect to PostgreSQL database
+
+**Solution:**
+```sh
+# Restart database container
+docker compose restart db
+
+# Check database is running
+docker compose ps
+
+# View database logs
+docker compose logs db
+
+# Recreate database from scratch
+docker compose down -v
+docker compose up -d
+docker compose run --rm app bin/rails db:setup
+```
+
+### Container Won't Start
+
+**Problem:** Docker container fails to start
+
+**Solution:**
+```sh
+# Check logs for errors
+docker compose logs app
+
+# Rebuild from scratch
+docker compose down
+docker compose build --no-cache
+docker compose up
+
+# Ensure Docker Desktop is running
+# Check disk space (Docker needs space for images)
+```
+
+### Tests Failing
+
+**Problem:** Tests that should pass are failing
+
+**Solution:**
+```sh
+# Reset test database
+docker compose run --rm app bin/rails db:test:prepare
+
+# Clear any cached data
+docker compose down -v
+docker compose up -d
+docker compose run --rm app bin/rails db:setup
+
+# Run tests with verbose output
+docker compose run --rm app bin/rails test -v
+```
+
+### Permission Errors
+
+**Problem:** Permission denied errors when running commands
+
+**Solution:**
+- Ensure Docker Desktop has necessary permissions
+- On macOS: System Preferences → Security & Privacy
+- On Linux: Add user to docker group:
+```sh
+sudo usermod -aG docker $USER
+```
+- Log out and back in for changes to take effect
+
+### Browser Certificate Warning
+
+**Problem:** Browser shows security warning at https://127.0.0.1:3001
+
+**Solution:**
+- This is expected with self-signed certificates
+- Safe to click "Advanced" → "Proceed to localhost"
+- Warning doesn't appear in production with valid certificate
+
+### Changes Not Reflecting
+
+**Problem:** Code changes don't appear in running application
+
+**Solution:**
+```sh
+# Restart Rails server
+docker compose restart app
+
+# Or for immediate effect during development, use:
+docker compose down
+docker compose up
+```
+
+**Note:** In development mode, most changes are auto-reloaded. If not:
+- Check for syntax errors in logs
+- Restart may be needed for initializers or routes
+- Clear browser cache for asset changes
+
+## Environment Variables
+
+Key environment variables in `.env` file:
+
+- **Database:** `DATABASE_URL`, `POSTGRES_USER`, `POSTGRES_PASSWORD`
+- **Rails:** `RAILS_ENV`, `SECRET_KEY_BASE`
+- **PayPal:** `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`
+- **Google:** OAuth credentials for Calendar, Groups, Admin Directory
+- **Email:** SMTP settings for Gmail
+
+**Never commit .env to version control.** It contains sensitive credentials.
+
+## Additional Resources
+
+- **CLAUDE.md** - AI assistant instructions and command reference
+- **.vscode/tasks.json** - VS Code task definitions
+- **.vscode/launch.json** - Debugger configurations
+- **docker-compose.yml** - Container orchestration
+- **Dockerfile** - Application container definition
+- **README.md** - Project overview and quick start
+
+## Summary
+
+The development environment is containerized with Docker for consistency and ease of setup. **VS Code tasks provide the recommended workflow** for common operations like running tests, accessing the console, and debugging. For developers who prefer the command line, all tasks can also be run with `docker compose` and `docker container exec` commands.
+
+Key points:
+- Use Docker Desktop for environment management
+- Use VS Code tasks for the best developer experience
+- Run tests frequently during development
+- Use the debugger to understand complex issues
+- Keep containers and database in sync with migrations
+- Follow the documented workflows for common tasks

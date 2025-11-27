@@ -1,0 +1,197 @@
+---
+title: 'Google Group Synchronization'
+description: 'Keeping Google Groups in sync with membership status.'
+icon: 'arrows-rotate'
+---
+
+## Overview
+
+The membership database keeps Google Groups synchronized with current membership status. This ensures that only active members have access to member-only email lists and resources.
+
+The primary use case is maintaining the **members@sjaa.net** Google Group, which serves as the main communication channel for active members.
+
+## How It Works
+
+### Automatic Addition
+
+When members sign up or renew their membership:
+* Their email address is **automatically added** to members@sjaa.net
+* This happens immediately upon successful payment
+* New members receive access to member communications right away
+* No manual intervention required
+
+### Manual Removal
+
+To remove expired members from the Google Group:
+* An administrator must **manually run** the synchronization job
+* This is done periodically (typically monthly or as needed)
+* The sync removes members whose memberships have expired
+* This process is intentionally manual to allow grace periods
+
+## Running the Synchronization
+
+### Prerequisites
+
+1. **Google Authentication**: Administrator must authenticate with Google
+2. **Write Permission**: Requires the `write` permission in the membership database
+3. **Google Workspace Access**: Must have permissions to manage the Google Group
+
+### Step-by-Step Process
+
+1. **Navigate to Google Groups**
+   * Log in to the membership database as an administrator
+   * Go to the Google integration section
+   * Select "Google Groups"
+
+2. **Authenticate with Google**
+   * If not already authenticated, click "Authenticate with Google"
+   * Grant the necessary permissions
+   * You'll be redirected back to the application
+
+3. **Select the Group**
+   * Choose "Members" (members@sjaa.net) from the list
+   * Or select another group with an email address configured
+
+4. **Compute Difference**
+   * Click "Compute Difference"
+   * The system compares:
+     * **Active members** in the database
+     * **Current members** of the Google Group
+   * Shows who will be added and removed
+
+5. **Review Changes**
+   * **People to Add**: Active members not in Google Group
+   * **People to Remove**: Google Group members whose memberships expired
+   * Review the lists carefully before proceeding
+
+6. **Sync the Group**
+   * Choose one of two options:
+     * **Sync (Add and Remove)**: Adds new members AND removes expired members
+     * **Sync (Add Only)**: Adds new members but keeps expired members
+   * Click the appropriate button
+   * Confirm the action
+
+7. **Verify Results**
+   * The system shows how many people were added and removed
+   * Check the results to ensure sync completed successfully
+
+## Synchronization Options
+
+### Add and Remove (Full Sync)
+**When to Use:**
+* Monthly maintenance
+* After membership renewal cycles
+* When cleaning up the group
+
+**What It Does:**
+* Adds active members missing from Google Group
+* Removes expired members from Google Group
+* Brings group into complete alignment with database
+
+**Recommended** for regular maintenance.
+
+### Add Only
+**When to Use:**
+* During grace periods
+* When you want to be more cautious
+* Immediately after a membership drive
+
+**What It Does:**
+* Adds active members missing from Google Group
+* Leaves all existing Google Group members unchanged
+* Does NOT remove expired members
+
+Use when you want to give expired members extra time before removal.
+
+## What Gets Synchronized
+
+### Members@sjaa.net Group
+
+**Added to Group:**
+* All people with **active memberships**
+* Membership must not be expired
+* Email address must be in the database
+
+**Removed from Group:**
+* People whose memberships have **expired**
+* No current active membership
+* Based on membership end date
+
+### Other Groups
+
+The sync system also works with other database groups that have email addresses configured:
+
+**Added to Group:**
+* People assigned to the group in the database
+* If group is "members only": must also have active membership
+
+**Removed from Group:**
+* People not assigned to the group in the database
+* If group is "members only": people with expired memberships
+
+## Best Practices
+
+### Timing
+
+**Run synchronization:**
+* **Monthly**: On or after the 1st of each month (after automatic renewal reminders)
+* **After major events**: Following membership drives or renewal campaigns
+* **Before important communications**: Prior to sending member-only announcements
+* **During grace periods**: Use "Add Only" to avoid immediately removing recently expired members
+
+**Don't run too frequently:**
+* No need to sync daily or weekly
+* Monthly is typically sufficient
+* Automatic additions handle new members immediately
+
+### Grace Periods
+
+Consider giving members a grace period before removing them:
+* Use "Add Only" sync for the first month after expiration
+* After 1-2 months, use full "Add and Remove" sync
+* This allows time for late renewals
+* Provides better member experience
+
+### Communication
+
+Before removing expired members:
+* Ensure renewal reminders have been sent (see [Recurring Tasks](recurring-tasks))
+* Allow sufficient time for members to renew
+* Consider sending a final notification before removal
+
+### Verification
+
+After synchronization:
+* Review the results shown on screen
+* Check that the numbers make sense
+* Spot-check a few members to verify correct status
+* Keep records of sync dates for reference
+
+## Google Groups Management
+
+Beyond synchronization, administrators can:
+* **Import members from CSV**: Add members to groups in bulk (see [Groups](groups))
+* **View group members**: See current Google Group membership
+* **Manage multiple groups**: Sync any group with an email address configured
+
+For groups other than members@sjaa.net:
+1. Create the group in the database with an email address
+2. Assign people to the group
+3. Use the same sync process to maintain the Google Group
+
+## Related Features
+
+* **Automatic Addition**: New members added to groups when they sign up or renew
+* **Renewal Reminders**: Automated emails to members approaching expiration (see [Recurring Tasks](recurring-tasks))
+* **Group Management**: Assigning members to groups in the database (see [Groups](groups))
+* **Membership Reports**: Track membership status and renewals (see [Reports](reports))
+
+## Summary
+
+Google Group synchronization keeps communication channels current by:
+* **Automatically adding** new and renewing members to groups
+* Providing a **manual process** to remove expired members with appropriate grace periods
+* Offering **flexible options** (add-only vs. full sync) for different situations
+* Working with **any group** that has an email address configured
+
+This hybrid approach ensures new members get immediate access while giving administrators control over when expired members are removed, allowing for grace periods and careful communication management.

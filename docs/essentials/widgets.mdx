@@ -1,0 +1,458 @@
+---
+title: 'Embeddable Widgets'
+description: 'Display membership data on your website with widgets.'
+icon: 'window'
+---
+
+## Overview
+
+Widgets are embeddable components that allow you to display membership data on external websites, such as the main SJAA website, Google Sites, or other platforms. These lightweight, self-contained displays automatically update with current information from the membership database.
+
+Widgets are designed to:
+* Display real-time information from the membership database
+* Embed seamlessly into external websites
+* Update automatically without manual intervention
+* Provide a professional, polished appearance
+* Work across different platforms and content management systems
+
+## Available Widgets
+
+### Meetup Events Widget
+
+The Meetup Events widget displays upcoming events from the SJAA Meetup.com page directly on your website.
+
+**Features:**
+* Shows the next 10 upcoming Meetup events
+* Displays event images (if available)
+* Shows event title, date, and time
+* Clickable links to the Meetup.com event page for RSVP
+* Automatically updates as new events are added
+* Shows times in Pacific Time Zone
+* Displays a placeholder message when no events are scheduled
+
+**What's Displayed:**
+* **Event Image**: Photo from Meetup.com (or a moon/stars icon if none)
+* **Event Title**: The name of the event
+* **Date**: Full date in format "Monday, January 15, 2025"
+* **Time**: Start time with timezone (e.g., "7:00 PM PST")
+* **Link**: Direct link to RSVP on Meetup.com
+
+**How It Works:**
+The widget connects to the membership database, which is automatically synchronized with Meetup.com through the Calendar Sync Job (see [Recurring Tasks](recurring-tasks)). When new Meetup events are created or updated, they're automatically reflected in the widget within 24 hours.
+
+## How to Use Widgets
+
+### Embedding on a Website
+
+To embed a widget on your website or Google Site:
+
+#### Step 1: Get the Widget URL
+
+Each widget has a unique URL:
+
+**Meetup Events Widget:**
+```
+https://membership.sjaa.net/widgets/meetup
+```
+
+#### Step 2: Create an Embed Code
+
+Use an iframe to embed the widget:
+
+```html
+<iframe
+  src="https://membership.sjaa.net/widgets/meetup"
+  width="100%"
+  height="600"
+  frameborder="0"
+  scrolling="auto"
+  style="border: none;">
+</iframe>
+```
+
+#### Step 3: Add to Your Website
+
+**For Google Sites:**
+1. Edit the page where you want the widget
+2. Click the "Insert" menu
+3. Select "Embed"
+4. Paste the iframe code
+5. Click "Insert" or "Embed"
+6. Adjust the size as needed
+7. Save the page
+
+**For WordPress:**
+1. Edit the page or post
+2. Add a "Custom HTML" block
+3. Paste the iframe code
+4. Preview to verify appearance
+5. Publish the page
+
+**For Other Platforms:**
+Most modern content management systems support iframe embeds. Look for:
+* "HTML" or "Custom HTML" blocks
+* "Embed" or "iFrame" options
+* "Code" or "Raw HTML" editing modes
+
+### Customizing Widget Appearance
+
+You can customize the widget's display using iframe parameters:
+
+**Width:**
+* Use `width="100%"` to fill the container
+* Use `width="400"` for a fixed pixel width
+* Widgets are responsive and adapt to container width
+
+**Height:**
+* Default: `height="600"` for Meetup widget
+* Adjust based on how many events you expect
+* Each event takes approximately 100-120 pixels
+* Too small causes scrolling; too large leaves empty space
+
+**Border:**
+* `frameborder="0"` removes the default iframe border
+* Use CSS styling on the iframe element for custom borders
+
+**Scrolling:**
+* `scrolling="auto"` shows scrollbar only when needed
+* `scrolling="yes"` always shows scrollbar
+* `scrolling="no"` hides scrollbar (may cut off content)
+
+**Example - Customized Embed:**
+```html
+<iframe
+  src="https://membership.sjaa.net/widgets/meetup"
+  width="400"
+  height="800"
+  frameborder="0"
+  scrolling="auto"
+  style="border: 1px solid #ccc; border-radius: 8px;">
+</iframe>
+```
+
+## Widget Features and Behavior
+
+### Automatic Updates
+
+Widgets automatically reflect current data:
+* **Meetup Events**: Updated daily via the Calendar Sync Job
+* No manual refresh needed - visitors always see current information
+* Changes to event details propagate within 24 hours
+
+### Responsive Design
+
+Widgets are built with responsive design:
+* Adapt to different screen sizes
+* Work on desktop, tablet, and mobile
+* Use modern Bootstrap styling
+* Maintain readability across devices
+
+### Cross-Origin Resource Sharing (CORS)
+
+Widgets are configured to allow embedding from external domains:
+* No special permissions needed to embed
+* Works on any public website
+* Specifically configured for Google Sites
+* Secure and follows web standards
+
+### Accessibility
+
+Widgets are built with accessibility in mind:
+* Semantic HTML structure
+* Appropriate alt text for images
+* Keyboard navigation support
+* Screen reader compatible
+* Proper color contrast
+
+## Meetup Events Widget Details
+
+### Data Source
+
+The Meetup widget displays events from the `MeetupEvent` database table, which is populated by:
+1. The Calendar Sync Job runs daily (see [Recurring Tasks](recurring-tasks))
+2. Job fetches events from SJAA's Meetup.com page
+3. Events are saved to the database with:
+   * Event title
+   * Date and time
+   * Meetup.com URL
+   * Event image (if available)
+   * Unique Meetup ID
+
+### Event Display
+
+Each event in the widget shows:
+
+**Event Image:**
+* Displays the event's featured image from Meetup.com
+* If no image exists, shows a moon and stars icon
+* Images are 80x80 pixels, cropped to fit
+* Rounded corners for visual appeal
+
+**Event Information:**
+* **Title**: Event name (e.g., "General Meeting", "Star Party at Houge Park")
+* **Date**: Full date with day of week
+* **Time**: Start time in Pacific Time (automatically adjusted for PST/PDT)
+* **Timezone**: Shows PST or PDT based on daylight saving time
+
+**Clickable Links:**
+* Entire event card is clickable
+* Opens Meetup.com event page in new tab
+* Allows visitors to RSVP directly on Meetup
+
+### Empty State
+
+When no upcoming events are scheduled:
+* Displays an informational message
+* Shows: "No upcoming Meetup events scheduled"
+* Prevents broken or empty widget appearance
+* Maintains professional look
+
+### Event Ordering
+
+Events are displayed:
+* In chronological order (soonest first)
+* Limited to 10 upcoming events
+* Only shows future events (past events excluded)
+* Automatically removes past events
+
+## Use Cases
+
+### Main Website Integration
+
+**Scenario**: Display upcoming events on the SJAA homepage
+
+**Implementation:**
+1. Add Meetup widget to homepage sidebar
+2. Set width to match sidebar (e.g., 350px)
+3. Set height to show 3-5 events (400-500px)
+4. Visitors see current events without leaving the site
+
+**Benefits:**
+* Increases event visibility
+* Encourages Meetup engagement
+* No manual updates needed
+* Always shows current information
+
+### Google Site Event Page
+
+**Scenario**: Dedicated events page on Google Sites
+
+**Implementation:**
+1. Create a new page titled "Upcoming Events"
+2. Embed Meetup widget at full width
+3. Set height to show all events (800px)
+4. Add introductory text above widget
+
+**Benefits:**
+* Centralized event calendar
+* Easy for members to find events
+* Automatically stays current
+* Professional appearance
+
+### Newsletter or Email
+
+**Scenario**: Link to widget from email newsletter
+
+**Implementation:**
+1. Don't embed iframe in email (poor compatibility)
+2. Instead, link to the widget URL directly
+3. Or create a landing page with the widget
+4. Link to landing page from newsletter
+
+**Benefits:**
+* Always shows current events when clicked
+* No manual updating of email lists
+* One link works indefinitely
+
+## Technical Details
+
+### Widget Architecture
+
+Widgets use a specialized layout:
+* Separate `widget.html.erb` layout
+* Minimal styling for embedding
+* Transparent background
+* No navigation or footer
+* Optimized for iframe display
+
+### Security
+
+Widgets are publicly accessible but secure:
+* No authentication required to view
+* Read-only access to data
+* Cannot modify database
+* CORS headers allow cross-origin embedding
+* Safe for public websites
+
+### Browser Compatibility
+
+Widgets work in all modern browsers:
+* Chrome, Firefox, Safari, Edge
+* Mobile browsers (iOS Safari, Chrome Mobile)
+* Desktop and mobile views
+* Requires JavaScript enabled
+
+### Performance
+
+Widgets are optimized for speed:
+* Minimal database queries
+* Cached event data
+* Small file size
+* Fast loading times
+* No external dependencies except Bootstrap
+
+## Troubleshooting
+
+### Widget Not Displaying
+
+**Possible causes:**
+* Incorrect iframe URL
+* Website blocks iframes
+* JavaScript disabled
+* CORS restrictions
+
+**Solutions:**
+1. Verify the widget URL is correct
+2. Check browser console for errors
+3. Ensure website allows iframe embeds
+4. Test in a different browser
+5. Verify JavaScript is enabled
+
+### Widget Shows Old Events
+
+**Possible causes:**
+* Calendar Sync Job hasn't run
+* Database not updating
+* Caching issue
+
+**Solutions:**
+1. Wait 24 hours for automatic sync
+2. Manually trigger Calendar Sync Job if you have access
+3. Clear browser cache
+4. Check the recurring tasks are running (see [Recurring Tasks](recurring-tasks))
+
+### Widget Size Issues
+
+**Problems:**
+* Too much scrolling
+* Cut-off content
+* Too much empty space
+
+**Solutions:**
+1. Adjust iframe height parameter
+2. For many events: increase height (800-1000px)
+3. For few events: decrease height (400-600px)
+4. Use `scrolling="auto"` to handle varying content
+5. Test on different screen sizes
+
+### Widget Not Updating
+
+**Possible causes:**
+* Browser caching
+* Meetup.com connection issue
+* Sync job not running
+
+**Solutions:**
+1. Hard refresh the page (Ctrl+Shift+R or Cmd+Shift+R)
+2. Clear browser cache
+3. Check that Meetup events exist on Meetup.com
+4. Verify Calendar Sync Job is scheduled (see [Recurring Tasks](recurring-tasks))
+5. Contact administrator to check sync job status
+
+## Future Widget Possibilities
+
+The widget system is designed to be extensible. Potential future widgets could include:
+
+* **Membership Statistics**: Display member count, growth trends
+* **Equipment Availability**: Show available loaner equipment
+* **Recent Donations**: Highlight recent donors (with permission)
+* **Upcoming Renewals**: Reminder for members to renew
+* **Event Calendar**: Full calendar view of all organization events
+* **Photo Gallery**: Recent astrophotography from members
+
+## Best Practices
+
+### Placement
+
+**Good Locations:**
+* Homepage sidebar
+* Dedicated events page
+* Member resources page
+* "Get Involved" section
+
+**Avoid:**
+* Footer (too far down)
+* Cluttered pages
+* Mobile-only pages (may be too small)
+
+### Sizing
+
+**Recommended:**
+* Width: 100% of container or 300-500px fixed
+* Height: 500-800px depending on event count
+* Test on mobile and desktop
+
+**Avoid:**
+* Very narrow widths (< 250px)
+* Very short heights (< 300px)
+* Extremely tall widgets (> 1200px)
+
+### Context
+
+**Provide:**
+* Brief introduction above widget
+* Call to action ("RSVP on Meetup!")
+* Link to full Meetup page as backup
+
+**Avoid:**
+* Widget without explanation
+* Competing event listings
+* Outdated static text about events
+
+### Maintenance
+
+**Remember to:**
+* Periodically check widget display
+* Verify events are updating
+* Test on different browsers
+* Update iframe code if widget URL changes
+
+**Don't:**
+* Hard-code event lists alongside widget
+* Copy event data from widget (use source)
+* Expect instant updates (allow 24 hours)
+
+## Support and Resources
+
+### Getting Help
+
+If you experience issues with widgets:
+1. Check this documentation first
+2. Verify the iframe code is correct
+3. Test in a different browser
+4. Contact the membership database administrator
+5. Report issues on the GitHub repository
+
+### Widget URLs
+
+Current widget endpoints:
+* **Meetup Events**: `/widgets/meetup`
+
+All widgets are hosted at `https://membership.sjaa.net`
+
+### Related Documentation
+
+* [Recurring Tasks](recurring-tasks) - Learn about the Calendar Sync Job
+* [Permissions](permissions) - Understanding access control
+* [Groups](groups) - Organization and member groups
+
+## Summary
+
+Widgets provide an easy way to display live membership data on external websites. The Meetup Events widget keeps your website visitors informed about upcoming events automatically, with no manual updates required. By embedding widgets, you create a seamless experience between the membership database and public-facing websites.
+
+Key benefits:
+* Automatic updates
+* Professional appearance
+* Easy to embed
+* Mobile-friendly
+* No maintenance required

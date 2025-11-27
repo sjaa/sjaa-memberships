@@ -4,29 +4,422 @@ description: 'What equipment exists in our organization, and where!'
 icon: 'telescope'
 ---
 
-This app has the ability to catalog, describe, and search for equipment in use by your organization.  For SJAA, this may
-include, but is not limited to: telescopes, mounts, tripods, cameras, eye pieces, binoculars, projectors, computers, batteries,
-and anything else that is property of the club and worth keeping track of.
+## Overview
 
-Adding equipment requires the "equipment write permission."  Permissions can be assigned by administrators with the `permit` permission.
-Once you have the appropriate permission, navigate to the Equipment page by selecting the "Equipment" link in the menu.  The look and feel
-may change over time, but it will look something like this:
+The equipment tracking system provides comprehensive inventory management for all organizational property. This powerful tool allows you to catalog, search, and track equipment ownership, condition, and location.
+
+For SJAA, this includes (but is not limited to):
+* **Optical Equipment**: Telescopes, binoculars, eyepieces, finderscopes, filters
+* **Mounts and Accessories**: Telescope mounts, tripods, counterweights, adapter rings
+* **Imaging Equipment**: Cameras, autoguiders, filter wheels, field flatteners
+* **Electronics**: Computers, tablets, projectors, batteries, cables, power supplies
+* **Event Equipment**: Tents, tables, chairs, signs, banners
+* **Educational Materials**: Books, star charts, demonstration models
+* **Anything else** that is property of the club and worth keeping track of
+
+## Permissions
+
+Managing equipment requires the **write** permission. Permissions can be assigned by administrators with the `permit` permission. Once you have the appropriate permission, navigate to the Equipment page by selecting "Equipment" from the main menu.
+
+**Permission Levels:**
+* **Read**: View equipment inventory and search
+* **Write**: Add, edit, and delete equipment entries
+* **Permit**: Assign equipment management permissions to others
+
+## Equipment Page Overview
+
+The Equipment page provides a search interface at the top and a list of equipment below. The page updates dynamically as you search and filter.
 
 <img
   className="block dark:hidden"
   src="/images/equipment-page.png"
-  alt="Hero Light"
+  alt="Equipment inventory page"
 />
 
-On this page you can search for equipment using the filters at the top.  Below, the equipment matching those filters is populated.  You 
-can create a new Equipment entry by clicking on the "New Equipment" button. Equipment has the following properties:
+## Understanding Equipment vs. Instruments
 
-* A [Person](people) "owner."  This represents the person who physically has the equipment or is otherwise responsible for it.
-* A [Role](roles) "owner."  This represents the group or program that the equipment belongs to.  For example, a camera my belong to the Hands-On Imaging Program (a potential Role).
-* An instrument.  A single Instrument "has many" Equipment.  That is, the club may have two pairs of Orion 80mm binoculars, which would be the same instrument, but two different pieces of equipment.
-  * The instrument has a "Kind," which describes what type of object it is.  i.e. Telescope or Eyepiece
-  * The instrument also has a "Model," which describes the brand and specifics of the instrument.  i.e. "Meade LX500"
-* A note.  The note is used to describe anything interesting about the equipment, like its condition or location.
-* Images.  A picture is worth a thousand words, so each equipment record can have many images associated with it.
-* Tags.  Tags help to group like items together.  For example, if different equipment is part of a set, then they could be tagged with the name of the set.  Equipment can have many tags, and they are searchable.
+The system uses a two-level structure to efficiently track equipment:
 
+### Instruments
+An **instrument** is a type or model of equipment. It represents the general category and specifications:
+* **Kind**: The category of equipment (e.g., "Telescope", "Eyepiece", "Camera")
+* **Model**: The brand and specific model (e.g., "Meade LX500", "Orion 80mm Binoculars")
+
+Think of an instrument as the "what" - what type of item it is.
+
+### Equipment
+An **equipment** record represents a specific physical item. Multiple equipment records can share the same instrument:
+* If you have two identical Orion 80mm binoculars, they're the **same instrument** but **two different equipment** entries
+* Each equipment entry tracks the specific item's owner, condition, location, and images
+
+Think of equipment as the "which one" - which specific instance of that instrument.
+
+**Example:**
+```
+Instrument: Telescope / Celestron NexStar 8SE
+  └─ Equipment #1: Owned by John Smith, located at site A, excellent condition
+  └─ Equipment #2: Owned by Imaging Program, located at site B, needs cleaning
+```
+
+This structure allows you to:
+* Track multiple identical items separately
+* Search for all equipment of a particular type
+* Avoid re-entering instrument specifications for each item
+
+## Creating Equipment Entries
+
+### Step-by-Step Process
+
+1. **Click "New Equipment"** on the Equipment page
+
+2. **Define the Instrument**
+   * **Kind**: Select or enter the equipment category
+     * Examples: Telescope, Mount, Camera, Eyepiece, Binoculars, Tripod, Battery
+     * The system auto-suggests existing kinds as you type
+   * **Model**: Enter the brand and model name
+     * Examples: "Celestron C8", "Orion SkyQuest XT10", "Canon EOS 6D"
+     * Be specific to help identify the exact equipment type
+
+3. **Assign Ownership**
+
+   Equipment can have two types of owners (both optional):
+
+   * **Person Owner**: The individual who physically possesses or is responsible for the equipment
+     * Select from the dropdown of all members
+     * Use this for equipment loaned to members
+     * The person can see this equipment in their profile
+
+   * **Group Owner**: The program, committee, or organizational unit that owns the equipment
+     * Select from the dropdown of all groups
+     * Examples: "Imaging Program", "School Outreach", "Star Party Team"
+     * Use this for equipment that belongs to a program rather than an individual
+
+   * **Both**: Equipment can have both a person and group owner
+     * Example: An Imaging Program camera currently checked out to Jane Doe
+
+   * **Neither**: Equipment with no owner is tracked as general club property
+
+4. **Add Description**
+   * **Note**: Enter any relevant information about this specific item
+     * Condition: "Excellent", "Good", "Needs repair", "Minor scratches on tube"
+     * Location: "Stored in cabinet A", "At Houge Park site"
+     * Serial number: "SN: 12345678"
+     * Accessories included: "Includes hard case and foam inserts"
+     * Usage restrictions: "For advanced users only"
+     * Maintenance history: "Collimated 11/2024", "Cleaned mirrors 06/2024"
+
+5. **Upload Images**
+   * Click the image upload field
+   * Select one or more image files (JPEG, PNG, etc.)
+   * Multiple images can be attached to document:
+     * Overall condition
+     * Close-up details
+     * Damage or wear
+     * Included accessories
+     * Setup or configuration
+   * Images are automatically resized for optimal storage
+   * Thumbnails are generated for quick viewing
+
+6. **Add Tags**
+   * Tags help organize and group equipment
+   * Enter multiple tags to make equipment easier to find
+   * Tag examples:
+     * **By set**: "Loaner Kit #1", "School Outreach Set"
+     * **By condition**: "Needs Repair", "Excellent Condition"
+     * **By location**: "Storage Unit A", "Houge Park"
+     * **By use case**: "Beginner Friendly", "Advanced", "Solar Safe"
+     * **By availability**: "Available for Loan", "Display Only"
+   * Tags are searchable and filterable
+   * Equipment can have multiple tags
+
+7. **Save**
+   * Click "Create Equipment" to save the entry
+   * The equipment appears in the inventory list
+   * You can edit it at any time
+
+## Searching and Filtering Equipment
+
+The Equipment page provides powerful search capabilities:
+
+### Filter by Person Owner
+* Select a person from the dropdown
+* Shows all equipment owned or checked out to that person
+* Useful for:
+  * Tracking what equipment is loaned out
+  * Finding all items a specific member has
+  * Inventory audits per person
+
+### Filter by Group Owner
+* Select a group from the dropdown
+* Shows all equipment owned by that program or committee
+* Useful for:
+  * Program-specific inventory (e.g., all Imaging Program gear)
+  * Budget tracking per committee
+  * Equipment allocation across programs
+
+### Filter by Instrument Kind
+* Select a kind from the dropdown (e.g., "Telescope", "Camera")
+* Shows all equipment of that type
+* The dropdown includes all kinds currently in the database
+* Useful for:
+  * Finding all telescopes
+  * Counting equipment by category
+  * Category-specific inventory checks
+
+### Filter by Tags
+* Select one or more tags
+* Choose "And" or "Or" operation:
+  * **And**: Equipment must have ALL selected tags
+  * **Or**: Equipment must have ANY selected tags
+* Useful for:
+  * Finding equipment in a specific set
+  * Filtering by condition or availability
+  * Location-based searches
+
+### Combining Filters
+* All filters work together
+* Example: Find all telescopes owned by the Star Party Team that are tagged "Available for Loan"
+* Clear filters by refreshing the page or selecting empty values
+
+## Viewing Equipment Details
+
+Click on any equipment entry to see its detailed page:
+
+### Equipment Detail Page Components
+
+**Header:**
+* **Model name**: Large heading showing the instrument model
+* **Kind**: In parentheses next to the model (e.g., "Telescope", "Camera")
+* **Action buttons**: Edit, Delete, Back to list
+
+**Equipment Information:**
+* **Owners**: Links to person and/or group owners
+* **Notes**: Full description and condition notes
+* **Tags**: All tags applied to this equipment
+* **Donation Information**: If donated, shows donation value and history
+
+**Image Gallery:**
+* All uploaded images displayed as thumbnails
+* Click any thumbnail to view full-size image in a lightbox modal
+* Zoom in to see details
+* Navigate between images in the lightbox
+
+**Related Information:**
+* **Donation History**: If this equipment was donated, links to donation records
+* **Other Equipment**: Links to other equipment using the same instrument
+
+## Equipment Images
+
+The image system provides rich visual documentation:
+
+### Uploading Images
+* **Formats Supported**: JPEG, PNG, GIF, and other common image formats
+* **Multiple Images**: Upload as many images as needed
+* **Automatic Processing**: Images are automatically resized and optimized
+* **Thumbnails**: Preview thumbnails generated automatically
+
+### Image Gallery Features
+* **Thumbnail View**: All images shown as small thumbnails on equipment page
+* **Lightbox Modal**: Click thumbnail to view full-size image
+* **Zoom In**: Full-size images allow inspection of details
+* **Navigation**: Navigate between images using modal controls
+* **Responsive**: Images scale to fit different screen sizes
+
+### Best Practices for Equipment Photography
+* **Overall shot**: Include one photo showing the entire item
+* **Detail shots**: Close-ups of important features, labels, or damage
+* **Serial numbers**: Photograph serial number plates for records
+* **Accessories**: Show included cases, cables, or accessories
+* **Condition issues**: Document any scratches, dents, or wear
+* **Proper lighting**: Use good lighting for clear, accurate photos
+* **Size reference**: Include a ruler or common object for scale if helpful
+
+## Managing Equipment Ownership
+
+### Assigning to a Person
+When equipment is assigned to a person:
+* The equipment appears in their profile
+* They can see it in their "Equipment" section
+* Useful for tracking loaned equipment
+* Helps members remember what they have
+
+### Assigning to a Group
+When equipment is assigned to a group:
+* The equipment appears on the group's detail page
+* Helps track program budgets and assets
+* Useful for organizational inventory
+* See [Groups](groups) for more information about groups
+
+### Transferring Ownership
+To transfer equipment from one person/group to another:
+1. Click "Edit" on the equipment detail page
+2. Change the person or group owner
+3. Save the changes
+4. The equipment now appears under the new owner
+
+### Equipment Without Owners
+Equipment with no assigned owner:
+* Represents general club property
+* Available in the pool for assignment
+* Stored at the club's main location
+* Can be searched and viewed like any equipment
+
+## Tags and Organization
+
+### Creating Tags
+Tags are created automatically when you enter them on equipment:
+* Enter a new tag name when editing equipment
+* The system creates the tag if it doesn't exist
+* Tags are reusable across all equipment
+
+### Tag Strategies
+
+**By Collection/Set:**
+```
+"Loaner Set #1"
+"Beginner Telescope Kit"
+"School Outreach Bundle"
+```
+
+**By Location:**
+```
+"Storage Cabinet A"
+"Houge Park Site"
+"Observatory"
+"Transport Case #3"
+```
+
+**By Condition:**
+```
+"Excellent Condition"
+"Needs Cleaning"
+"Repair Required"
+"Calibration Due"
+```
+
+**By Availability:**
+```
+"Available for Loan"
+"Display Only"
+"Staff Use Only"
+"Event Equipment"
+```
+
+**By Purpose:**
+```
+"Solar Viewing"
+"Deep Sky"
+"Planetary"
+"Astrophotography"
+"Education"
+```
+
+## Equipment and Donations
+
+Equipment that has been donated to the organization is tracked with donation records:
+
+### Viewing Donation Information
+On the equipment detail page:
+* **Donation summary** appears if the equipment was donated
+* Shows total donation value
+* Links to detailed donation records
+
+### Donated Equipment Workflow
+1. Equipment is donated (recorded in [Donations](donations))
+2. Donation record links to equipment entry
+3. Equipment entry shows donation history
+4. Full audit trail maintained
+
+This integration allows you to:
+* Thank donors appropriately
+* Track donation value for tax purposes
+* Maintain provenance of equipment
+* Generate donation reports
+
+See [Donations](donations) for more information about tracking donations.
+
+## Use Cases and Examples
+
+### Scenario 1: Loaner Telescope Program
+**Situation**: Club maintains 5 beginner telescopes for members to borrow
+
+**Setup:**
+1. Create instrument: Telescope / Orion StarBlast 6
+2. Create 5 equipment entries for the 5 physical telescopes
+3. Tag each: "Available for Loan", "Beginner Friendly"
+4. Add photos of each telescope
+5. Note condition and serial number for each
+
+**When Loaned:**
+1. Edit equipment entry
+2. Assign to person borrowing it
+3. Add note: "Loaned to [name] on [date]"
+
+**When Returned:**
+1. Edit equipment entry
+2. Remove person owner
+3. Update condition notes if needed
+
+### Scenario 2: Imaging Program Equipment
+**Situation**: Imaging program owns multiple cameras and accessories
+
+**Setup:**
+1. Create group: "Imaging Program"
+2. For each item:
+   * Create instrument (Camera / Canon EOS 6D, etc.)
+   * Create equipment entry
+   * Assign group owner: "Imaging Program"
+   * Tag: "Imaging Program", "Available for Events"
+   * Upload photos
+
+**Searching:**
+* Filter by group: "Imaging Program"
+* See all program equipment at once
+* Track program assets for budget planning
+
+### Scenario 3: School Outreach Kits
+**Situation**: Multiple complete kits for school visits
+
+**Setup:**
+1. Tag all equipment in kit #1: "School Kit #1"
+2. Tag all equipment in kit #2: "School Kit #2"
+3. Each kit contains:
+   * Telescope (with photos)
+   * Eyepieces (with photos)
+   * Star charts
+   * Demonstration models
+
+**Before Event:**
+* Search by tag: "School Kit #1"
+* Verify all items present
+* Check condition notes
+* Assign to person leading the event
+
+**After Event:**
+* Update condition notes
+* Remove person assignment
+* Note any damage or missing items
+
+## Database Representation
+
+An equipment record contains:
+
+* An internal `id`
+* A reference to an **instrument** (kind + model)
+* An optional **person owner** (foreign key to people table)
+* An optional **group owner** (foreign key to groups table)
+* A `note` field for condition, location, and other details
+* Zero or more **images** (via Active Storage attachments)
+* Zero or more **tags** (many-to-many relationship)
+* Zero or more **donation items** linking to donation records
+
+An instrument record contains:
+
+* An internal `id`
+* A `kind` (equipment category)
+* A `model` (brand and model name)
+* Relationships to all equipment using this instrument
+
+This structure allows efficient searching, prevents duplicate instrument data, and maintains clear ownership and organization.
+
+See [the database page](/development/database) for more information.
