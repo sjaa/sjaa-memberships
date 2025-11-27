@@ -1,0 +1,284 @@
+---
+title: 'Recurring Tasks'
+description: 'Automated background jobs that run on a schedule.'
+icon: 'clock'
+---
+
+## Overview
+
+The membership management application uses automated background jobs to perform recurring tasks without manual intervention. These jobs run on a schedule using Heroku Scheduler and Solid Queue (the Rails job processing system). This ensures critical operations like sending renewal reminders and synchronizing calendars happen automatically.
+
+Understanding these recurring tasks helps administrators monitor the system's health and troubleshoot any issues that might arise.
+
+## Job Processing System
+
+The application uses **Solid Queue** for background job processing. Jobs are queued and then processed by workers that run on a schedule or continuously.
+
+### How It Works
+
+1. **Job Queueing**: When a job needs to run, it's added to the Solid Queue database
+2. **Worker Processing**: A worker process picks up jobs from the queue and executes them
+3. **Scheduling**: Heroku Scheduler triggers jobs at specified times
+4. **Monitoring**: Jobs are tracked in the database with status information
+
+## Scheduled Jobs
+
+### 1. Background Job Worker
+
+**Command:**
+```bash
+bin/rails runner lib/solid_queue_simple_worker.rb -d
+```
+
+**Schedule:** Hourly (every hour at :00 minutes)
+
+**Purpose:**
+Processes any jobs that have been queued for background execution. This worker:
+* Checks the job queue every hour
+* Executes any pending jobs
+* Automatically stops when the queue is empty
+* Runs with debug logging enabled (`-d` flag)
+
+**What It Does:**
+* Processes queued calendar sync jobs
+* Processes queued group import jobs
+* Handles any other background tasks that have been queued
+
+**How It Works:**
+The worker uses Solid Queue's built-in dispatcher and worker to:
+1. Start a dispatcher thread to handle scheduled jobs
+2. Start a worker thread to process ready jobs
+3. Monitor the queue and auto-stop when no jobs remain
+4. Process jobs in batches for efficiency
+
+**Technical Details:**
+* Polls the queue every 1 second by default
+* Processes up to 10 jobs per batch
+* Automatically handles SIGTERM and SIGINT signals for graceful shutdown
+* Logs detailed information about job processing
+
+### 2. Renewal Reminder Emails
+
+**Command:**
+```bash
+bin/rails runner "RenewalRemindersJob.perform_now('enable', '* 1 *')"
+```
+
+**Schedule:** Daily at 12:00 AM UTC (4:00 PM or 5:00 PM Pacific, depending on DST)
+
+**Purpose:**
+Automatically sends renewal reminder emails to members whose memberships are expiring or have recently expired.
+
+**What It Does:**
+* Identifies members eligible for renewal reminders (those whose memberships expired in the last 3 months or will expire in the next 2 months)
+* Sends personalized renewal reminder emails to each eligible member
+* Rate-limits email sending (1 second delay between emails) to avoid overwhelming the mail server
+* Only runs on the 1st day of each month (based on the schedule pattern `* 1 *`)
+
+**Schedule Pattern Explained:**
+The pattern `* 1 *` means:
+* First `*`: Any month
+* `1`: Day 1 of the month
+* Third `*`: Any hour
+
+The job runs daily, but only actually sends emails on the 1st of the month at midnight UTC.
+
+**Email Content:**
+Each reminder email includes:
+* Personalized greeting with member's name
+* Current membership status
+* Membership expiration date
+* Direct link to renew online
+* Information about membership benefits
+* Contact information for questions
+
+**Rate Limiting:**
+To be a good email citizen, the job includes a 1-second sleep between each email sent. This prevents triggering spam filters and being too aggressive with the mail server.
+
+### 3. Calendar Synchronization
+
+**Command:**
+```bash
+bin/rails runner "CalendarSyncJob.perform_now('vp@sjaa.net', nil, 60, true)"
+```
+
+**Schedule:** Daily at 2:00 AM UTC (6:00 PM or 7:00 PM Pacific, depending on DST)
+
+**Purpose:**
+Synchronizes events from multiple sources (Google Calendars, Meetup.com) to the SJAA All Events calendar.
+
+**What It Does:**
+* Fetches events from configured calendar sources for the next 60 days
+* Creates new events in the SJAA All Events Google Calendar
+* Updates existing events that have changed
+* Marks cancelled events with a `[CANCELLED]` prefix
+* Saves Meetup events to the database for widget display
+* Generates a detailed sync report
+
+**Parameters Explained:**
+* `'vp@sjaa.net'`: Admin email address with Google Calendar API access
+* `nil`: Calendar ID (uses environment variable `SJAA_MERGED_CALENDAR_ID`)
+* `60`: Number of days to sync (60 days / ~2 months)
+* `true`: Commit mode (actually make changes; `false` would be a dry-run)
+
+**Event Sources:**
+The job aggregates events from:
+* **SJAA 2025 All Events Calendar**: Primary SJAA Google Calendar
+* **SJAA Aggregate Calendar**: Secondary calendar feed
+* **SJAA Meetup Events**: Events from the SJAA Meetup.com page
+* **Moon Phases**: Astronomical moon phase events
+
+**Sync Process:**
+1. **Fetch**: Retrieves events from all sources for the specified date range
+2. **Deduplicate**: Combines duplicate events from multiple sources
+3. **Match**: Checks if each event already exists in the target calendar
+4. **Sync**: Creates, updates, or marks events as cancelled as needed
+5. **Save Meetup Data**: Stores Meetup events in the database for display on the website
+
+**Event Matching:**
+The job intelligently matches events by:
+* Checking the event's direct ID
+* Checking all source event IDs
+* Handling events that have been merged from multiple sources
+
+**Cancellation Handling:**
+If an event is cancelled at the source:
+* The job finds the existing event in Google Calendar
+* Updates the title to include `[CANCELLED]` prefix
+* Keeps the event visible so members are aware of the cancellation
+
+**Sync Report:**
+After each run, the job generates a detailed report showing:
+* Total events processed
+* Number of events created
+* Number of events updated
+* Number of events marked as cancelled
+* Any errors encountered
+* Details for each action (with event titles, dates, and locations)
+
+**Meetup Integration:**
+Meetup events are also saved to the database (`MeetupEvent` model) to power:
+* Meetup event widgets on the SJAA website
+* Direct links to RSVP on Meetup.com
+* Display of event images and attendance counts
+
+## Monitoring Jobs
+
+### Viewing Job Status
+
+Jobs can be monitored through:
+* **Heroku Dashboard**: View scheduler run history and next scheduled times
+* **Rails Console**: Query the Solid Queue database for job status
+* **Application Logs**: Review detailed execution logs
+
+### Checking Pending Jobs
+
+To see what jobs are queued:
+
+```bash
+docker compose run --rm app bin/rails runner "puts SolidQueue::Job.where(finished_at: nil).count"
+```
+
+### Viewing Recent Job History
+
+To see recently completed jobs:
+
+```bash
+docker compose run --rm app bin/rails runner "puts SolidQueue::Job.order(created_at: :desc).limit(10).pluck(:job_class, :finished_at, :created_at)"
+```
+
+### Clearing Stale Jobs
+
+If jobs get stuck, you can clear them:
+
+```bash
+# Clear ALL pending jobs (use with caution)
+docker compose run --rm app bin/rails runner "SolidQueue::Job.where(finished_at: nil).delete_all"
+```
+
+## Manual Job Execution
+
+You can manually trigger any of these jobs for testing or troubleshooting:
+
+### Manual Renewal Reminders
+
+```bash
+# Send reminders regardless of schedule
+docker compose run --rm app bin/rails runner "RenewalRemindersJob.perform_now('enable', '*')"
+```
+
+### Manual Calendar Sync (Dry Run)
+
+```bash
+# Preview what would happen without making changes
+docker compose run --rm app bin/rails runner "CalendarSyncJob.perform_now('your-email@sjaa.net', nil, 60, false)"
+```
+
+### Manual Calendar Sync (Live)
+
+```bash
+# Actually sync events
+docker compose run --rm app bin/rails runner "CalendarSyncJob.perform_now('your-email@sjaa.net', nil, 60, true)"
+```
+
+### Process Background Queue
+
+```bash
+# Manually process any queued jobs
+docker compose run --rm app bin/rails runner lib/solid_queue_simple_worker.rb -d
+```
+
+## Troubleshooting
+
+### Jobs Not Running
+
+If scheduled jobs aren't running:
+1. Check Heroku Scheduler is enabled and active
+2. Verify scheduler commands are correct
+3. Check application logs for errors
+4. Ensure required environment variables are set
+
+### Calendar Sync Failing
+
+Common issues with calendar sync:
+* **Invalid Admin Email**: Ensure the admin email exists and has a valid Google refresh token
+* **Missing API Key**: Check `SJAA_GOOGLE_API_KEY` environment variable is set
+* **Calendar Permissions**: Verify the admin has write access to the target calendar
+* **Rate Limiting**: Google APIs have rate limits; large syncs may need batching
+
+### Renewal Reminders Not Sending
+
+If reminders aren't being sent:
+* Check that members are actually eligible (expired in last 3 months or expiring in next 2 months)
+* Verify SMTP configuration is correct
+* Check member email addresses are valid
+* Review application logs for email sending errors
+* Verify schedule pattern matches the current date
+
+### Worker Not Processing Jobs
+
+If the worker isn't processing queued jobs:
+* Check the Heroku scheduler entry is active
+* Verify Solid Queue tables exist in the database
+* Check for database connectivity issues
+* Look for worker crash logs
+* Ensure queue names match between job queueing and worker configuration
+
+## Best Practices
+
+1. **Monitor Regularly**: Check Heroku Scheduler dashboard weekly to ensure jobs are running
+2. **Review Logs**: Periodically review job execution logs for errors or warnings
+3. **Test Changes**: Always use dry-run mode when testing calendar sync changes
+4. **Backup First**: Before clearing jobs, understand what's in the queue
+5. **Rate Limits**: Be mindful of email and API rate limits when manually triggering jobs
+6. **Timezone Awareness**: Remember scheduler times are in UTC; convert to Pacific for local reference
+7. **Alert on Failures**: Set up monitoring alerts for job failures in production
+
+## Environment Variables Required
+
+These jobs depend on the following environment variables being set:
+
+* `SJAA_MERGED_CALENDAR_ID`: Target Google Calendar ID for calendar sync
+* `SJAA_GOOGLE_API_KEY`: Google API key for calendar access
+* SMTP configuration for sending renewal emails
+* Google OAuth credentials for calendar API access

@@ -3,3 +3,235 @@ title: 'Reports'
 description: 'Useful summaries of SJAA data.'
 icon: 'newspaper'
 ---
+
+## Overview
+
+The reporting system provides administrators with powerful tools to analyze membership trends, track renewals, and generate mailing lists. These reports help with membership outreach, financial tracking, and organizational planning.
+
+Accessing reports requires the "read" permission. Some report actions (like sending emails or creating Google Groups) require the "write" permission. Permissions can be assigned by administrators with the `permit` permission.
+
+## Available Reports
+
+### Ephemeris Mailing List
+
+The Ephemeris report generates a mailing list of all members who have opted in to receive a printed copy of the organization's newsletter, The Ephemeris.
+
+**Features:**
+* Lists all members who selected the printed Ephemeris option during signup or renewal
+* Displays member names and mailing addresses
+* Includes city, state, and zip code information
+* Can be exported to CSV for mail merge or label printing
+
+**Use Cases:**
+* Generate labels for mailing printed newsletters
+* Calculate postage costs
+* Verify member mailing addresses
+* Share with newsletter printing vendor
+
+**How to Use:**
+1. Navigate to Reports → Ephemeris Mailing List
+2. Review the list of subscribers
+3. Click "Download CSV" to export for mail merge
+4. Use the CSV with your label printing software
+
+**CSV Format:**
+The exported CSV includes these columns:
+* First Name
+* Last Name
+* Address
+* City
+* State
+* Zip
+
+### Renewal Reminders
+
+The Renewal Reminders report identifies members whose memberships have recently expired or are about to expire, making it easy to send timely renewal notifications.
+
+**Features:**
+* Shows members whose memberships expired in the last 3 months
+* Shows members whose memberships will expire in the next 2 months
+* Displays membership start date, end date, and term length
+* Includes member contact information and current status
+* Can send batch renewal reminder emails
+* Can be exported to CSV
+
+**How to Use:**
+1. Navigate to Reports → Renewal Reminders
+2. Review the list of members eligible for renewal reminders
+3. Optionally export to CSV for further analysis
+4. Click "Send Renewal Reminders" to email all listed members
+5. Confirm the action (shows how many members will be emailed)
+
+**Email Content:**
+The renewal reminder email includes:
+* Personalized greeting with member's name
+* Current membership status and expiration date
+* Link to renew online
+* Information about membership benefits
+* Contact information for questions
+
+**Best Practices:**
+* Send reminders monthly to catch members before their renewal lapses
+* Review the list before sending to avoid duplicate notifications
+* Export to CSV to track renewal trends over time
+
+### Membership Report
+
+The Membership Report provides comprehensive statistics about membership changes over any date range, including new memberships, renewals, lapses, and financial data.
+
+**Features:**
+* Customizable date range (defaults to current month)
+* Shows total membership count at start and end of period
+* Lists all new memberships gained during the period
+* Lists all memberships lost (expired without renewal)
+* Distinguishes between brand new members and returning members
+* Tracks donation amounts
+* Shows first membership date for each member
+* Can filter to show only brand new members (no previous membership)
+* Export sections to CSV
+* Create Google Groups from report sections
+
+**Report Sections:**
+
+#### Summary Statistics
+* Beginning total membership count
+* Ending total membership count
+* Net change in membership
+
+#### Memberships Gained
+Shows all memberships that started during the selected date range.
+
+**Columns:**
+* Name (linked to member profile)
+* Membership start date
+* Membership end date
+* Donation amount (if any)
+* Previous membership end date (or "New Member")
+* First membership date ever
+
+**Summary Totals:**
+* Total new memberships
+* Number of brand new members (first time joining)
+* Number of renewals (returning members)
+* Total donation amount
+
+#### Memberships Lost
+Shows all memberships that expired during the selected date range without being renewed.
+
+**Columns:**
+* Name (linked to member profile)
+* Membership start date
+* Membership end date
+* First membership date ever
+
+**How to Use:**
+
+1. Navigate to Reports → Membership Report
+2. Select a date range using the date pickers
+3. Optionally check "Show only brand new members" to filter
+4. Click "Generate Report"
+5. Review the statistics and member lists
+6. Use the action buttons to:
+   * Download CSV for either gained or lost members
+   * Create a Google Group from either section
+
+**Creating Google Groups:**
+
+The Membership Report includes powerful integration with Google Workspace, allowing you to create email groups directly from report data.
+
+To create a Google Group from a report section:
+
+1. Click "Create Group" next to either "Memberships Gained" or "Memberships Lost"
+2. Enter a group name (e.g., "new-members-january-2025")
+3. Click "Create Group"
+
+The system will:
+* Create a new Google Group with the name you specified plus @sjaa.net
+* Add all members from the selected section to the group
+* Configure the group to allow only managers to post
+* Add you as a manager of the group
+* Report success or any errors
+
+This is useful for:
+* Sending targeted announcements to new members
+* Following up with members who didn't renew
+* Creating cohorts for orientation sessions
+* Tracking member engagement over time
+
+**Filtering Options:**
+
+**All Members (default):**
+Shows all membership activity including new members and renewals
+
+**Brand New Members Only:**
+When enabled, filters to show only members with no previous membership history. This is useful for:
+* Planning new member orientations
+* Analyzing member acquisition trends
+* Creating welcome campaigns specifically for first-time members
+
+**Use Cases:**
+
+**Monthly Board Reports:**
+* Set date range to previous month
+* Export statistics for board presentation
+* Track membership growth trends
+
+**Quarterly Analysis:**
+* Set date range to last quarter
+* Compare new vs. lost memberships
+* Identify retention issues
+
+**New Member Outreach:**
+* Filter to brand new members only
+* Create a Google Group for orientation invitations
+* Track conversion from first membership to renewal
+
+**Financial Tracking:**
+* Review donation amounts
+* Compare membership revenue month over month
+* Identify high-value donors
+
+**CSV Export:**
+
+Both "Memberships Gained" and "Memberships Lost" sections can be exported to CSV.
+
+**Memberships Gained CSV includes:**
+* First Name
+* Last Name
+* Email
+
+**Memberships Lost CSV includes:**
+* First Name
+* Last Name
+* Email
+
+These CSVs are perfect for:
+* Importing into email marketing tools
+* Creating custom reports in spreadsheet software
+* Sharing with board members or committees
+* Archiving historical membership data
+
+## Report Permissions
+
+Different report actions require different permission levels:
+
+**Read Permission (required for all reports):**
+* View Ephemeris Mailing List
+* View Renewal Reminders
+* View Membership Report
+* Export any report to CSV
+
+**Write Permission (required for these actions):**
+* Send renewal reminder emails
+* Create Google Groups from membership reports
+* Import members to Google Groups
+
+## Best Practices
+
+1. **Regular Monitoring**: Review the Renewal Reminders report monthly to maintain consistent member communication
+2. **Date Range Selection**: Use meaningful date ranges for the Membership Report (monthly, quarterly, annually)
+3. **CSV Exports**: Archive CSV exports for historical tracking and year-over-year comparisons
+4. **Google Groups**: Use descriptive names for Google Groups (include dates or cohort identifiers)
+5. **Verify Before Sending**: Always review member lists before sending batch emails
+6. **Privacy**: Treat exported member data with appropriate confidentiality
+7. **Backup Data**: Regularly export and backup critical membership statistics

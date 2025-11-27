@@ -1,0 +1,173 @@
+---
+title: 'Groups'
+description: 'Different functions and groups within SJAA.'
+icon: 'badge'
+---
+
+## Overview
+
+Groups are organizational units that allow you to categorize and manage collections of members. They provide a flexible way to track membership in committees, special interest groups, programs, or any other organizational subdivision. Groups can also be synchronized with external systems like Google Groups and Discord.
+
+Managing groups requires the "write" permission. Permissions can be assigned by administrators with the `permit` permission. Once you have the appropriate permission, navigate to the Groups page by selecting the "Groups" link in the menu.
+
+## What Are Groups?
+
+A group represents any collection of people within your organization. Common examples include:
+
+* **Leadership roles**: Board of Directors, Officers, Committee Chairs
+* **Programs**: Star Parties, Imaging Programs, School Outreach
+* **Special interests**: Astrophotography, Deep Sky Observers, Solar System
+* **Communication channels**: Email lists, Discord channels
+* **Operational teams**: Volunteers, Event Coordinators, Newsletter Contributors
+
+Each person can belong to multiple groups, and groups can have any number of members.
+
+## Group Properties
+
+Each group in the system has the following attributes:
+
+### Name
+The full descriptive name of the group (e.g., "Board of Directors", "Astrophotography Interest Group")
+
+### Short Name
+An abbreviated version for display purposes (e.g., "Board", "AP Group")
+
+### Email Address
+The associated email address for the group, typically a Google Group email (e.g., "board@sjaa.net"). This field:
+* Links the database group to a corresponding Google Group
+* Enables CSV import functionality to sync members to Google Groups
+* Appears in group listings and reports
+
+### Discord ID
+The Discord channel or role identifier if the group corresponds to a Discord community. This allows tracking which members have access to specific Discord channels.
+
+### Joinable Flag
+Indicates whether members can self-select to join this group through their profile. When set to true, the group appears as an option on member profile pages, allowing members to opt in.
+
+### Members Only Flag
+Restricts group visibility or functionality to current members only. This is useful for groups that should only be available to active members versus the general public or former members.
+
+## Creating and Managing Groups
+
+### Creating a New Group
+
+1. Click the "New Group" button on the Groups page
+2. Enter the group name and short name
+3. Optionally provide an email address if this group corresponds to an email list
+4. Optionally provide a Discord ID if this group corresponds to a Discord channel
+5. Set the joinable flag if members should be able to self-select into this group
+6. Set the members_only flag if appropriate
+7. Save the group
+
+### Adding Members to Groups
+
+There are several ways to add members to a group:
+
+#### Manual Addition
+1. Navigate to the group's detail page
+2. Use the "Add Person" dropdown to search for a member
+3. Select the member and click "Add Person"
+4. The member is immediately added to the group
+
+#### CSV Import to Google Groups
+For groups with an associated email address (Google Group):
+
+1. Navigate to the group's detail page
+2. Prepare a CSV file with an "Email address" column containing member emails
+3. Choose either:
+   * **Import Now**: Process immediately and see results on screen
+   * **Import as Background Job**: Queue for later processing (check logs for results)
+4. Upload the CSV file
+
+The system will:
+* Add each email address to the Google Group
+* Add matching members to the database group
+* Report which members were added, skipped (already in group), or had errors
+
+This is particularly useful for bulk synchronization between the membership database and Google Groups.
+
+### Viewing Group Members
+
+The group detail page displays:
+* All group properties
+* A complete list of members in the group
+* Links to each member's profile
+* The total member count
+
+### Editing Groups
+
+1. Navigate to the group's detail page
+2. Click "Edit this group"
+3. Modify any group properties
+4. Save the changes
+
+### Removing Members from Groups
+
+To remove a member from a group, edit the member's profile and remove the group association from their groups list.
+
+### Deleting Groups
+
+1. Navigate to the group's detail page
+2. Click "Destroy this group"
+3. Confirm the deletion
+
+Note: Deleting a group removes the group record but does not delete the members who belonged to that group.
+
+## Groups and Equipment
+
+Groups can also be assigned as owners of equipment. This allows tracking which program or committee owns specific telescopes, cameras, or other gear. For example:
+
+* The "Imaging Program" group might own several cameras and laptops
+* The "Star Party Team" group might own portable telescopes
+* The "School Outreach" group might own presentation equipment
+
+This ownership tracking helps with inventory management and accountability. See the [Equipment Tracking](equipment) page for more details.
+
+## Integration with External Systems
+
+### Google Groups
+When a group has an email address, you can:
+* Import members from CSV directly to the Google Group
+* Keep the database group in sync with the Google Group
+* Automatically configure group settings (e.g., restrict posting to managers)
+
+### Discord
+When a group has a Discord ID, it serves as a reference point for tracking which members have access to specific Discord channels or roles.
+
+## Use Cases
+
+### Example: Board of Directors
+* Name: "Board of Directors"
+* Short Name: "Board"
+* Email: "board@sjaa.net"
+* Joinable: No (board members are appointed, not self-selected)
+* Members Only: Yes
+
+### Example: Astrophotography Interest Group
+* Name: "Astrophotography Interest Group"
+* Short Name: "AP Group"
+* Email: "astrophotography@sjaa.net"
+* Joinable: Yes (members can opt in if interested)
+* Members Only: Yes (requires active membership)
+
+### Example: School Outreach Volunteers
+* Name: "School Outreach Volunteers"
+* Short Name: "Outreach"
+* Email: "outreach@sjaa.net"
+* Discord ID: "1234567890"
+* Joinable: Yes
+* Members Only: Yes
+
+## Database Representation
+
+A group record contains:
+
+* An internal `id`
+* A `name` (full descriptive name)
+* A `short_name` (abbreviated version)
+* An `email` address (optional, for Google Groups)
+* A `discord_id` (optional, for Discord integration)
+* A `joinable` flag (boolean)
+* A `members_only` flag (boolean)
+* A many-to-many relationship with people (a person can be in multiple groups, and a group can have multiple people)
+* A one-to-many relationship with equipment (equipment can belong to a group)

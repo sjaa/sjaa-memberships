@@ -3,3 +3,123 @@ title: 'Security and Permissions'
 description: 'How data is protected.'
 icon: 'lock'
 ---
+
+## Overview
+
+The membership management application uses a comprehensive role-based permission system to control access to features and data. This ensures that sensitive member information is protected while allowing authorized administrators to perform their duties effectively.
+
+## User Types
+
+There are two distinct types of users in the system:
+
+### Members (People)
+Regular members can log in to the application to:
+* View and update their own profile information
+* Renew their membership
+* Manage their contact details, interests, and equipment
+* View their membership history and donation records
+
+Members can only access their own information and cannot view or edit other members' data.
+
+### Administrators (Admins)
+Administrators are staff or volunteers who manage the organization's membership database. Admins have special permissions based on their role, which determines what actions they can perform in the system.
+
+## Permission Levels
+
+The system uses four distinct permission levels that can be assigned to administrators:
+
+### Read Permission
+Allows viewing member data and generating reports. Administrators with read permission can:
+* Browse the member directory
+* Search for members
+* View individual member profiles
+* Access reports (Ephemeris subscribers, renewal reminders, membership statistics)
+* View equipment inventory
+* See donation records
+* View groups and their members
+
+**Cannot**: Edit any data, create new records, or delete information
+
+### Write Permission
+Allows creating and editing data. Administrators with write permission can:
+* All actions from read permission
+* Create and edit member records
+* Add and modify memberships (including offline renewals)
+* Record donations
+* Manage equipment inventory
+* Add members to groups
+* Send renewal reminder emails
+* Send welcome emails to new members
+* Integrate with Google Workspace (sync groups, manage calendars)
+* Import data via CSV
+
+**Cannot**: Manage other administrators or assign permissions
+
+### Permit Permission
+The highest level of access for managing administrators. Administrators with permit permission can:
+* All actions from read and write permissions
+* Create new administrator accounts
+* Edit existing administrator accounts
+* Assign permissions to other administrators
+* Remove administrators from the system
+
+This permission should only be given to trusted staff who are responsible for managing the administrator team.
+
+### Verify Members Permission
+A specialized permission for verifying member status. Administrators with this permission can:
+* Access the member verification interface
+* Confirm membership status for access to club resources
+
+This permission is useful for volunteers who need to check membership status at events but don't need full read access to all member data.
+
+## Permission Assignment
+
+Only administrators with the `permit` permission can assign or modify permissions for other administrators. To manage permissions:
+
+1. Navigate to the Admins section
+2. Select an administrator to edit
+3. Check or uncheck the desired permissions
+4. Save the changes
+
+An administrator can have multiple permissions. For example, someone might have both `read` and `write` permissions, giving them the ability to view and edit data, but not manage other administrators.
+
+## Access Control Implementation
+
+The application uses Pundit policies to enforce permissions throughout the system. Each controller action checks whether the current user has the required permission before allowing access. If a user attempts to access a feature they don't have permission for, they will receive an authorization error.
+
+### Examples of Permission Requirements
+
+**Viewing Reports**: Requires `read` permission
+**Editing Member Information**: Requires `write` permission (or being the member themselves)
+**Creating a New Admin**: Requires `permit` permission
+**Verifying a Member at an Event**: Requires `verify_members` or `read` permission
+
+## Security Best Practices
+
+When managing administrator permissions:
+
+1. **Principle of Least Privilege**: Only grant the minimum permissions necessary for each administrator's role
+2. **Permit Permission**: Limit `permit` permission to only 1-2 senior staff members
+3. **Regular Audits**: Periodically review administrator accounts and remove access for former volunteers
+4. **Strong Passwords**: Ensure all administrators use strong, unique passwords
+5. **Password Resets**: Use the secure password reset flow rather than sharing passwords
+
+## Authentication
+
+Both members and administrators use email-based authentication with secure password hashing. The system includes:
+
+* Password reset functionality via email
+* Secure session management
+* API key authentication for programmatic access
+* Integration with Google OAuth for Google Workspace features
+
+## Data Protection
+
+Member data is protected through:
+
+* Encrypted passwords using bcrypt
+* Secure session cookies
+* HTTPS encryption in production
+* Database-level access controls
+* Input validation and sanitization
+* Protection against common web vulnerabilities (XSS, CSRF, SQL injection)

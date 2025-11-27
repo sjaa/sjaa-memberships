@@ -1,0 +1,417 @@
+---
+title: 'Member Verification'
+description: 'How to verify membership status for events and access control.'
+icon: 'shield-check'
+---
+
+## Overview
+
+Member verification allows authorized users to quickly check whether someone has an active membership. This is useful for:
+
+* Checking members at events (star parties, meetings, etc.)
+* Verifying access to member-only resources
+* Confirming membership status at the door
+* Quick lookup without exposing sensitive member data
+
+The system provides two different verification methods depending on your permission level and needs.
+
+## For Administrators: Using the People Search
+
+Administrators with **read** permission can verify membership status using the comprehensive People search page. This method provides full member details and is ideal for administrative tasks.
+
+### Accessing People Search
+
+1. Log in as an administrator with read permission
+2. Navigate to **People** from the main menu
+3. The People search page appears with search and filter options
+
+### Quick Verification by Email
+
+The fastest way to verify a member:
+
+1. In the "More Filters" section, enter the member's email address in the **Email** field
+2. The search updates automatically as you type
+3. Review the results:
+   * **Active members**: Highlighted in green with "Active" badge
+   * **Expired members**: Standard display without active badge
+   * **Not found**: No results appear
+
+### Verification Search Options
+
+The People search provides multiple ways to find and verify members:
+
+#### Basic Search
+Use the main search bar at the top to search across:
+* First name
+* Last name
+* Email address
+* Phone number
+* City
+* Notes
+
+Simply type any identifying information and the system will find matching members.
+
+#### Advanced Filters
+Click "More Filters" to access additional search criteria:
+
+**Personal Information:**
+* **First Name**: Member's first name
+* **Last Name**: Member's last name
+* **Email**: Email address (most reliable for verification)
+* **Phone**: Phone number
+
+**Location:**
+* **City**: Member's city
+* **State**: Member's state
+
+**Membership Status:**
+* **Active Members**: Filter to show only currently active members
+  * Select "Yes" to show only active members
+  * Select "No" to show only expired members
+  * Select "Either" to show all members
+
+**Other Filters:**
+* **Interests**: Astronomy interests (astrophotography, planets, etc.)
+* **Groups**: Organizational groups or committees
+* **Skills**: Volunteer skills
+* **Ephemeris Subscription**: Printed or digital newsletter preference
+* **Volunteer Status**: Whether the member volunteers
+* **Mentor Status**: Whether the member mentors
+* **Astrobin Username**: Astrophotography platform username
+* **Telescopius Username**: Astronomy platform username
+
+### Reading Verification Results
+
+When you find a member in the search results, you can see:
+
+* **Name**: Linked to their full profile
+* **Membership Status**:
+  * Active memberships are highlighted in **green**
+  * Active members show an **"Active" badge**
+  * Expired members have no highlighting
+* **Contact Information**: Email and other contact details (in full profile)
+* **Membership Dates**: Start and end dates (in full profile)
+
+### Detailed Verification
+
+To see complete membership details:
+
+1. Click on the member's name in the search results
+2. Their profile page opens, showing:
+   * Full membership history with dates
+   * Current membership status
+   * Expiration date (or "Lifetime" for lifetime members)
+   * Donation history
+   * Contact information
+   * Groups and interests
+
+### Best Practices for Admin Verification
+
+**For Event Check-In:**
+1. Keep a tablet or laptop with the People search page open
+2. Search by email address as members arrive
+3. Look for the green highlight and "Active" badge
+4. Grant access to active members
+
+**For Access Control:**
+1. Use the "Active Members" filter set to "Yes"
+2. Search for the specific member
+3. If they appear in results, they're active
+4. If no results, membership has expired
+
+**Privacy Considerations:**
+* The People search shows detailed member information
+* Only use for legitimate verification purposes
+* Don't share search results with unauthorized individuals
+* Admins see all member data—handle responsibly
+
+## For Verifiers: Using the Membership Verification Page
+
+Users with the **verify_members** permission have access to a specialized verification page designed specifically for quick membership checks without exposing detailed member information.
+
+### Who Should Use This Method
+
+The verification page is ideal for:
+* **Event volunteers** checking members at the door
+* **Staff** without full admin access
+* **Greeters** at star parties or meetings
+* Anyone who needs to verify membership without accessing full member profiles
+
+### Accessing the Verification Page
+
+1. Log in with an account that has the `verify_members` permission
+2. Navigate to the **Membership Verification** page
+3. You'll see a simple form with an email address field
+
+### How to Verify a Member
+
+The verification process is straightforward:
+
+1. **Enter Email Address**
+   * Ask the person for the email address they used to register
+   * Type or paste the email into the "Email Address" field
+   * Click "Verify Membership"
+
+2. **Review the Result**
+
+The system displays one of three outcomes:
+
+#### Valid Member (Active)
+A **green success message** appears with:
+* ✓ **"Valid Member"** heading with green checkmark
+* **Membership expires**: Shows the month and year (e.g., "December 2025")
+* **Timestamp**: When the verification was performed
+
+**Example:**
+```
+✓ Valid Member
+Membership expires: December 2025
+Verified on November 26, 2025 at 2:30 PM
+```
+
+#### Invalid Member (Expired)
+A **red error message** appears with:
+* ✗ **"No member found with this email address"** or expiration details
+* Information about when the membership expired
+* **Timestamp**: When the verification was attempted
+
+**Example:**
+```
+✗ Membership Expired
+Expired: June 2024
+Attempted on November 26, 2025 at 2:30 PM
+```
+
+#### No Member Found
+A **red error message** appears with:
+* ✗ **"No member found with this email address"**
+* This means the email is not in the system
+* The person may have used a different email or is not a member
+* **Timestamp**: When the verification was attempted
+
+### Features of the Verification Page
+
+**Privacy-Focused:**
+* Shows only membership status (active or expired)
+* Shows only expiration month and year
+* Does NOT show:
+  * Member's name
+  * Full contact information
+  * Donation history
+  * Other personal details
+
+**Quick and Simple:**
+* Single field form for fast lookups
+* Immediate results
+* No complex filters or options
+* Perfect for event check-in stations
+
+**Timestamped:**
+* Each verification shows when it was performed
+* Useful for audit trails or dispute resolution
+* Helps track verification activity
+
+**Real-Time:**
+* Checks current membership status from the database
+* Always shows the most up-to-date information
+* No caching or delayed updates
+
+### Best Practices for Verification Page Use
+
+**Setting Up at Events:**
+1. Open the verification page on a tablet or laptop
+2. Position it at the entry point
+3. Have members provide their email address
+4. Verify and grant access to valid members
+
+**Handling Edge Cases:**
+
+**Wrong Email Address:**
+* If no member found, ask if they used a different email
+* Try variations (work vs. personal email)
+* If still not found, direct to admin for manual verification
+
+**Expired Membership:**
+* Politely inform the member their membership has expired
+* Offer information about renewing
+* May allow entry with payment of membership at the door (depending on policy)
+
+**Lifetime Members:**
+* Shows "Lifetime" instead of an expiration date
+* Always valid, never expires
+
+**Technical Issues:**
+* Keep a backup list of current members (CSV export)
+* Have admin contact available for problem cases
+* Consider offline verification method as fallback
+
+**Privacy and Security:**
+* Don't read email addresses aloud in crowded areas
+* Don't share verification results with others nearby
+* Clear the screen between verifications for privacy
+* Log out when leaving the station unattended
+
+### Verification Page Workflow Example
+
+**Scenario: Star Party Check-In**
+
+1. **Member arrives**: "Hi, I'm here for the star party"
+2. **Verifier**: "Great! Can I have your email address to verify your membership?"
+3. **Member provides**: "john.doe@example.com"
+4. **Verifier enters** email and clicks "Verify Membership"
+5. **System shows**: ✓ Valid Member, Membership expires: March 2026
+6. **Verifier**: "Perfect, you're all set! Enjoy the event!"
+
+**Scenario: Expired Membership**
+
+1. **Member arrives** and provides email
+2. **Verifier enters** email and clicks "Verify Membership"
+3. **System shows**: ✗ Membership Expired: August 2024
+4. **Verifier**: "It looks like your membership expired in August. You can renew online at sjaa.net or we can help you renew right here."
+5. **Option A**: Member renews on-site (if policy allows)
+6. **Option B**: Member is given renewal information for later
+
+## Permission Requirements
+
+### Read Permission (Full Admin Access)
+**Required for:** People search and full member profiles
+**Can:**
+* Search all members with advanced filters
+* View complete member profiles
+* See membership history and dates
+* Access contact information and personal details
+* View donation history
+
+**Cannot:**
+* Edit member information (requires write permission)
+
+### Verify Members Permission (Verification Page Only)
+**Required for:** Membership verification page access
+**Can:**
+* Verify membership status by email
+* See if a membership is active or expired
+* See expiration month and year
+* Perform quick event check-ins
+
+**Cannot:**
+* See member names or personal information
+* Access full member profiles
+* Search or browse all members
+* Edit any member data
+
+### Granting Verification Permission
+
+Administrators with **permit** permission can grant verify_members access:
+
+1. Navigate to **Admins** section
+2. Select the admin/volunteer account
+3. Check the **verify_members** permission checkbox
+4. Save changes
+
+This allows the user to access the verification page without seeing sensitive member information.
+
+## Comparison: Admin Search vs. Verification Page
+
+| Feature | Admin Search (read permission) | Verification Page (verify_members) |
+|---------|-------------------------------|-------------------------------------|
+| **Permission Required** | read | verify_members |
+| **Shows Member Names** | Yes | No |
+| **Shows Contact Info** | Yes | No |
+| **Shows Full History** | Yes | No |
+| **Quick Email Lookup** | Yes | Yes |
+| **Advanced Filters** | Yes | No |
+| **Privacy Level** | Low (full access) | High (minimal data) |
+| **Best For** | Administrative tasks | Event check-in |
+| **Speed** | Moderate (many options) | Fast (single field) |
+
+## Security and Privacy
+
+### Data Protection
+* Both methods use secure authentication
+* All verification activity can be audited
+* Permissions are enforced at the application level
+* No public access to verification features
+
+### Appropriate Use
+Verification features should only be used for:
+* Legitimate membership verification
+* Event access control
+* Resource access confirmation
+* Administrative purposes
+
+**Not for:**
+* Sharing member information publicly
+* Marketing without consent
+* Unauthorized data collection
+* Personal curiosity about members
+
+### Audit Trail
+All verifications are timestamped, allowing administrators to:
+* Track verification activity
+* Investigate disputes
+* Monitor proper use of verification features
+* Ensure privacy compliance
+
+## Troubleshooting
+
+### Member Says They're Active But System Shows Expired
+
+**Possible causes:**
+* Membership payment not yet processed
+* Used different email address for renewal
+* Database sync delay (rare)
+
+**Resolution:**
+1. Ask member to check their renewal confirmation email
+2. Search by name in admin People search
+3. Check if multiple accounts exist (different emails)
+4. Contact admin to manually verify payment status
+
+### Can't Find Member in System
+
+**Possible causes:**
+* Email address typo
+* Member used different email address
+* Member hasn't completed signup process
+* Not yet a member
+
+**Resolution:**
+1. Confirm correct email address spelling
+2. Try alternative email addresses
+3. Search by name in admin People search (if you have access)
+4. Check recent membership list if available
+5. Contact admin for manual lookup
+
+### Verification Page Not Accessible
+
+**Possible causes:**
+* Don't have verify_members permission
+* Not logged in
+* Session expired
+
+**Resolution:**
+1. Log in or re-login if needed
+2. Confirm you have verify_members permission
+3. Contact an administrator to grant permission if needed
+4. Clear browser cache and try again
+
+## Best Practices Summary
+
+**For Quick Event Verification:**
+* Use the Verification Page (verify_members permission)
+* Keep the page open on a tablet at the entry
+* Have Wi-Fi or cellular connection available
+* Keep a backup member list for technical failures
+
+**For Administrative Verification:**
+* Use the People Search (read permission)
+* Filter by "Active Members: Yes" for current members
+* Use email search for fastest results
+* Access full profile for detailed verification needs
+
+**For Privacy Protection:**
+* Only grant necessary permissions
+* Use verification page for volunteers/staff
+* Reserve admin access for trusted administrators
+* Log out when stepping away from verification station
+* Don't discuss member status publicly

@@ -1,3 +1,8 @@
+---
+title: 'Calendar Sync'
+description: 'Details of how calendar synchronization is handled.'
+---
+
 # Calendar Sync Job
 
 The `CalendarSyncJob` aggregates events from multiple calendar sources and syncs them to a master Google Calendar.
@@ -89,18 +94,6 @@ CalendarSyncJob.perform_later('admin@sjaa.net')
    - **Cancelled Event**: Adds `[CANCELLED]` prefix to title (if not already present)
    - **Existing Event**: Updates event details in Google Calendar
    - **New Event**: Creates new event in Google Calendar
-
-### Event Metadata
-
-The job stores Google Calendar event IDs in the aggregator event's metadata:
-```ruby
-event.metadata[:google_calendar_id] = 'abc123...'
-```
-
-This allows the job to:
-- Update events instead of creating duplicates
-- Mark events as cancelled without deleting them
-- Track which events have been synced
 
 ### Event Properties Synced
 

@@ -51,8 +51,10 @@
               "essentials/equipment",
               "essentials/donations",
               "essentials/permissions",
-              "essentials/roles",
-              "essentials/reports"
+              "essentials/groups",
+              "essentials/reports",
+              "essentials/member-verification",
+              "essentials/recurring-tasks"
             ]
           }
         ],

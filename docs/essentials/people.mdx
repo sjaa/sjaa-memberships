@@ -25,22 +25,157 @@ renew, and makes for a smoother overall membership experience.  *Some people may
 another password, and we will provide convenient and secure ways to renew memberships without needing
 to sign in.* More on that in the following sections.
 
-## Person Dashboard
+## Member Profile Page
 
-When a person logs in to the application, they will be presented with a page that displays
-the information that they've previously submitted to us.  This includes contact information,
-interests, and a host of other optional information.  A person has the option to edit any of
-this information at any time, and our records will remain in sync.  A person can also see
-the status of their membership, and are presented with the option to renew if their membership
-has expired.
+When a person logs in to the application, they are taken to their personal profile page. This comprehensive dashboard displays all of their information and provides easy access to manage their account and membership.
 
-## Roles
+### Profile Sections
 
-Roles are brief descriptors that can be assigned to people.  A person can have many different roles.  Each
-role can be used to denote any number of different things.  For example, we can identify officers
-and position holders with roles.  We could also choose to identify membership in our Google Groups as a role
-assigned to each person.  Each role comes with a description and an email address, for cases where a role represents
-some larger group that we have an email address for (i.e. imagers Google Group).  Roles are flexible and can
+#### Profile Picture
+Members can upload a profile picture to personalize their account. The picture appears prominently at the top of the profile and helps identify the member in the system. If no picture is uploaded, a default avatar icon is shown.
+
+**To add or change a profile picture:**
+1. Click "Edit Profile"
+2. Upload an image file (JPEG, PNG, etc.)
+3. The system automatically resizes images to appropriate dimensions
+4. Save the profile
+
+#### Personal Information
+This section displays the member's core information:
+
+* **Name**: First and last name
+* **Volunteer Status**: Badges indicating if the member is a volunteer or mentor
+* **Interests**: Astronomy interests such as "astrophotography," "solar system," "deep sky," etc.
+* **Notes**: Personal notes or additional information about the member
+* **Referral**: How the member heard about the organization (website, friend, school, etc.)
+* **Astrobin Profile**: Link to the member's Astrobin account for viewing astrophotography
+* **Telescopius Profile**: Link to the member's Telescopius account
+* **Discord ID**: Member's Discord identifier (visible to admins only)
+* **Groups**: Organizations, committees, or special interest groups the member belongs to
+
+**Groups Display:**
+* Regular members see only "joinable" groups (groups they can opt into themselves)
+* Administrators see all groups assigned to the member
+* Groups appear as clickable badges that link to the group's detail page
+
+#### Contact Information
+Displays all contact methods on file for the member:
+
+* **Email**: Primary email address (clickable to send email)
+* **Phone**: Phone number (clickable to dial on mobile devices)
+* **Address**: Full mailing address including street, city, state, and ZIP code
+
+Members can have multiple contact entries (for example, work and home addresses). The primary contact is clearly marked with a badge.
+
+#### Skills and Volunteer Interests
+For members who have indicated interest in volunteering or mentoring, this section showcases their skills:
+
+* **Skill Cards**: Each skill is displayed with details including:
+  * Skill name (e.g., "Telescope Operation," "Public Speaking," "Photography")
+  * Skill level (rated 1-5 or custom scale)
+  * Whether they're willing to volunteer using this skill
+  * Whether they're willing to mentor others in this skill
+  * Any notes about their experience or availability
+
+* **Badges**: Members marked as volunteers or mentors display special badges in their profile
+
+**Managing Skills:**
+Members can add, edit, or remove skills through the profile editor. They can indicate:
+* Their proficiency level in each skill
+* Willingness to volunteer
+* Willingness to mentor others
+* Specific notes about how they'd like to contribute
+
+This system helps the organization match volunteers with opportunities and identify mentors for new members.
+
+#### Membership History
+A complete chronological record of all memberships:
+
+* **Member Since**: Date of first membership (displayed in the section header)
+* **Duration**: Start and end dates for each membership period
+* **Type**: Membership type (individual, family, student, etc.)
+* **Donation Amount**: Any additional donation made with the membership
+* **Ephemeris Subscription**: Whether the member opted for printed newsletter delivery
+* **Status**: Active memberships are highlighted in green with an "Active" badge
+* **Lifetime Memberships**: Clearly marked as "LIFETIME" with no end date
+
+The table shows all historical memberships in chronological order, making it easy to see membership continuity and renewal history.
+
+#### Donation History
+If the member has made donations, this section displays:
+
+* All cash and equipment donations
+* Donation dates and values
+* Equipment items donated with descriptions
+* Links to detailed donation records
+
+This provides a complete record of the member's contributions to the organization.
+
+### Profile Actions
+
+#### Edit Profile
+The "Edit Profile" button allows members to update:
+* Personal information (name, contact details)
+* Profile picture
+* Interests and astronomy preferences
+* Referral information
+* Astrobin and Telescopius usernames
+* Discord ID
+* Volunteer and mentor status
+* Skills and skill levels
+* Group memberships (for joinable groups)
+* Contact information (add, edit, or remove contacts)
+
+All changes are saved to the database and immediately reflected in the profile view.
+
+#### Renew Membership
+The "Renew Membership" button appears when:
+* The member's current membership is expiring soon
+* The member's membership has expired
+
+Clicking this button takes the member to the renewal payment page where they can:
+* Select membership term (6 months, 12 months, etc.)
+* Add an optional donation
+* Opt-in for printed Ephemeris delivery
+* Complete payment via PayPal
+
+#### Membership Status Alert
+If a membership is inactive or expired, a prominent warning banner appears at the top of the profile with a direct link to renew.
+
+### Admin-Only Features
+
+When an administrator views a member's profile, they see additional options:
+
+#### Email Actions
+* **Welcome Email**: Send a welcome email to the member (useful for new members or resending information)
+* **Renewal Reminder**: Send a membership renewal reminder email
+
+#### Admin Panel
+A special admin section at the bottom of the profile includes:
+* **Delete Person**: Remove the member from the database (requires confirmation)
+* Access to all group assignments (not just joinable groups)
+* Visibility of Discord ID and other technical identifiers
+
+### Privacy and Access Control
+
+**Member Access:**
+* Members can only view and edit their own profile
+* Members cannot see other members' profiles
+* Members can only join "joinable" groups themselves
+
+**Administrator Access:**
+* Administrators with "read" permission can view all member profiles
+* Administrators with "write" permission can edit all member profiles
+* Administrators with "write" permission can add members to any group
+* Only administrators with "permit" permission can manage other administrators
+
+## Groups
+
+Groups are brief descriptors that can be assigned to people.  A person can have many different groups.  Each
+group can be used to denote any number of different things.  For example, we can identify officers
+and position holders with groups.  We could also choose to identify membership in our Google Groups as a group
+assigned to each person.  Each group comes with a description and an email address, for cases where a group represents
+some larger group that we have an email address for (i.e. imagers Google Group).  Groups are flexible and can
 be used in whatever way is convenient.
 
 ## Signup Flow and Renewal Flow

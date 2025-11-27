@@ -3,3 +3,104 @@ title: 'Donation Tracking'
 description: 'How to manage donations.'
 icon: 'coin'
 ---
+
+## Overview
+
+The donation tracking system allows you to record and manage both monetary and equipment donations made to the organization. This comprehensive system helps maintain accurate records of donor contributions, generate thank-you letters, and track the history of all donations over time.
+
+Managing donations requires the "write" permission. Permissions can be assigned by administrators with the `permit` permission. Once you have the appropriate permission, navigate to the Donations page by selecting the "Donations" link in the menu.
+
+## Types of Donations
+
+The system supports two main types of donations:
+
+### Cash Donations
+Monetary contributions of any amount. Cash donations are recorded with:
+* Dollar value
+* Date of donation
+* Associated donor (person)
+* Optional notes about the donation
+
+### Equipment Donations
+Physical items donated to the organization, such as telescopes, cameras, or other astronomical equipment. Equipment donations include:
+* Equipment details (instrument kind and model)
+* Estimated value
+* Donation phases tracking the item's journey
+* Images of the donated equipment
+* Notes about condition or specifications
+
+## Creating a Donation Record
+
+To create a new donation record:
+
+1. Click the "New Donation" button on the Donations page
+2. Enter the donor's information:
+   * First name and last name
+   * Email address (the system will find or create a person record)
+3. For cash donations:
+   * Enter the dollar amount
+4. For equipment donations:
+   * Specify the instrument type (e.g., Telescope, Camera, Eyepiece)
+   * Provide the model name (e.g., "Celestron NexStar 8SE")
+   * Enter the estimated value
+   * Add photos of the equipment
+   * Record donation phases (explained below)
+5. Add any relevant notes
+6. Save the donation record
+
+## Donation Phases
+
+For equipment donations, "phases" track the lifecycle of a donated item. Each phase represents a step in the donation process and includes:
+
+* **Phase name**: Description of the step (e.g., "Received", "Evaluated", "Distributed", "Sold")
+* **Person**: Who handled this phase
+* **Date**: When this phase occurred
+
+This allows you to track when equipment was received, who evaluated it, when it was given to a member or program, or if it was sold to raise funds.
+
+## Searching and Filtering Donations
+
+The Donations page includes powerful filtering options:
+
+* **By person**: Find all donations from a specific donor
+* **By value range**: Filter donations within a certain dollar amount range
+* **By date range**: View donations made between specific dates
+
+Simply enter your search criteria and the list will update automatically to show matching donations.
+
+## Donation Letters
+
+The system can generate and send thank-you letters to donors for tax purposes. These letters include:
+
+* Donor information
+* Itemized list of donated items and values
+* Date of donation
+* Organization details
+* Optional custom message from the administrator
+
+To send a donation letter:
+
+1. Navigate to the donation record
+2. Click the "Send Letter" button
+3. Optionally customize the message
+4. Add CC recipients if needed
+5. Preview or send the letter
+
+The letter will be emailed to the donor's registered email address. You can preview the letter before sending to ensure it looks correct.
+
+## Database Representation
+
+A donation record contains:
+
+* An internal `id`
+* Associated `person` (the donor)
+* A `name` or title for the donation
+* A `note` field for additional details
+* One or more donation items, each containing:
+  * A `value` (dollar amount)
+  * Either cash indicator OR equipment details
+  * For equipment: associated instrument (kind + model)
+  * For equipment: donation phases tracking the item's journey
+  * For equipment: images of the donated item
+
+This structure allows tracking both simple cash donations and complex equipment donations with full history in a single, unified system.
