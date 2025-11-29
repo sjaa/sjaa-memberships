@@ -22,6 +22,7 @@ class MemberVerificationTest < ApplicationSystemTestCase
       person: @volunteer,
       primary: true
     )
+    @volunteer.reload  # Reload to ensure contacts association is loaded
 
     @active_member = Person.create!(
       first_name: "Active",

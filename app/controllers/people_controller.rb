@@ -103,12 +103,13 @@ class PeopleController < ApplicationController
   # POST /people or /people.json
   def create
     @person = Person.new(person_params)
-    
+
     respond_to do |format|
       if @person.save
         format.html { redirect_to @person, notice: "Profile was successfully created." }
         format.json { render :show, status: :created, location: @person }
       else
+        flash.now[:alert] = "Problem creating person: <ul>#{@person.errors.full_messages.map{|er| "<li>#{er}</li>"}.join('  ')}</ul>"
         format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @person.errors, status: :unprocessable_entity }
       end
@@ -149,7 +150,7 @@ class PeopleController < ApplicationController
         format.html { redirect_to @person, notice: notice_message }
         format.json { render :show, status: :ok, location: @person }
       else
-        flash[:alert] = "Problem updating person: <ul>#{@person.errors.full_messages.map{|er| "<li>#{er}</li>"}.join('  ')}</ul>"
+        flash.now[:alert] = "Problem updating person: <ul>#{@person.errors.full_messages.map{|er| "<li>#{er}</li>"}.join('  ')}</ul>"
         format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: @person.errors, status: :unprocessable_entity }
       end

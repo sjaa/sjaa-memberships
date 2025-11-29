@@ -239,14 +239,23 @@ class Person < ApplicationRecord
         _contact_attr[:city] = city
       end
 
-      contact.update _contact_attr
-      contact.errors.each do |err|
-        self.errors.add err.attribute, err.message
-      end
+      contact.assign_attributes _contact_attr
       _contacts << contact
     end
 
     self.contacts = _contacts
+  end
+
+  # Custom validation to check all contacts are valid
+  validate :contacts_must_be_valid
+
+  def contacts_must_be_valid
+    contacts.each do |contact|
+      next if contact.valid?
+      contact.errors.each do |error|
+        errors.add(:base, "Contact #{error.attribute}: #{error.message}")
+      end
+    end
   end
 
   def membership_attributes=(attributes)

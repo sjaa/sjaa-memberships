@@ -27,7 +27,8 @@ class PersonTest < ActiveSupport::TestCase
       person: @person,
       primary: false
     )
-    
+
+    @person.reload  # Reload to refresh contacts association
     assert_equal 2, @person.contacts.count
     assert_equal @contact, @person.primary_contact
   end
@@ -190,6 +191,7 @@ class PersonTest < ActiveSupport::TestCase
     membership = Membership.create!(person: @person, start: Date.current, term_months: 12)
     donation = Donation.create!(person: @person, name: 'Test Donation')
 
+    @person.reload  # Reload to refresh associations
     assert_includes @person.memberships, membership
     assert_includes @person.donations, donation
     assert_includes @person.contacts, @contact

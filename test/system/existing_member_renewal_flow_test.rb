@@ -4,16 +4,19 @@ class ExistingMemberRenewalFlowTest < ApplicationSystemTestCase
   setup do
     @person = Person.create!(
       first_name: "John",
-      last_name: "Doe", 
+      last_name: "Doe",
       password: "password123",
     )
-    
+
     @contact = Contact.create!(
       email: "john@example.com",
       person: @person,
       primary: true
     )
-    
+
+    # Reload person to ensure contacts association is loaded
+    @person.reload
+
     # Create existing membership that's about to expire
     @existing_membership = Membership.create!(
       person: @person,
@@ -21,7 +24,7 @@ class ExistingMemberRenewalFlowTest < ApplicationSystemTestCase
       term_months: 12,
       ephemeris: false
     )
-    
+
     # Set up constants
     unless defined?(SjaaMembers::YEARLY_MEMBERSHIP_RATE)
       stub_const('SjaaMembers::YEARLY_MEMBERSHIP_RATE', 75.0)
@@ -29,7 +32,7 @@ class ExistingMemberRenewalFlowTest < ApplicationSystemTestCase
     unless defined?(SjaaMembers::EPHEMERIS_FEE)
       stub_const('SjaaMembers::EPHEMERIS_FEE', 10.0)
     end
-    
+
     # Login as the person
     login_as(@person.email, 'password123')
   end

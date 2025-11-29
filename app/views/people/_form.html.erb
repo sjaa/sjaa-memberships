@@ -204,8 +204,12 @@
       </div>
       <div data-controller="form">
         <div data-form-target="fields">
-          <% person.contacts.each_with_index do |contact, i| %>
-            <%= render partial: 'contact_form', locals: {id: "contact_#{contact.id}", contact: contact, i: i, person: person} %>
+          <% if person.contacts.any? %>
+            <% person.contacts.each_with_index do |contact, i| %>
+              <%= render partial: 'contact_form', locals: {id: "contact_#{contact.id}", contact: contact, i: i, person: person} %>
+            <% end %>
+          <% else %>
+            <%= render partial: 'contact_form', locals: {id: "new_contact_0", contact: Contact.new, i: 0, person: person} %>
           <% end %>
           <template data-form-target="template">
             <%= render partial: 'contact_form', locals: {id: "NEWID", contact: Contact.new, i: nil, person: person} %>
