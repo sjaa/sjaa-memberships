@@ -19,17 +19,47 @@
     <p>
     <% to_add = @unmatched_people.select{|person| person.email.present?}.size %>
     <% to_remove = @group_unmatched.select{|mh| mh[:email]}.size %>
-    <%= to_add %> <%='person'.pluralize(to_add)%> <%= @commit ? "were added" : 'will be added' %>.
-    <%= to_remove %> <%='person'.pluralize(to_remove)%> <%= @commit ? "were removed" : 'will be removed' %>.
+    <%= to_add %> <%='person'.pluralize(to_add)%> will be added.
+    <%= to_remove %> <%='person'.pluralize(to_remove)%> will be removed.
     </p>
-    <p>
-    <% if @commit %>
-    See below for details.
-    <% else %>
-    <%= link_to 'Sync (Add and Remove)', google_group_sync_path(group_id: @group_id, diff: true, commit: true), class: 'btn btn-sm btn-primary' %>
-    <%= link_to 'Sync (Add Only)', google_group_sync_path(group_id: @group_id, diff: true, commit: true, add_only: true), class: 'btn btn-sm btn-success' %>
-    <% end %>
-    </p>
+
+    <div class="card mb-3">
+      <div class="card-header">
+        <h5 class="mb-0">Sync Options</h5>
+      </div>
+      <div class="card-body">
+        <%= form_tag google_group_sync_path, method: :get, class: 'form-inline' do %>
+          <%= hidden_field_tag :group_id, @group_id %>
+          <%= hidden_field_tag :diff, true %>
+          <%= hidden_field_tag :commit, true %>
+
+          <div class="form-group mb-3">
+            <label for="remove_group" class="mr-2">Remove Group Email:</label>
+            <%= text_field_tag :remove_group, @remove_group, class: 'form-control mr-3', placeholder: 'expired-members@sjaa.net', style: 'width: 300px;' %>
+          </div>
+
+          <div class="form-check mb-3 mr-3">
+            <%= check_box_tag :use_remove_group, 'true', @use_remove_group, class: 'form-check-input' %>
+            <%= label_tag :use_remove_group, 'Save removed members to remove group', class: 'form-check-label' %>
+          </div>
+
+          <div class="form-check mb-3 mr-3">
+            <%= check_box_tag :clear_remove_group, 'true', @clear_remove_group, class: 'form-check-input' %>
+            <%= label_tag :clear_remove_group, 'Clear remove group first', class: 'form-check-label' %>
+          </div>
+
+          <div class="form-group mb-3">
+            <%= submit_tag 'Queue Sync Job (Add and Remove)', class: 'btn btn-sm btn-primary mr-2' %>
+            <%= submit_tag 'Queue Sync Job (Add Only)', class: 'btn btn-sm btn-success', onclick: "document.getElementById('add_only_field').value='true'; return true;" %>
+            <%= hidden_field_tag :add_only, '', id: 'add_only_field' %>
+          </div>
+
+          <p class="text-muted mb-0">
+            <small>The sync will run as a background job. Check the Rails logs to monitor progress.</small>
+          </p>
+        <% end %>
+      </div>
+    </div>
 
     <h2><%= @members_only ? 'Active Members' : 'People in Group' %> Missing From Google Group</h2>
     <div class="table-responsive mt-2">

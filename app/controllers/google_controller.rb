@@ -56,14 +56,31 @@ class GoogleController < ApplicationController
 
     @diff = params[:diff].present?
     @commit = params[:commit].present?
+    @remove_group = params[:remove_group].presence || GoogleHelper::REMOVE_GROUP
+    @use_remove_group = params[:use_remove_group].present? ? params[:use_remove_group] == 'true' : true
+    @clear_remove_group = params[:clear_remove_group].present? ? params[:clear_remove_group] == 'true' : true
 
     begin
       if(@commit)
-        diff_results = sync(auth: @auth, group: @group_email, group_model: @group, members_only: @members_only, save: !params[:add_only], add_only: params[:add_only])
+        # Queue the sync job instead of running it directly
+        GoogleGroupSyncJob.perform_later(
+          @user.email,
+          @group_email,
+          group_id: @group_id,
+          members_only: @members_only,
+          use_remove_group: @use_remove_group,
+          remove_group: @remove_group,
+          clear_remove_group: @clear_remove_group,
+          add_only: params[:add_only].present?
+        )
+
+        flash[:notice] = "Group sync job has been queued for #{@group_email}. The sync will run in the background."
+        redirect_to google_group_sync_path(group_id: @group_id)
+        return
       end
 
       if(@diff)
-        diff_results ||= diff_group(auth: @auth, group: @group_email, group_model: @group, members_only: @members_only)
+        diff_results = diff_group(auth: @auth, group: @group_email, group_model: @group, members_only: @members_only)
         @group_matched = diff_results[:group_matched]
         @unmatched_people = diff_results[:unmatched_people]
         @group_unmatched = diff_results[:group_unmatched]

@@ -54,8 +54,16 @@ docker compose run --rm app bin/rails csv_compare CSV1=file1.csv CSV2=file2.csv 
 docker compose run --rm app bin/rails runner "CalendarSyncJob.perform_now('vp@sjaa.net')"
 docker compose run --rm app bin/rails runner "CalendarSyncJob.perform_now('vp@sjaa.net', 'custom-calendar@group.calendar.google.com')"
 
+# Google Group sync job - syncs a Google Group with the membership database
+# Basic usage (syncs members@sjaa.net with active members)
+docker compose run --rm app bin/rails runner "GoogleGroupSyncJob.perform_now('vp@sjaa.net', 'members@sjaa.net')"
+
+# With custom options
+docker compose run --rm app bin/rails runner "GoogleGroupSyncJob.perform_now('vp@sjaa.net', 'observers@sjaa.net', group_id: 42, use_remove_group: true, remove_group: 'expired-members@sjaa.net', clear_remove_group: true, add_only: false)"
+
 # Queue jobs for later processing
 docker compose run --rm app bin/rails runner "CalendarSyncJob.perform_later('vp@sjaa.net')"
+docker compose run --rm app bin/rails runner "GoogleGroupSyncJob.perform_later('vp@sjaa.net', 'members@sjaa.net')"
 
 # Process queued jobs with custom worker (auto-stops when queue is empty)
 docker compose run --rm app bin/rails runner lib/solid_queue_simple_worker.rb

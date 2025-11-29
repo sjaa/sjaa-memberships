@@ -19,7 +19,7 @@ class MembersSyncJob < ApplicationJob
     end
 
     auth = get_auth(admin)
-    diff = sync(auth: auth, save: true)
+    diff = sync(auth: auth, use_remove_group: true, admin_email: admin.email)
 
     puts "[I] People not in the members group that should be: #{diff[:umatched_people].inspect}"
     puts "[I] People in the members group that should not be: #{diff[:group_unmatched].inspect}"

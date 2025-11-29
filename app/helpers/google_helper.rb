@@ -21,27 +21,36 @@ module GoogleHelper
     return auth
   end
 
-  def sync(auth: nil, group: MEMBERS_GROUP, group_model: nil, members_only: true, save: true, add_only: false)
+  def sync(auth: nil, group: MEMBERS_GROUP, group_model: nil, members_only: true, use_remove_group: true, remove_group: REMOVE_GROUP, clear_remove_group: true, add_only: false, admin_email: nil)
     # Compute diff
     diff = diff_group(auth: auth, group: group, group_model: group_model, members_only: members_only)
     client = diff[:client]
     diff[:errors] ||= []
 
     # Optionally save off all removed members in a temporary group
-    if(save)
-      members = get_members(client: client, group: REMOVE_GROUP)
-      members.each do |member|
-        begin
-          client.delete_member(REMOVE_GROUP, member.email)
-        rescue
-          puts "[W] Skipping delete of #{member.inspect} from #{REMOVE_GROUP}"
+    if(use_remove_group && remove_group.present?)
+      # Optionally clear the remove_group first
+      if(clear_remove_group)
+        members = get_members(client: client, group: remove_group)
+        members.each do |member|
+          # Don't remove the admin user from the remove group
+          if admin_email.present? && member.email.downcase == admin_email.downcase
+            puts "[I] Keeping admin user #{admin_email} in #{remove_group}"
+            next
+          end
+
+          begin
+            client.delete_member(remove_group, member.email)
+          rescue
+            puts "[W] Skipping delete of #{member.inspect} from #{remove_group}"
+          end
         end
       end
 
-      # Add the to-be-removed members to a new group
+      # Add the to-be-removed members to the remove group
       diff[:group_unmatched].each do |mh|
         begin
-          client.insert_member(REMOVE_GROUP, Google::Apis::AdminDirectoryV1::Member.new(email: mh[:email]))
+          client.insert_member(remove_group, Google::Apis::AdminDirectoryV1::Member.new(email: mh[:email]))
         rescue => e
           diff[:errors] << {source: :remove, email: mh[:email], error: e}
         end
