@@ -24,7 +24,8 @@ class WidgetControllerTest < ActionDispatch::IntegrationTest
 
     get widget_meetup_path
     assert_response :success
-    assert_select "h4", "Upcoming Meetup Events"
+    assert_select "div.meetup-widget"
+    assert_select "div.list-group"
     assert_match "Future Event", response.body
     assert_no_match "Past Event", response.body
   end

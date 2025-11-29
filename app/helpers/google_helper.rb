@@ -21,7 +21,7 @@ module GoogleHelper
     return auth
   end
 
-  def sync(auth: nil, group: MEMBERS_GROUP, group_model: nil, members_only: true, use_remove_group: true, remove_group: REMOVE_GROUP, clear_remove_group: true, add_only: false, admin_email: nil)
+  def sync(auth: nil, group: MEMBERS_GROUP, group_model: nil, members_only: true, use_remove_group: true, remove_group: REMOVE_GROUP, clear_remove_group: true, add_only: false, admin_email: nil, preview_only: false)
     # Compute diff
     diff = diff_group(auth: auth, group: group, group_model: group_model, members_only: members_only)
     client = diff[:client]
@@ -55,6 +55,12 @@ module GoogleHelper
           diff[:errors] << {source: :remove, email: mh[:email], error: e}
         end
       end
+    end
+
+    # Preview mode: only populate the remove group, don't modify the primary group
+    if(preview_only)
+      puts "[I] Preview mode: Remove group populated, skipping primary group modifications"
+      return diff
     end
 
     # Remove the unmatched people from the target group

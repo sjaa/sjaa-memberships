@@ -61,6 +61,9 @@ docker compose run --rm app bin/rails runner "GoogleGroupSyncJob.perform_now('vp
 # With custom options
 docker compose run --rm app bin/rails runner "GoogleGroupSyncJob.perform_now('vp@sjaa.net', 'observers@sjaa.net', group_id: 42, use_remove_group: true, remove_group: 'expired-members@sjaa.net', clear_remove_group: true, add_only: false)"
 
+# Preview mode - populate remove group without modifying primary group (useful for warning members)
+docker compose run --rm app bin/rails runner "GoogleGroupSyncJob.perform_now('vp@sjaa.net', 'members@sjaa.net', use_remove_group: true, remove_group: 'expired-members@sjaa.net', preview_only: true)"
+
 # Queue jobs for later processing
 docker compose run --rm app bin/rails runner "CalendarSyncJob.perform_later('vp@sjaa.net')"
 docker compose run --rm app bin/rails runner "GoogleGroupSyncJob.perform_later('vp@sjaa.net', 'members@sjaa.net')"

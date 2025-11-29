@@ -59,6 +59,7 @@ class GoogleController < ApplicationController
     @remove_group = params[:remove_group].presence || GoogleHelper::REMOVE_GROUP
     @use_remove_group = params[:use_remove_group].present? ? params[:use_remove_group] == 'true' : true
     @clear_remove_group = params[:clear_remove_group].present? ? params[:clear_remove_group] == 'true' : true
+    @preview_only = params[:preview_only].present? ? params[:preview_only] == 'true' : false
 
     begin
       if(@commit)
@@ -71,10 +72,15 @@ class GoogleController < ApplicationController
           use_remove_group: @use_remove_group,
           remove_group: @remove_group,
           clear_remove_group: @clear_remove_group,
-          add_only: params[:add_only].present?
+          add_only: params[:add_only].present?,
+          preview_only: @preview_only
         )
 
-        flash[:notice] = "Group sync job has been queued for #{@group_email}. The sync will run in the background."
+        if @preview_only
+          flash[:notice] = "Preview mode: Populating remove group #{@remove_group} without modifying #{@group_email}. Check the Rails logs to monitor progress."
+        else
+          flash[:notice] = "Group sync job has been queued for #{@group_email}. The sync will run in the background."
+        end
         redirect_to google_group_sync_path(group_id: @group_id)
         return
       end

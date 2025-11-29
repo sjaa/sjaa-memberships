@@ -50,12 +50,17 @@
 
           <div class="form-group mb-3">
             <%= submit_tag 'Queue Sync Job (Add and Remove)', class: 'btn btn-sm btn-primary mr-2' %>
-            <%= submit_tag 'Queue Sync Job (Add Only)', class: 'btn btn-sm btn-success', onclick: "document.getElementById('add_only_field').value='true'; return true;" %>
+            <%= submit_tag 'Queue Sync Job (Add Only)', class: 'btn btn-sm btn-success mr-2', onclick: "document.getElementById('add_only_field').value='true'; return true;" %>
+            <%= submit_tag 'Preview Mode (Populate Remove Group)', class: 'btn btn-sm btn-warning', onclick: "document.getElementById('preview_only_field').value='true'; return true;" %>
             <%= hidden_field_tag :add_only, '', id: 'add_only_field' %>
+            <%= hidden_field_tag :preview_only, '', id: 'preview_only_field' %>
           </div>
 
           <p class="text-muted mb-0">
             <small>The sync will run as a background job. Check the Rails logs to monitor progress.</small>
+          </p>
+          <p class="text-info mb-0">
+            <small><strong>Tip:</strong> Use preview mode to warn members before removing them. It will populate the remove group without modifying the primary group.</small>
           </p>
         <% end %>
       </div>

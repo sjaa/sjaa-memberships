@@ -219,6 +219,34 @@ class GoogleGroupSyncJobTest < ActiveJob::TestCase
       "Expected default remove group #{default_group} to be used"
   end
 
+  test "preview mode populates remove group without modifying primary group" do
+    delete_calls = []
+    insert_calls = []
+
+    stub_google_api_sync_track_all_with_members(delete_calls, insert_calls) do
+      GoogleGroupSyncJob.perform_now(
+        @admin.email,
+        @group.email,
+        group_id: @group.id,
+        use_remove_group: true,
+        remove_group: 'expired-members@sjaa.net',
+        clear_remove_group: true,
+        preview_only: true
+      )
+    end
+
+    # Verify remove group was populated (expired member should be added)
+    remove_group_inserts = insert_calls.select { |call| call[:group] == 'expired-members@sjaa.net' }
+    assert remove_group_inserts.size > 0, "Expected members to be added to remove group in preview mode"
+
+    # Verify primary group was not modified
+    primary_group_deletes = delete_calls.select { |call| call[:group] == @group.email }
+    primary_group_inserts = insert_calls.select { |call| call[:group] == @group.email }
+
+    assert_equal 0, primary_group_deletes.size, "Expected no deletes from primary group in preview mode"
+    assert_equal 0, primary_group_inserts.size, "Expected no inserts to primary group in preview mode"
+  end
+
   private
 
   def stub_google_api_not_called
@@ -272,6 +300,17 @@ class GoogleGroupSyncJobTest < ActiveJob::TestCase
     end
   end
 
+  def stub_google_api_sync_track_all_with_members(delete_calls, insert_calls)
+    mock_auth = Object.new
+    mock_client = create_mock_client_with_members([], delete_calls, insert_calls)
+
+    self.stub :get_auth, mock_auth do
+      Google::Apis::AdminDirectoryV1::DirectoryService.stub :new, mock_client do
+        yield
+      end
+    end
+  end
+
   def stub_google_api_error
     mock_auth = Object.new
     mock_client = Object.new
@@ -307,6 +346,50 @@ class GoogleGroupSyncJobTest < ActiveJob::TestCase
       if group.include?('expired') || group.include?('remove')
         admin_member = Google::Apis::AdminDirectoryV1::Member.new(email: 'admin@sjaa.net')
         members << admin_member
+      end
+
+      Google::Apis::AdminDirectoryV1::Members.new(members: members, next_page_token: nil)
+    end
+
+    def mock_client.delete_member(group, email)
+      @delete_calls << { method: :delete_member, group: group, email: email }
+      nil
+    end
+
+    def mock_client.insert_member(group, member)
+      @insert_calls << { method: :insert_member, group: group, email: member.email }
+      nil
+    end
+
+    mock_client
+  end
+
+  def create_mock_client_with_members(calls_tracker = [], delete_calls = [], insert_calls = [])
+    mock_client = Object.new
+
+    # Track calls
+    mock_client.instance_variable_set(:@calls_tracker, calls_tracker)
+    mock_client.instance_variable_set(:@delete_calls, delete_calls)
+    mock_client.instance_variable_set(:@insert_calls, insert_calls)
+
+    def mock_client.authorization=(auth); end
+
+    def mock_client.list_members(group, page_token: nil)
+      @calls_tracker << { method: :list_members, group: group, page_token: page_token }
+
+      # Return mock response with members
+      members = []
+
+      # Admin user in remove group
+      if group.include?('expired') || group.include?('remove')
+        admin_member = Google::Apis::AdminDirectoryV1::Member.new(email: 'admin@sjaa.net')
+        members << admin_member
+      end
+
+      # Expired member in primary group (to simulate someone who needs to be removed)
+      if !group.include?('expired') && !group.include?('remove')
+        expired_member = Google::Apis::AdminDirectoryV1::Member.new(email: 'expired@example.com')
+        members << expired_member
       end
 
       Google::Apis::AdminDirectoryV1::Members.new(members: members, next_page_token: nil)
