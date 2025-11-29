@@ -1,4 +1,11 @@
-<% skill_level = people_skill&.skill_level || 0 %>
+<%
+  # Get the integer value from the enum (skill_level returns string key, we need the integer)
+  skill_level = if people_skill
+    PeopleSkill.skill_levels[people_skill.skill_level] || 0
+  else
+    0
+  end
+%>
 
 <div class="card mb-3 skill-card <%= 'skill-active' if skill_level.to_i > 0 %>"
      data-skill-id="<%= skill.id %>">
@@ -14,8 +21,18 @@
       <div class="col-12 col-md-6">
         <%= hidden_field_tag "person[skills_attributes][][skill_id]", skill.id %>
 
+        <%
+          # Apply color class based on skill level to match JavaScript behavior
+          color_class = case skill_level
+          when 0 then 'text-muted'
+          when 1 then 'text-info'
+          when 2 then 'text-warning'
+          when 3 then 'text-success'
+          else 'text-muted'
+          end
+        %>
         <label class="form-label small mb-1">
-          Skill Level: <strong data-skill-target="skillValue-<%= skill.id %>"><%= skill_level_name(skill_level) %></strong>
+          Skill Level: <strong class="<%= color_class %>" data-skill-target="skillValue-<%= skill.id %>"><%= skill_level_name(skill_level) %></strong>
         </label>
         <%= range_field_tag "person[skills_attributes][][skill_level]",
             skill_level,
