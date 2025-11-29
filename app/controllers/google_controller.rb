@@ -57,8 +57,8 @@ class GoogleController < ApplicationController
     @diff = params[:diff].present?
     @commit = params[:commit].present?
     @remove_group = params[:remove_group].presence || GoogleHelper::REMOVE_GROUP
-    @use_remove_group = params[:use_remove_group].present? ? params[:use_remove_group] == 'true' : true
-    @clear_remove_group = params[:clear_remove_group].present? ? params[:clear_remove_group] == 'true' : true
+    @use_remove_group = params[:use_remove_group].present? ? params[:use_remove_group] == 'true' : false
+    @clear_remove_group = params[:clear_remove_group].present? ? params[:clear_remove_group] == 'true' : false
     @preview_only = params[:preview_only].present? ? params[:preview_only] == 'true' : false
 
     begin
