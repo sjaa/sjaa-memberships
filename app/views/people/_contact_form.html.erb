@@ -1,9 +1,7 @@
 <div id="<%=id%>" class="card mb-3">
-  <% if @user&.is_a?(Admin) %>
-    <div class="card-header">
-      <h3 class="h5 mb-0">Contact <%= i ? i+1 : 'New'%></h3>
-    </div>
-  <% end %>
+  <div class="card-header">
+    <h3 class="h5 mb-0">Contact <%= i ? i+1 : 'New'%></h3>
+  </div>
   <div class="card-body">
     <%= hidden_field_tag 'person[contact_attributes][][id]', contact.id %>
     <%= hidden_field_tag 'person[contact_attributes][][person_id]', person&.id %>
@@ -34,16 +32,20 @@
       </div>
 
       <% if @user&.is_a?(Admin) %>
-      <div class="col-md-6 mt-2">
-        <%= label_tag :contact_primary, 'Primary', class: 'form-label' %><br/>
-        <%= combobox_tag 'person[contact_attributes][][primary]', [{display: 'Yes', value: 'true'}, {display: 'No', value: 'false'}], value: contact.primary ? 'true' : 'false' %>
-      </div>
-      <div class="col-md-6 mt-2">
-        <%= label_tag :delete_button, 'Delete', class: 'form-label' %><br/>
-        <button type="button" data-form-id-param="<%=id%>" data-action="form#removeField" class="btn btn-danger">Remove Contact</button>
-      </div>
+        <div class="col-md-6 mt-2">
+          <%= label_tag :contact_primary, 'Primary', class: 'form-label' %><br/>
+          <%= combobox_tag 'person[contact_attributes][][primary]', [{display: 'Yes', value: 'true'}, {display: 'No', value: 'false'}], value: contact.primary ? 'true' : 'false' %>
+        </div>
+        <div class="col-md-6 mt-2">
+          <%= label_tag :delete_button, 'Delete', class: 'form-label' %><br/>
+          <button type="button" data-form-id-param="<%=id%>" data-action="form#removeField" class="btn btn-danger">Remove Contact</button>
+        </div>
       <% else %>
-        <%= hidden_field_tag 'person[contact_attributes][][primary]', true %>
+        <%= hidden_field_tag 'person[contact_attributes][][primary]', contact.primary ? 'true' : 'false' %>
+        <div class="col-md-12 mt-2">
+          <%= label_tag :delete_button, 'Remove This Contact', class: 'form-label' %><br/>
+          <button type="button" data-form-id-param="<%=id%>" data-action="form#removeField" class="btn btn-danger">Remove Contact</button>
+        </div>
       <% end %>
     </div>
   </div>
