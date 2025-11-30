@@ -29,6 +29,7 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <% if @user %>
+              <%= render 'shared/notifications' %>
               <% if @user.class != Admin && ENV['SHOW_MENTOR'] %>
                 <li class="nav-item">
                   <%= link_to 'Mentorship', mentorship_path, class: 'nav-link' %>
@@ -123,6 +124,10 @@
           <br/>
           © <small>SJAA 2025</small>
       </div>
+    </div>
+
+    <!-- Toast Container for Notifications -->
+    <div id="notification-toast-container" class="position-fixed top-0 end-0 p-3" style="z-index: 9999;">
     </div>
   </body>
 </html>

@@ -82,6 +82,19 @@ docker compose run --rm app bin/rails runner "SolidQueue::Job.delete_all"
 
 # Clear only pending jobs
 docker compose run --rm app bin/rails runner "SolidQueue::Job.where(finished_at: nil).delete_all"
+
+# Run jobs WITH notifications (sends real-time notifications to the specified user)
+docker compose run --rm app bin/rails runner "GoogleGroupSyncJob.perform_now_with_notifications('vp@sjaa.net', 'vp@sjaa.net', 'members@sjaa.net')"
+docker compose run --rm app bin/rails runner "CalendarSyncJob.perform_later_with_notifications('admin@sjaa.net', 'admin@sjaa.net')"
+```
+
+### Notifications
+```bash
+# Notification management tasks
+docker compose run --rm app bin/rails notifications:cleanup            # Clean notifications older than 10 days
+docker compose run --rm app bin/rails notifications:cleanup[30]        # Clean notifications older than 30 days
+docker compose run --rm app bin/rails notifications:cleanup_read       # Delete all read notifications
+docker compose run --rm app bin/rails notifications:stats              # Show notification statistics
 ```
 
 ### Docker Development
@@ -218,6 +231,82 @@ The `CalendarSyncJob` syncs events from multiple sources (Google Calendar, Meetu
 **Requirements:**
 - Admin account with valid Google Calendar refresh token
 - Calendar aggregator configuration file (optional, uses defaults if not present)
+
+### Real-Time Notification System
+The application uses Action Cable for real-time WebSocket notifications to both admins and members.
+
+#### Notification Categories
+- **job_status**: Background job lifecycle events (queued, started, completed, failed)
+- **membership**: Membership-related notifications (renewal reminders, expiration, activation)
+- **mentorship**: Mentorship contact requests
+- **admin_alert**: Admin-specific alerts (new signups, sync errors, import completion)
+- **system**: General system notifications
+
+#### Notification Priorities
+- **urgent**: Requires immediate attention (membership expired)
+- **high**: Important but not critical (job failures, approaching renewals)
+- **normal**: Standard notifications (job completions, mentor contacts)
+- **low**: Informational (job queued, job started)
+
+#### Key Components
+- **Notification Model** ([app/models/notification.rb](app/models/notification.rb)): Polymorphic associations to Person and Admin
+- **NotificationChannel** ([app/channels/notification_channel.rb](app/channels/notification_channel.rb)): User-specific WebSocket channel
+- **NotificationBroadcaster** ([app/services/notification_broadcaster.rb](app/services/notification_broadcaster.rb)): Service for creating and broadcasting notifications
+- **NotificationsController** ([app/controllers/notifications_controller.rb](app/controllers/notifications_controller.rb)): REST API for notification management
+
+#### Using Notifications with Background Jobs
+Jobs can opt-in to automatic notifications by setting `enable_notifications = true`:
+
+```ruby
+class MyJob < ApplicationJob
+  self.enable_notifications = true
+
+  def perform(*args)
+    # Job automatically sends notifications on queue, start, complete, and failure
+  end
+end
+
+# Trigger with notifications - user can be Person, Admin, email, or ID
+MyJob.perform_later_with_notifications(current_user, arg1, arg2)     # From controller
+MyJob.perform_now_with_notifications('admin@sjaa.net', arg1, arg2)  # From command line
+MyJob.perform_now_with_notifications(123, arg1, arg2)               # Using ID
+```
+
+**User Parameter Formats:**
+- `Person` or `Admin` object (from controller with `current_user`)
+- Email string: `'admin@sjaa.net'` or `'member@example.com'` (looks up both Admin and Person)
+- Integer ID: `123` (checks Admin table first, then Person table)
+
+
+#### Manual Notification Broadcasting
+```ruby
+# Notify about membership events
+NotificationBroadcaster.membership_renewal_reminder(person, 7)
+NotificationBroadcaster.membership_activated(person, membership)
+
+# Notify mentors of contact requests
+NotificationBroadcaster.mentor_contact_received(mentor, requester_name, message)
+
+# Admin alerts
+NotificationBroadcaster.google_sync_error(admin, error_message)
+NotificationBroadcaster.csv_import_completed(admin, imported_count, errors_count)
+
+# System messages
+NotificationBroadcaster.system_message(user, "Your profile is incomplete", priority: 'normal')
+```
+
+#### Notification Lifecycle
+1. Notification created in database with recipient (Person or Admin)
+2. After creation, notification automatically broadcasts via Action Cable
+3. Connected users receive real-time toast popup and bell badge update
+4. Clicking notification marks it as read
+5. Notifications auto-delete after 10 days (configurable via rake task)
+
+#### User Interface
+- **Bell Icon**: Navbar notification bell with unread count badge
+- **Dropdown**: Recent unread notifications with category icons and timestamps
+- **Toast Popups**: Auto-dismissing alerts for new notifications
+- **Priority Styling**: Color-coded badges based on notification priority
 
 ### Email System
 Configured for SMTP delivery using Google's servers with app passwords. Development can use Mailtrap for testing.

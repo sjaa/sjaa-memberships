@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_11_26_025814) do
+ActiveRecord::Schema[7.1].define(version: 2025_11_30_020555) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
   enable_extension "plpgsql"
@@ -225,6 +225,16 @@ ActiveRecord::Schema[7.1].define(version: 2025_11_26_025814) do
     t.boolean "unread", default: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "category", default: "system"
+    t.string "priority", default: "normal"
+    t.string "job_id"
+    t.string "job_status"
+    t.string "action_url"
+    t.index ["admin_id", "unread"], name: "index_notifications_on_admin_id_and_unread"
+    t.index ["category"], name: "index_notifications_on_category"
+    t.index ["created_at"], name: "index_notifications_on_created_at"
+    t.index ["job_id"], name: "index_notifications_on_job_id"
+    t.index ["person_id", "unread"], name: "index_notifications_on_person_id_and_unread"
     t.index ["unread"], name: "index_notifications_on_unread"
   end
 

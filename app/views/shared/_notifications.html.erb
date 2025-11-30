@@ -1,0 +1,30 @@
+<!-- Notification Bell -->
+<li class="nav-item dropdown">
+  <a class="nav-link position-relative" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" id="notification-bell">
+    <i class="bi bi-bell"></i>
+    <span class="position-absolute translate-middle badge rounded-pill bg-danger" id="notification-badge" style="display: none; font-size: 0.6rem;">
+      0
+    </span>
+  </a>
+  <div class="dropdown-menu dropdown-menu-start notification-dropdown" aria-labelledby="notification-bell" id="notification-dropdown-container">
+    <h6 class="dropdown-header d-flex justify-content-between align-items-center">
+      <span>Notifications</span>
+      <div>
+        <button class="btn btn-sm btn-link text-muted p-0" id="toggle-notifications" style="font-size: 0.75rem;" data-show-all="true">
+          Show unread only
+        </button>
+        <span class="text-muted">|</span>
+        <button class="btn btn-sm btn-link text-muted p-0" id="mark-all-read" style="font-size: 0.75rem;">
+          Mark all read
+        </button>
+      </div>
+    </h6>
+    <div class="dropdown-divider"></div>
+    <div id="notification-dropdown" class="notification-list">
+      <div class="dropdown-item text-center text-muted py-3">
+        <i class="bi bi-inbox"></i>
+        <div>No notifications</div>
+      </div>
+    </div>
+  </div>
+</li>

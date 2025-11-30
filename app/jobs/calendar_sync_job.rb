@@ -2,6 +2,9 @@ class CalendarSyncJob < ApplicationJob
   include GoogleHelper
 
   queue_as :default
+
+  # Enable notifications for this job
+  self.enable_notifications = true
   
   # CalendarSyncJob.perform_later(admin_email, calendar_id, days, commit)
   #   admin_email - Email of admin with valid refresh token for calendar access

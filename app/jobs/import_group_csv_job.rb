@@ -2,6 +2,9 @@ class ImportGroupCsvJob < ApplicationJob
   queue_as :default
   include GoogleHelper
 
+  # Enable notifications for this job
+  self.enable_notifications = true
+
   # ImportGroupCsvJob.perform_later(group_id, csv_content, admin_id)
   #   group_id - ID of the group to add members to
   #   csv_content - String content of the CSV file

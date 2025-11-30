@@ -3,6 +3,9 @@ class GoogleGroupSyncJob < ApplicationJob
   include JobsHelper
   include GoogleHelper
 
+  # Enable notifications for this job
+  self.enable_notifications = true
+
   # GoogleGroupSyncJob.perform_later(
   #   admin_email,
   #   group_email,

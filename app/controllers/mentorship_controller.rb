@@ -25,6 +25,11 @@ class MentorshipController < ApplicationController
     if @mentor && @message.present?
       begin
         AccountMailer.mentor_contact(@mentor, @requester, @message).deliver_now
+
+        # Send real-time notification to mentor
+        requester_name = @requester.respond_to?(:full_name) ? @requester.full_name : @requester.email
+        NotificationBroadcaster.mentor_contact_received(@mentor, requester_name, @message)
+
         flash[:notice] = "Your message has been sent to #{@mentor.first_name} #{@mentor.last_name}."
         render json: { success: true, message: flash[:notice] }, status: :ok
       rescue => e
