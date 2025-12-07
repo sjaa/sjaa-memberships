@@ -71,7 +71,8 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
   
   # Defines the root path route ("/")
-  root "people#index"
+  # Redirect to appropriate page based on user type
+  root "home#index"
   
   # API Keys
   resources :api_keys

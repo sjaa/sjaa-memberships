@@ -5,7 +5,7 @@ class PeopleController < ApplicationController
 
   before_action :set_person, only: %i[ show edit update destroy new_membership  remind]
   skip_before_action :verify_authenticity_token, only: [:update], if: -> { request.format.json? }
-  
+
   # GET /people or /people.json
   def index
     people_filter
@@ -168,6 +168,7 @@ class PeopleController < ApplicationController
   end
   
   private
+
   # Use callbacks to share common setup or constraints between actions.
   def set_person
     @person = Person.find(params[:id])
