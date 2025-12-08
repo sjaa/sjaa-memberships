@@ -27,10 +27,12 @@
 <% end %>
 
 <div class="card mb-4">
+  <div class="card-header">
+    <h5 class="card-title mb-0">Opportunity Description</h5>
+  </div>
   <div class="card-body">
-    <h5 class="card-title">Description</h5>
     <% if @opportunity.description.present? %>
-      <p class="card-text"><%= simple_format(@opportunity.description) %></p>
+      <div class="card-text"><%= markdown(@opportunity.description) %></div>
     <% else %>
       <p class="text-muted">No description provided.</p>
     <% end %>

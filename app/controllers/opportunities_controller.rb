@@ -1,5 +1,6 @@
 class OpportunitiesController < ApplicationController
   before_action :set_opportunity, only: [:show, :edit, :update, :destroy, :contact]
+  include MarkdownHelper
 
   # GET /opportunities
   def index

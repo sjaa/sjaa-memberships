@@ -107,3 +107,6 @@ gem "uri", ">= 1.0.3"
 source "https://rubygems.pkg.github.com/sjaa" do
   gem "sjaa-ruby-calendar-aggregator", "0.5.1"
 end
+
+# Markdown support
+gem 'redcarpet'
