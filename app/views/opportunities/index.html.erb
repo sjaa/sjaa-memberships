@@ -40,7 +40,7 @@
               </div>
             <% end %>
             <% if opportunity.description.present? %>
-              <p class="card-text"><%= truncate(opportunity.description, length: 500) %></p>
+              <div class="card-text"><%= markdown(truncate(opportunity.description, length: 500)) %></div>
             <% end %>
 
             <% if opportunity.opportunity_skills.any? %>
