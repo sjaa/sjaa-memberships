@@ -421,4 +421,215 @@ class OpportunitiesControllerTest < ActionDispatch::IntegrationTest
     end
     assert_redirected_to edit_person_path(@person)
   end
+
+  # Active/Inactive opportunity tests
+  test "person index only shows active opportunities" do
+    inactive_opportunity = Opportunity.create!(
+      title: 'Inactive Opportunity',
+      description: 'This is inactive',
+      active: false
+    )
+
+    login_as_person(@person)
+    get opportunities_url
+    assert_response :success
+
+    # Should show active opportunity
+    assert_select '.card-header h5', text: @opportunity.title
+
+    # Should NOT show inactive opportunity
+    assert_select '.card-header h5', text: inactive_opportunity.title, count: 0
+  end
+
+  test "admin index shows both active and inactive opportunities" do
+    inactive_opportunity = Opportunity.create!(
+      title: 'Inactive Opportunity',
+      description: 'This is inactive',
+      active: false
+    )
+
+    login_as_admin(@admin)
+    get opportunities_url
+    assert_response :success
+
+    # Should show active opportunity
+    assert_match @opportunity.title, response.body
+
+    # Should show inactive opportunity
+    assert_match inactive_opportunity.title, response.body
+  end
+
+  test "admin index shows INACTIVE badge for inactive opportunities" do
+    inactive_opportunity = Opportunity.create!(
+      title: 'Inactive Opportunity',
+      description: 'This is inactive',
+      active: false
+    )
+
+    login_as_admin(@admin)
+    get opportunities_url
+    assert_response :success
+
+    # Should show INACTIVE badge
+    assert_select '.badge', text: 'INACTIVE'
+  end
+
+  test "person index does not show INACTIVE badge (no inactive opportunities visible)" do
+    inactive_opportunity = Opportunity.create!(
+      title: 'Inactive Opportunity',
+      description: 'This is inactive',
+      active: false
+    )
+
+    login_as_person(@person)
+    get opportunities_url
+    assert_response :success
+
+    # Should not show INACTIVE badge (no inactive opportunities visible)
+    assert_select '.badge', text: 'INACTIVE', count: 0
+  end
+
+  test "inactive opportunity show page displays INACTIVE badge" do
+    inactive_opportunity = Opportunity.create!(
+      title: 'Inactive Opportunity',
+      description: 'This is inactive',
+      active: false
+    )
+
+    login_as_admin(@admin)
+    get opportunity_url(inactive_opportunity)
+    assert_response :success
+
+    # Should show INACTIVE badge in title
+    assert_select 'h1 .badge', text: 'INACTIVE'
+  end
+
+  test "inactive opportunity show page displays warning alert" do
+    inactive_opportunity = Opportunity.create!(
+      title: 'Inactive Opportunity',
+      description: 'This is inactive',
+      active: false
+    )
+
+    login_as_admin(@admin)
+    get opportunity_url(inactive_opportunity)
+    assert_response :success
+
+    # Should show warning alert
+    assert_select '.alert-warning', text: /not visible to members/i
+  end
+
+  test "active opportunity show page does not display INACTIVE badge" do
+    login_as_person(@person)
+    get opportunity_url(@opportunity)
+    assert_response :success
+
+    # Should NOT show INACTIVE badge
+    assert_select 'h1 .badge', text: 'INACTIVE', count: 0
+  end
+
+  test "active opportunity show page does not display warning alert" do
+    login_as_person(@person)
+    get opportunity_url(@opportunity)
+    assert_response :success
+
+    # Should NOT show warning alert about being inactive
+    assert_select '.alert-warning', text: /not visible to members/i, count: 0
+  end
+
+  test "should create opportunity as active by default" do
+    login_as_admin(@admin)
+
+    assert_difference('Opportunity.count', 1) do
+      post opportunities_url, params: {
+        opportunity: {
+          title: 'New Opportunity',
+          description: 'Test'
+        }
+      }
+    end
+
+    opportunity = Opportunity.last
+    assert opportunity.active
+  end
+
+  test "should create opportunity as inactive when specified" do
+    login_as_admin(@admin)
+
+    assert_difference('Opportunity.count', 1) do
+      post opportunities_url, params: {
+        opportunity: {
+          title: 'New Inactive Opportunity',
+          description: 'Test',
+          active: false
+        }
+      }
+    end
+
+    opportunity = Opportunity.last
+    assert_not opportunity.active
+  end
+
+  test "should create opportunity as active when explicitly specified" do
+    login_as_admin(@admin)
+
+    assert_difference('Opportunity.count', 1) do
+      post opportunities_url, params: {
+        opportunity: {
+          title: 'New Active Opportunity',
+          description: 'Test',
+          active: true
+        }
+      }
+    end
+
+    opportunity = Opportunity.last
+    assert opportunity.active
+  end
+
+  test "should update opportunity to inactive" do
+    login_as_admin(@admin)
+
+    patch opportunity_url(@opportunity), params: {
+      opportunity: {
+        active: false
+      }
+    }
+
+    @opportunity.reload
+    assert_not @opportunity.active
+  end
+
+  test "should update opportunity to active" do
+    @opportunity.update!(active: false)
+
+    login_as_admin(@admin)
+
+    patch opportunity_url(@opportunity), params: {
+      opportunity: {
+        active: true
+      }
+    }
+
+    @opportunity.reload
+    assert @opportunity.active
+  end
+
+  test "edit form includes active checkbox" do
+    login_as_admin(@admin)
+    get edit_opportunity_url(@opportunity)
+    assert_response :success
+
+    # Should have active checkbox
+    assert_select 'input[type=checkbox][name=?]', 'opportunity[active]'
+  end
+
+  test "new form includes active checkbox" do
+    login_as_admin(@admin)
+    get new_opportunity_url
+    assert_response :success
+
+    # Should have active checkbox
+    assert_select 'input[type=checkbox][name=?]', 'opportunity[active]'
+  end
 end

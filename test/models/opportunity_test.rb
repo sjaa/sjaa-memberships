@@ -306,4 +306,66 @@ class OpportunityTest < ActiveSupport::TestCase
     assert_equal 1, @opportunity.opportunity_skills.count
     assert_equal 2, @opportunity.opportunity_skills.first.skill_level_before_type_cast
   end
+
+  # Test active/inactive functionality
+  test 'opportunity is active by default' do
+    opportunity = Opportunity.create!(title: 'Test Opportunity')
+    assert opportunity.active
+  end
+
+  test 'opportunity can be created as inactive' do
+    opportunity = Opportunity.create!(title: 'Test Opportunity', active: false)
+    assert_not opportunity.active
+  end
+
+  test 'active scope returns only active opportunities' do
+    active_opp1 = Opportunity.create!(title: 'Active 1', active: true)
+    active_opp2 = Opportunity.create!(title: 'Active 2', active: true)
+    inactive_opp = Opportunity.create!(title: 'Inactive', active: false)
+
+    active_opportunities = Opportunity.active
+
+    assert_includes active_opportunities, active_opp1
+    assert_includes active_opportunities, active_opp2
+    assert_not_includes active_opportunities, inactive_opp
+  end
+
+  test 'inactive scope returns only inactive opportunities' do
+    active_opp = Opportunity.create!(title: 'Active', active: true)
+    inactive_opp1 = Opportunity.create!(title: 'Inactive 1', active: false)
+    inactive_opp2 = Opportunity.create!(title: 'Inactive 2', active: false)
+
+    inactive_opportunities = Opportunity.inactive
+
+    assert_includes inactive_opportunities, inactive_opp1
+    assert_includes inactive_opportunities, inactive_opp2
+    assert_not_includes inactive_opportunities, active_opp
+  end
+
+  test 'for_person respects scope when called on active opportunities' do
+    person = Person.create!(first_name: 'Test', last_name: 'User', password: 'password123')
+
+    # Clear any existing opportunities from setup
+    Opportunity.destroy_all
+
+    active_opp = Opportunity.create!(title: 'Active', active: true)
+    inactive_opp = Opportunity.create!(title: 'Inactive', active: false)
+
+    # When called on Opportunity.active scope
+    result = Opportunity.active.for_person(person)
+
+    assert_equal 1, result.length
+    assert_equal active_opp, result[0][0]
+  end
+
+  test 'opportunity can be updated from active to inactive' do
+    @opportunity.update!(active: false)
+    assert_not @opportunity.active
+  end
+
+  test 'opportunity can be updated from inactive to active' do
+    @opportunity.update!(active: false)
+    @opportunity.update!(active: true)
+    assert @opportunity.active
+  end
 end

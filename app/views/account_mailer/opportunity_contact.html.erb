@@ -20,6 +20,32 @@
   <li><strong>Name:</strong> <%= @requester.first_name %> <%= @requester.last_name %></li>
   <li><strong>Email:</strong> <%= @requester.email %></li>
 </ul>
+
+<% if @requester.people_skills.where('skill_level > 0').any? %>
+<h3>Volunteer's Skills:</h3>
+<ul>
+  <% @requester.people_skills.includes(:skill).where('skill_level > 0').order('skills.name').each do |ps| %>
+    <li>
+      <strong><%= ps.skill.name %>:</strong> <%= ps.skill_level_name %>
+      <%
+        # Check if this skill is required for the opportunity
+        required_skill = @opportunity.opportunity_skills.find_by(skill_id: ps.skill_id)
+        if required_skill
+          if ps.skill_level_before_type_cast >= required_skill.skill_level_before_type_cast
+      %>
+        <span style="color: #28a745;">✓ Meets requirement</span>
+      <%
+          else
+      %>
+        <span style="color: #ffc107;">⚠ Below requirement (<%= required_skill.skill_level_name %> needed)</span>
+      <%
+          end
+        end
+      %>
+    </li>
+  <% end %>
+</ul>
+<% end %>
 <% end %>
 
 <p>

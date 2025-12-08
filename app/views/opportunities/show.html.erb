@@ -1,4 +1,9 @@
-<h1 class="mb-3"><%= @opportunity.title %></h1>
+<h1 class="mb-3">
+  <%= @opportunity.title %>
+  <% unless @opportunity.active %>
+    <span class="badge bg-secondary">INACTIVE</span>
+  <% end %>
+</h1>
 <div class="d-flex gap-2 mb-4">
   <%= link_to 'Back', opportunities_path, class: 'btn btn-secondary' %>
   <% if policy(@opportunity).edit? %>
@@ -8,6 +13,12 @@
     <%= button_to 'Delete', @opportunity, method: :delete, data: { turbo_confirm: 'Are you sure you want to delete this opportunity?' }, class: 'btn btn-danger' %>
   <% end %>
 </div>
+
+<% if !@opportunity.active %>
+  <div class="alert alert-warning">
+    <strong>Note:</strong> This opportunity is currently inactive and not visible to members.
+  </div>
+<% end %>
 
 <% if @matching %>
   <div class="alert alert-success">

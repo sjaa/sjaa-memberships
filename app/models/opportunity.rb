@@ -5,6 +5,10 @@ class Opportunity < ApplicationRecord
   validates :title, presence: true
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_blank: true
 
+  # Scopes for filtering by active status
+  scope :active, -> { where(active: true) }
+  scope :inactive, -> { where(active: false) }
+
   # Get opportunities matching a person's skills
   # Returns array of [opportunity, full_match_count, partial_match_count]
   def self.for_person(person)

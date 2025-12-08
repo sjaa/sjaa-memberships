@@ -30,6 +30,14 @@
         <%= form.email_field :email, class: 'form-control' %>
         <small class="form-text text-muted">Email address for volunteers to contact about this opportunity.</small>
       </div>
+
+      <div class="mb-3">
+        <div class="form-check">
+          <%= form.check_box :active, class: 'form-check-input' %>
+          <%= form.label :active, class: 'form-check-label' %>
+          <small class="form-text text-muted d-block">Only active opportunities are visible to members.</small>
+        </div>
+      </div>
     </div>
   </div>
 

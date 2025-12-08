@@ -13,9 +13,14 @@
   <div class="row">
     <% @opportunities_with_match.each do |opportunity, full_matches, partial_matches| %>
       <div class="col-md-6 col-lg-4 mb-4">
-        <div class="card h-100 <%= 'border-success' if full_matches > 0 && partial_matches == 0 %>">
-          <div class="card-header">
-            <h5 class="mb-0"><%= opportunity.title %></h5>
+        <div class="card h-100 <%= 'border-success' if full_matches > 0 && partial_matches == 0 %> <%= 'border-secondary' unless opportunity.active %>">
+          <div class="card-header <%= 'bg-secondary text-white' unless opportunity.active %>">
+            <h5 class="mb-0">
+              <%= opportunity.title %>
+              <% if policy(Opportunity).edit? && !opportunity.active %>
+                <span class="badge bg-dark">INACTIVE</span>
+              <% end %>
+            </h5>
           </div>
           <div class="card-body">
             <% if @user&.is_a?(Person) && (full_matches > 0 || partial_matches > 0) %>

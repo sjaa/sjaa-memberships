@@ -3,11 +3,13 @@ class OpportunitiesController < ApplicationController
 
   # GET /opportunities
   def index
-    @opportunities = Opportunity.includes(:opportunity_skills, :skills).all
+    # Admins see all opportunities, others only see active ones
+    base_scope = admin_user? ? Opportunity.all : Opportunity.active
+    @opportunities = base_scope.includes(:opportunity_skills, :skills)
 
     # If user is a Person, sort by skill match
     if @user&.is_a?(Person)
-      @opportunities_with_match = Opportunity.for_person(@user)
+      @opportunities_with_match = base_scope.for_person(@user)
     else
       @opportunities_with_match = @opportunities.map { |o| [o, 0, 0] }
     end
@@ -82,7 +84,11 @@ class OpportunitiesController < ApplicationController
     @opportunity = Opportunity.find(params[:id])
   end
 
+  def admin_user?
+    @user.is_a?(Admin) && @user.has_permission?(:write)
+  end
+
   def opportunity_params
-    params.require(:opportunity).permit(:title, :description, :email, skills_attributes: [:skill_id, :skill_level])
+    params.require(:opportunity).permit(:title, :description, :email, :active, skills_attributes: [:skill_id, :skill_level])
   end
 end
