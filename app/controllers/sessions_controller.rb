@@ -170,7 +170,7 @@ class SessionsController < ApplicationController
   private
 
   def login_params
-    params.permit(:email, :password, :first_name, :last_name)
+    params.permit(:email, :password, :first_name, :last_name, :authenticity_token, :commit)
   end
 
 end

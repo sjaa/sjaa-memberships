@@ -48,11 +48,15 @@ class ActionDispatch::IntegrationTest
   
   # Add integration test helpers here
   def login_as_admin(admin)
-    post login_path, params: { email: admin.email, password: 'password123' }
+    post sessions_path, params: { email: admin.email, password: 'password123' }
   end
-  
+
   def login_as_person(person)
-    post login_path, params: { email: person.email, password: 'password123' }
+    # Reload to ensure contacts association is loaded
+    person.reload
+    email = person.email || person.contacts.first&.email
+    raise "Person #{person.id} has no email address" if email.blank?
+    post sessions_path, params: { email: email, password: 'password123' }
   end
 end
 

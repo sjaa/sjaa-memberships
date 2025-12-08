@@ -1,8 +1,7 @@
 class OpportunitiesController < ApplicationController
-  before_action :set_opportunity, only: [:show, :edit, :update, :destroy]
+  before_action :set_opportunity, only: [:show, :edit, :update, :destroy, :contact]
 
   # GET /opportunities
-  # Public view for all users (including non-authenticated)
   def index
     @opportunities = Opportunity.includes(:opportunity_skills, :skills).all
 
@@ -10,7 +9,7 @@ class OpportunitiesController < ApplicationController
     if @user&.is_a?(Person)
       @opportunities_with_match = Opportunity.for_person(@user)
     else
-      @opportunities_with_match = @opportunities.map { |o| [o, 0, false] }
+      @opportunities_with_match = @opportunities.map { |o| [o, 0, 0] }
     end
   end
 

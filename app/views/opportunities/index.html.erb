@@ -11,18 +11,29 @@
   </div>
 <% else %>
   <div class="row">
-    <% @opportunities_with_match.each do |opportunity, match_count, meets_requirements| %>
+    <% @opportunities_with_match.each do |opportunity, full_matches, partial_matches| %>
       <div class="col-md-6 col-lg-4 mb-4">
-        <div class="card h-100 <%= 'border-success' if meets_requirements %>">
-          <div class="card-header d-flex justify-content-between align-items-center">
+        <div class="card h-100 <%= 'border-success' if full_matches > 0 && partial_matches == 0 %>">
+          <div class="card-header">
             <h5 class="mb-0"><%= opportunity.title %></h5>
-            <% if @user&.is_a?(Person) && match_count > 0 %>
-              <span class="badge <%= meets_requirements ? 'bg-success' : 'bg-warning' %>">
-                <%= match_count %> skill<%= 's' if match_count != 1 %> match
-              </span>
-            <% end %>
           </div>
           <div class="card-body">
+            <% if @user&.is_a?(Person) && (full_matches > 0 || partial_matches > 0) %>
+              <div class="mb-3">
+                <% if full_matches > 0 %>
+                  <div class="text-success mb-1">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <strong><%= full_matches %></strong> full <%= 'match'.pluralize(full_matches) %>
+                  </div>
+                <% end %>
+                <% if partial_matches > 0 %>
+                  <div class="text-warning">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <strong><%= partial_matches %></strong> partial <%= 'match'.pluralize(partial_matches) %>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
             <% if opportunity.description.present? %>
               <p class="card-text"><%= truncate(opportunity.description, length: 500) %></p>
             <% end %>

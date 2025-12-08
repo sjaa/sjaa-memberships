@@ -6,28 +6,31 @@ class Opportunity < ApplicationRecord
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_blank: true
 
   # Get opportunities matching a person's skills
-  # Returns array of [opportunity, matching_skill_count, has_required_level]
+  # Returns array of [opportunity, full_match_count, partial_match_count]
   def self.for_person(person)
-    return all.map { |o| [o, 0, false] } if person.nil? || person.active_skills.empty?
+    return all.map { |o| [o, 0, 0] } if person.nil? || person.active_skills.empty?
 
     person_skill_map = person.people_skills.includes(:skill).each_with_object({}) do |ps, hash|
       hash[ps.skill_id] = ps.skill_level_before_type_cast
     end
 
     all.includes(:opportunity_skills, :skills).map do |opportunity|
-      matching_count = 0
-      has_required_level = true
+      full_match_count = 0
+      partial_match_count = 0
 
       opportunity.opportunity_skills.each do |os|
         person_level = person_skill_map[os.skill_id] || 0
         if person_level > 0
-          matching_count += 1
-          has_required_level = false if person_level < os.skill_level_before_type_cast
+          if person_level >= os.skill_level_before_type_cast
+            full_match_count += 1
+          else
+            partial_match_count += 1
+          end
         end
       end
 
-      [opportunity, matching_count, has_required_level && matching_count > 0]
-    end.sort_by { |_, count, _| -count }
+      [opportunity, full_match_count, partial_match_count]
+    end.sort_by { |_, full, partial| [-full, -partial] }
   end
 
   # Check if a person meets the skill requirements
