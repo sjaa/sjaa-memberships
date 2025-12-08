@@ -19,9 +19,6 @@
 <ul>
   <li><strong>Name:</strong> <%= @requester.first_name %> <%= @requester.last_name %></li>
   <li><strong>Email:</strong> <%= @requester.email %></li>
-  <% if @requester.phone.present? %>
-    <li><strong>Phone:</strong> <%= @requester.phone %></li>
-  <% end %>
 </ul>
 <% end %>
 
