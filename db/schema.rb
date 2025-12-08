@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_11_26_025814) do
+ActiveRecord::Schema[7.1].define(version: 2025_12_07_224823) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
   enable_extension "plpgsql"
@@ -225,7 +225,37 @@ ActiveRecord::Schema[7.1].define(version: 2025_11_26_025814) do
     t.boolean "unread", default: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "category", default: "system"
+    t.string "priority", default: "normal"
+    t.string "job_id"
+    t.string "job_status"
+    t.string "action_url"
+    t.index ["admin_id", "unread"], name: "index_notifications_on_admin_id_and_unread"
+    t.index ["category"], name: "index_notifications_on_category"
+    t.index ["created_at"], name: "index_notifications_on_created_at"
+    t.index ["job_id"], name: "index_notifications_on_job_id"
+    t.index ["person_id", "unread"], name: "index_notifications_on_person_id_and_unread"
     t.index ["unread"], name: "index_notifications_on_unread"
+  end
+
+  create_table "opportunities", force: :cascade do |t|
+    t.string "title", null: false
+    t.text "description"
+    t.string "email"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["title"], name: "index_opportunities_on_title"
+  end
+
+  create_table "opportunity_skills", force: :cascade do |t|
+    t.bigint "opportunity_id", null: false
+    t.bigint "skill_id", null: false
+    t.integer "skill_level", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["opportunity_id", "skill_id"], name: "index_opportunity_skills_on_opportunity_id_and_skill_id", unique: true
+    t.index ["opportunity_id"], name: "index_opportunity_skills_on_opportunity_id"
+    t.index ["skill_id"], name: "index_opportunity_skills_on_skill_id"
   end
 
   create_table "orders", force: :cascade do |t|
@@ -446,6 +476,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_11_26_025814) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "opportunity_skills", "opportunities"
+  add_foreign_key "opportunity_skills", "skills"
   add_foreign_key "people_skills", "people"
   add_foreign_key "people_skills", "skills"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade

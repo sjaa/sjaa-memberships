@@ -1,0 +1,51 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1>Volunteer Opportunities</h1>
+  <% if policy(Opportunity).new? %>
+    <%= link_to 'New Opportunity', new_opportunity_path, class: 'btn btn-success' %>
+  <% end %>
+</div>
+
+<% if @opportunities_with_match.empty? %>
+  <div class="alert alert-info">
+    <p class="mb-0">No volunteer opportunities are currently available. Check back soon!</p>
+  </div>
+<% else %>
+  <div class="row">
+    <% @opportunities_with_match.each do |opportunity, match_count, meets_requirements| %>
+      <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100 <%= 'border-success' if meets_requirements %>">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><%= opportunity.title %></h5>
+            <% if @user&.is_a?(Person) && match_count > 0 %>
+              <span class="badge <%= meets_requirements ? 'bg-success' : 'bg-warning' %>">
+                <%= match_count %> skill<%= 's' if match_count != 1 %> match
+              </span>
+            <% end %>
+          </div>
+          <div class="card-body">
+            <% if opportunity.description.present? %>
+              <p class="card-text"><%= truncate(opportunity.description, length: 500) %></p>
+            <% end %>
+
+            <% if opportunity.opportunity_skills.any? %>
+              <h6 class="mt-3 mb-2">Required Skills:</h6>
+              <div class="d-flex flex-wrap gap-1">
+                <% opportunity.opportunity_skills.includes(:skill).each do |os| %>
+                  <span class="badge <%= skill_level_bg(os.skill_level_before_type_cast) %>">
+                    <%= os.skill.name %> (<%= os.skill_level_name %>)
+                  </span>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+          <div class="card-footer bg-transparent">
+            <%= link_to 'View Details', opportunity, class: 'btn btn-primary btn-sm' %>
+            <% if policy(opportunity).edit? %>
+              <%= link_to 'Edit', edit_opportunity_path(opportunity), class: 'btn btn-secondary btn-sm' %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% end %>

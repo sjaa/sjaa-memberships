@@ -1,0 +1,84 @@
+<%= form_with(model: opportunity, data: { controller: 'opportunity-form' }) do |form| %>
+  <% if opportunity.errors.any? %>
+    <div class="alert alert-danger">
+      <h4><%= pluralize(opportunity.errors.count, "error") %> prohibited this opportunity from being saved:</h4>
+      <ul>
+        <% opportunity.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="card-title">Basic Information</h5>
+
+      <div class="mb-3">
+        <%= form.label :title, class: 'form-label' %>
+        <%= form.text_field :title, class: 'form-control', required: true %>
+      </div>
+
+      <div class="mb-3">
+        <%= form.label :description, class: 'form-label' %>
+        <%= form.text_area :description, class: 'form-control', rows: 6 %>
+        <small class="form-text text-muted">Describe the volunteer opportunity, responsibilities, and time commitment.</small>
+      </div>
+
+      <div class="mb-3">
+        <%= form.label :email, 'Contact Email', class: 'form-label' %>
+        <%= form.email_field :email, class: 'form-control' %>
+        <small class="form-text text-muted">Email address for volunteers to contact about this opportunity.</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="card-title">Required Skills</h5>
+      <p class="text-muted">Select the skills needed for this opportunity and the minimum proficiency level required.</p>
+
+      <div id="skills-container" data-opportunity-form-target="skillsContainer">
+        <% existing_skills = opportunity.opportunity_skills.includes(:skill).index_by(&:skill_id) %>
+        <% @skills.each do |skill| %>
+          <% os = existing_skills[skill.id] %>
+          <% current_level = os ? os.skill_level_before_type_cast : 0 %>
+
+          <div class="mb-3 skill-item" data-skill-id="<%= skill.id %>">
+            <div class="d-flex align-items-center">
+              <div class="flex-grow-1">
+                <label class="form-label mb-1"><%= skill.name %></label>
+                <% if skill.description.present? %>
+                  <p class="text-muted small mb-2"><%= skill.description %></p>
+                <% end %>
+                <div class="d-flex align-items-center gap-3">
+                  <input type="range"
+                         name="opportunity[skills_attributes][][skill_level]"
+                         min="0"
+                         max="3"
+                         value="<%= current_level %>"
+                         class="form-range flex-grow-1"
+                         data-action="input->opportunity-form#updateSkillLevel"
+                         data-skill-id="<%= skill.id %>">
+                  <input type="hidden"
+                         name="opportunity[skills_attributes][][skill_id]"
+                         value="<%= skill.id %>">
+                  <span class="badge skill-level-badge <%= skill_level_bg(current_level) %>"
+                        data-opportunity-form-target="skillBadge"
+                        data-skill-id="<%= skill.id %>">
+                    <%= skill_level_name(current_level) %>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex gap-2">
+    <%= form.submit class: 'btn btn-success' %>
+    <%= link_to 'Cancel', opportunity.persisted? ? opportunity : opportunities_path, class: 'btn btn-secondary' %>
+  </div>
+<% end %>

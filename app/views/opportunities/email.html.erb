@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f5f5f5;">
+  <!-- Wrapper table for centering and max-width -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f5f5f5;">
+    <tr>
+      <td align="center" style="padding: 20px 0;">
+        <!-- Content container with max-width -->
+        <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; background-color: #ffffff;">
+          <tr>
+            <td style="padding: 30px;">
+
+              <!-- Header -->
+              <h1 style="margin: 0 0 20px 0; font-size: 28px; color: #333333;">Volunteer Opportunities</h1>
+
+              <% if @opportunities_with_match.empty? %>
+                <p style="margin: 0; padding: 15px; background-color: #d1ecf1; border: 1px solid #bee5eb; border-radius: 4px; color: #0c5460;">
+                  No volunteer opportunities are currently available. Check back soon!
+                </p>
+              <% else %>
+                <% @opportunities_with_match.each_with_index do |(opportunity, match_count, meets_requirements), index| %>
+
+                  <!-- Opportunity Card -->
+                  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 20px; border: 1px solid <%= meets_requirements ? '#28a745' : '#dee2e6' %>; border-radius: 4px; overflow: hidden;">
+                    <!-- Card Header -->
+                    <tr>
+                      <td style="padding: 15px; background-color: #f8f9fa; border-bottom: 1px solid #dee2e6;">
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                          <tr>
+                            <td>
+                              <h2 style="margin: 0; font-size: 20px; color: #333333;"><%= opportunity.title %></h2>
+                            </td>
+                            <% if @current_user&.is_a?(Person) && match_count > 0 %>
+                              <td align="right" style="white-space: nowrap;">
+                                <span style="display: inline-block; padding: 4px 8px; background-color: <%= meets_requirements ? '#28a745' : '#ffc107' %>; color: white; border-radius: 4px; font-size: 12px; font-weight: bold;">
+                                  <%= match_count %> skill<%= 's' if match_count != 1 %> match
+                                </span>
+                              </td>
+                            <% end %>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+
+                    <!-- Card Body -->
+                    <tr>
+                      <td style="padding: 15px;">
+                        <% if opportunity.description.present? %>
+                          <p style="margin: 0 0 15px 0; color: #666666; line-height: 1.5;"><%= simple_format(opportunity.description) %></p>
+                        <% end %>
+
+                        <% if opportunity.opportunity_skills.any? %>
+                          <p style="margin: 15px 0 10px 0; font-weight: bold; color: #333333;">Required Skills:</p>
+                          <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                              <td>
+                                <% opportunity.opportunity_skills.includes(:skill).each do |os| %>
+                                  <span style="display: inline-block; margin: 0 5px 5px 0; padding: 4px 8px; background-color: #6c757d; color: white; border-radius: 4px; font-size: 12px;">
+                                    <%= os.skill.name %> (<%= os.skill_level_name %>)
+                                  </span>
+                                <% end %>
+                              </td>
+                            </tr>
+                          </table>
+                        <% end %>
+
+                        <% if opportunity.email.present? %>
+                          <p style="margin: 15px 0 0 0; font-size: 14px; color: #666666;">
+                            <strong>Contact:</strong> <a href="mailto:<%= opportunity.email %>" style="color: #007bff; text-decoration: none;"><%= opportunity.email %></a>
+                          </p>
+                        <% end %>
+                      </td>
+                    </tr>
+
+                    <!-- Card Footer -->
+                    <tr>
+                      <td style="padding: 10px 15px; background-color: #f8f9fa; border-top: 1px solid #dee2e6;">
+                        <a href="<%= opportunity_url(opportunity) %>" style="display: inline-block; padding: 6px 12px; background-color: #007bff; color: white; text-decoration: none; border-radius: 4px; font-size: 14px;">View Details</a>
+                      </td>
+                    </tr>
+                  </table>
+
+                <% end %>
+              <% end %>
+
+              <!-- Footer -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #dee2e6;">
+                <tr>
+                  <td align="center" style="color: #666666; font-size: 14px;">
+                    <p style="margin: 0 0 10px 0;">
+                      <a href="<%= opportunities_url %>" style="color: #007bff; text-decoration: none;">View all opportunities online</a>
+                    </p>
+                    <p style="margin: 0;">
+                      <a href="https://www.sjaa.net" style="color: #007bff; text-decoration: none;" target="_blank">sjaa.net</a><br/>
+                      © SJAA 2025
+                    </p>
+                  </td>
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

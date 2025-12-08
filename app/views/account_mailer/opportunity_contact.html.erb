@@ -1,0 +1,39 @@
+<h1>SJAA Volunteer Opportunity Interest</h1>
+<p>A member has expressed interest in the following volunteer opportunity:</p>
+
+<div style="background-color: #f8f9fa; padding: 16px; margin: 20px 0; border-left: 4px solid #007bff;">
+  <h2 style="margin-top: 0;"><%= @opportunity.title %></h2>
+  <% if @opportunity.description.present? %>
+    <%= simple_format(@opportunity.description) %>
+  <% end %>
+</div>
+
+<h3>Message from <%= @requester_name %>:</h3>
+
+<div style="border-left: 4px solid #0066cc; padding-left: 16px; margin: 20px 0; color: #333;">
+  <%= simple_format(@message) %>
+</div>
+
+<% if @requester&.is_a?(Person) %>
+<h3>Contact Information:</h3>
+<ul>
+  <li><strong>Name:</strong> <%= @requester.first_name %> <%= @requester.last_name %></li>
+  <li><strong>Email:</strong> <%= @requester.email %></li>
+  <% if @requester.phone.present? %>
+    <li><strong>Phone:</strong> <%= @requester.phone %></li>
+  <% end %>
+</ul>
+<% end %>
+
+<p>
+You can reply directly to this email to respond to the volunteer.
+</p>
+
+<p>
+Thank you for supporting SJAA volunteer opportunities!
+</p>
+
+<p>
+Clear skies,<br/>
+SJAA Leadership
+</p>
