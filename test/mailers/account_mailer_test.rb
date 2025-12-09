@@ -28,7 +28,7 @@ class AccountMailerTest < ActionMailer::TestCase
   end
 
   test "opportunity_contact email includes basic information" do
-    message = "I'm interested in helping with this opportunity!"
+    message = "I am interested in helping with this opportunity!"
 
     email = AccountMailer.opportunity_contact(@opportunity, @person, message)
 
@@ -103,6 +103,155 @@ class AccountMailerTest < ActionMailer::TestCase
 
   test "opportunity_contact returns NullMail when opportunity is nil" do
     email = AccountMailer.opportunity_contact(nil, @person, "Test message")
+    assert_instance_of ActionMailer::Base::NullMail, email.message
+  end
+
+  test "volunteer_opportunity_matches email includes all categories" do
+    # Create opportunities for each category
+    full_match = Opportunity.create!(title: 'Rails Developer', active: true)
+    OpportunitySkill.create!(opportunity: full_match, skill: @skill1, skill_level: 2)
+
+    partial_match = Opportunity.create!(title: 'Full Stack Developer', active: true)
+    OpportunitySkill.create!(opportunity: partial_match, skill: @skill1, skill_level: 2)
+    OpportunitySkill.create!(opportunity: partial_match, skill: @skill2, skill_level: 3)
+
+    no_skills = Opportunity.create!(title: 'Event Volunteer', active: true)
+
+    # Give person skills
+    PeopleSkill.create!(person: @person, skill: @skill1, skill_level: 3)
+    PeopleSkill.create!(person: @person, skill: @skill2, skill_level: 1)
+
+    email = AccountMailer.volunteer_opportunity_matches(
+      @person,
+      [full_match],
+      [partial_match],
+      [no_skills]
+    )
+
+    assert_equal '[SJAA] Volunteer Opportunities Match Your Skills', email.subject
+    assert_equal [@person.email], email.to
+
+    body = email.html_part.body.to_s
+
+    # Check for all sections
+    assert_includes body, 'Great Matches for Your Skills'
+    assert_includes body, full_match.title
+
+    assert_includes body, 'Opportunities Where You Could Contribute'
+    assert_includes body, partial_match.title
+
+    assert_includes body, 'Open to All Volunteers'
+    assert_includes body, no_skills.title
+
+    assert_includes body, 'opportunities'
+  end
+
+  test "volunteer_opportunity_matches email with only full matches" do
+    full_match = Opportunity.create!(title: 'Rails Developer', active: true)
+
+    email = AccountMailer.volunteer_opportunity_matches(
+      @person,
+      [full_match],
+      [],
+      []
+    )
+
+    body = email.html_part.body.to_s
+
+    assert_includes body, 'Great Matches for Your Skills'
+    assert_includes body, full_match.title
+    assert_not_includes body, 'Opportunities Where You Could Contribute'
+    assert_not_includes body, 'Open to All Volunteers'
+  end
+
+  test "volunteer_opportunity_matches email with no matches encourages browsing" do
+    email = AccountMailer.volunteer_opportunity_matches(
+      @person,
+      [],
+      [],
+      []
+    )
+
+    body = email.html_part.body.to_s
+
+    assert_includes body, 'currently no active opportunities'
+    assert_includes body, 'browse all available opportunities'
+    assert_includes body, 'opportunities'
+  end
+
+  test "volunteer_opportunity_matches includes opportunity descriptions" do
+    opportunity = Opportunity.create!(
+      title: 'Test Opportunity',
+      description: 'This is a test description with **markdown**',
+      active: true
+    )
+
+    email = AccountMailer.volunteer_opportunity_matches(
+      @person,
+      [],
+      [],
+      [opportunity]
+    )
+
+    body = email.html_part.body.to_s
+
+    assert_includes body, opportunity.title
+    # Markdown should be rendered
+    assert_includes body, '<strong>markdown</strong>'
+  end
+
+  test "volunteer_opportunity_matches includes required skills for opportunities" do
+    opportunity = Opportunity.create!(title: 'Test Opportunity', active: true)
+    OpportunitySkill.create!(opportunity: opportunity, skill: @skill1, skill_level: 2)
+    OpportunitySkill.create!(opportunity: opportunity, skill: @skill2, skill_level: 3)
+
+    email = AccountMailer.volunteer_opportunity_matches(
+      @person,
+      [],
+      [opportunity],
+      []
+    )
+
+    body = email.html_part.body.to_s
+
+    assert_includes body, 'Required Skills'
+    assert_includes body, @skill1.name
+    assert_includes body, @skill2.name
+    assert_includes body, 'Intermediate' # Level 2
+    assert_includes body, 'Advanced' # Level 3
+  end
+
+  test "volunteer_opportunity_matches text part includes all content" do
+    opportunity = Opportunity.create!(title: 'Test Opportunity', active: true)
+
+    email = AccountMailer.volunteer_opportunity_matches(
+      @person,
+      [opportunity],
+      [],
+      []
+    )
+
+    text_body = email.text_part.body.to_s
+
+    assert_includes text_body, 'SJAA Volunteer Opportunities'
+    assert_includes text_body, @person.first_name
+    assert_includes text_body, opportunity.title
+    assert_includes text_body, 'GREAT MATCHES FOR YOUR SKILLS'
+  end
+
+  test "volunteer_opportunity_matches returns NullMail when person is nil" do
+    email = AccountMailer.volunteer_opportunity_matches(nil, [], [], [])
+    assert_instance_of ActionMailer::Base::NullMail, email.message
+  end
+
+  test "volunteer_opportunity_matches returns NullMail when person has no email" do
+    person_no_email = Person.create!(
+      first_name: 'No',
+      last_name: 'Email',
+      password: 'password123'
+    )
+
+    email = AccountMailer.volunteer_opportunity_matches(person_no_email, [], [], [])
     assert_instance_of ActionMailer::Base::NullMail, email.message
   end
 end

@@ -95,4 +95,19 @@ class AccountMailer < ApplicationMailer
       subject: "[SJAA Volunteer] Interest in: #{@opportunity.title}"
     )
   end
+
+  def volunteer_opportunity_matches(person, full_matches, partial_matches, no_skill_required)
+    @person = person
+    @full_matches = full_matches
+    @partial_matches = partial_matches
+    @no_skill_required = no_skill_required
+    @opportunities_url = opportunities_url
+
+    return nil if @person.nil? || @person.email.nil?
+
+    mail(
+      to: @person.email,
+      subject: '[SJAA] Volunteer Opportunities Match Your Skills'
+    )
+  end
 end

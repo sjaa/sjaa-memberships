@@ -77,6 +77,12 @@ docker compose run --rm app bin/rails runner "lib/solid_queue_simple_worker.rb -
 # With debug logging
 docker compose run --rm app bin/rails runner "lib/solid_queue_simple_worker.rb -d"
 
+# Volunteer opportunity matching job - emails volunteers about matching opportunities
+docker compose run --rm app bin/rails runner "VolunteerOpportunityMatchJob.perform_now"
+
+# Queue for later processing
+docker compose run --rm app bin/rails runner "VolunteerOpportunityMatchJob.perform_later"
+
 # Clear all queued jobs without running them
 docker compose run --rm app bin/rails runner "SolidQueue::Job.delete_all"
 
