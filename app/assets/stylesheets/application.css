@@ -211,16 +211,15 @@ label.btn {
   overflow: hidden;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1006px) {
   .notification-dropdown {
-    width: calc(100vw - 3rem);
-    max-width: 350px;
+    width: 100%;
   }
 }
 
 @media (max-width: 400px) {
   .notification-dropdown {
-    width: calc(100vw - 2rem);
+    width: 100%;
   }
 }
 
