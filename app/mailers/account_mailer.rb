@@ -1,6 +1,6 @@
 class AccountMailer < ApplicationMailer
   default from: 'website@sjaa.net', reply_to: 'asksjaa@sjaa.net'
-  helper :application
+  helper :application, :markdown
 
   def password_reset(user)
     @user = user
@@ -70,6 +70,29 @@ class AccountMailer < ApplicationMailer
       to: @mentor.email,
       reply_to: reply_to_email,
       subject: "[SJAA Mentorship] Message from #{@requester_name}"
+    )
+  end
+
+  def opportunity_contact(opportunity, requester, message)
+    @opportunity = opportunity
+    @requester = requester
+    @message = message
+    return nil if @opportunity.nil? || @message.blank?
+
+    reply_to_email = @requester&.email || 'asksjaa@sjaa.net'
+    @requester_name = @requester&.class == Person ? "#{@requester.first_name} #{@requester.last_name}" : @requester&.email
+
+    # Build recipients list: opportunity contact, volunteer@sjaa.net, and requester
+    recipients = []
+    recipients << @opportunity.email if @opportunity.email.present?
+    recipients << 'volunteer@sjaa.net'
+    recipients << @requester.email if @requester&.email.present?
+    recipients = recipients.uniq.compact
+
+    mail(
+      to: recipients,
+      reply_to: reply_to_email,
+      subject: "[SJAA Volunteer] Interest in: #{@opportunity.title}"
     )
   end
 end

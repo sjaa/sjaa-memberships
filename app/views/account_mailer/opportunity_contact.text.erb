@@ -1,0 +1,35 @@
+SJAA Volunteer Opportunity Interest
+=====================================
+
+A member has expressed interest in the following volunteer opportunity:
+
+Opportunity: <%= @opportunity.title %>
+<% if @opportunity.description.present? %>
+<%= @opportunity.description %>
+<% end %>
+
+Message from <%= @requester_name %>:
+-------------------------------------
+<%= @message %>
+
+<% if @requester&.is_a?(Person) %>
+Contact Information:
+--------------------
+Name: <%= @requester.first_name %> <%= @requester.last_name %>
+Email: <%= @requester.email %>
+
+<% if @requester.people_skills.where('skill_level > 0').any? %>
+Volunteer's Skills:
+-------------------
+<% @requester.people_skills.includes(:skill).where('skill_level > 0').order('skills.name').each do |ps| %>
+  * <%= ps.skill.name %>: <%= ps.skill_level_name %><% required_skill = @opportunity.opportunity_skills.find_by(skill_id: ps.skill_id) %><% if required_skill %><% if ps.skill_level_before_type_cast >= required_skill.skill_level_before_type_cast %> ✓ Meets requirement<% else %> ⚠ Below requirement (<%= required_skill.skill_level_name %> needed)<% end %><% end %>
+<% end %>
+<% end %>
+<% end %>
+
+You can reply directly to this email to respond to the volunteer.
+
+Thank you for supporting SJAA volunteer opportunities!
+
+Clear skies,
+SJAA Leadership

@@ -1,0 +1,106 @@
+<h1 class="mb-3">
+  <%= @opportunity.title %>
+  <% unless @opportunity.active %>
+    <span class="badge bg-secondary">INACTIVE</span>
+  <% end %>
+</h1>
+<div class="d-flex gap-2 mb-4">
+  <%= link_to 'Back', opportunities_path, class: 'btn btn-secondary' %>
+  <% if policy(@opportunity).edit? %>
+    <%= link_to 'Edit', edit_opportunity_path(@opportunity), class: 'btn btn-primary' %>
+  <% end %>
+  <% if policy(@opportunity).destroy? %>
+    <%= button_to 'Delete', @opportunity, method: :delete, data: { turbo_confirm: 'Are you sure you want to delete this opportunity?' }, class: 'btn btn-danger' %>
+  <% end %>
+</div>
+
+<% if !@opportunity.active %>
+  <div class="alert alert-warning">
+    <strong>Note:</strong> This opportunity is currently inactive and not visible to members.
+  </div>
+<% end %>
+
+<% if @matching %>
+  <div class="alert alert-success">
+    <strong>Great match!</strong> You meet all the skill requirements for this opportunity.
+  </div>
+<% end %>
+
+<div class="card mb-4">
+  <div class="card-header">
+    <h5 class="card-title mb-0">Opportunity Description</h5>
+  </div>
+  <div class="card-body">
+    <% if @opportunity.description.present? %>
+      <div class="card-text"><%= markdown(@opportunity.description) %></div>
+    <% else %>
+      <p class="text-muted">No description provided.</p>
+    <% end %>
+  </div>
+</div>
+
+<% if @opportunity.opportunity_skills.any? %>
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="card-title">Required Skills</h5>
+      <div class="row">
+        <% @opportunity.opportunity_skills.includes(:skill).each do |os| %>
+          <div class="col-md-6 mb-3">
+            <div class="card">
+              <div class="card-body">
+                <h6 class="card-subtitle mb-2"><%= os.skill.name %></h6>
+                <div class="d-flex align-items-center">
+                  <span class="me-2">Required Level:</span>
+                  <span class="badge <%= skill_level_bg(os.skill_level_before_type_cast) %>">
+                    <%= os.skill_level_name %>
+                  </span>
+                </div>
+                <% if @user&.is_a?(Person) %>
+                  <% person_skill = @user.people_skills.find_by(skill_id: os.skill_id) %>
+                  <% if person_skill && person_skill.skill_level_before_type_cast > 0 %>
+                    <div class="mt-2">
+                      <small>
+                        Your level:
+                        <span class="badge <%= skill_level_bg(person_skill.skill_level_before_type_cast) %>">
+                          <%= person_skill.skill_level_name %>
+                        </span>
+                        <% if person_skill.skill_level_before_type_cast >= os.skill_level_before_type_cast %>
+                          <span class="text-success">✓</span>
+                        <% else %>
+                          <span class="text-warning">⚠</span>
+                        <% end %>
+                      </small>
+                    </div>
+                  <% else %>
+                    <div class="mt-2">
+                      <small class="text-muted">You haven't listed this skill</small>
+                    </div>
+                  <% end %>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<div class="card">
+  <div class="card-body">
+    <h5 class="card-title">Express Interest</h5>
+    <p class="mb-3">
+      Send a message to express your interest in this volunteer opportunity. Your message will be sent to volunteer@sjaa.net<%= ", #{@opportunity.email}" if @opportunity.email.present? %>, and a copy will be sent to you.
+    </p>
+
+    <%= form_with url: contact_opportunity_path(@opportunity), method: :post do |f| %>
+      <div class="mb-3">
+        <%= f.label :message, "Your Message", class: "form-label" %>
+        <%= f.text_area :message, class: "form-control", rows: 5, required: true,
+          placeholder: "Introduce yourself and explain why you're interested in this opportunity..." %>
+      </div>
+
+      <%= f.submit "Send Message", class: "btn btn-success" %>
+    <% end %>
+  </div>
+</div>

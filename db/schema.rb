@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_11_30_020555) do
+ActiveRecord::Schema[7.1].define(version: 2025_12_08_051318) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
   enable_extension "plpgsql"
@@ -238,6 +238,27 @@ ActiveRecord::Schema[7.1].define(version: 2025_11_30_020555) do
     t.index ["unread"], name: "index_notifications_on_unread"
   end
 
+  create_table "opportunities", force: :cascade do |t|
+    t.string "title", null: false
+    t.text "description"
+    t.string "email"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.boolean "active", default: true, null: false
+    t.index ["title"], name: "index_opportunities_on_title"
+  end
+
+  create_table "opportunity_skills", force: :cascade do |t|
+    t.bigint "opportunity_id", null: false
+    t.bigint "skill_id", null: false
+    t.integer "skill_level", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["opportunity_id", "skill_id"], name: "index_opportunity_skills_on_opportunity_id_and_skill_id", unique: true
+    t.index ["opportunity_id"], name: "index_opportunity_skills_on_opportunity_id"
+    t.index ["skill_id"], name: "index_opportunity_skills_on_skill_id"
+  end
+
   create_table "orders", force: :cascade do |t|
     t.decimal "price"
     t.string "token"
@@ -456,6 +477,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_11_30_020555) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "opportunity_skills", "opportunities"
+  add_foreign_key "opportunity_skills", "skills"
   add_foreign_key "people_skills", "people"
   add_foreign_key "people_skills", "skills"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade

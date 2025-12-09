@@ -32,6 +32,9 @@
               <%= render 'shared/notifications' %>
               <% if @user.class != Admin && ENV['SHOW_MENTOR'] %>
                 <li class="nav-item">
+                  <%= link_to 'Volunteer Opportunities', opportunities_path, class: 'nav-link' %>
+                </li>
+                <li class="nav-item">
                   <%= link_to 'Mentorship', mentorship_path, class: 'nav-link' %>
                 </li>
               <% end %>
@@ -48,6 +51,7 @@
                     <li><%= link_to 'Groups', groups_path, class: 'dropdown-item' %></li>
                     <li><%= link_to 'Skills', skills_path, class: 'dropdown-item' %></li>
                     <li><%= link_to 'Tags', tags_path, class: 'dropdown-item' %></li>
+                    <li><%= link_to 'Opportunities', opportunities_path, class: 'dropdown-item' %></li>
                     <% if @user.has_permission? :permit %>
                       <li><a class="dropdown-item" href="/admins">Permissions</a></li>
                     <% end %>

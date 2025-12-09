@@ -329,6 +329,7 @@ GEM
     rbtree3 (0.7.1)
     rdoc (6.10.0)
       psych (>= 4.0.0)
+    redcarpet (3.6.1)
     regexp_parser (2.10.0)
     reline (0.6.0)
       io-console (~> 0.5)
@@ -445,6 +446,7 @@ DEPENDENCIES
   rack (>= 3.2.3)
   rack-session (>= 2.1.1)
   rails (~> 7.1.5.2)
+  redcarpet
   rexml (>= 3.4.2)
   selenium-webdriver
   sjaa-ruby-calendar-aggregator (= 0.5.1)!

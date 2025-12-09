@@ -3,6 +3,9 @@
   <div class="row">
     <div class="col-12">
       <h1>Membership Payment For <%= @person.name %></h1>
+        <div class="alert alert-danger">
+          We are currently investigating an issue with PayPal payments.  Thank you for your patience while we work to correct it.
+        </div>
       <% if @person.is_active?%>
         <div class="alert alert-warning">
           Your membership is currently active, and will end on <strong><%= date_format @person.latest_membership&.end %></strong>.
