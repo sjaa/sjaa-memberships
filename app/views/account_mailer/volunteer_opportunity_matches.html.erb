@@ -1,0 +1,125 @@
+<h1>SJAA Volunteer Opportunities</h1>
+
+<p>Dear <%= @person&.first_name || "SJAA Member" %>,</p>
+
+<p>
+  Thank you for being willing to volunteer with SJAA! We have exciting opportunities that may match your skills and interests.
+</p>
+
+<p>
+  You can browse all volunteer opportunities at any time by visiting:
+  <%= link_to @opportunities_url, @opportunities_url %>
+</p>
+
+<% if @full_matches.any? %>
+<h2>Great Matches for Your Skills</h2>
+<p>
+  These opportunities match all your skills at the required level. We encourage you to apply!
+</p>
+
+<% @full_matches.each do |opportunity| %>
+<div style="margin: 20px 0; padding: 15px; border-left: 4px solid #4CAF50; background-color: #f9f9f9;">
+  <h3 style="margin-top: 0;"><%= link_to opportunity.title, opportunity_url(opportunity) %></h3>
+
+  <% if opportunity.description.present? %>
+  <div style="margin: 10px 0;">
+    <%= markdown(opportunity.description) %>
+  </div>
+  <% end %>
+
+  <% if opportunity.opportunity_skills.any? %>
+  <p style="margin: 5px 0;"><strong>Required Skills:</strong></p>
+  <ul style="margin: 5px 0;">
+    <% opportunity.opportunity_skills.includes(:skill).each do |os| %>
+    <li><%= os.skill.name %> (Level: <%= os.skill_level_name %>)</li>
+    <% end %>
+  </ul>
+  <% end %>
+
+  <p style="margin-top: 10px;">
+    <%= link_to "Apply for this opportunity", opportunity_url(opportunity), style: "display: inline-block; padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 4px;" %>
+  </p>
+</div>
+<% end %>
+<% end %>
+
+<% if @partial_matches.any? %>
+<h2>Opportunities Where You Could Contribute</h2>
+<p>
+  These opportunities match some of your skills, though you may not meet all requirements at the specified level.
+  We still encourage you to reach out and learn more about how you could contribute!
+</p>
+
+<% @partial_matches.each do |opportunity| %>
+<div style="margin: 20px 0; padding: 15px; border-left: 4px solid #FF9800; background-color: #f9f9f9;">
+  <h3 style="margin-top: 0;"><%= link_to opportunity.title, opportunity_url(opportunity) %></h3>
+
+  <% if opportunity.description.present? %>
+  <div style="margin: 10px 0;">
+    <%= markdown(opportunity.description) %>
+  </div>
+  <% end %>
+
+  <% if opportunity.opportunity_skills.any? %>
+  <p style="margin: 5px 0;"><strong>Required Skills:</strong></p>
+  <ul style="margin: 5px 0;">
+    <% opportunity.opportunity_skills.includes(:skill).each do |os| %>
+    <li><%= os.skill.name %> (Level: <%= os.skill_level_name %>)</li>
+    <% end %>
+  </ul>
+  <% end %>
+
+  <p style="margin-top: 10px;">
+    <%= link_to "Learn more and apply", opportunity_url(opportunity), style: "display: inline-block; padding: 10px 20px; background-color: #FF9800; color: white; text-decoration: none; border-radius: 4px;" %>
+  </p>
+</div>
+<% end %>
+<% end %>
+
+<% if @no_skill_required.any? %>
+<h2>Open to All Volunteers</h2>
+<p>
+  These opportunities have no specific skill requirements. Everyone is welcome to apply!
+</p>
+
+<% @no_skill_required.each do |opportunity| %>
+<div style="margin: 20px 0; padding: 15px; border-left: 4px solid #2196F3; background-color: #f9f9f9;">
+  <h3 style="margin-top: 0;"><%= link_to opportunity.title, opportunity_url(opportunity) %></h3>
+
+  <% if opportunity.description.present? %>
+  <div style="margin: 10px 0;">
+    <%= markdown(opportunity.description) %>
+  </div>
+  <% end %>
+
+  <p style="margin-top: 10px;">
+    <%= link_to "Apply for this opportunity", opportunity_url(opportunity), style: "display: inline-block; padding: 10px 20px; background-color: #2196F3; color: white; text-decoration: none; border-radius: 4px;" %>
+  </p>
+</div>
+<% end %>
+<% end %>
+
+<% if @full_matches.empty? && @partial_matches.empty? && @no_skill_required.empty? %>
+<p>
+  While there are currently no active opportunities matching your skills, we encourage you to browse all available opportunities
+  at <%= link_to @opportunities_url, @opportunities_url %>. New opportunities are added regularly, and many positions can accommodate
+  volunteers with varying skill levels.
+</p>
+<% end %>
+
+<hr style="margin: 30px 0; border: none; border-top: 1px solid #ccc;">
+
+<p>
+  <strong>Update Your Skills:</strong> You can update your volunteer skills and preferences at any time by logging into
+  your account at <%= link_to 'https://membership.sjaa.net', 'https://membership.sjaa.net' %>.
+</p>
+
+<p>
+  Thank you for your willingness to contribute to SJAA. Clear skies!
+</p>
+
+<p>
+  Sincerely,<br/>
+  SJAA Volunteer Coordination Team<br/>
+  <%= link_to 'volunteer@sjaa.net', 'mailto:volunteer@sjaa.net' %>
+</p>

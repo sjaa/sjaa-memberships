@@ -1,0 +1,94 @@
+SJAA Volunteer Opportunities
+
+Dear <%= @person&.first_name || "SJAA Member" %>,
+
+Thank you for being willing to volunteer with SJAA! We have exciting opportunities that may match your skills and interests.
+
+You can browse all volunteer opportunities at any time by visiting:
+<%= @opportunities_url %>
+
+<% if @full_matches.any? %>
+===============================================================================
+GREAT MATCHES FOR YOUR SKILLS
+===============================================================================
+
+These opportunities match all your skills at the required level. We encourage you to apply!
+
+<% @full_matches.each do |opportunity| %>
+---
+<%= opportunity.title %>
+<%= opportunity_url(opportunity) %>
+
+<% if opportunity.description.present? %>
+<%= opportunity.description %>
+<% end %>
+
+<% if opportunity.opportunity_skills.any? %>
+Required Skills:
+<% opportunity.opportunity_skills.includes(:skill).each do |os| %>
+  * <%= os.skill.name %> (Level: <%= os.skill_level_name %>)
+<% end %>
+<% end %>
+
+<% end %>
+<% end %>
+
+<% if @partial_matches.any? %>
+===============================================================================
+OPPORTUNITIES WHERE YOU COULD CONTRIBUTE
+===============================================================================
+
+These opportunities match some of your skills, though you may not meet all requirements at the specified level.
+We still encourage you to reach out and learn more about how you could contribute!
+
+<% @partial_matches.each do |opportunity| %>
+---
+<%= opportunity.title %>
+<%= opportunity_url(opportunity) %>
+
+<% if opportunity.description.present? %>
+<%= opportunity.description %>
+<% end %>
+
+<% if opportunity.opportunity_skills.any? %>
+Required Skills:
+<% opportunity.opportunity_skills.includes(:skill).each do |os| %>
+  * <%= os.skill.name %> (Level: <%= os.skill_level_name %>)
+<% end %>
+<% end %>
+
+<% end %>
+<% end %>
+
+<% if @no_skill_required.any? %>
+===============================================================================
+OPEN TO ALL VOLUNTEERS
+===============================================================================
+
+These opportunities have no specific skill requirements. Everyone is welcome to apply!
+
+<% @no_skill_required.each do |opportunity| %>
+---
+<%= opportunity.title %>
+<%= opportunity_url(opportunity) %>
+
+<% if opportunity.description.present? %>
+<%= opportunity.description %>
+<% end %>
+
+<% end %>
+<% end %>
+
+<% if @full_matches.empty? && @partial_matches.empty? && @no_skill_required.empty? %>
+While there are currently no active opportunities matching your skills, we encourage you to browse all available opportunities at <%= @opportunities_url %>. New opportunities are added regularly, and many positions can accommodate volunteers with varying skill levels.
+<% end %>
+
+===============================================================================
+
+Update Your Skills: You can update your volunteer skills and preferences at any time by logging into your account at https://membership.sjaa.net
+
+Thank you for your willingness to contribute to SJAA. Clear skies!
+
+Sincerely,
+SJAA Volunteer Coordination Team
+volunteer@sjaa.net
