@@ -46,6 +46,12 @@ docker compose run --rm app env RUBYOPT="-W0" bin/rails console  # Start Rails c
 docker compose run --rm app bin/rails generate_data                # Generate fake test data (100 people)
 docker compose run --rm app bin/rails patch PATCH_FILE=file.csv COMMIT=true  # Port data from SJAA database
 docker compose run --rm app bin/rails csv_compare CSV1=file1.csv CSV2=file2.csv  # Compare membership lists
+
+# People merging tasks
+docker compose run --rm app bin/rails merge_people KEEPER=123 DUPLICATE=456  # Preview merging two people (dry-run)
+docker compose run --rm app bin/rails merge_people KEEPER=123 DUPLICATE=456 COMMIT=true  # Merge two people by ID
+docker compose run --rm app bin/rails merge_duplicate_emails  # Preview merging people with duplicate emails (dry-run)
+docker compose run --rm app bin/rails merge_duplicate_emails COMMIT=true  # Find and merge people with duplicate emails
 ```
 
 ### Background Jobs
