@@ -44,10 +44,11 @@ docker compose up
 
 5. **Initialize the database:**
    - On first run, the database is automatically initialized with a single admin account: `vp@sjaa.net`
-   - To generate sample data for development:
+   - Sometimes this does not automatically happen and needs to be done manually:
 
 ```sh
-docker container exec -it sjaa-memberships-app-1 bin/rake generate_data
+docker compose run app bin/rails db:setup
+docker compose run app bin/rake generate_data
 ```
 
 6. **Access the application:**
