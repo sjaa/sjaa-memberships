@@ -282,7 +282,7 @@ GEM
       date
       stringio
     public_suffix (6.0.2)
-    puma (6.5.0)
+    puma (7.1.0)
       nio4r (~> 2.0)
     pundit (2.4.0)
       activesupport (>= 3.0.0)
@@ -441,7 +441,7 @@ DEPENDENCIES
   pry-nav
   pry-remote
   pstore
-  puma (>= 5.0)
+  puma (>= 7.0.3)
   pundit
   rack (>= 3.2.3)
   rack-session (>= 2.1.1)
@@ -458,7 +458,7 @@ DEPENDENCIES
   web-console
 
 RUBY VERSION
-   ruby 3.4.1p0
+   ruby 3.4.8p72
 
 BUNDLED WITH
    2.6.2

@@ -14,7 +14,7 @@ class RenewalRemindersJob < ApplicationJob
 
         # Send real-time notification to member
         if person.latest_membership&.end
-          days_until_expiration = (person.latest_membership.end - Date.today).to_i
+          days_until_expiration = (person.latest_membership.end.to_date - Date.today).to_i
           NotificationBroadcaster.membership_renewal_reminder(person, days_until_expiration)
         end
 
