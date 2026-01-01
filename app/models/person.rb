@@ -114,8 +114,8 @@ class Person < ApplicationRecord
   # Members who are within 3 months of expiration are eligible to receive
   # renewal reminders
   def self.renewable_members(date = Date.today)
-    date_max = date.end_of_month + 2.months # Expiring this month and two months ahead
-    date_min = date.beginning_of_month - 3.months # Expired up to 3 months ago
+    date_max = (date.end_of_month + 2.months).to_date # Expiring this month and two months ahead
+    date_min = (date.beginning_of_month - 3.months).to_date # Expired up to 3 months ago
 
     # Begin the Arel madness
     people = Person.arel_table

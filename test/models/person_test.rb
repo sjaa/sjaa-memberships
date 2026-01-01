@@ -752,4 +752,152 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal 'telescopius_user', @person.telescopius.username
   end
 
+  # renewable_members tests
+  test 'renewable_members returns members expiring within renewal window' do
+    # Create a member expiring next month
+    person_expiring_soon = Person.create!(
+      first_name: 'Jane',
+      last_name: 'Smith',
+      password: 'password123',
+      referral: @referral
+    )
+    Contact.create!(email: 'jane@example.com', person: person_expiring_soon, primary: true)
+    Membership.create!(
+      person: person_expiring_soon,
+      start: 1.year.ago.beginning_of_month,
+      term_months: 13 # Expires next month
+    )
+
+    renewable = Person.renewable_members
+    assert_includes renewable, person_expiring_soon
+  end
+
+  test 'renewable_members excludes lifetime members' do
+    # Create a lifetime member
+    lifer = Person.create!(
+      first_name: 'Lifetime',
+      last_name: 'Member',
+      password: 'password123',
+      referral: @referral
+    )
+    Contact.create!(email: 'lifer@example.com', person: lifer, primary: true)
+    Membership.create!(
+      person: lifer,
+      start: Date.current,
+      term_months: nil # Lifetime membership
+    )
+
+    renewable = Person.renewable_members
+    assert_not_includes renewable, lifer
+  end
+
+  test 'renewable_members includes members expired up to 3 months ago' do
+    # Create a member who expired 2 months ago
+    recently_expired = Person.create!(
+      first_name: 'Recently',
+      last_name: 'Expired',
+      password: 'password123',
+      referral: @referral
+    )
+    Contact.create!(email: 'expired@example.com', person: recently_expired, primary: true)
+    Membership.create!(
+      person: recently_expired,
+      start: 1.year.ago.beginning_of_month - 2.months,
+      term_months: 12 # Expired 2 months ago
+    )
+
+    renewable = Person.renewable_members
+    assert_includes renewable, recently_expired
+  end
+
+  test 'renewable_members excludes members expired more than 3 months ago' do
+    # Create a member who expired 4 months ago
+    long_expired = Person.create!(
+      first_name: 'Long',
+      last_name: 'Expired',
+      password: 'password123',
+      referral: @referral
+    )
+    Contact.create!(email: 'longexpired@example.com', person: long_expired, primary: true)
+    Membership.create!(
+      person: long_expired,
+      start: 1.year.ago.beginning_of_month - 4.months,
+      term_months: 12 # Expired 4 months ago
+    )
+
+    renewable = Person.renewable_members
+    assert_not_includes renewable, long_expired
+  end
+
+  test 'renewable_members excludes members expiring too far in future' do
+    # Create a member expiring in 4 months
+    future_member = Person.create!(
+      first_name: 'Future',
+      last_name: 'Member',
+      password: 'password123',
+      referral: @referral
+    )
+    Contact.create!(email: 'future@example.com', person: future_member, primary: true)
+    Membership.create!(
+      person: future_member,
+      start: Date.current.beginning_of_month,
+      term_months: 16 # Expires in 4 months
+    )
+
+    renewable = Person.renewable_members
+    assert_not_includes renewable, future_member
+  end
+
+  test 'renewable_members handles date arithmetic correctly' do
+    # This test specifically verifies that the date arithmetic in renewable_members
+    # doesn't trigger the "undefined method '-@' for Date" error that was fixed
+    # The error occurred when date.beginning_of_month - 3.months returned a Time object
+    # instead of a Date, which then caused issues in the Arel query
+    # The fix ensures .to_date is called to convert to proper Date objects
+
+    # Create a member expiring within the next 2 months (renewable window)
+    person_in_window = Person.create!(
+      first_name: 'Test',
+      last_name: 'Renewal',
+      password: 'password123',
+      referral: @referral
+    )
+    Contact.create!(email: 'renewal@example.com', person: person_in_window, primary: true)
+    Membership.create!(
+      person: person_in_window,
+      start: 11.months.ago.beginning_of_month,
+      term_months: 12 # Expires 1 month from now
+    )
+
+    # This should not raise an error
+    assert_nothing_raised do
+      renewable = Person.renewable_members(Date.today)
+      assert_kind_of Array, renewable
+    end
+
+    # Verify the method returns valid results
+    renewable = Person.renewable_members(Date.today)
+    assert_includes renewable, person_in_window
+  end
+
+  test 'renewable_members with custom date parameter' do
+    # Create a member expiring in February 2026
+    future_person = Person.create!(
+      first_name: 'Future',
+      last_name: 'Test',
+      password: 'password123',
+      referral: @referral
+    )
+    Contact.create!(email: 'futuretest@example.com', person: future_person, primary: true)
+    Membership.create!(
+      person: future_person,
+      start: Date.new(2025, 2, 1),
+      term_months: 12 # Expires February 2026
+    )
+
+    # Query for renewable members as of January 2026
+    renewable = Person.renewable_members(Date.new(2026, 1, 1))
+    assert_includes renewable, future_person
+  end
+
 end
