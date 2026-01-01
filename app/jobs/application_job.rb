@@ -31,9 +31,22 @@ class ApplicationJob < ActiveJob::Base
   end
 
   rescue_from StandardError do |exception|
+    # Send notification to the user who initiated the job
     if self.class.enable_notifications && initiated_by
       NotificationBroadcaster.job_failed(self, initiated_by, exception)
     end
+
+    # Explicitly notify Airbrake (in addition to automatic notification)
+    # This ensures errors are tracked even if automatic tracking fails
+    if defined?(Airbrake)
+      Airbrake.notify(exception) do |notice|
+        notice[:context][:job_class] = self.class.name
+        notice[:context][:job_id] = job_id
+        notice[:context][:arguments] = arguments
+        notice[:context][:initiated_by] = initiated_by&.email if initiated_by.respond_to?(:email)
+      end
+    end
+
     raise exception
   end
 

@@ -2,6 +2,9 @@ class RenewalRemindersJob < ApplicationJob
   queue_as :default
   include JobsHelper
 
+  # Enable notifications for this job
+  self.enable_notifications = true
+
   def perform(*args)
     enable = args[0].downcase.strip == 'enable'
     schedule = args[1]
