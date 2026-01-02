@@ -993,4 +993,95 @@ class PeopleControllerTest < ActionDispatch::IntegrationTest
       end
     end
   end
+
+  test "bulk_add_to_groups should add multiple people to multiple groups" do
+    write_permission = Permission.find_or_create_by(name: 'write')
+    @admin.permissions << write_permission
+    login_as_admin @admin
+
+    group1 = Group.create!(name: "Test Group 1")
+    group2 = Group.create!(name: "Test Group 2")
+
+    person1 = Person.create!(first_name: "Test", last_name: "Person1")
+    person2 = Person.create!(first_name: "Test", last_name: "Person2")
+
+    post bulk_add_to_groups_path, params: {
+      person_ids: [person1.id, person2.id],
+      group_ids: [group1.id, group2.id]
+    }, as: :json
+
+    assert_response :success
+
+    json_response = JSON.parse(response.body)
+    assert_equal 2, json_response['people_count']
+    assert_equal 2, json_response['groups_count']
+    assert_equal 4, json_response['added_count']
+
+    person1.reload
+    person2.reload
+
+    assert_includes person1.groups, group1
+    assert_includes person1.groups, group2
+    assert_includes person2.groups, group1
+    assert_includes person2.groups, group2
+  end
+
+  test "bulk_add_to_groups should not duplicate existing group memberships" do
+    write_permission = Permission.find_or_create_by(name: 'write')
+    @admin.permissions << write_permission
+    login_as_admin @admin
+
+    group1 = Group.create!(name: "Test Group")
+    person1 = Person.create!(first_name: "Test", last_name: "Person")
+    person1.groups << group1
+
+    post bulk_add_to_groups_path, params: {
+      person_ids: [person1.id],
+      group_ids: [group1.id]
+    }, as: :json
+
+    assert_response :success
+
+    json_response = JSON.parse(response.body)
+    assert_equal 0, json_response['added_count']
+
+    person1.reload
+    assert_equal 1, person1.groups.count
+  end
+
+  test "bulk_add_to_groups should require person_ids" do
+    write_permission = Permission.find_or_create_by(name: 'write')
+    @admin.permissions << write_permission
+    login_as_admin @admin
+
+    group1 = Group.create!(name: "Test Group")
+
+    post bulk_add_to_groups_path, params: {
+      person_ids: [],
+      group_ids: [group1.id]
+    }, as: :json
+
+    assert_response :unprocessable_entity
+
+    json_response = JSON.parse(response.body)
+    assert_match /select at least one person and one group/, json_response['error']
+  end
+
+  test "bulk_add_to_groups should require group_ids" do
+    write_permission = Permission.find_or_create_by(name: 'write')
+    @admin.permissions << write_permission
+    login_as_admin @admin
+
+    person1 = Person.create!(first_name: "Test", last_name: "Person")
+
+    post bulk_add_to_groups_path, params: {
+      person_ids: [person1.id],
+      group_ids: []
+    }, as: :json
+
+    assert_response :unprocessable_entity
+
+    json_response = JSON.parse(response.body)
+    assert_match /select at least one person and one group/, json_response['error']
+  end
 end

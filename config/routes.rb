@@ -26,6 +26,7 @@ Rails.application.routes.draw do
   get '/people/welcome/:id', to: 'people#welcome', as: :welcome_email
   post '/people/search', to: 'people#search', as: :people_search
   get '/people/search', to: 'people#search'
+  post '/people/bulk_add_to_groups', to: 'people#bulk_add_to_groups', as: :bulk_add_to_groups
   post '/donations/search', to: 'donations#search', as: :donations_search
   get '/donations/search', to: 'donations#search'
   get '/donations/letter/:id', to: 'donations#send_letter', as: :donations_letter

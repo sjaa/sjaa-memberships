@@ -43,4 +43,8 @@ class PersonPolicy < ApplicationPolicy
   def verify_form?
     verify?
   end
+
+  def bulk_add_to_groups?
+    user&.has_permission?(:write)
+  end
 end

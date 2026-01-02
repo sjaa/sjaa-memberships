@@ -1,21 +1,5 @@
 <%= turbo_frame_tag 'people' do %>
-  <div class="row" data-controller="clipboard column-visibility">
-    <div class="col-sm-12 col-md-6 mt-2">
-      <table class="table table-hover table-striped table-sm">
-        <% @totals&.each do |type, val| %>
-          <tr>
-            <td><strong><%=type&.to_s&.titleize%></strong></td>
-            <td><%=val%><td>
-          </tr>
-        <% end %>
-      </table>
-    </div>
-    <div class="col-12 mt-2">
-      <%= button_tag 'Copy Link', class: 'btn btn-secondary d-inline-block', style: 'min-width: 100px; margin-right: 20px;',
-          data: {action: 'clipboard#copy', clipboard_text_param: people_url(@query_params)}  %>
-      <%= link_to "Download CSV (SJAA DB)", people_path(@query_params&.merge({format: :csv})), class: 'btn btn-success d-inline-block', style: 'margin-right: 20px;', data: {turbo: false} %>
-      <%= link_to "New Person", new_person_path, class: 'btn btn-primary d-inline-block', data: {turbo: false} %>
-    </div>
+  <div class="row" data-controller="clipboard column-visibility bulk-actions" data-bulk-actions-csrf-token-value="<%= form_authenticity_token %>">
     <div class="col-12 mt-2">
       <%= pagy_bootstrap_nav(@pagy, anchor_string: 'data-turbo-frame="_self"').html_safe %>
     </div>
@@ -95,9 +79,65 @@
         </div>
       </div>
     </div>
+    <div class="col-12 mb-3">
+      <div class="accordion" id="bulkActionsAccordion">
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseBulkActions" aria-expanded="false" aria-controls="collapseBulkActions">
+              <strong>Bulk Actions</strong>
+              <span class="badge bg-primary ms-2" data-bulk-actions-target="selectedCount">0</span>
+              <small class="text-muted ms-2">selected</small>
+            </button>
+          </h2>
+          <div id="collapseBulkActions" class="accordion-collapse collapse" data-bs-parent="#bulkActionsAccordion">
+            <div class="accordion-body">
+              <div class="row">
+                <div class="col-12 mb-3">
+                  <p class="mb-2">Add the selected people to the following groups:</p>
+                </div>
+                <div class="col-md-8 col-sm-12 mb-3">
+                  <label for="bulk_group_selector" class="form-label">Select Groups:</label>
+                  <select id="bulk_group_selector" name="group_ids[]" multiple class="form-select" size="6" data-bulk-actions-target="groupSelector">
+                    <% Group.order(:name).each do |group| %>
+                      <option value="<%= group.id %>"><%= group.name %></option>
+                    <% end %>
+                  </select>
+                  <small class="text-muted">Hold Ctrl (Cmd on Mac) to select multiple groups</small>
+                </div>
+                <div class="col-md-4 col-sm-12 mb-3">
+                  <label class="form-label d-block">&nbsp;</label>
+                  <button type="button" class="btn btn-primary w-100" data-bulk-actions-target="submitButton" data-action="click->bulk-actions#submit" disabled>
+                    Add to Groups
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 mb-2">
+      <%= button_tag 'Copy Link', class: 'btn btn-secondary d-inline-block', style: 'min-width: 100px; margin-right: 20px;',
+          data: {action: 'clipboard#copy', clipboard_text_param: people_url(@query_params)}  %>
+      <%= link_to "Download CSV (SJAA DB)", people_path(@query_params&.merge({format: :csv})), class: 'btn btn-success d-inline-block', style: 'margin-right: 20px;', data: {turbo: false} %>
+      <%= link_to "New Person", new_person_path, class: 'btn btn-primary d-inline-block', data: {turbo: false} %>
+    </div>
+    <div class="col-12">
+      <table class="table table-hover table-striped table-sm">
+        <% @totals&.each do |type, val| %>
+          <tr>
+            <td><strong><%=type&.to_s&.titleize%></strong></td>
+            <td><%=val%><td>
+          </tr>
+        <% end %>
+      </table>
+    </div>
     <div class="table-responsive">
       <table class="table table-hover table-striped table-sm" data-column-visibility-target="table">
       <tr>
+        <th style="width: 30px;">
+          <input type="checkbox" class="form-check-input" data-bulk-actions-target="selectAll" data-action="change->bulk-actions#toggleAll" title="Select all">
+        </th>
         <th>Status</th>
         <th>Name</th>
         <th>Email</th>
@@ -117,6 +157,9 @@
           <% active_membership = person.membership_map(@active_memberships, true)&.last %>
           <% active = active_membership ? 'ACTIVE' : 'INACTIVE' %>
           <tr>
+            <td>
+              <input type="checkbox" class="form-check-input" value="<%= person.id %>" data-bulk-actions-target="checkbox" data-action="change->bulk-actions#toggleOne">
+            </td>
             <td class="<%=active.downcase%>"><%=active%></td>
             <td><%=link_to "#{person.first_name} #{person.last_name}", person_path(person.id), data: {turbo: false} %></td>
             <td><%=person.contacts.map(&:email).join('<br/>').html_safe%></td>

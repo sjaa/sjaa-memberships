@@ -53,6 +53,36 @@ class PeopleController < ApplicationController
     render turbo_stream: turbo_stream.replace('people', partial: 'index')
   end
 
+  def bulk_add_to_groups
+    person_ids = params[:person_ids] || []
+    group_ids = params[:group_ids] || []
+
+    if person_ids.empty? || group_ids.empty?
+      render json: { error: 'Please select at least one person and one group' }, status: :unprocessable_entity
+      return
+    end
+
+    people = Person.where(id: person_ids)
+    groups = Group.where(id: group_ids)
+
+    added_count = 0
+    people.each do |person|
+      groups.each do |group|
+        unless person.groups.include?(group)
+          person.groups << group
+          added_count += 1
+        end
+      end
+    end
+
+    render json: {
+      message: "Successfully added #{people.count} people to #{groups.count} group(s). #{added_count} new group memberships created.",
+      added_count: added_count,
+      people_count: people.count,
+      groups_count: groups.count
+    }
+  end
+
   # GET /people/verify
   def verify_form
     @verification_result = nil

@@ -44,6 +44,9 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
     assert_text "Jane Smith"
     assert_text "Memberships"
 
+    # Expand memberships accordion
+    expand_memberships_section
+
     # Select cash payment method for existing membership
     within("#membership_#{@existing_membership.id}") do
       select "Cash", from: "person[membership_attributes][][order_attributes][payment_method]"
@@ -63,6 +66,9 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
   test "admin can edit person's membership and set check payment method" do
     visit edit_person_path(@person)
 
+    # Expand memberships accordion
+    expand_memberships_section
+
     # Select check payment method for existing membership
     within("#membership_#{@existing_membership.id}") do
       select "Check", from: "person[membership_attributes][][order_attributes][payment_method]"
@@ -81,6 +87,9 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
 
   test "admin can edit person's membership and set paypal payment method" do
     visit edit_person_path(@person)
+
+    # Expand memberships accordion
+    expand_memberships_section
 
     # Select paypal payment method for existing membership
     within("#membership_#{@existing_membership.id}") do
@@ -105,6 +114,9 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
 
     visit edit_person_path(@person)
 
+    # Expand memberships accordion
+    expand_memberships_section
+
     # Select none payment method for existing membership
     within("#membership_#{@existing_membership.id}") do
       select "None", from: "person[membership_attributes][][order_attributes][payment_method]"
@@ -123,6 +135,9 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
 
   test "admin can add new membership with cash payment method" do
     visit edit_person_path(@person)
+
+    # Expand memberships accordion
+    expand_memberships_section
 
     # Add a new membership
     click_on "Add Membership"
@@ -154,6 +169,9 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
   test "admin can add new membership with check payment method" do
     visit edit_person_path(@person)
 
+    # Expand memberships accordion
+    expand_memberships_section
+
     # Add a new membership
     click_on "Add Membership"
 
@@ -181,6 +199,9 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
 
   test "admin can add new membership with paypal payment method" do
     visit edit_person_path(@person)
+
+    # Expand memberships accordion
+    expand_memberships_section
 
     # Add a new membership
     click_on "Add Membership"
@@ -214,6 +235,9 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
     assert_text "Jane Smith"
     assert_text "Memberships"
 
+    # Expand memberships accordion
+    expand_memberships_section
+
     # Test that we can see the membership form with payment options
     assert_text "Payment Method"
 
@@ -236,6 +260,9 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
 
     visit edit_person_path(@person)
 
+    # Expand memberships accordion
+    expand_memberships_section
+
     within("#membership_#{@existing_membership.id}") do
       # Verify cash is currently selected
       assert page.has_select?("person[membership_attributes][][order_attributes][payment_method]", selected: "Cash")
@@ -257,6 +284,9 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
 
   test "order price is set correctly when creating membership with payment method" do
     visit edit_person_path(@person)
+
+    # Expand memberships accordion
+    expand_memberships_section
 
     # Add a new membership
     click_on "Add Membership"
@@ -289,6 +319,13 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
   end
 
   private
+
+  def expand_memberships_section
+    # Expand the memberships accordion
+    find('button[data-bs-target="#memberships-collapse"]').click
+    # Wait for the accordion to expand
+    assert_selector('#memberships-collapse.show', wait: 2)
+  end
 
   def setup_test_constants
     unless defined?(SjaaMembers::YEARLY_MEMBERSHIP_RATE)
