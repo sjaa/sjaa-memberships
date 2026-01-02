@@ -36,6 +36,15 @@
                         <i class="bi bi-envelope me-1"></i>Contact Mentor
                       </button>
                     </h4>
+                    <!-- Mentor Description -->
+                    <% if mentor.mentor_description.present? %>
+                      <div class="mb-3">
+                        <div class="alert alert-info mb-0">
+                          <strong>Why I want to mentor:</strong>
+                          <p class="mb-0 mt-2"><%= simple_format(mentor.mentor_description) %></p>
+                        </div>
+                      </div>
+                    <% end %>
                     <!-- Interests -->
                     <% if mentor.interests.any? %>
                       <div class="mb-3">

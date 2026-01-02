@@ -69,6 +69,10 @@
                 <% end %>
               </dd>
             <% end %>
+            <% if @person.mentor && @person.mentor_description.present? %>
+              <dt class="col-sm-4">Why I mentor</dt>
+              <dd class="col-sm-8"><%= simple_format(@person.mentor_description) %></dd>
+            <% end %>
             <% if @person.interests.any? %>
               <dt class="col-sm-4">Interests</dt>
               <dd class="col-sm-8">
