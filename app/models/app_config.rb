@@ -20,7 +20,7 @@ class AppConfig < ApplicationRecord
 
   # Configuration categories
   CATEGORIES = {
-    smtp: 'SMTP Email Settings',
+    smtp: 'SMTP Email Settings (Requires Application Restart)',
     paypal: 'PayPal Payment Settings',
     google: 'Google API Settings'
   }.freeze
