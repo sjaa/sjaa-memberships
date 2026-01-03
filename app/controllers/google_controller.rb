@@ -48,7 +48,7 @@ class GoogleController < ApplicationController
       end
     else
       # Default to hardcoded members group
-      @group_email = GoogleHelper::MEMBERS_GROUP
+      @group_email = members_group
       @members_only = true
       @group_name = "Members"
       @group_id = 'members'
@@ -56,7 +56,7 @@ class GoogleController < ApplicationController
 
     @diff = params[:diff].present?
     @commit = params[:commit].present?
-    @remove_group = params[:remove_group].presence || GoogleHelper::REMOVE_GROUP
+    @remove_group = params[:remove_group].presence || remove_group
     @use_remove_group = params[:use_remove_group].present? ? params[:use_remove_group] == 'true' : false
     @clear_remove_group = params[:clear_remove_group].present? ? params[:clear_remove_group] == 'true' : false
     @preview_only = params[:preview_only].present? ? params[:preview_only] == 'true' : false

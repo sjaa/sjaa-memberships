@@ -1,0 +1,8 @@
+# Test admin fixtures
+# Admin needs email and password_digest
+# Use BCrypt to generate password_digest for "password123"
+
+test_admin:
+  email: test@sjaa.net
+  password_digest: <%= BCrypt::Password.create('password123', cost: 4) %>
+  refresh_token: null

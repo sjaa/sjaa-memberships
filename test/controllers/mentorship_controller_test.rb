@@ -2,6 +2,9 @@ require "test_helper"
 
 class MentorshipControllerTest < ActionDispatch::IntegrationTest
   setup do
+    # Create an admin to bypass the setup wizard
+    Admin.create!(email: 'test@sjaa.net', password: 'password123') if Admin.count == 0
+
     @referral = Referral.create!(name: 'internet', description: 'Web search')
 
     # Create an approved mentor

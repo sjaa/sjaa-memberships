@@ -1,6 +1,11 @@
 require "test_helper"
 
 class WidgetControllerTest < ActionDispatch::IntegrationTest
+  setup do
+    # Create an admin to bypass the setup wizard
+    Admin.create!(email: 'test@sjaa.net', password: 'password123') if Admin.count == 0
+  end
+
   test "should get meetup widget without authentication" do
     get widget_meetup_path
     assert_response :success

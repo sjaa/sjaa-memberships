@@ -2,6 +2,9 @@ require "application_system_test_case"
 
 class ExistingMemberRenewalFlowTest < ApplicationSystemTestCase
   setup do
+    # Create an admin to bypass the setup wizard
+    Admin.create!(email: 'test@sjaa.net', password: 'password123') if Admin.count == 0
+
     @person = Person.create!(
       first_name: "John",
       last_name: "Doe",

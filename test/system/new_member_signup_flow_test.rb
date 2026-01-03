@@ -2,8 +2,11 @@ require "application_system_test_case"
 
 class NewMemberSignupFlowTest < ApplicationSystemTestCase
   setup do
+    # Create an admin to bypass the setup wizard
+    Admin.create!(email: 'test@sjaa.net', password: 'password123') if Admin.count == 0
+
     @referral = Referral.create!(name: 'internet', description: 'Web search')
-    
+
     # Set up constants if not defined
     unless defined?(SjaaMembers::YEARLY_MEMBERSHIP_RATE)
       stub_const('SjaaMembers::YEARLY_MEMBERSHIP_RATE', 75.0)

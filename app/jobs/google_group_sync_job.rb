@@ -12,7 +12,7 @@ class GoogleGroupSyncJob < ApplicationJob
   #   group_id: nil,
   #   members_only: true,
   #   use_remove_group: true,
-  #   remove_group: GoogleHelper::REMOVE_GROUP,
+  #   remove_group: nil,  # Uses AppConfig.google_remove_group if not specified
   #   clear_remove_group: true,
   #   add_only: false,
   #   preview_only: false
