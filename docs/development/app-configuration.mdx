@@ -1,0 +1,451 @@
+---
+title: 'Application Configuration'
+description: 'Managing application settings with database-backed configuration'
+icon: 'gear'
+---
+
+## Overview
+
+The SJAA Membership application uses a database-backed configuration system called **AppConfig** to manage application settings. This replaces environment variables for application functionality settings, allowing administrators to update configuration through a web UI without requiring application redeployment.
+
+### Why AppConfig?
+
+**Traditional approach (environment variables):**
+- Requires server access to change settings
+- Needs application restart for changes to take effect
+- No audit trail of configuration changes
+- Security risks if `.env` files are accidentally committed
+
+**AppConfig approach:**
+- Change settings through admin web UI at `/app_configs`
+- Changes take effect immediately (cached for 5 minutes)
+- Encrypted storage for sensitive values
+- No redeployment needed
+- Role-based access control (requires `permit` permission)
+
+## Configuration Categories
+
+AppConfig organizes settings into three categories:
+
+### SMTP Email Settings
+Email server configuration for sending notifications, renewal reminders, and other system emails.
+
+| Setting | Key | Encrypted | Default |
+|---------|-----|-----------|---------|
+| SMTP Server | `smtp_address` | No | `smtp.gmail.com` |
+| SMTP Port | `smtp_port` | No | `587` |
+| SMTP Domain | `smtp_domain` | No | `sjaa.net` |
+| SMTP Username | `smtp_user_name` | No | _(empty)_ |
+| SMTP Password | `smtp_password` | **Yes** | _(empty)_ |
+
+### PayPal Payment Settings
+PayPal API credentials for processing membership renewals and donations.
+
+| Setting | Key | Encrypted |
+|---------|-----|-----------|
+| PayPal Client ID | `paypal_client_id` | **Yes** |
+| PayPal Client Secret | `paypal_client_secret` | **Yes** |
+
+### Google API Settings
+Credentials and identifiers for Google Workspace integration (Groups, Calendar, OAuth).
+
+| Setting | Key | Encrypted | Default |
+|---------|-----|-----------|---------|
+| OAuth Client Config | `google_web_client_base64` | **Yes** | _(empty)_ |
+| Members Group Email | `google_members_group` | No | `membership-app-test-group@sjaa.net` |
+| Remove Group Email | `google_remove_group` | No | `expired-members@sjaa.net` |
+| API Key | `google_api_key` | **Yes** | _(empty)_ |
+| All Events Calendar ID | `google_all_events_calendar_id` | No | _(empty)_ |
+| Merged Calendar ID | `google_merged_calendar_id` | No | _(empty)_ |
+
+## Managing Configuration
+
+### Web UI (Recommended)
+
+1. **Log in** as an admin with `permit` permission
+2. **Navigate** to **Data** → **App Configuration** (`/app_configs`)
+3. **View** all settings organized by category
+4. **Click** on any value to edit it
+5. **Update** the value and save
+
+<Info>
+For encrypted fields, the value is displayed as `[Encrypted - Set]` or `[Not Set]`. Leave the field blank when editing to keep the existing value, or enter a new value to update it.
+</Info>
+
+### First-Time Setup
+
+If no configuration exists, you'll see a button to **Initialize Configuration from Environment Variables**.
+
+<Accordion title="What does initialization do?">
+  - Creates all 13 configuration entries in the database
+  - Populates values from environment variables (if set in `.env`)
+  - Uses sensible defaults for values not in environment variables
+  - Equivalent to running `docker compose run --rm app bin/rails db:seed`
+</Accordion>
+
+This is useful for:
+- Initial application setup
+- Migrating from environment variables to AppConfig
+- Resetting configuration to defaults
+
+### Programmatic Access
+
+Access configuration values in Ruby code:
+
+```ruby
+# Get a configuration value
+AppConfig.get('smtp_address')
+# => "smtp.gmail.com"
+
+# Get with required check (raises error if not found)
+AppConfig.get('smtp_address', required: true)
+
+# Convenience methods for common settings
+AppConfig.smtp_settings
+# => {:address=>"smtp.gmail.com", :port=>587, :domain=>"sjaa.net", ...}
+
+AppConfig.paypal_client_id
+# => "your-paypal-client-id"
+
+AppConfig.google_members_group
+# => "members@sjaa.net"
+
+# Calendar ID with automatic fallback
+AppConfig.google_calendar_id
+# Prefers google_all_events_calendar_id, falls back to google_merged_calendar_id
+```
+
+### Helper Methods
+
+The `GoogleHelper` module provides convenient methods for accessing Google-related configuration:
+
+```ruby
+include GoogleHelper
+
+# Get members group email
+members_group
+# => "members@sjaa.net"
+
+# Get remove group email
+remove_group
+# => "expired-members@sjaa.net"
+```
+
+## Security
+
+### Encrypted Values
+
+Sensitive configuration values are encrypted at rest using Rails 7's built-in ActiveRecord encryption:
+
+- **SMTP Password**: Email server password
+- **PayPal Credentials**: Client ID and secret
+- **Google OAuth Config**: Base64-encoded client configuration
+- **Google API Key**: Calendar API access key
+
+<Warning>
+Encryption requires Rails credentials to be configured in production. In development/test environments, AppConfig gracefully falls back to plaintext storage if encryption is not configured.
+</Warning>
+
+### Setting Up Encryption
+
+**Production environment:**
+
+```bash
+# Generate encryption credentials
+docker compose run --rm app bin/rails db:encryption:init
+
+# Add output to credentials file
+docker compose run --rm app bin/rails credentials:edit
+```
+
+**Test/development environments:**
+Encryption is optional. AppConfig automatically detects if encryption is configured and enables it only when available.
+
+### Access Control
+
+Only admins with the `permit` permission can access `/app_configs`. This is enforced through Pundit policy:
+
+```ruby
+class AppConfigPolicy < ApplicationPolicy
+  def index?
+    user&.has_permission? :permit
+  end
+
+  def update?
+    user&.has_permission? :permit
+  end
+end
+```
+
+## Performance
+
+### Caching
+
+Configuration values are cached in memory for 5 minutes to minimize database queries:
+
+```ruby
+# First call hits database
+AppConfig.get('smtp_address')
+
+# Subsequent calls use cached value (for 5 minutes)
+AppConfig.get('smtp_address')
+```
+
+### Cache Management
+
+Cache is automatically cleared when:
+- A configuration value is updated
+- A configuration record is deleted
+
+Manual cache clearing:
+
+```ruby
+# Clear specific key
+AppConfig.clear_cache('smtp_address')
+
+# Clear all configuration caches
+AppConfig.clear_all_cache
+```
+
+## Database Schema
+
+AppConfig uses a simple database table:
+
+```ruby
+create_table :app_configs do |t|
+  t.string :key, null: false           # Unique identifier
+  t.text :value                        # Configuration value
+  t.string :category, null: false      # smtp, paypal, or google
+  t.text :description                  # Human-readable description
+  t.boolean :encrypted, default: false # Whether value is encrypted
+  t.timestamps
+end
+
+add_index :app_configs, :key, unique: true
+add_index :app_configs, :category
+```
+
+## Migration from Environment Variables
+
+If you're migrating from environment variables to AppConfig, see the [Migration Guide](/docs/MIGRATION-env-to-appconfig.md) for detailed instructions.
+
+### Quick Migration Steps
+
+1. **Deploy the migration** to create `app_configs` table
+2. **Use the web UI** to initialize configuration from existing environment variables
+3. **Verify** settings work correctly
+4. **Optionally remove** old environment variables from `.env` (keep deployment-related vars)
+
+<Tip>
+Keep these environment variables - they're still used for deployment:
+- `GITHUB_USERNAME` / `GITHUB_TOKEN`
+- `RAILS_ENV`
+- `DATABASE_URL`
+- `POSTGRES_USER` / `POSTGRES_PASSWORD`
+</Tip>
+
+## Common Tasks
+
+### Update SMTP Settings
+
+1. Navigate to `/app_configs`
+2. Find **SMTP Email Settings** section
+3. Click on the value you want to change
+4. Update and save
+5. Changes take effect immediately
+
+### Update PayPal Credentials
+
+1. Navigate to `/app_configs`
+2. Find **PayPal Payment Settings** section
+3. Click on the encrypted value (shows `[Encrypted - Set]`)
+4. Enter the new client ID or secret
+5. Save - value is encrypted automatically
+
+### Configure Google Calendar
+
+1. Navigate to `/app_configs`
+2. Find **Google API Settings** section
+3. Click on `google_all_events_calendar_id`
+4. Enter your calendar ID (format: `xyz@group.calendar.google.com`)
+5. Save
+
+### Test Configuration Changes
+
+After updating configuration:
+
+```ruby
+# In Rails console
+docker compose run --rm app env RUBY_DEBUG_OPEN= bin/rails console
+
+# Verify SMTP settings
+AppConfig.smtp_settings
+
+# Test PayPal credentials
+AppConfig.paypal_client_id
+AppConfig.paypal_client_secret
+
+# Check Google settings
+AppConfig.google_members_group
+AppConfig.google_calendar_id
+```
+
+## Troubleshooting
+
+### Configuration Not Taking Effect
+
+**Problem:** Changed a setting but the app still uses the old value
+
+**Solution:**
+```ruby
+# Clear the cache
+docker compose run --rm app bin/rails runner "AppConfig.clear_all_cache"
+
+# Or in Rails console
+AppConfig.clear_cache('smtp_address')
+```
+
+Configuration is cached for 5 minutes. Either wait for cache expiry or manually clear it.
+
+### Cannot Access /app_configs
+
+**Problem:** "You are not authorized to perform this action" error
+
+**Solution:** Ensure your admin account has the `permit` permission:
+
+```ruby
+# In Rails console
+admin = Admin.find_by(email: 'your-email@sjaa.net')
+admin.permissions << Permission.find_or_create_by!(name: 'permit')
+admin.save!
+```
+
+### Encryption Errors in Production
+
+**Problem:** "Missing Active Record encryption credential" error
+
+**Solution:** Configure Rails credentials for encryption:
+
+```bash
+# Generate encryption keys
+docker compose run --rm app bin/rails db:encryption:init
+
+# Edit credentials file and add the output
+docker compose run --rm app bin/rails credentials:edit
+```
+
+In development/test, AppConfig gracefully falls back to plaintext if encryption is not configured.
+
+### Lost Configuration After Reset
+
+**Problem:** Configuration disappeared after `db:reset`
+
+**Solution:** Re-initialize using the seed button:
+
+1. Navigate to `/app_configs`
+2. Click **Initialize Configuration from Environment Variables**
+3. Verify settings were restored
+
+Or run seed command:
+```bash
+docker compose run --rm app bin/rails db:seed
+```
+
+## API Reference
+
+### Class Methods
+
+```ruby
+# Retrieve configuration value
+AppConfig.get(key, required: false)
+
+# Set configuration value
+AppConfig.set(key, value, category: nil, description: nil, encrypted: false)
+
+# Get all settings for a category
+AppConfig.for_category(category)
+```
+
+### Convenience Methods
+
+```ruby
+# SMTP settings as hash for ActionMailer
+AppConfig.smtp_settings
+
+# PayPal credentials
+AppConfig.paypal_client_id
+AppConfig.paypal_client_secret
+
+# Google settings
+AppConfig.google_web_client_base64
+AppConfig.google_members_group
+AppConfig.google_remove_group
+AppConfig.google_api_key
+AppConfig.google_all_events_calendar_id
+AppConfig.google_merged_calendar_id
+AppConfig.google_calendar_id  # Prefers all_events, falls back to merged
+```
+
+### Cache Management
+
+```ruby
+# Clear cache for specific key
+AppConfig.clear_cache(key)
+
+# Clear all configuration caches
+AppConfig.clear_all_cache
+```
+
+### Instance Methods
+
+```ruby
+config = AppConfig.find_by(key: 'smtp_address')
+
+# Check if value is encrypted
+config.encrypted?  # => false
+```
+
+## Best Practices
+
+### When to Use AppConfig
+
+✅ **Use AppConfig for:**
+- Application functionality settings (SMTP, API keys, group emails)
+- Values that change occasionally
+- Settings that require encryption
+- Configuration managed by non-technical admins
+- Sensitive data that should be encrypted
+
+❌ **Use environment variables for:**
+- Deployment and infrastructure settings
+- Values that differ between environments (dev, staging, prod)
+- Settings needed before database is available
+- Example: `DATABASE_URL`, `RAILS_ENV`, `GITHUB_TOKEN`
+
+### Security Guidelines
+
+1. **Never commit** `.env` files to version control
+2. **Always encrypt** sensitive values (passwords, API keys, secrets)
+3. **Limit access** to `/app_configs` to admins with `permit` permission
+4. **Configure encryption** in production environments
+5. **Audit changes** by reviewing database timestamps and modified values
+
+### Performance Tips
+
+1. **Cache is automatic** - don't worry about it for most use cases
+2. **Batch updates** if changing multiple settings at once
+3. **Clear cache** after bulk updates to see changes immediately
+4. **Monitor** cache hit rates in production if needed
+
+## Summary
+
+AppConfig provides a robust, secure, and user-friendly way to manage application configuration:
+
+- **Web-based UI** for easy updates without server access
+- **Encrypted storage** for sensitive credentials
+- **Automatic caching** for optimal performance
+- **Role-based access** for security
+- **Migration path** from environment variables
+- **Flexible API** for programmatic access
+
+For most administrators, the web UI at `/app_configs` is all you need to manage application settings safely and efficiently.
