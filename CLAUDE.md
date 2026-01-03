@@ -22,6 +22,18 @@ rails db:setup                   # Set up database schema and seed data
 rails server                     # Start development server (port 3000)
 ```
 
+### First-Time Setup
+When starting the application for the first time without any admin accounts, you'll be redirected to a setup wizard. For security reasons, the first admin account must be created from the command line:
+
+```bash
+# Create the first admin account
+docker compose run --rm app bin/rails admin:create_first EMAIL=admin@sjaa.net PASSWORD=your_secure_password
+
+# The first admin will automatically receive all permissions
+# After creating the first admin, you can log in at http://localhost:3000/login
+# Additional admin accounts can be created through the web interface at /admins/new
+```
+
 ### Testing
 ```bash
 # Run tests through Docker container

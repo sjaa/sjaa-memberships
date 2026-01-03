@@ -3,6 +3,7 @@ class ApplicationController < ActionController::Base
   include Pundit::Authorization
   include Pagy::Backend
 
+  prepend_before_action :check_for_setup
   prepend_before_action :authenticate!
   append_before_action :set_user
 
@@ -10,6 +11,16 @@ class ApplicationController < ActionController::Base
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
   private
+
+  def check_for_setup
+    # Skip this check if we're already on the setup page
+    return if controller_name == 'setup'
+
+    # If no admins exist, redirect to setup page
+    if Admin.count == 0
+      redirect_to setup_path
+    end
+  end
 
   def set_user
     @user = current_user

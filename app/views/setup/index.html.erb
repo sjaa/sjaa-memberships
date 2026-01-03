@@ -1,0 +1,100 @@
+<div class="row justify-content-center mt-5">
+  <div class="col-md-8">
+    <div class="card border-warning">
+      <div class="card-header bg-warning text-dark">
+        <h3 class="mb-0">
+          <i class="bi bi-exclamation-triangle-fill"></i> First-Time Setup Required
+        </h3>
+      </div>
+      <div class="card-body">
+        <div class="alert alert-info">
+          <i class="bi bi-info-circle-fill"></i>
+          <strong>No administrator accounts detected.</strong>
+          You must create the first admin account before you can use this application.
+        </div>
+
+        <h4 class="mt-4">Setup Instructions</h4>
+
+        <p>For security reasons, the first administrator account must be created from the command line with direct server access.</p>
+
+        <div class="card bg-light mt-3">
+          <div class="card-body">
+            <h5 class="card-title">
+              <i class="bi bi-terminal"></i> Step 1: Open a terminal with access to your application
+            </h5>
+            <p class="card-text">
+              If you're running the application in Docker (recommended), open a terminal on the host machine where Docker is running.
+            </p>
+          </div>
+        </div>
+
+        <div class="card bg-light mt-3">
+          <div class="card-body">
+            <h5 class="card-title">
+              <i class="bi bi-key-fill"></i> Step 2: Run the admin creation command
+            </h5>
+            <p class="card-text mb-3">Execute the following command, replacing the email and password with your desired credentials:</p>
+
+            <div class="alert alert-dark">
+              <strong>Docker environment:</strong>
+              <pre class="mb-0"><code>docker compose run --rm app bin/rails admin:create_first \
+  EMAIL=admin@sjaa.net \
+  PASSWORD=YourSecurePassword123!</code></pre>
+            </div>
+
+            <div class="alert alert-secondary mt-2">
+              <strong>Non-Docker environment:</strong>
+              <pre class="mb-0"><code>bin/rails admin:create_first \
+  EMAIL=admin@sjaa.net \
+  PASSWORD=YourSecurePassword123!</code></pre>
+            </div>
+
+            <div class="alert alert-warning mt-3">
+              <i class="bi bi-shield-lock-fill"></i>
+              <strong>Password Requirements:</strong>
+              <ul class="mb-0">
+                <li>Choose a strong, unique password</li>
+                <li>Minimum 6 characters (longer is better)</li>
+                <li>Include a mix of letters, numbers, and special characters</li>
+                <li>Do not reuse passwords from other accounts</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="card bg-light mt-3">
+          <div class="card-body">
+            <h5 class="card-title">
+              <i class="bi bi-check-circle-fill text-success"></i> Step 3: Log in to the application
+            </h5>
+            <p class="card-text">
+              Once the first admin account is created successfully, you can log in using the email and password you specified.
+            </p>
+            <p class="card-text mb-0">
+              The first admin account will be granted all permissions automatically. You can create additional admin accounts and manage permissions from the admin interface after logging in.
+            </p>
+          </div>
+        </div>
+
+        <div class="alert alert-secondary mt-4">
+          <h5><i class="bi bi-question-circle"></i> Need Help?</h5>
+          <p class="mb-1">
+            <strong>Can't access the command line?</strong> You need shell access to the server or Docker host to complete first-time setup.
+          </p>
+          <p class="mb-1">
+            <strong>Command not working?</strong> Make sure you're in the application's root directory and that all dependencies are installed.
+          </p>
+          <p class="mb-0">
+            <strong>Still having issues?</strong> Check the application logs for error messages or consult the documentation at <code>CLAUDE.md</code>.
+          </p>
+        </div>
+
+        <div class="mt-4 text-center">
+          <%= link_to raw('<i class="bi bi-arrow-clockwise"></i> Refresh Page After Creating Admin'),
+                      setup_path,
+                      class: 'btn btn-primary btn-lg' %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

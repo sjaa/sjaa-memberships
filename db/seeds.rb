@@ -10,10 +10,6 @@
 require_relative('./sjaa_port')
 include SjaaPort
 
-# Actual admin
-admin = Admin.create(email: 'vp@sjaa.net', password: 'secret')
-admin.permissions += [PERMISSION_HASH['read'], PERMISSION_HASH['write'], PERMISSION_HASH['permit']]
-
 # Application configuration
 # These values should be updated with actual credentials after deployment
 puts "Creating application configuration..."
