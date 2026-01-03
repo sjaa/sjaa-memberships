@@ -200,7 +200,7 @@ class OpportunitiesControllerTest < ActionDispatch::IntegrationTest
       }
     end
 
-    assert_response :unprocessable_entity
+    assert_response :unprocessable_content
     assert_select '.field_with_errors', minimum: 1
   end
 
@@ -217,7 +217,7 @@ class OpportunitiesControllerTest < ActionDispatch::IntegrationTest
       }
     end
 
-    assert_response :unprocessable_entity
+    assert_response :unprocessable_content
   end
 
   # Update action tests
@@ -269,7 +269,7 @@ class OpportunitiesControllerTest < ActionDispatch::IntegrationTest
       }
     }
 
-    assert_response :unprocessable_entity
+    assert_response :unprocessable_content
     @opportunity.reload
     assert_not_equal '', @opportunity.title
   end

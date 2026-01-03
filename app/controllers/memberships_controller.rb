@@ -31,8 +31,8 @@ class MembershipsController < ApplicationController
         format.html { redirect_to @membership, notice: "Membership was successfully created." }
         format.json { render :show, status: :created, location: @membership }
       else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @membership.errors, status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_content }
+        format.json { render json: @membership.errors, status: :unprocessable_content }
       end
     end
   end
@@ -122,8 +122,8 @@ class MembershipsController < ApplicationController
         format.html { redirect_to @membership, notice: "Membership was successfully updated." }
         format.json { render :show, status: :ok, location: @membership }
       else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @membership.errors, status: :unprocessable_entity }
+        format.html { render :edit, status: :unprocessable_content }
+        format.json { render json: @membership.errors, status: :unprocessable_content }
       end
     end
   end

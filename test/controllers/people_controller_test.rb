@@ -148,7 +148,7 @@ class PeopleControllerTest < ActionDispatch::IntegrationTest
     login_as_admin(@admin)
     post verify_membership_path, params: { email: "" }
 
-    assert_response :unprocessable_entity
+    assert_response :unprocessable_content
     assert_select '.alert-danger', text: /Email address is required/
     assert_select 'small', text: /Attempted on/
   end
@@ -157,7 +157,7 @@ class PeopleControllerTest < ActionDispatch::IntegrationTest
     login_as_admin(@admin)
     post verify_membership_path, params: { email: "   " }
 
-    assert_response :unprocessable_entity
+    assert_response :unprocessable_content
     assert_select '.alert-danger', text: /Email address is required/
   end
 
@@ -1061,7 +1061,7 @@ class PeopleControllerTest < ActionDispatch::IntegrationTest
       group_ids: [group1.id]
     }, as: :json
 
-    assert_response :unprocessable_entity
+    assert_response :unprocessable_content
 
     json_response = JSON.parse(response.body)
     assert_match /select at least one person and one group/, json_response['error']
@@ -1079,7 +1079,7 @@ class PeopleControllerTest < ActionDispatch::IntegrationTest
       group_ids: []
     }, as: :json
 
-    assert_response :unprocessable_entity
+    assert_response :unprocessable_content
 
     json_response = JSON.parse(response.body)
     assert_match /select at least one person and one group/, json_response['error']

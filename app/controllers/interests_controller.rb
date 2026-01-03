@@ -28,8 +28,8 @@ class InterestsController < ApplicationController
         format.html { redirect_to @interest, notice: "Interest was successfully created." }
         format.json { render :show, status: :created, location: @interest }
       else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @interest.errors, status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_content }
+        format.json { render json: @interest.errors, status: :unprocessable_content }
       end
     end
   end
@@ -41,8 +41,8 @@ class InterestsController < ApplicationController
         format.html { redirect_to @interest, notice: "Interest was successfully updated." }
         format.json { render :show, status: :ok, location: @interest }
       else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @interest.errors, status: :unprocessable_entity }
+        format.html { render :edit, status: :unprocessable_content }
+        format.json { render json: @interest.errors, status: :unprocessable_content }
       end
     end
   end

@@ -40,7 +40,7 @@ class OpportunitiesController < ApplicationController
       redirect_to @opportunity, notice: 'Opportunity was successfully created.'
     else
       @skills = Skill.order(:name)
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -50,7 +50,7 @@ class OpportunitiesController < ApplicationController
       redirect_to @opportunity, notice: 'Opportunity was successfully updated.'
     else
       @skills = Skill.order(:name)
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 

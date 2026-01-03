@@ -31,8 +31,8 @@ class GroupsController < ApplicationController
         format.html { redirect_to @group, notice: "Group was successfully updated." }
         format.json { render :show, status: :ok, location: @group }
       else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @group.errors, status: :unprocessable_entity }
+        format.html { render :edit, status: :unprocessable_content }
+        format.json { render json: @group.errors, status: :unprocessable_content }
       end
     end
   end
@@ -50,8 +50,8 @@ class GroupsController < ApplicationController
         format.html { redirect_to @group, notice: "Group was successfully created." }
         format.json { render :show, status: :created, location: @group }
       else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @group.errors, status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_content }
+        format.json { render json: @group.errors, status: :unprocessable_content }
       end
     end
   end
@@ -63,8 +63,8 @@ class GroupsController < ApplicationController
         format.html { redirect_to @group, notice: "Group was successfully updated." }
         format.json { render :show, status: :ok, location: @group }
       else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @group.errors, status: :unprocessable_entity }
+        format.html { render :edit, status: :unprocessable_content }
+        format.json { render json: @group.errors, status: :unprocessable_content }
       end
     end
   end

@@ -58,7 +58,7 @@ class PeopleController < ApplicationController
     group_ids = params[:group_ids] || []
 
     if person_ids.empty? || group_ids.empty?
-      render json: { error: 'Please select at least one person and one group' }, status: :unprocessable_entity
+      render json: { error: 'Please select at least one person and one group' }, status: :unprocessable_content
       return
     end
 
@@ -113,7 +113,7 @@ class PeopleController < ApplicationController
 
     if email.blank?
       @verification_result[:error] = "Email address is required"
-      render :verify_form, status: :unprocessable_entity
+      render :verify_form, status: :unprocessable_content
       return
     end
 
@@ -158,8 +158,8 @@ class PeopleController < ApplicationController
         format.json { render :show, status: :created, location: @person }
       else
         flash.now[:alert] = "Problem creating person: <ul>#{@person.errors.full_messages.map{|er| "<li>#{er}</li>"}.join('  ')}</ul>"
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @person.errors, status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_content }
+        format.json { render json: @person.errors, status: :unprocessable_content }
       end
     end
   end
@@ -199,8 +199,8 @@ class PeopleController < ApplicationController
         format.json { render :show, status: :ok, location: @person }
       else
         flash.now[:alert] = "Problem updating person: <ul>#{@person.errors.full_messages.map{|er| "<li>#{er}</li>"}.join('  ')}</ul>"
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @person.errors, status: :unprocessable_entity }
+        format.html { render :edit, status: :unprocessable_content }
+        format.json { render json: @person.errors, status: :unprocessable_content }
       end
     end
   end

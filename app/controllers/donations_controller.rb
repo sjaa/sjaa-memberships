@@ -41,8 +41,8 @@ class DonationsController < ApplicationController
         format.html { redirect_to @donation, notice: "Donation was successfully created." }
         format.json { render :show, status: :created, location: @donation }
       else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @donation.errors, status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_content }
+        format.json { render json: @donation.errors, status: :unprocessable_content }
       end
     end
   end
@@ -60,8 +60,8 @@ class DonationsController < ApplicationController
         format.html { redirect_to @donation, notice: "Donation was successfully updated." }
         format.json { render :show, status: :ok, location: @donation }
       else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @donation.errors, status: :unprocessable_entity }
+        format.html { render :edit, status: :unprocessable_content }
+        format.json { render json: @donation.errors, status: :unprocessable_content }
       end
     end
   end
@@ -103,7 +103,7 @@ class DonationsController < ApplicationController
         flash.now[:alert] = 'Failed to send donation letter. Please try again.'
         render turbo_stream: [
           turbo_stream.prepend('flash-messages', partial: 'shared/flash')
-        ], status: :unprocessable_entity
+        ], status: :unprocessable_content
       end
       format.html { redirect_to @donation, alert: 'Failed to send donation letter. Please try again.' }
     end

@@ -28,8 +28,8 @@ class DonationPhasesController < ApplicationController
         format.html { redirect_to @donation_phase, notice: "Donation phase was successfully created." }
         format.json { render :show, status: :created, location: @donation_phase }
       else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @donation_phase.errors, status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_content }
+        format.json { render json: @donation_phase.errors, status: :unprocessable_content }
       end
     end
   end
@@ -41,8 +41,8 @@ class DonationPhasesController < ApplicationController
         format.html { redirect_to @donation_phase, notice: "Donation phase was successfully updated." }
         format.json { render :show, status: :ok, location: @donation_phase }
       else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @donation_phase.errors, status: :unprocessable_entity }
+        format.html { render :edit, status: :unprocessable_content }
+        format.json { render json: @donation_phase.errors, status: :unprocessable_content }
       end
     end
   end

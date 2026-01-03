@@ -29,8 +29,8 @@ class SkillsController < ApplicationController
         format.html { redirect_to @skill, notice: "Skill was successfully created." }
         format.json { render :show, status: :created, location: @skill }
       else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @skill.errors, status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_content }
+        format.json { render json: @skill.errors, status: :unprocessable_content }
       end
     end
   end
@@ -42,8 +42,8 @@ class SkillsController < ApplicationController
         format.html { redirect_to @skill, notice: "Skill was successfully updated." }
         format.json { render :show, status: :ok, location: @skill }
       else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @skill.errors, status: :unprocessable_entity }
+        format.html { render :edit, status: :unprocessable_content }
+        format.json { render json: @skill.errors, status: :unprocessable_content }
       end
     end
   end

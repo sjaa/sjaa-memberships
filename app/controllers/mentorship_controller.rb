@@ -34,10 +34,10 @@ class MentorshipController < ApplicationController
         render json: { success: true, message: flash[:notice] }, status: :ok
       rescue => e
         logger.error "[MENTOR_CONTACT] Error sending email: #{e.message}"
-        render json: { success: false, error: "Failed to send message. Please try again." }, status: :unprocessable_entity
+        render json: { success: false, error: "Failed to send message. Please try again." }, status: :unprocessable_content
       end
     else
-      render json: { success: false, error: "Please provide a message." }, status: :unprocessable_entity
+      render json: { success: false, error: "Please provide a message." }, status: :unprocessable_content
     end
   end
 
