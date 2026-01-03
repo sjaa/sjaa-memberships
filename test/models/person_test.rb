@@ -900,4 +900,136 @@ class PersonTest < ActiveSupport::TestCase
     assert_includes renewable, future_person
   end
 
+  # Mentorship approval status tests
+  test 'mentorship_approval_status defaults to nil' do
+    assert_nil @person.mentorship_approval_status
+  end
+
+  test 'mentorship_approval_status is set to pending when mentor flag is checked' do
+    @person.update!(mentor: true)
+    assert_equal Person::MENTORSHIP_APPROVAL_PENDING, @person.mentorship_approval_status
+  end
+
+  test 'mentorship_approval_status remains nil when mentor is already false' do
+    @person.update!(mentor: false)
+    assert_nil @person.mentorship_approval_status
+  end
+
+  test 'mentorship_approval_status is not changed when already set' do
+    @person.update!(mentor: true, mentorship_approval_status: Person::MENTORSHIP_APPROVAL_APPROVED)
+    @person.reload
+    assert_equal Person::MENTORSHIP_APPROVAL_APPROVED, @person.mentorship_approval_status
+
+    # Uncheck mentor flag
+    @person.update!(mentor: false)
+    @person.reload
+
+    # Status should remain approved
+    assert_equal Person::MENTORSHIP_APPROVAL_APPROVED, @person.mentorship_approval_status
+  end
+
+  test 'mentorship_approval_status validates allowed values' do
+    @person.mentorship_approval_status = 'invalid_status'
+    assert_not @person.valid?
+    assert_includes @person.errors[:mentorship_approval_status], 'is not included in the list'
+  end
+
+  test 'mentorship_approval_status accepts valid values' do
+    [nil, 'pending', 'approved', 'denied'].each do |status|
+      @person.mentorship_approval_status = status
+      assert @person.valid?, "Expected #{status} to be valid"
+    end
+  end
+
+  test 'mentorship_approved? returns true when approved' do
+    @person.update!(mentorship_approval_status: Person::MENTORSHIP_APPROVAL_APPROVED)
+    assert @person.mentorship_approved?
+  end
+
+  test 'mentorship_approved? returns false when pending' do
+    @person.update!(mentorship_approval_status: Person::MENTORSHIP_APPROVAL_PENDING)
+    assert_not @person.mentorship_approved?
+  end
+
+  test 'mentorship_approved? returns false when denied' do
+    @person.update!(mentorship_approval_status: Person::MENTORSHIP_APPROVAL_DENIED)
+    assert_not @person.mentorship_approved?
+  end
+
+  test 'mentorship_approved? returns false when nil' do
+    @person.update!(mentorship_approval_status: nil)
+    assert_not @person.mentorship_approved?
+  end
+
+  test 'approve_mentorship! sets status to approved' do
+    @person.update!(mentor: true)
+    assert_equal Person::MENTORSHIP_APPROVAL_PENDING, @person.mentorship_approval_status
+
+    @person.approve_mentorship!
+    @person.reload
+    assert_equal Person::MENTORSHIP_APPROVAL_APPROVED, @person.mentorship_approval_status
+  end
+
+  test 'deny_mentorship! sets status to denied' do
+    @person.update!(mentor: true)
+    assert_equal Person::MENTORSHIP_APPROVAL_PENDING, @person.mentorship_approval_status
+
+    @person.deny_mentorship!
+    @person.reload
+    assert_equal Person::MENTORSHIP_APPROVAL_DENIED, @person.mentorship_approval_status
+  end
+
+  test 'mentorship_approval_status_display returns correct text for pending' do
+    @person.update!(mentorship_approval_status: Person::MENTORSHIP_APPROVAL_PENDING)
+    assert_equal 'Pending Approval', @person.mentorship_approval_status_display
+  end
+
+  test 'mentorship_approval_status_display returns correct text for approved' do
+    @person.update!(mentorship_approval_status: Person::MENTORSHIP_APPROVAL_APPROVED)
+    assert_equal 'Approved', @person.mentorship_approval_status_display
+  end
+
+  test 'mentorship_approval_status_display returns correct text for denied' do
+    @person.update!(mentorship_approval_status: Person::MENTORSHIP_APPROVAL_DENIED)
+    assert_equal 'Denied', @person.mentorship_approval_status_display
+  end
+
+  test 'mentorship_approval_status_display returns correct text for nil' do
+    @person.update!(mentorship_approval_status: nil)
+    assert_equal 'Not Applicable', @person.mentorship_approval_status_display
+  end
+
+  test 'checking mentor box when previously denied keeps denied status' do
+    @person.update!(mentor: true, mentorship_approval_status: Person::MENTORSHIP_APPROVAL_DENIED)
+    @person.reload
+
+    # Uncheck and recheck mentor
+    @person.update!(mentor: false)
+    @person.update!(mentor: true)
+    @person.reload
+
+    # Should still be denied, not pending
+    assert_equal Person::MENTORSHIP_APPROVAL_DENIED, @person.mentorship_approval_status
+  end
+
+  test 'admin can change approved status to denied' do
+    @person.update!(mentor: true, mentorship_approval_status: Person::MENTORSHIP_APPROVAL_APPROVED)
+    @person.reload
+    assert_equal Person::MENTORSHIP_APPROVAL_APPROVED, @person.mentorship_approval_status
+
+    @person.deny_mentorship!
+    @person.reload
+    assert_equal Person::MENTORSHIP_APPROVAL_DENIED, @person.mentorship_approval_status
+  end
+
+  test 'admin can change denied status to approved' do
+    @person.update!(mentor: true, mentorship_approval_status: Person::MENTORSHIP_APPROVAL_DENIED)
+    @person.reload
+    assert_equal Person::MENTORSHIP_APPROVAL_DENIED, @person.mentorship_approval_status
+
+    @person.approve_mentorship!
+    @person.reload
+    assert_equal Person::MENTORSHIP_APPROVAL_APPROVED, @person.mentorship_approval_status
+  end
+
 end

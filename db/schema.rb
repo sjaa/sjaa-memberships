@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_01_02_030539) do
+ActiveRecord::Schema[7.1].define(version: 2026_01_03_032517) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
   enable_extension "plpgsql"
@@ -287,8 +287,10 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_02_030539) do
     t.boolean "mentor", default: false
     t.integer "telescopius_id"
     t.text "mentor_description"
+    t.string "mentorship_approval_status"
     t.index ["first_name"], name: "index_people_on_first_name"
     t.index ["last_name"], name: "index_people_on_last_name"
+    t.index ["mentorship_approval_status"], name: "index_people_on_mentorship_approval_status"
   end
 
   create_table "people_permissions", id: false, force: :cascade do |t|

@@ -47,4 +47,12 @@ class PersonPolicy < ApplicationPolicy
   def bulk_add_to_groups?
     user&.has_permission?(:write)
   end
+
+  def approve_mentorship?
+    user&.has_permission?(:write)
+  end
+
+  def deny_mentorship?
+    user&.has_permission?(:write)
+  end
 end

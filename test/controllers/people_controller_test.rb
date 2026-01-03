@@ -1084,4 +1084,153 @@ class PeopleControllerTest < ActionDispatch::IntegrationTest
     json_response = JSON.parse(response.body)
     assert_match /select at least one person and one group/, json_response['error']
   end
+
+  # Mentorship approval tests
+  test "approve_mentorship requires authentication" do
+    mentor = Person.create!(first_name: "Mentor", last_name: "User", mentor: true, password: "password123")
+    Contact.create!(email: "mentor@example.com", person: mentor, primary: true)
+
+    # Not logged in
+    post approve_mentorship_path(mentor)
+    assert_redirected_to login_path
+  end
+
+  test "approve_mentorship requires write permission as admin" do
+    mentor = Person.create!(first_name: "Mentor", last_name: "User", mentor: true, password: "password123")
+    Contact.create!(email: "mentor@example.com", person: mentor, primary: true)
+
+    # Logged in as admin with only read permission
+    login_as_admin(@admin) # @admin only has read permission from setup
+    post approve_mentorship_path(mentor)
+    # Redirects to root when unauthorized (application behavior)
+    assert_redirected_to root_path
+  end
+
+  test "approve_mentorship works with write permission" do
+    write_permission = Permission.find_or_create_by(name: 'write')
+    @admin.permissions << write_permission
+    login_as_admin @admin
+
+    mentor = Person.create!(first_name: "Mentor", last_name: "User", mentor: true, password: "password123")
+    assert_equal Person::MENTORSHIP_APPROVAL_PENDING, mentor.mentorship_approval_status
+
+    post approve_mentorship_path(mentor)
+    assert_redirected_to person_path(mentor)
+
+    mentor.reload
+    assert_equal Person::MENTORSHIP_APPROVAL_APPROVED, mentor.mentorship_approval_status
+    assert_match /approved as a mentor/, flash[:notice]
+  end
+
+  test "approve_mentorship sets status to approved" do
+    write_permission = Permission.find_or_create_by(name: 'write')
+    @admin.permissions << write_permission
+    login_as_admin @admin
+
+    mentor = Person.create!(
+      first_name: "Pending",
+      last_name: "Mentor",
+      mentor: true,
+      mentorship_approval_status: Person::MENTORSHIP_APPROVAL_PENDING,
+      password: "password123"
+    )
+
+    post approve_mentorship_path(mentor)
+
+    mentor.reload
+    assert_equal Person::MENTORSHIP_APPROVAL_APPROVED, mentor.mentorship_approval_status
+  end
+
+  test "deny_mentorship requires authentication" do
+    mentor = Person.create!(first_name: "Mentor", last_name: "User", mentor: true, password: "password123")
+    Contact.create!(email: "mentor@example.com", person: mentor, primary: true)
+
+    # Not logged in
+    post deny_mentorship_path(mentor)
+    assert_redirected_to login_path
+  end
+
+  test "deny_mentorship requires write permission as admin" do
+    mentor = Person.create!(first_name: "Mentor", last_name: "User", mentor: true, password: "password123")
+    Contact.create!(email: "mentor@example.com", person: mentor, primary: true)
+
+    # Logged in as admin with only read permission
+    login_as_admin(@admin) # @admin only has read permission from setup
+    post deny_mentorship_path(mentor)
+    # Redirects to root when unauthorized (application behavior)
+    assert_redirected_to root_path
+  end
+
+  test "deny_mentorship works with write permission" do
+    write_permission = Permission.find_or_create_by(name: 'write')
+    @admin.permissions << write_permission
+    login_as_admin @admin
+
+    mentor = Person.create!(first_name: "Mentor", last_name: "User", mentor: true, password: "password123")
+    assert_equal Person::MENTORSHIP_APPROVAL_PENDING, mentor.mentorship_approval_status
+
+    post deny_mentorship_path(mentor)
+    assert_redirected_to person_path(mentor)
+
+    mentor.reload
+    assert_equal Person::MENTORSHIP_APPROVAL_DENIED, mentor.mentorship_approval_status
+    assert_match /denied/, flash[:notice]
+  end
+
+  test "deny_mentorship sets status to denied" do
+    write_permission = Permission.find_or_create_by(name: 'write')
+    @admin.permissions << write_permission
+    login_as_admin @admin
+
+    mentor = Person.create!(
+      first_name: "Approved",
+      last_name: "Mentor",
+      mentor: true,
+      mentorship_approval_status: Person::MENTORSHIP_APPROVAL_APPROVED,
+      password: "password123"
+    )
+
+    post deny_mentorship_path(mentor)
+
+    mentor.reload
+    assert_equal Person::MENTORSHIP_APPROVAL_DENIED, mentor.mentorship_approval_status
+  end
+
+  test "approve_mentorship can change denied to approved" do
+    write_permission = Permission.find_or_create_by(name: 'write')
+    @admin.permissions << write_permission
+    login_as_admin @admin
+
+    mentor = Person.create!(
+      first_name: "Denied",
+      last_name: "Mentor",
+      mentor: true,
+      mentorship_approval_status: Person::MENTORSHIP_APPROVAL_DENIED,
+      password: "password123"
+    )
+
+    post approve_mentorship_path(mentor)
+
+    mentor.reload
+    assert_equal Person::MENTORSHIP_APPROVAL_APPROVED, mentor.mentorship_approval_status
+  end
+
+  test "deny_mentorship can change approved to denied" do
+    write_permission = Permission.find_or_create_by(name: 'write')
+    @admin.permissions << write_permission
+    login_as_admin @admin
+
+    mentor = Person.create!(
+      first_name: "Approved",
+      last_name: "Mentor",
+      mentor: true,
+      mentorship_approval_status: Person::MENTORSHIP_APPROVAL_APPROVED,
+      password: "password123"
+    )
+
+    post deny_mentorship_path(mentor)
+
+    mentor.reload
+    assert_equal Person::MENTORSHIP_APPROVAL_DENIED, mentor.mentorship_approval_status
+  end
 end

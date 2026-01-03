@@ -69,6 +69,21 @@
                 <% end %>
               </dd>
             <% end %>
+            <% if @person.mentor %>
+              <dt class="col-sm-4">Mentorship Status</dt>
+              <dd class="col-sm-8">
+                <% case @person.mentorship_approval_status %>
+                <% when Person::MENTORSHIP_APPROVAL_PENDING %>
+                  <span class="badge bg-warning text-dark">Pending Approval</span>
+                <% when Person::MENTORSHIP_APPROVAL_APPROVED %>
+                  <span class="badge bg-success">Approved</span>
+                <% when Person::MENTORSHIP_APPROVAL_DENIED %>
+                  <span class="badge bg-danger">Denied</span>
+                <% else %>
+                  <span class="badge bg-secondary">Not Applicable</span>
+                <% end %>
+              </dd>
+            <% end %>
             <% if @person.mentor && @person.mentor_description.present? %>
               <dt class="col-sm-4">Why I mentor</dt>
               <dd class="col-sm-8"><%= simple_format(@person.mentor_description) %></dd>
@@ -270,6 +285,24 @@
             <h5 class="mb-0">Admin Actions</h5>
           </div>
           <div class="card-body">
+            <% if @person.mentor %>
+              <div class="mb-3">
+                <h6>Mentorship Approval</h6>
+                <div class="d-flex flex-wrap gap-2">
+                  <% if @person.mentorship_approval_status != Person::MENTORSHIP_APPROVAL_APPROVED %>
+                    <%= button_to "Approve Mentor", approve_mentorship_path(@person),
+                        method: :post,
+                        class: 'btn btn-sm btn-success' %>
+                  <% end %>
+                  <% if @person.mentorship_approval_status != Person::MENTORSHIP_APPROVAL_DENIED %>
+                    <%= button_to "Deny Mentor", deny_mentorship_path(@person),
+                        method: :post,
+                        data: {turbo_confirm: 'Are you sure you want to deny mentorship approval?'},
+                        class: 'btn btn-sm btn-warning' %>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
             <div class="d-flex flex-wrap gap-2">
               <%= button_to "Delete Person", @person, method: :delete,
                   data: {turbo_confirm: 'Are you TOTALLY sure??'},

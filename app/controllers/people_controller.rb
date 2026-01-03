@@ -3,7 +3,7 @@ class PeopleController < ApplicationController
   include Filterable
   include GoogleHelper
 
-  before_action :set_person, only: %i[ show edit update destroy new_membership  remind]
+  before_action :set_person, only: %i[ show edit update destroy new_membership  remind approve_mentorship deny_mentorship]
   skip_before_action :verify_authenticity_token, only: [:update], if: -> { request.format.json? }
 
   # GET /people or /people.json
@@ -81,6 +81,24 @@ class PeopleController < ApplicationController
       people_count: people.count,
       groups_count: groups.count
     }
+  end
+
+  # POST /people/:id/approve_mentorship
+  def approve_mentorship
+    if @person.approve_mentorship!
+      redirect_to @person, notice: "#{@person.name} has been approved as a mentor."
+    else
+      redirect_to @person, alert: "Failed to approve mentorship."
+    end
+  end
+
+  # POST /people/:id/deny_mentorship
+  def deny_mentorship
+    if @person.deny_mentorship!
+      redirect_to @person, notice: "Mentorship approval for #{@person.name} has been denied."
+    else
+      redirect_to @person, alert: "Failed to deny mentorship."
+    end
   end
 
   # GET /people/verify

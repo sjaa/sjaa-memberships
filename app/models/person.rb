@@ -20,6 +20,15 @@ class Person < ApplicationRecord
   belongs_to :telescopius, optional: true
   belongs_to :referral, optional: true
   validates :first_name, :last_name, strip: true
+  validates :mentorship_approval_status, inclusion: { in: [nil, 'pending', 'approved', 'denied'], allow_nil: true }
+
+  # Mentorship approval status constants
+  MENTORSHIP_APPROVAL_PENDING = 'pending'
+  MENTORSHIP_APPROVAL_APPROVED = 'approved'
+  MENTORSHIP_APPROVAL_DENIED = 'denied'
+
+  # Before save callback to manage mentorship approval status
+  before_save :update_mentorship_approval_status
 
   def name
     return "#{first_name} #{last_name}"
@@ -354,5 +363,46 @@ class Person < ApplicationRecord
   # Passwords for people can be blank if they've never signed up
   def password_presence
     true
+  end
+
+  # Mentorship approval status methods
+  def mentorship_approval_status_display
+    case mentorship_approval_status
+    when MENTORSHIP_APPROVAL_PENDING
+      'Pending Approval'
+    when MENTORSHIP_APPROVAL_APPROVED
+      'Approved'
+    when MENTORSHIP_APPROVAL_DENIED
+      'Denied'
+    else
+      'Not Applicable'
+    end
+  end
+
+  def mentorship_approved?
+    mentorship_approval_status == MENTORSHIP_APPROVAL_APPROVED
+  end
+
+  def approve_mentorship!
+    update(mentorship_approval_status: MENTORSHIP_APPROVAL_APPROVED)
+  end
+
+  def deny_mentorship!
+    update(mentorship_approval_status: MENTORSHIP_APPROVAL_DENIED)
+  end
+
+  private
+
+  # Automatically set mentorship approval status when mentor flag is toggled
+  def update_mentorship_approval_status
+    # If person is newly indicating interest in mentorship (checking the mentor box)
+    # and has never been approved or denied, set to pending
+    if mentor_changed? && mentor? && mentorship_approval_status.nil?
+      self.mentorship_approval_status = MENTORSHIP_APPROVAL_PENDING
+    end
+
+    # If person unchecks mentor box but was previously approved, keep the approved status
+    # This preserves the approval even if they toggle the checkbox
+    # Admin can still explicitly deny if needed
   end
 end

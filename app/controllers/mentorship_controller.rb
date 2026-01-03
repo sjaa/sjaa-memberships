@@ -56,8 +56,8 @@ class MentorshipController < ApplicationController
     qp = sanitize query_params.to_h
     logger.debug "[MENTORSHIP_FILTER] Params: #{qp.to_h.inspect}"
 
-    # Start with all mentors
-    query = Person.where(mentor: true)
+    # Start with approved mentors only
+    query = Person.where(mentor: true, mentorship_approval_status: Person::MENTORSHIP_APPROVAL_APPROVED)
 
     # Filter by skills if provided
     # Use AND logic: mentors must have ALL selected skills
