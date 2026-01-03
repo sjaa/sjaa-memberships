@@ -1,4 +1,9 @@
 Rails.application.routes.draw do
+  resources :app_configs, only: [:index, :edit, :update] do
+    collection do
+      post :seed_from_env
+    end
+  end
   resources :tags
   mount MissionControl::Jobs::Engine, at: "/jobs"
   

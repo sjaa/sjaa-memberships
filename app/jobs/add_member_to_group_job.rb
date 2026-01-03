@@ -64,25 +64,25 @@ class AddMemberToGroupJob < ApplicationJob
       )
       Rails.logger.debug "[AddMemberToGroupJob] Member object created: #{member.inspect}"
       Rails.logger.debug "[AddMemberToGroupJob] Member as JSON: #{member.to_json}"
-      Rails.logger.debug "[AddMemberToGroupJob] Calling insert_member with group: #{GoogleHelper::MEMBERS_GROUP}"
+      Rails.logger.debug "[AddMemberToGroupJob] Calling insert_member with group: #{members_group}"
 
-      client.insert_member(GoogleHelper::MEMBERS_GROUP, member)
+      client.insert_member(members_group, member)
 
-      Rails.logger.info "[AddMemberToGroupJob] Successfully added #{email} to #{GoogleHelper::MEMBERS_GROUP}"
+      Rails.logger.info "[AddMemberToGroupJob] Successfully added #{email} to #{members_group}"
 
     rescue Google::Apis::ClientError => e
       # Handle duplicate member error gracefully (409 Conflict or 'Member already exists' message)
       if e.status_code == 409 || e.message.include?("Member already exists") || e.message.include?("duplicate")
-        Rails.logger.info "[AddMemberToGroupJob] Person #{person.id} (#{email}) is already in #{GoogleHelper::MEMBERS_GROUP}"
+        Rails.logger.info "[AddMemberToGroupJob] Person #{person.id} (#{email}) is already in #{members_group}"
         return
       end
 
-      Rails.logger.error "[AddMemberToGroupJob] Failed to add #{email} to #{GoogleHelper::MEMBERS_GROUP}: #{e.class.name} - #{e.message}"
+      Rails.logger.error "[AddMemberToGroupJob] Failed to add #{email} to #{members_group}: #{e.class.name} - #{e.message}"
       Rails.logger.error "[AddMemberToGroupJob] Error details: #{e.inspect}"
       Rails.logger.error e.backtrace.join("\n")
       raise e
     rescue => e
-      Rails.logger.error "[AddMemberToGroupJob] Failed to add #{email} to #{GoogleHelper::MEMBERS_GROUP}: #{e.class.name} - #{e.message}"
+      Rails.logger.error "[AddMemberToGroupJob] Failed to add #{email} to #{members_group}: #{e.class.name} - #{e.message}"
       Rails.logger.error "[AddMemberToGroupJob] Error details: #{e.inspect}"
       Rails.logger.error e.backtrace.join("\n")
       raise e

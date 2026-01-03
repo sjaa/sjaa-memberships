@@ -1,0 +1,42 @@
+<h1>Edit Configuration</h1>
+
+<div class="card">
+  <div class="card-header">
+    <h4 class="mb-0"><%= @config.key %></h4>
+  </div>
+  <div class="card-body">
+    <%= form_with(model: @config, url: app_config_path(@config), method: :patch, local: true) do |form| %>
+      <div class="mb-3">
+        <label class="form-label"><strong>Category:</strong></label>
+        <p><%= AppConfig::CATEGORIES[@config.category.to_sym] || @config.category.titleize %></p>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label"><strong>Description:</strong></label>
+        <p><%= @config.description %></p>
+      </div>
+
+      <% if @config.encrypted? %>
+        <div class="alert alert-warning">
+          <i class="bi bi-shield-lock"></i>
+          <strong>Encrypted Value:</strong> This value will be encrypted when saved.
+        </div>
+      <% end %>
+
+      <div class="mb-3">
+        <%= form.label :value, class: 'form-label' %>
+        <% if @config.encrypted? %>
+          <%= form.password_field :value, class: 'form-control', placeholder: 'Enter new value to update' %>
+          <small class="form-text text-muted">Leave blank to keep current value</small>
+        <% else %>
+          <%= form.text_field :value, class: 'form-control' %>
+        <% end %>
+      </div>
+
+      <div class="d-flex gap-2">
+        <%= form.submit "Update Configuration", class: 'btn btn-primary' %>
+        <%= link_to "Cancel", app_configs_path, class: 'btn btn-secondary' %>
+      </div>
+    <% end %>
+  </div>
+</div>

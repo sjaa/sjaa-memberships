@@ -18,7 +18,7 @@ class CalendarSyncJob < ApplicationJob
   def perform(admin_email, calendar_id = nil, days = 90, commit = false)
     require 'sjaa-ruby-calendar-aggregator'
 
-    calendar_id ||= ENV.fetch('SJAA_MERGED_CALENDAR_ID')
+    calendar_id ||= AppConfig.google_calendar_id
     admin = Admin.find_by(email: admin_email)
     
     # Validate admin has refresh token
@@ -45,7 +45,7 @@ class CalendarSyncJob < ApplicationJob
     config.max_events_per_day = 3
     config.prioritize_timed_events = true
     config.debug = true
-    config.google_api_key = ENV['SJAA_GOOGLE_API_KEY']
+    config.google_api_key = AppConfig.google_api_key
 
     # Add a Google Calendar source (you'll need to provide a real API key and calendar ID)
     config.add_google_calendar(

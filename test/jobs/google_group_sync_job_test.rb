@@ -214,7 +214,7 @@ class GoogleGroupSyncJobTest < ActiveJob::TestCase
     end
 
     # Verify default REMOVE_GROUP was used
-    default_group = GoogleHelper::REMOVE_GROUP
+    default_group = AppConfig.google_remove_group
     assert remove_group_calls.any? { |call| call[:group] == default_group },
       "Expected default remove group #{default_group} to be used"
   end

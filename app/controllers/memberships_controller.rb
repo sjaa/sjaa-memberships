@@ -150,8 +150,8 @@ class MembershipsController < ApplicationController
     end
 
     def paypal_init
-      client_id = ENV['PAYPAL_CLIENT_ID']
-      client_secret = ENV['PAYPAL_CLIENT_SECRET']
+      client_id = AppConfig.paypal_client_id
+      client_secret = AppConfig.paypal_client_secret
       if(Rails.application.config.paypal_mode == :live)
         puts "[I] Using PayPal Live Environment"
         environment = PayPal::LiveEnvironment.new client_id, client_secret

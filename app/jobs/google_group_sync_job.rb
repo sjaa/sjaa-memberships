@@ -53,7 +53,7 @@ class GoogleGroupSyncJob < ApplicationJob
     auth = get_auth(admin)
 
     # Use default remove_group if not specified
-    remove_group ||= GoogleHelper::REMOVE_GROUP
+    remove_group ||= self.remove_group
 
     begin
       # Perform the sync

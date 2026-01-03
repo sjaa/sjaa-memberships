@@ -1,0 +1,66 @@
+<h1>Application Configuration</h1>
+
+<% if @configs_empty %>
+  <div class="alert alert-warning">
+    <h4 class="alert-heading">
+      <i class="bi bi-exclamation-triangle"></i>
+      No Configuration Settings Found
+    </h4>
+    <p class="mb-3">
+      The application configuration has not been initialized yet. You can seed all configuration
+      settings from environment variables (if set) or with default values.
+    </p>
+    <%= form_with url: seed_from_env_app_configs_path, method: :post, local: true do |f| %>
+      <%= f.submit "Initialize Configuration from Environment Variables",
+          class: 'btn btn-primary',
+          data: { confirm: 'This will create all configuration entries. Continue?' } %>
+    <% end %>
+  </div>
+<% else %>
+  <div class="alert alert-info">
+    <strong>Note:</strong> These settings control application behavior. Changes take effect immediately.
+    Encrypted values are stored securely in the database.
+  </div>
+<% end %>
+
+<% @configs_by_category.each do |category, configs| %>
+  <div class="card mb-4">
+    <div class="card-header">
+      <h4 class="mb-0"><%= AppConfig::CATEGORIES[category.to_sym] || category.titleize %></h4>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th style="width: 40%">Setting</th>
+              <th style="width: 60%">Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% configs.each do |config| %>
+              <tr>
+                <td>
+                  <div><code><%= config.key %></code></div>
+                  <small class="text-muted"><%= config.description %></small>
+                </td>
+                <td style="word-break: break-all;">
+                  <%= link_to edit_app_config_path(config), class: 'text-decoration-none' do %>
+                    <% if config.encrypted? %>
+                      <em class="text-muted">
+                        <%= config.value.present? ? '[Encrypted - Set]' : '[Not Set]' %>
+                      </em>
+                    <% else %>
+                      <code><%= config.value.present? ? config.value : '[Not Set]' %></code>
+                    <% end %>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+<% end %>
+

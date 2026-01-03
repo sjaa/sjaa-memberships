@@ -230,7 +230,7 @@ The `CalendarSyncJob` syncs events from multiple sources (Google Calendar, Meetu
 **Configuration:**
 1. Copy `config/calendar_aggregator.yml.example` to `config/calendar_aggregator.yml`
 2. Update the configuration with your calendar sources
-3. Set environment variable: `SJAA_ALL_EVENTS_CALENDAR_ID=your-calendar-id@group.calendar.google.com`
+3. Configure the calendar ID via the admin UI at `/app_configs` (key: `google_all_events_calendar_id` or `google_merged_calendar_id`) or set it during database seeding with `SJAA_ALL_EVENTS_CALENDAR_ID` or `SJAA_MERGED_CALENDAR_ID` environment variable
 
 **Features:**
 - Fetches 3 months of events from configured sources
@@ -243,6 +243,7 @@ The `CalendarSyncJob` syncs events from multiple sources (Google Calendar, Meetu
 **Requirements:**
 - Admin account with valid Google Calendar refresh token
 - Calendar aggregator configuration file (optional, uses defaults if not present)
+- Google Calendar ID configured in app settings (`google_all_events_calendar_id` or `google_merged_calendar_id`)
 
 ### Real-Time Notification System
 The application uses Action Cable for real-time WebSocket notifications to both admins and members.

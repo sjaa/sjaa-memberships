@@ -13,7 +13,14 @@ class SessionsController < ApplicationController
     'https://www.googleapis.com/auth/apps.groups.settings',
     'https://www.googleapis.com/auth/calendar.events',
   ]
-  GOOGLE_CLIENT_SECRETS = Google::APIClient::ClientSecrets.new(JSON.parse Base64.decode64(ENV['GOOGLE_WEB_CLIENT_BASE64']))
+  # Load Google client secrets from AppConfig (lazy-loaded)
+  def self.google_client_secrets
+    @google_client_secrets ||= Google::APIClient::ClientSecrets.new(
+      JSON.parse Base64.decode64(AppConfig.google_web_client_base64)
+    )
+  end
+
+  GOOGLE_CLIENT_SECRETS = -> { SessionsController.google_client_secrets }
 
   def public_login
   end
@@ -41,18 +48,18 @@ class SessionsController < ApplicationController
 
   def request_google_authorization
     @authUrl = 'https://accounts.google.com/o/oauth2/auth' +
-    "?client_id=#{GOOGLE_CLIENT_SECRETS.client_id}" +
+    "?client_id=#{GOOGLE_CLIENT_SECRETS.call.client_id}" +
     "&redirect_uri=#{google_callback_url}" +
-    "&scope=#{GOOGLE_SCOPES.join(' ')}" + 
+    "&scope=#{GOOGLE_SCOPES.join(' ')}" +
     '&response_type=code' +
-    '&prompt=consent&' + 
+    '&prompt=consent&' +
     '&access_type=offline';
   end
 
   def google_oauth2_callback
     @code = params[:code]
     @scope = params[:scope]
-    @auth = GOOGLE_CLIENT_SECRETS.to_authorization
+    @auth = GOOGLE_CLIENT_SECRETS.call.to_authorization
     # Pick the redirect_uri that we generated earlier
     @auth.redirect_uri = google_callback_url
     @auth.code = @code

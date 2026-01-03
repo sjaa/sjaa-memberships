@@ -1,0 +1,91 @@
+# AppConfig fixtures for testing
+google_web_client:
+  key: google_web_client_base64
+  value: <%= Base64.encode64('{"web":{"client_id":"test_client_id","client_secret":"test_client_secret","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token"}}') %>
+  category: google
+  description: Base64 encoded Google OAuth client configuration (encrypted)
+  encrypted: true
+
+google_members_group:
+  key: google_members_group
+  value: membership-app-test-group@sjaa.net
+  category: google
+  description: Google Groups email for active members
+  encrypted: false
+
+google_remove_group:
+  key: google_remove_group
+  value: expired-members@sjaa.net
+  category: google
+  description: Google Groups email for expired members
+  encrypted: false
+
+google_api_key:
+  key: google_api_key
+  value: test_api_key_12345
+  category: google
+  description: Google API key for calendar access (encrypted)
+  encrypted: true
+
+google_all_events_calendar_id:
+  key: google_all_events_calendar_id
+  value: test-all-events@group.calendar.google.com
+  category: google
+  description: Google Calendar ID for SJAA All Events calendar
+  encrypted: false
+
+google_merged_calendar_id:
+  key: google_merged_calendar_id
+  value: test-merged@group.calendar.google.com
+  category: google
+  description: Google Calendar ID for SJAA Merged calendar (legacy)
+  encrypted: false
+
+smtp_address:
+  key: smtp_address
+  value: smtp.gmail.com
+  category: smtp
+  description: SMTP server address
+  encrypted: false
+
+smtp_port:
+  key: smtp_port
+  value: "587"
+  category: smtp
+  description: SMTP server port
+  encrypted: false
+
+smtp_domain:
+  key: smtp_domain
+  value: sjaa.net
+  category: smtp
+  description: SMTP domain
+  encrypted: false
+
+smtp_user_name:
+  key: smtp_user_name
+  value: test@sjaa.net
+  category: smtp
+  description: SMTP username
+  encrypted: false
+
+smtp_password:
+  key: smtp_password
+  value: test_password
+  category: smtp
+  description: SMTP password (encrypted)
+  encrypted: true
+
+paypal_client_id:
+  key: paypal_client_id
+  value: test_paypal_client_id
+  category: paypal
+  description: PayPal client ID (encrypted)
+  encrypted: true
+
+paypal_client_secret:
+  key: paypal_client_secret
+  value: test_paypal_secret
+  category: paypal
+  description: PayPal client secret (encrypted)
+  encrypted: true

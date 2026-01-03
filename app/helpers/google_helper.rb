@@ -1,8 +1,13 @@
 require 'google/api_client/client_secrets'
 
 module GoogleHelper
-  MEMBERS_GROUP = ENV.fetch('GOOGLE_MEMBERS_GROUP', 'membership-app-test-group@sjaa.net')
-  REMOVE_GROUP = ENV.fetch('GOOGLE_REMOVE_GROUP', 'expired-members@sjaa.net')
+  def members_group
+    AppConfig.google_members_group
+  end
+
+  def remove_group
+    AppConfig.google_remove_group
+  end
 
   def get_auth(user)
     # Make sure there's a valid refresh token available
@@ -10,8 +15,13 @@ module GoogleHelper
       return nil
     end
 
-    # Load client secrets
-    cshash = JSON.parse Base64.decode64(ENV['GOOGLE_WEB_CLIENT_BASE64'])
+    # Load client secrets from AppConfig
+    google_client_config = AppConfig.google_web_client_base64
+    if google_client_config.blank?
+      return nil
+    end
+
+    cshash = JSON.parse Base64.decode64(google_client_config)
     client_secrets = Google::APIClient::ClientSecrets.new cshash
 
     # Get the auth object
@@ -21,7 +31,9 @@ module GoogleHelper
     return auth
   end
 
-  def sync(auth: nil, group: MEMBERS_GROUP, group_model: nil, members_only: true, use_remove_group: true, remove_group: REMOVE_GROUP, clear_remove_group: true, add_only: false, admin_email: nil, preview_only: false)
+  def sync(auth: nil, group: nil, group_model: nil, members_only: true, use_remove_group: true, remove_group: nil, clear_remove_group: true, add_only: false, admin_email: nil, preview_only: false)
+    group ||= members_group
+    remove_group ||= self.remove_group
     # Compute diff
     diff = diff_group(auth: auth, group: group, group_model: group_model, members_only: members_only)
     client = diff[:client]
@@ -87,7 +99,8 @@ module GoogleHelper
   end
 
   # Generic method to diff any group with group membership or active members
-  def diff_group(auth: nil, group: MEMBERS_GROUP, group_model: nil, members_only: true)
+  def diff_group(auth: nil, group: nil, group_model: nil, members_only: true)
+    group ||= members_group
     results = {}
 
     # Get a client from googleapis
@@ -162,10 +175,11 @@ module GoogleHelper
 
   # Backwards compatibility wrapper
   def diff_members_group(auth: nil)
-    diff_group(auth: auth, group: MEMBERS_GROUP, group_model: nil, members_only: true)
+    diff_group(auth: auth, group: members_group, group_model: nil, members_only: true)
   end
 
-  def get_members(auth: nil, client: nil, group: MEMBERS_GROUP)
+  def get_members(auth: nil, client: nil, group: nil)
+    group ||= members_group
     if(client.nil?)
       client = Google::Apis::AdminDirectoryV1::DirectoryService.new
       client.authorization = auth

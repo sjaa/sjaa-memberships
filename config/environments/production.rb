@@ -81,18 +81,8 @@ Rails.application.configure do
   ActionMailer::Base.add_delivery_method :smtp_pool, SmtpPoolDelivery
   config.action_mailer.delivery_method = :smtp_pool
   config.action_mailer.perform_deliveries = true
-  config.action_mailer.smtp_pool_settings = {
-    pool_size: 1, # Maximum number of connections in the pool
-    pool_timeout: 10, # Seconds to wait for a connection
-    address:              ENV['SMTP_ADDRESS'],
-    port:                 ENV['SMTP_PORT'],
-    domain:               ENV['SMTP_DOMAIN'],
-    user_name:            ENV['SMTP_USER_NAME'],
-    password:             ENV['SMTP_PASSWORD'],
-    host:                 ENV['SMTP_ADDRESS'],
-    authentication:       :login,
-    enable_starttls_auto: true
-  }
+  # SMTP settings are loaded from AppConfig model at runtime
+  # See config/initializers/smtp_settings.rb
 
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.

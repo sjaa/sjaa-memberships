@@ -265,7 +265,7 @@ task delete_corrupt_calendar_events: [:environment] do
   include GoogleHelper
 
   admin_email = ENV['ADMIN']
-  calendar_id = ENV['CALENDAR_ID'] || ENV.fetch('SJAA_MERGED_CALENDAR_ID')
+  calendar_id = ENV['CALENDAR_ID'] || AppConfig.google_calendar_id
   commit = ENV['COMMIT'] == 'true'
 
   if admin_email.nil? || admin_email.empty?

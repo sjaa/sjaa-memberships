@@ -14,7 +14,7 @@
     <%= javascript_importmap_tags %>
     <script>
       window.AppConfig = {
-        pp_client: "<%=ENV['PAYPAL_CLIENT_ID']%>"
+        pp_client: "<%=AppConfig.paypal_client_id%>"
       };
     </script>
     <%= combobox_style_tag %>
@@ -53,7 +53,9 @@
                     <li><%= link_to 'Tags', tags_path, class: 'dropdown-item' %></li>
                     <li><%= link_to 'Opportunities', opportunities_path, class: 'dropdown-item' %></li>
                     <% if @user.has_permission? :permit %>
+                      <li><hr class="dropdown-divider"></li>
                       <li><a class="dropdown-item" href="/admins">Permissions</a></li>
+                      <li><%= link_to 'App Configuration', app_configs_path, class: 'dropdown-item' %></li>
                     <% end %>
                   </ul>
                 </li>

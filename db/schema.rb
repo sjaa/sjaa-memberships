@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_01_03_032517) do
+ActiveRecord::Schema[7.1].define(version: 2026_01_03_041140) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
   enable_extension "plpgsql"
@@ -69,6 +69,18 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_03_032517) do
     t.datetime "updated_at", null: false
     t.index ["bearer_id", "bearer_type"], name: "index_api_keys_on_bearer_id_and_bearer_type"
     t.index ["token"], name: "index_api_keys_on_token", unique: true
+  end
+
+  create_table "app_configs", force: :cascade do |t|
+    t.string "key", null: false
+    t.text "value"
+    t.string "category", null: false
+    t.text "description"
+    t.boolean "encrypted", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["category"], name: "index_app_configs_on_category"
+    t.index ["key"], name: "index_app_configs_on_key", unique: true
   end
 
   create_table "astrobins", force: :cascade do |t|

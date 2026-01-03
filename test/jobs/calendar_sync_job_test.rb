@@ -11,8 +11,8 @@ class CalendarSyncJobTest < ActiveJob::TestCase
 
     @calendar_id = 'test-calendar@group.calendar.google.com'
 
-    # Set required environment variable
-    ENV['SJAA_ALL_EVENTS_CALENDAR_ID'] = @calendar_id
+    # Set required configuration
+    AppConfig.set('google_all_events_calendar_id', @calendar_id, category: 'google', description: 'Test calendar')
 
     # Track API calls
     @api_called = false
