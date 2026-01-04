@@ -7,7 +7,7 @@
     <% end %>
     </p>
     <p>The list below shows people whose memberships have recently expired (in the last three months) or
-    that are about to expire (in the next two months)</p>
+    that are about to expire (in the next <%= pluralize(AppConfig.membership_renewal_threshold_months, 'month') %>)</p>
   </div>
  
   <div id="people" class="col-12 mt-2">

@@ -1,12 +1,35 @@
 class AppConfigsController < ApplicationController
   def index
     authorize AppConfig
-    @configs_by_category = AppConfig.all.group_by(&:category).sort_by { |k, _| k }
+
+    # Build a complete list of configs (existing + placeholders)
+    existing_configs = AppConfig.all.index_by(&:key)
+
+    @configs_by_category = AppConfig.all_definitions_by_category.map do |category, definitions|
+      configs = definitions.map do |definition|
+        existing_configs[definition[:key]] || AppConfig.new(
+          key: definition[:key],
+          category: definition[:category],
+          description: definition[:description],
+          encrypted: definition[:encrypted],
+          value: nil  # Placeholder - not persisted
+        )
+      end
+      [category, configs]
+    end
+
     @configs_empty = AppConfig.count == 0
   end
 
   def edit
-    @config = AppConfig.find(params[:id])
+    # Try to find existing config, or create from definition using key param
+    @config = if params[:id].to_i > 0
+      AppConfig.find(params[:id])
+    else
+      # ID is actually a key for a placeholder config
+      AppConfig.find_or_create_from_definition(params[:id])
+    end
+
     authorize @config
   end
 
@@ -26,8 +49,17 @@ class AppConfigsController < ApplicationController
   def seed_from_env
     authorize AppConfig
     begin
-      seed_all_configs
-      flash[:success] = "Configuration settings have been seeded successfully!"
+      counts = seed_all_configs
+
+      if counts[:created] > 0 && counts[:updated] > 0
+        flash[:success] = "Configuration settings seeded! Created #{counts[:created]} new config(s) and updated #{counts[:updated]} existing config(s) from environment variables/defaults."
+      elsif counts[:created] > 0
+        flash[:success] = "Created #{counts[:created]} configuration setting(s) from environment variables/defaults."
+      elsif counts[:updated] > 0
+        flash[:success] = "Updated #{counts[:updated]} configuration setting(s) from environment variables/defaults."
+      else
+        flash[:success] = "All #{counts[:unchanged]} configuration setting(s) already up to date."
+      end
     rescue => e
       flash[:alert] = "Error seeding configurations: #{e.message}"
     end
@@ -41,98 +73,34 @@ class AppConfigsController < ApplicationController
   end
 
   def seed_all_configs
-    # SMTP Email Settings
-    AppConfig.find_or_create_by!(key: 'smtp_address') do |c|
-      c.value = ENV.fetch('SMTP_ADDRESS', 'smtp.gmail.com')
-      c.category = 'smtp'
-      c.description = 'SMTP server address'
-      c.encrypted = false
+    # Create or update all configs from definitions
+    created_count = 0
+    updated_count = 0
+    unchanged_count = 0
+
+    AppConfig::DEFINITIONS.each do |definition|
+      config = AppConfig.find_or_initialize_by(key: definition[:key])
+      was_new = config.new_record?
+
+      new_value = ENV.fetch(definition[:env], definition[:default])
+      old_value = config.value
+
+      config.value = new_value
+      config.category = definition[:category]
+      config.description = definition[:description]
+      config.encrypted = definition[:encrypted]
+
+      if config.save
+        if was_new
+          created_count += 1
+        elsif old_value != new_value
+          updated_count += 1
+        else
+          unchanged_count += 1
+        end
+      end
     end
 
-    AppConfig.find_or_create_by!(key: 'smtp_port') do |c|
-      c.value = ENV.fetch('SMTP_PORT', '587')
-      c.category = 'smtp'
-      c.description = 'SMTP server port'
-      c.encrypted = false
-    end
-
-    AppConfig.find_or_create_by!(key: 'smtp_domain') do |c|
-      c.value = ENV.fetch('SMTP_DOMAIN', 'sjaa.net')
-      c.category = 'smtp'
-      c.description = 'SMTP domain'
-      c.encrypted = false
-    end
-
-    AppConfig.find_or_create_by!(key: 'smtp_user_name') do |c|
-      c.value = ENV.fetch('SMTP_USER_NAME', '')
-      c.category = 'smtp'
-      c.description = 'SMTP username'
-      c.encrypted = false
-    end
-
-    AppConfig.find_or_create_by!(key: 'smtp_password') do |c|
-      c.value = ENV.fetch('SMTP_PASSWORD', '')
-      c.category = 'smtp'
-      c.description = 'SMTP password (encrypted)'
-      c.encrypted = true
-    end
-
-    # PayPal Settings
-    AppConfig.find_or_create_by!(key: 'paypal_client_id') do |c|
-      c.value = ENV.fetch('PAYPAL_CLIENT_ID', '')
-      c.category = 'paypal'
-      c.description = 'PayPal client ID (encrypted)'
-      c.encrypted = true
-    end
-
-    AppConfig.find_or_create_by!(key: 'paypal_client_secret') do |c|
-      c.value = ENV.fetch('PAYPAL_CLIENT_SECRET', '')
-      c.category = 'paypal'
-      c.description = 'PayPal client secret (encrypted)'
-      c.encrypted = true
-    end
-
-    # Google API Settings
-    AppConfig.find_or_create_by!(key: 'google_web_client_base64') do |c|
-      c.value = ENV.fetch('GOOGLE_WEB_CLIENT_BASE64', '')
-      c.category = 'google'
-      c.description = 'Base64 encoded Google OAuth client configuration (encrypted)'
-      c.encrypted = true
-    end
-
-    AppConfig.find_or_create_by!(key: 'google_members_group') do |c|
-      c.value = ENV.fetch('GOOGLE_MEMBERS_GROUP', 'membership-app-test-group@sjaa.net')
-      c.category = 'google'
-      c.description = 'Google Groups email for active members'
-      c.encrypted = false
-    end
-
-    AppConfig.find_or_create_by!(key: 'google_remove_group') do |c|
-      c.value = ENV.fetch('GOOGLE_REMOVE_GROUP', 'expired-members@sjaa.net')
-      c.category = 'google'
-      c.description = 'Google Groups email for expired members'
-      c.encrypted = false
-    end
-
-    AppConfig.find_or_create_by!(key: 'google_api_key') do |c|
-      c.value = ENV.fetch('SJAA_GOOGLE_API_KEY', '')
-      c.category = 'google'
-      c.description = 'Google API key for calendar access (encrypted)'
-      c.encrypted = true
-    end
-
-    AppConfig.find_or_create_by!(key: 'google_all_events_calendar_id') do |c|
-      c.value = ENV.fetch('SJAA_ALL_EVENTS_CALENDAR_ID', '')
-      c.category = 'google'
-      c.description = 'Google Calendar ID for SJAA All Events calendar'
-      c.encrypted = false
-    end
-
-    AppConfig.find_or_create_by!(key: 'google_merged_calendar_id') do |c|
-      c.value = ENV.fetch('SJAA_MERGED_CALENDAR_ID', '')
-      c.category = 'google'
-      c.description = 'Google Calendar ID for SJAA Merged calendar (legacy)'
-      c.encrypted = false
-    end
+    { created: created_count, updated: updated_count, unchanged: unchanged_count }
   end
 end

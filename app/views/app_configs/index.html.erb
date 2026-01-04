@@ -1,25 +1,32 @@
 <h1>Application Configuration</h1>
 
+<div class="mb-3">
+  <%= form_with url: seed_from_env_app_configs_path, method: :post, class: 'd-inline' do |f| %>
+    <%= f.submit @configs_empty ? "Initialize All Configurations" : "Seed/Update from Environment Variables",
+        class: @configs_empty ? 'btn btn-primary' : 'btn btn-outline-secondary',
+        data: {
+          turbo_confirm: @configs_empty ?
+            'This will create all configuration entries from environment variables or default values. Continue?' :
+            'WARNING: This will override ALL existing configuration values with values from environment variables (if set) or defaults. Any custom values you have set will be lost. Are you sure you want to continue?'
+        } %>
+  <% end %>
+</div>
+
 <% if @configs_empty %>
   <div class="alert alert-warning">
     <h4 class="alert-heading">
       <i class="bi bi-exclamation-triangle"></i>
       No Configuration Settings Found
     </h4>
-    <p class="mb-3">
-      The application configuration has not been initialized yet. You can seed all configuration
+    <p class="mb-0">
+      The application configuration has not been initialized yet. Click the "Initialize All Configurations" button above to create all configuration
       settings from environment variables (if set) or with default values.
     </p>
-    <%= form_with url: seed_from_env_app_configs_path, method: :post, local: true do |f| %>
-      <%= f.submit "Initialize Configuration from Environment Variables",
-          class: 'btn btn-primary',
-          data: { confirm: 'This will create all configuration entries. Continue?' } %>
-    <% end %>
   </div>
 <% else %>
   <div class="alert alert-info">
     <strong>Note:</strong> These settings control application behavior. Most changes take effect immediately, but some require an application restart.
-    Encrypted values are stored securely in the database.
+    Encrypted values are stored securely in the database. Use the "Seed/Update from Environment Variables" button above to reset all values from environment variables or defaults.
   </div>
 <% end %>
 
@@ -39,19 +46,28 @@
           </thead>
           <tbody>
             <% configs.each do |config| %>
-              <tr>
+              <tr class="<%= 'table-warning' unless config.persisted? %>">
                 <td>
-                  <div><code><%= config.key %></code></div>
+                  <div>
+                    <code><%= config.key %></code>
+                    <% unless config.persisted? %>
+                      <span class="badge bg-warning text-dark ms-2">Not Configured</span>
+                    <% end %>
+                  </div>
                   <small class="text-muted"><%= config.description %></small>
                 </td>
                 <td style="word-break: break-all;">
-                  <%= link_to edit_app_config_path(config), class: 'text-decoration-none' do %>
-                    <% if config.encrypted? %>
-                      <em class="text-muted">
-                        <%= config.value.present? ? '[Encrypted - Set]' : '[Not Set]' %>
-                      </em>
+                  <%= link_to edit_app_config_path(config.persisted? ? config.id : config.key), class: 'text-decoration-none' do %>
+                    <% if config.persisted? %>
+                      <% if config.encrypted? %>
+                        <em class="text-muted">
+                          <%= config.value.present? ? '[Encrypted - Set]' : '[Not Set]' %>
+                        </em>
+                      <% else %>
+                        <code><%= config.value.present? ? config.value : '[Not Set]' %></code>
+                      <% end %>
                     <% else %>
-                      <code><%= config.value.present? ? config.value : '[Not Set]' %></code>
+                      <em class="text-muted">[Click to configure with default value]</em>
                     <% end %>
                   <% end %>
                 </td>

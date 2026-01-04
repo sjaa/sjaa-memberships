@@ -26,6 +26,32 @@ class AppConfig < ApplicationRecord
     membership: 'Membership Settings'
   }.freeze
 
+  # Define all possible configurations with their defaults
+  # This serves as the source of truth for what configs exist
+  DEFINITIONS = [
+    # SMTP Email Settings
+    { key: 'smtp_address', category: 'smtp', description: 'SMTP server address', encrypted: false, default: 'smtp.gmail.com', env: 'SMTP_ADDRESS' },
+    { key: 'smtp_port', category: 'smtp', description: 'SMTP server port', encrypted: false, default: '587', env: 'SMTP_PORT' },
+    { key: 'smtp_domain', category: 'smtp', description: 'SMTP domain', encrypted: false, default: 'sjaa.net', env: 'SMTP_DOMAIN' },
+    { key: 'smtp_user_name', category: 'smtp', description: 'SMTP username', encrypted: false, default: '', env: 'SMTP_USER_NAME' },
+    { key: 'smtp_password', category: 'smtp', description: 'SMTP password (encrypted)', encrypted: true, default: '', env: 'SMTP_PASSWORD' },
+
+    # PayPal Settings
+    { key: 'paypal_client_id', category: 'paypal', description: 'PayPal client ID (encrypted)', encrypted: true, default: '', env: 'PAYPAL_CLIENT_ID' },
+    { key: 'paypal_client_secret', category: 'paypal', description: 'PayPal client secret (encrypted)', encrypted: true, default: '', env: 'PAYPAL_CLIENT_SECRET' },
+
+    # Google API Settings
+    { key: 'google_web_client_base64', category: 'google', description: 'Base64 encoded Google OAuth client configuration (encrypted)', encrypted: true, default: '', env: 'GOOGLE_WEB_CLIENT_BASE64' },
+    { key: 'google_members_group', category: 'google', description: 'Google Groups email for active members', encrypted: false, default: 'membership-app-test-group@sjaa.net', env: 'GOOGLE_MEMBERS_GROUP' },
+    { key: 'google_remove_group', category: 'google', description: 'Google Groups email for expired members', encrypted: false, default: 'expired-members@sjaa.net', env: 'GOOGLE_REMOVE_GROUP' },
+    { key: 'google_api_key', category: 'google', description: 'Google API key for calendar access (encrypted)', encrypted: true, default: '', env: 'SJAA_GOOGLE_API_KEY' },
+    { key: 'google_all_events_calendar_id', category: 'google', description: 'Google Calendar ID for SJAA All Events calendar', encrypted: false, default: '', env: 'SJAA_ALL_EVENTS_CALENDAR_ID' },
+    { key: 'google_merged_calendar_id', category: 'google', description: 'Google Calendar ID for SJAA Merged calendar (legacy)', encrypted: false, default: '', env: 'SJAA_MERGED_CALENDAR_ID' },
+
+    # Membership Settings
+    { key: 'membership_renewal_threshold_months', category: 'membership', description: 'Number of months before expiration to show renewal reminders and mark memberships as renewable', encrypted: false, default: '2', env: 'MEMBERSHIP_RENEWAL_THRESHOLD_MONTHS' }
+  ].freeze
+
   # Cache configuration values in memory for performance
   class << self
     # Get a configuration value by key
@@ -115,6 +141,37 @@ class AppConfig < ApplicationRecord
     # Get membership renewal threshold in months
     def membership_renewal_threshold_months
       (get('membership_renewal_threshold_months') || '2').to_i
+    end
+
+    # Find a config definition by key
+    def definition_for(key)
+      DEFINITIONS.find { |d| d[:key] == key }
+    end
+
+    # Get all config definitions grouped by category
+    def all_definitions_by_category
+      DEFINITIONS.group_by { |d| d[:category] }.sort_by { |k, _| k }
+    end
+
+    # Create a config from its definition with default or env value
+    def create_from_definition(key)
+      definition = definition_for(key)
+      return nil unless definition
+
+      value = ENV.fetch(definition[:env], definition[:default])
+
+      create!(
+        key: definition[:key],
+        value: value,
+        category: definition[:category],
+        description: definition[:description],
+        encrypted: definition[:encrypted]
+      )
+    end
+
+    # Find or create a config by key using its definition
+    def find_or_create_from_definition(key)
+      find_by(key: key) || create_from_definition(key)
     end
 
     # Clear cache for a specific key
