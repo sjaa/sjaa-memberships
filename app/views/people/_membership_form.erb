@@ -1,43 +1,78 @@
+<%
+  # Local variables with defaults
+  show_descriptions ||= false
+  show_delete ||= true
+  disable_start_date ||= false
+  field_name_prefix ||= 'person[membership_attributes][]'
+%>
 <div id="<%=id%>" class="card mb-3">
   <div class="card-header">
-    <h3 class="h5 mb-0">Membership <%= i ? i+1 : 'New'%></h3>
+    <h3 class="h5 mb-0"><%= !i ? 'New' : ''%> Membership <%= i ? i+1 : ''%></h3>
   </div>
   <div class="card-body">
-    <%= hidden_field_tag 'person[membership_attributes][][id]', membership.id %>
-    <%= hidden_field_tag 'person[membership_attributes][][person_id]', person&.id %>
+    <% if membership.id.present? %>
+      <%= hidden_field_tag "#{field_name_prefix}[id]", membership.id %>
+    <% end %>
+    <%= hidden_field_tag "#{field_name_prefix}[person_id]", person&.id %>
     <% if membership.id.nil? %>
-    <%= hidden_field_tag 'person[membership_attributes][][author]', membership.author.presence || @user&.email %>
+      <%= hidden_field_tag "#{field_name_prefix}[author]", membership.author.presence || @user&.email %>
     <% end %>
     <div class="row">
       <div class="col-md-6 mt-2">
         <%= label_tag :membership_start, 'Start Date', class: 'form-label' %>
-        <%= date_field_tag 'person[membership_attributes][][start]', membership.start&.strftime('%Y-%m-%d'), class: 'form-control' %>
+        <%= date_field_tag "#{field_name_prefix}[start]", membership.start&.strftime('%Y-%m-%d'), class: 'form-control', readonly: disable_start_date %>
+        <% if show_descriptions %>
+          <small class="form-text text-muted">
+            Membership start date (automatically calculated for renewals)
+          </small>
+        <% end %>
       </div>
       <div class="col-md-6 mt-2">
-        <%= label_tag :membership_term, 'Term in Months', class: 'form-label' %>
-        <%= number_field_tag 'person[membership_attributes][][term_months]', membership.term_months || 12, class: 'form-control' %>
+        <%= label_tag :membership_term, 'Term (months)', class: 'form-label' %>
+        <%= number_field_tag "#{field_name_prefix}[term_months]", membership.term_months || SjaaMembers::DEFAULT_MEMBERSHIP_TERM, class: 'form-control', min: 1 %>
+        <% if show_descriptions %>
+          <small class="form-text text-muted">
+            Default: <%= SjaaMembers::DEFAULT_MEMBERSHIP_TERM %> months (1 year)
+          </small>
+        <% end %>
       </div>
       <div class="col-md-6 mt-2">
-        <%= label_tag :donation_amount, 'Donation', class: 'form-label' %>
+        <%= label_tag :membership_kind_id, 'Membership Type', class: 'form-label' %>
+        <%= select_tag "#{field_name_prefix}[kind_id]",
+                       options_for_select([['Select type (optional)', '']] + MembershipKind.all.map { |k| [k.name, k.id] }, membership.kind_id),
+                       class: 'form-select' %>
+        <% if show_descriptions %>
+          <small class="form-text text-muted">
+            Optional membership classification
+          </small>
+        <% end %>
+      </div>
+      <div class="col-md-6 mt-2">
+        <%= label_tag :membership_ephemeris, 'Printed Ephemeris', class: 'form-label' %>
+        <%= select_tag "#{field_name_prefix}[ephemeris]",
+                       options_for_select([['Yes', 'true'], ['No', 'false']], membership.ephemeris ? 'true' : 'false'),
+                       class: 'form-select' %>
+        <% if show_descriptions %>
+          <small class="form-text text-muted">
+            Check if member wants printed version
+          </small>
+        <% end %>
+      </div>
+      <div class="col-md-6 mt-2">
+        <%= label_tag :donation_amount, 'Donation Amount', class: 'form-label' %>
         <div class="input-group">
           <span class="input-group-text">$</span>
-          <%= number_field_tag 'person[membership_attributes][][donation_amount]', membership.donation_amount, class: 'form-control', style: 'max-width: 120px' %>
+          <%= number_field_tag "#{field_name_prefix}[donation_amount]", membership.donation_amount || 0, class: 'form-control', step: 0.01, min: 0 %>
         </div>
-      </div>
-      <%# Kind isn't really well defined, so skip it%>
-      <% if false %>
-        <div class="col-md-6 mt-2">
-          <%= label_tag :membership_kind_id, 'Kind', class: 'form-label' %>
-          <%= combobox_tag 'person[membership_attributes][][kind_id]', MembershipKind.all, value: membership.kind&.id, name_when_new: 'person[membership_attributes][][kind]' %>
-        </div>
-      <% end %>
-      <div class="col-md-6 mt-2">
-        <%= label_tag :membership_ephemeris, 'Printed Ephemeris', class: 'form-label' %><br/>
-        <%= combobox_tag 'person[membership_attributes][][ephemeris]', [{display: 'Yes', value: 'true'}, {display: 'No', value: 'false'}], value: membership.ephemeris ? 'true' : 'false' %>
+        <% if show_descriptions %>
+          <small class="form-text text-muted">
+            Optional extra donation
+          </small>
+        <% end %>
       </div>
       <div class="col-md-6 mt-2">
         <%= label_tag :payment_method, 'Payment Method', class: 'form-label' %>
-        <%= select_tag 'person[membership_attributes][][order_attributes][payment_method]',
+        <%= select_tag "#{field_name_prefix}[order_attributes][payment_method]",
                        options_for_select([
                          ['None', 'none'],
                          ['Cash', 'cash'],
@@ -45,11 +80,27 @@
                          ['PayPal', 'paypal']
                        ], membership.order&.payment_method || 'none'),
                        class: 'form-select' %>
+        <% if show_descriptions %>
+          <small class="form-text text-muted">
+            How the membership fee was paid
+          </small>
+        <% end %>
       </div>
-      <div class="col-md-6 mt-2">
-        <%= label_tag :membership_delete, 'Delete', class: 'form-label' %><br/>
-        <button type="button" data-form-id-param="<%=id%>" data-action="form#removeField" class="btn btn-danger">Remove Membership</button>
+      <div class="col-12 mt-2">
+        <%= label_tag :membership_notes, 'Notes', class: 'form-label' %>
+        <%= text_area_tag "#{field_name_prefix}[notes]", membership.notes, class: 'form-control', rows: 2, placeholder: 'Optional notes about this membership (e.g., "Comp membership for speaker", "Manual renewal - payment received via check")' %>
+        <% if show_descriptions %>
+          <small class="form-text text-muted">
+            Optional notes for record keeping
+          </small>
+        <% end %>
       </div>
+      <% if show_delete %>
+        <div class="col-md-6 mt-2">
+          <%= label_tag :membership_delete, 'Delete', class: 'form-label' %><br/>
+          <button type="button" data-form-id-param="<%=id%>" data-action="form#removeField" class="btn btn-danger">Remove Membership</button>
+        </div>
+      <% end %>
     </div>
   </div>
 </div>

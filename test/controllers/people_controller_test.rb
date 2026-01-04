@@ -1233,4 +1233,165 @@ class PeopleControllerTest < ActionDispatch::IntegrationTest
     mentor.reload
     assert_equal Person::MENTORSHIP_APPROVAL_DENIED, mentor.mentorship_approval_status
   end
+
+  # Admin renewal tests
+  test "admin_renew requires authentication" do
+    person = Person.create!(first_name: "Test", last_name: "Person", password: "password123")
+
+    # Not logged in
+    post admin_renew_person_path(person), params: {
+      membership: {
+        start: Date.today,
+        term_months: 12,
+        ephemeris: false
+      }
+    }
+    assert_redirected_to login_path
+  end
+
+  test "admin_renew requires write permission as admin" do
+    person = Person.create!(first_name: "Test", last_name: "Person", password: "password123")
+
+    # Logged in as admin with only read permission
+    login_as_admin(@admin)
+    post admin_renew_person_path(person), params: {
+      membership: {
+        start: Date.today,
+        term_months: 12,
+        ephemeris: false
+      }
+    }
+    # Redirects to root when unauthorized (application behavior)
+    assert_redirected_to root_path
+  end
+
+  test "admin_renew creates membership with write permission" do
+    write_permission = Permission.find_or_create_by(name: 'write')
+    @admin.permissions << write_permission
+    login_as_admin @admin
+
+    person = Person.create!(first_name: "Test", last_name: "Person", password: "password123")
+    initial_membership_count = person.memberships.count
+
+    start_date = Date.today
+    post admin_renew_person_path(person), params: {
+      membership: {
+        start: start_date,
+        term_months: 12,
+        ephemeris: true,
+        donation_amount: 25.00
+      }
+    }
+
+    assert_redirected_to person_path(person)
+    assert_match /successfully created/, flash[:notice]
+
+    person.reload
+    assert_equal initial_membership_count + 1, person.memberships.count
+
+    new_membership = person.memberships.order(:created_at).last
+    assert_equal start_date, new_membership.start
+    assert_equal 12, new_membership.term_months
+    assert new_membership.ephemeris
+    assert_equal 25.00, new_membership.donation_amount
+    assert_equal @admin.email, new_membership.author
+  end
+
+  test "admin_renew uses next_membership_start_date by default" do
+    write_permission = Permission.find_or_create_by(name: 'write')
+    @admin.permissions << write_permission
+    login_as_admin @admin
+
+    person = Person.create!(first_name: "Test", last_name: "Person", password: "password123")
+    # Create an active membership
+    Membership.create!(
+      person: person,
+      start: 6.months.ago,
+      term_months: 12,
+      ephemeris: false
+    )
+
+    expected_start = person.next_membership_start_date
+
+    post admin_renew_person_path(person), params: {
+      membership: {
+        start: expected_start,
+        term_months: 12,
+        ephemeris: false
+      }
+    }
+
+    person.reload
+    new_membership = person.memberships.order(:created_at).last
+    assert_equal expected_start, new_membership.start
+  end
+
+  test "admin_renew creates membership with kind_id" do
+    write_permission = Permission.find_or_create_by(name: 'write')
+    @admin.permissions << write_permission
+    login_as_admin @admin
+
+    person = Person.create!(first_name: "Test", last_name: "Person", password: "password123")
+    kind = MembershipKind.create!(name: "Student")
+
+    post admin_renew_person_path(person), params: {
+      membership: {
+        start: Date.today,
+        term_months: 12,
+        ephemeris: false,
+        kind_id: kind.id
+      }
+    }
+
+    person.reload
+    new_membership = person.memberships.order(:created_at).last
+    assert_equal kind.id, new_membership.kind_id
+  end
+
+  test "admin_renew stores notes and sets author automatically" do
+    write_permission = Permission.find_or_create_by(name: 'write')
+    @admin.permissions << write_permission
+    login_as_admin @admin
+
+    person = Person.create!(first_name: "Test", last_name: "Person", password: "password123")
+
+    post admin_renew_person_path(person), params: {
+      membership: {
+        start: Date.today,
+        term_months: 12,
+        ephemeris: false,
+        notes: "Comp membership for volunteer work"
+      }
+    }
+
+    person.reload
+    new_membership = person.memberships.order(:created_at).last
+    assert_equal "Comp membership for volunteer work", new_membership.notes
+    assert_equal @admin.email, new_membership.author
+  end
+
+  test "admin_renew allows membership without start date" do
+    write_permission = Permission.find_or_create_by(name: 'write')
+    @admin.permissions << write_permission
+    login_as_admin @admin
+
+    person = Person.create!(first_name: "Test", last_name: "Person", password: "password123")
+
+    # Membership without start date should still be created (no validation on Membership model)
+    post admin_renew_person_path(person), params: {
+      membership: {
+        start: nil,
+        term_months: 12,
+        ephemeris: false
+      }
+    }
+
+    assert_redirected_to person_path(person)
+    assert_match /successfully created/, flash[:notice]
+
+    person.reload
+    new_membership = person.memberships.order(:created_at).last
+    assert_nil new_membership.start
+    assert_equal 12, new_membership.term_months
+  end
 end

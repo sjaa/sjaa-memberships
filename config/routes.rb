@@ -24,6 +24,7 @@ Rails.application.routes.draw do
   get '/people/:id/new_membership', to: 'people#new_membership', as: :membership_renewal
   post '/people/:id/approve_mentorship', to: 'people#approve_mentorship', as: :approve_mentorship
   post '/people/:id/deny_mentorship', to: 'people#deny_mentorship', as: :deny_mentorship
+  post '/people/:id/admin_renew', to: 'people#admin_renew', as: :admin_renew_person
   get '/people/verify', to: 'people#verify_form', as: :verify_membership_form
   post '/people/verify', to: 'people#verify', as: :verify_membership
   post '/memberships/order', to: 'memberships#create_order', as: :membership_order

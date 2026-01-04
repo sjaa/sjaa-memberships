@@ -20,8 +20,13 @@
           </div>
           <% if @user.is_a?(Admin) %>
             <div class="btn-group" role="group">
-              <%= link_to "Welcome Email", welcome_email_path(@person), class: 'btn btn-sm btn-outline-secondary' %>
-              <%= link_to "Renewal Reminder", reminder_email_path(@person), class: 'btn btn-sm btn-outline-secondary' %>
+              <%= link_to "Send Welcome Email", welcome_email_path(@person), class: 'btn btn-sm btn-outline-secondary' %>
+              <%= link_to "Send Renewal Reminder", reminder_email_path(@person), class: 'btn btn-sm btn-outline-secondary' %>
+              <% if @user.has_permission?(:write) %>
+                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#adminRenewModal">
+                  Admin Renew
+                </button>
+              <% end %>
             </div>
           <% end %>
         </div>
@@ -233,9 +238,9 @@
                 <thead>
                   <tr>
                     <th>Duration</th>
-                    <th>Type</th>
                     <th class="text-end">Donation</th>
                     <th class="text-center">Ephemeris</th>
+                    <th>Notes</th>
                     <th></th>
                   </tr>
                 </thead>
@@ -251,9 +256,9 @@
                           <small class="text-muted"><%= membership.term_months %> months</small>
                         <% end %>
                       </td>
-                      <td><%= membership.kind&.name %></td>
                       <td class="text-end"><%= dollar_format(membership.donation_amount) %></td>
                       <td class="text-center"><%= ephemeris_format membership.ephemeris %></td>
+                      <td><%= membership.notes %></td>
                       <td>
                         <% if membership.is_active? %>
                           <span class="badge bg-success">Active</span>
@@ -314,3 +319,8 @@
     <% end %>
   </div>
 </div>
+
+<!-- Admin Renew Modal -->
+<% if @user.is_a?(Admin) && @user.has_permission?(:write) %>
+  <%= render partial: 'admin_renew_modal' %>
+<% end %>

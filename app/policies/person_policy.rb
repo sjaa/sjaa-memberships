@@ -55,4 +55,8 @@ class PersonPolicy < ApplicationPolicy
   def deny_mentorship?
     user&.has_permission?(:write)
   end
+
+  def admin_renew?
+    user&.has_permission?(:write)
+  end
 end

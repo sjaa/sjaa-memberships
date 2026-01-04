@@ -3,7 +3,7 @@ class PeopleController < ApplicationController
   include Filterable
   include GoogleHelper
 
-  before_action :set_person, only: %i[ show edit update destroy new_membership  remind approve_mentorship deny_mentorship]
+  before_action :set_person, only: %i[ show edit update destroy new_membership  remind approve_mentorship deny_mentorship admin_renew]
   skip_before_action :verify_authenticity_token, only: [:update], if: -> { request.format.json? }
 
   # GET /people or /people.json
@@ -98,6 +98,20 @@ class PeopleController < ApplicationController
       redirect_to @person, notice: "Mentorship approval for #{@person.name} has been denied."
     else
       redirect_to @person, alert: "Failed to deny mentorship."
+    end
+  end
+
+  # POST /people/:id/admin_renew
+  def admin_renew
+    @membership = Membership.new(admin_renew_params)
+    @membership.person = @person
+    # Always set author to the admin who created the membership
+    @membership.author = current_user.email if current_user.respond_to?(:email)
+
+    if @membership.save
+      redirect_to @person, notice: "Membership was successfully created for #{@person.name}."
+    else
+      redirect_to @person, alert: "Failed to create membership: #{@membership.errors.full_messages.join(', ')}"
     end
   end
 
@@ -322,9 +336,14 @@ class PeopleController < ApplicationController
     permission_attributes: [],
     skills_attributes: [:skill_id, :skill_level, :interest_level],
     contact_attributes: [:address, :zipcode, :phone, :state_id, :city_id, :city_name, :email, :primary, :person_id, :id],
-    membership_attributes: [:start, :kind, :kind_id, :term_months, :new, :ephemeris, :id, :person_id, :donation_amount, :author, order_attributes: [:payment_method]],
+    membership_attributes: [:start, :kind, :kind_id, :term_months, :new, :ephemeris, :id, :person_id, :donation_amount, :author, :notes, order_attributes: [:payment_method]],
     astrobin_attributes: [:username, :latest_image, :id],
     telescopius_attributes: [:username, :id])
+  end
+
+  # Parameters for admin renewal
+  def admin_renew_params
+    params.require(:membership).permit(:start, :term_months, :ephemeris, :kind_id, :donation_amount, :notes, order_attributes: [:payment_method])
   end
   
   def policy_handling

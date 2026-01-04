@@ -1,0 +1,42 @@
+<!-- Bootstrap Modal for Admin Renewal -->
+<div class="modal fade" id="adminRenewModal" tabindex="-1" aria-labelledby="adminRenewModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <%= form_with(url: admin_renew_person_path(@person), method: :post, data: { turbo: false }) do |form| %>
+        <div class="modal-header">
+          <h5 class="modal-title" id="adminRenewModalLabel">Admin Renew Membership for <%= @person.name %></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-info">
+            <strong>Admin Note:</strong> This form allows you to manually create a new membership for this person.
+          </div>
+
+          <%
+            # Create a membership with pre-filled values
+            new_membership = Membership.new(
+              start: @person.next_membership_start_date,
+              term_months: SjaaMembers::DEFAULT_MEMBERSHIP_TERM,
+              person: @person
+            )
+          %>
+
+          <%= render partial: 'membership_form', locals: {
+            id: "admin_renew_membership",
+            membership: new_membership,
+            i: nil,
+            person: @person,
+            show_descriptions: true,
+            show_delete: false,
+            disable_start_date: true,
+            field_name_prefix: 'membership'
+          } %>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <%= submit_tag "Create Membership", class: "btn btn-primary" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

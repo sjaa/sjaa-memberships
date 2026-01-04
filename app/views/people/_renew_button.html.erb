@@ -1,9 +1,9 @@
 <% if @person.latest_membership&.is_active? %>
   <% if @person.renew_soon? %>
-    <%= link_to "Renew Soon", membership_renewal_path(id: @person.id), class: 'btn btn-warning d-inline-block' %>
+    <%= link_to "Renew (Expiring Soon)", membership_renewal_path(id: @person.id), class: 'btn btn-warning d-inline-block' %>
   <% else %>
-    <%= link_to "Membership Active", membership_renewal_path(id: @person.id), class: 'btn btn-success d-inline-block' %>
+    <%= link_to "Renew (Membership Active)", membership_renewal_path(id: @person.id), class: 'btn btn-success d-inline-block' %>
   <% end %>
 <% else %>
-  <%= link_to "Renew Membership", membership_renewal_path(id: @person.id), class: 'btn btn-warning d-inline-block' %>
+  <%= link_to "Renew Membership (Expired)", membership_renewal_path(id: @person.id), class: 'btn btn-warning d-inline-block' %>
 <% end %>
