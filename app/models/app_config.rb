@@ -22,7 +22,8 @@ class AppConfig < ApplicationRecord
   CATEGORIES = {
     smtp: 'SMTP Email Settings (Requires Application Restart)',
     paypal: 'PayPal Payment Settings',
-    google: 'Google API Settings'
+    google: 'Google API Settings',
+    membership: 'Membership Settings'
   }.freeze
 
   # Cache configuration values in memory for performance
@@ -109,6 +110,11 @@ class AppConfig < ApplicationRecord
     # For backward compatibility, prefer all_events, fall back to merged
     def google_calendar_id
       get('google_all_events_calendar_id') || get('google_merged_calendar_id')
+    end
+
+    # Get membership renewal threshold in months
+    def membership_renewal_threshold_months
+      (get('membership_renewal_threshold_months') || '2').to_i
     end
 
     # Clear cache for a specific key

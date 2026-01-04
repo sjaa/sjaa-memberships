@@ -151,15 +151,15 @@ class SessionsController < ApplicationController
       # If authentication succeeds, then record session id and redirect to root with success
       session[:admin_id] = admin.id
       flash[:success] = 'Successful login!'
-      redirect_to root_path
+      redirect_to_return_path(default: root_path)
     elsif(person&.authenticate(login_params[:password]))
       session[:person_id] = person.id
       flash[:success] = 'Successful login!'
       if(person.is_active?)
-        redirect_to person_path(person)
+        redirect_to_return_path(default: person_path(person))
       else
         flash[:success] += '  Our records show that it is time to renew your membership.  If you would like to do that now, please use the form below to complete payment.'
-        redirect_to membership_renewal_path(person)
+        redirect_to_return_path(default: membership_renewal_path(person))
       end
     else
       # If authentication fails, redirect to login with an error
@@ -178,6 +178,16 @@ class SessionsController < ApplicationController
 
   def login_params
     params.permit(:email, :password, :first_name, :last_name, :authenticity_token, :commit)
+  end
+
+  def redirect_to_return_path(default:)
+    return_to = session.delete(:return_to)
+    # Only redirect to return_to if it's a safe, relative path (not an external URL)
+    if return_to && return_to.start_with?('/')
+      redirect_to return_to
+    else
+      redirect_to default
+    end
   end
 
 end

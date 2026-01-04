@@ -17,7 +17,11 @@ module Authenticatable
     if(!@current_user)
       respond_to do |format|
         #format.html {render 'static_pages/unauthorized', status: :unauthorized}
-        format.html {redirect_to Rails.application.routes.url_helpers.login_path, notice: 'Please log in to continue.' }
+        format.html do
+          # Save the original request path so we can redirect back after login
+          session[:return_to] = request.fullpath if request.get?
+          redirect_to Rails.application.routes.url_helpers.login_path, notice: 'Please log in to continue.'
+        end
         format.json {render json: {errors: ['Unauthorized']},status: :unauthorized}
       end
     end

@@ -88,6 +88,22 @@ class Person < ApplicationRecord
     is_active? ? 'Active' : 'Expired'
   end
 
+  # Check if this person's membership should be renewed soon
+  # Returns true if membership expires within the configured threshold
+  def renew_soon?(date = Date.today)
+    return false if is_lifetime_member
+
+    lm = latest_membership
+    return false unless lm&.end
+
+    threshold_months = AppConfig.membership_renewal_threshold_months
+    # Calculate the date N months before expiration
+    renewal_start_date = (lm.end.beginning_of_month - threshold_months.months).to_date
+
+    # Member should renew if today is within N months of expiration
+    date >= renewal_start_date && date <= lm.end
+  end
+
   # Pick out preloaded memberships that match this person
   def membership_map(_memberships, current = false)
     matches = _memberships[self.id] || []
@@ -120,10 +136,11 @@ class Person < ApplicationRecord
     return Person.joins(:memberships).where(memberships: {end: nil})
   end
 
-  # Members who are within 3 months of expiration are eligible to receive
-  # renewal reminders
+  # Members who are within N months of expiration are eligible to receive
+  # renewal reminders (N is configured via AppConfig)
   def self.renewable_members(date = Date.today)
-    date_max = (date.end_of_month + 2.months).to_date # Expiring this month and two months ahead
+    threshold_months = AppConfig.membership_renewal_threshold_months
+    date_max = (date.end_of_month + threshold_months.months).to_date # Expiring this month and N months ahead
     date_min = (date.beginning_of_month - 3.months).to_date # Expired up to 3 months ago
 
     # Begin the Arel madness

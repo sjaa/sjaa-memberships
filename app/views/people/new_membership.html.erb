@@ -3,8 +3,13 @@
   <div class="row">
     <div class="col-12">
       <h1>Membership Payment For <%= @person.name %></h1>
-      <% if @person.is_active?%>
+      <% if @person.is_active? && @person.renew_soon? %>
         <div class="alert alert-warning">
+          Your membership expires soon on <strong><%= date_format @person.latest_membership&.end %></strong>.
+          Please renew your membership below.
+        </div>
+      <% elsif @person.is_active? %>
+        <div class="alert alert-info">
           Your membership is currently active, and will end on <strong><%= date_format @person.latest_membership&.end %></strong>.
           If you would like to renew your membership, please proceed below.
         </div>

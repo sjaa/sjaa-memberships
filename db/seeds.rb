@@ -108,4 +108,12 @@ AppConfig.find_or_create_by!(key: 'google_merged_calendar_id') do |c|
   c.encrypted = false
 end
 
+# Membership Settings
+AppConfig.find_or_create_by!(key: 'membership_renewal_threshold_months') do |c|
+  c.value = ENV.fetch('MEMBERSHIP_RENEWAL_THRESHOLD_MONTHS', '2')
+  c.category = 'membership'
+  c.description = 'Number of months before expiration to show renewal reminders and mark memberships as renewable'
+  c.encrypted = false
+end
+
 puts "Application configuration created successfully!"
