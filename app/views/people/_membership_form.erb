@@ -1,8 +1,8 @@
 <%
   # Local variables with defaults
-  show_descriptions ||= false
-  show_delete ||= true
-  disable_start_date ||= false
+  show_descriptions = false unless local_assigns.has_key?(:show_descriptions)
+  show_delete = true unless local_assigns.has_key?(:show_delete)
+  disable_start_date = false unless local_assigns.has_key?(:disable_start_date)
   field_name_prefix ||= 'person[membership_attributes][]'
 %>
 <div id="<%=id%>" class="card mb-3">
