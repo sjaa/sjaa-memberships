@@ -94,6 +94,28 @@ class SessionsController < ApplicationController
       return
     end
 
+    # Check for similar names (soft warning, not a blocker)
+    # Create a temporary Person object to check for similar names
+    temp_person = Person.new(first_name: params[:first_name], last_name: params[:last_name])
+    similar_people = NameSimilarityDetector.find_similar(temp_person, threshold: 0.85, limit: 3)
+
+    if similar_people.any?
+      # Build warning message
+      names = similar_people.map { |p, score| "#{p.name} (#{(score * 100).round}% match)" }.join(', ')
+      flash.now[:warning] = "We found existing accounts with similar names: #{names}. If one of these is you, please try logging in with a different email or resetting your password instead. If this is not you, you may continue signing up."
+
+      # Store signup data in flash to repopulate the form
+      flash.now[:signup_data] = {
+        first_name: params[:first_name],
+        last_name: params[:last_name],
+        email: params[:email]
+      }
+
+      # Show the signup form again with the warning
+      render :signup
+      return
+    end
+
     # Generate encrypted token
     token = SignupToken.encode(
       first_name: login_params[:first_name],

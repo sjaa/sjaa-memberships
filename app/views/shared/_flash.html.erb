@@ -1,4 +1,4 @@
-<% {'warning' => notice, 'success' => flash[:success], 'danger' => flash[:alert]}.each do |style, msg| %>
+<% {'info' => notice, 'success' => flash[:success], 'danger' => flash[:alert], 'warning' => flash[:warning]}.each do |style, msg| %>
   <% if msg %>
     <div class="alert alert-<%=style%> alert-dismissible fade show" role="alert">
       <%=msg.html_safe%>

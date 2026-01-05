@@ -157,6 +157,119 @@ task encode_google_secret: [:environment] do
   end
 end
 
+desc "Find people with duplicate or similar names (THRESHOLD=0.85 for similarity threshold)"
+task find_duplicate_names: [:environment] do
+  threshold = ENV['THRESHOLD']&.to_f || 0.85
+
+  puts "\n" + "=" * 80
+  puts "FIND DUPLICATE NAMES"
+  puts "=" * 80
+  puts "Similarity threshold: #{threshold} (0.0 = completely different, 1.0 = identical)"
+  puts "=" * 80 + "\n"
+
+  # First, find exact matches
+  exact_matches = NameSimilarityDetector.find_exact_matches
+
+  if exact_matches.any?
+    puts "EXACT NAME MATCHES (#{exact_matches.size} groups):"
+    puts "=" * 80
+
+    exact_matches.each_with_index do |(name, people), idx|
+      puts "\n#{idx + 1}. Name: #{name.upcase} (#{people.size} people)"
+      puts "-" * 80
+
+      people.each_with_index do |person, pidx|
+        primary_contact = person.primary_contact
+        latest_membership = person.latest_membership
+
+        puts "\n  Person #{pidx + 1}:"
+        puts "    ID: #{person.id}"
+        puts "    Name: #{person.name}"
+        puts "    Email: #{primary_contact&.email || '(no email)'}"
+        puts "    Created: #{person.created_at}"
+        puts "    Updated: #{person.updated_at}"
+        puts "    Status: #{person.status&.name || '(none)'}"
+        puts "    Latest Membership: #{latest_membership&.start} (#{latest_membership&.term_months} months)" if latest_membership
+        puts "    Memberships: #{person.memberships.size}"
+        puts "    Donations: #{person.donations.size}"
+        puts "    Notes: #{person.notes[0..100]}" if person.notes.present?
+      end
+
+      # Suggest which person to keep (most recent updated_at)
+      keeper = people.max_by(&:updated_at)
+      puts "\n  💡 Suggested keeper: Person ##{keeper.id} (most recently updated)"
+      puts "  ⚠️  Review manually before merging"
+      puts "  📋 To merge: rails merge_people KEEPER=#{keeper.id} DUPLICATE=<id> COMMIT=true"
+    end
+  else
+    puts "No exact name matches found.\n"
+  end
+
+  # Now find fuzzy matches (only if threshold < 1.0)
+  if threshold < 1.0
+    puts "\n\n" + "=" * 80
+    puts "SIMILAR NAME MATCHES (similarity >= #{threshold}):"
+    puts "=" * 80
+
+    processed_pairs = Set.new
+    similar_match_count = 0
+
+    Person.find_each do |person|
+      next if person.first_name.blank? || person.last_name.blank?
+
+      similar_people = NameSimilarityDetector.find_similar(person, threshold: threshold)
+
+      similar_people.each do |similar_person, score|
+        # Create a sorted pair key to avoid duplicates (e.g., [1,2] == [2,1])
+        pair_key = [person.id, similar_person.id].sort
+
+        next if processed_pairs.include?(pair_key)
+        processed_pairs.add(pair_key)
+
+        similar_match_count += 1
+
+        puts "\n#{similar_match_count}. Similarity Score: #{(score * 100).round(1)}%"
+        puts "-" * 80
+
+        [person, similar_person].each_with_index do |p, idx|
+          primary_contact = p.primary_contact
+          latest_membership = p.latest_membership
+
+          puts "\n  Person #{idx + 1}:"
+          puts "    ID: #{p.id}"
+          puts "    Name: #{p.name}"
+          puts "    Email: #{primary_contact&.email || '(no email)'}"
+          puts "    Created: #{p.created_at}"
+          puts "    Updated: #{p.updated_at}"
+          puts "    Status: #{p.status&.name || '(none)'}"
+          puts "    Latest Membership: #{latest_membership&.start} (#{latest_membership&.term_months} months)" if latest_membership
+        end
+
+        # Suggest which person to keep (most recent updated_at)
+        keeper = [person, similar_person].max_by(&:updated_at)
+        duplicate = [person, similar_person].find { |p| p != keeper }
+        puts "\n  💡 Suggested keeper: Person ##{keeper.id} (most recently updated)"
+        puts "  ⚠️  Review manually before merging - these are similar but not exact matches"
+        puts "  📋 To merge: rails merge_people KEEPER=#{keeper.id} DUPLICATE=#{duplicate.id} COMMIT=true"
+      end
+    end
+
+    if similar_match_count == 0
+      puts "\nNo similar name matches found with threshold #{threshold}."
+      puts "Try lowering the threshold (e.g., THRESHOLD=0.75) to find more matches."
+    end
+  end
+
+  puts "\n" + "=" * 80
+  puts "SEARCH COMPLETE"
+  puts "=" * 80
+  puts "Exact match groups: #{exact_matches.size}"
+  puts "Similar pairs found: #{threshold < 1.0 ? processed_pairs.size : 'N/A (threshold = 1.0)'}"
+  puts "\n⚠️  IMPORTANT: Review each match carefully before merging!"
+  puts "Use: rails merge_people KEEPER=<id> DUPLICATE=<id> COMMIT=true"
+  puts "=" * 80 + "\n"
+end
+
 desc "Find and merge people with duplicate email addresses (COMMIT=true to execute, otherwise dry-run)"
 task merge_duplicate_emails: [:environment] do
   commit = ENV['COMMIT'] == 'true'
