@@ -95,25 +95,29 @@ class SessionsController < ApplicationController
     end
 
     # Check for similar names (soft warning, not a blocker)
-    # Create a temporary Person object to check for similar names
-    temp_person = Person.new(first_name: params[:first_name], last_name: params[:last_name])
-    similar_people = NameSimilarityDetector.find_similar(temp_person, threshold: 0.85, limit: 3)
+    # Skip check if user has already acknowledged the warning
+    unless params[:acknowledge_warning] == 'true'
+      # Create a temporary Person object to check for similar names
+      temp_person = Person.new(first_name: params[:first_name], last_name: params[:last_name])
+      similar_people = NameSimilarityDetector.find_similar(temp_person, threshold: 0.85, limit: 3)
 
-    if similar_people.any?
-      # Build warning message
-      names = similar_people.map { |p, score| "#{p.name} (#{(score * 100).round}% match)" }.join(', ')
-      flash[:warning] = "We found existing accounts with similar names: #{names}. If one of these is you, please try logging in with a different email or resetting your password instead. If this is not you, you may continue signing up."
+      if similar_people.any?
+        # Build warning message
+        names = similar_people.map { |p, score| "#{p.name} (#{(score * 100).round}% match)" }.join(', ')
+        flash[:warning] = "We found existing accounts with similar names: #{names}. If one of these is you, please try logging in with a different email or resetting your password instead. If this is not you, you may continue signing up."
 
-      # Store signup data in session to repopulate the form
-      session[:signup_data] = {
-        'first_name' => params[:first_name],
-        'last_name' => params[:last_name],
-        'email' => params[:email]
-      }
+        # Store signup data in session to repopulate the form
+        session[:signup_data] = {
+          'first_name' => params[:first_name],
+          'last_name' => params[:last_name],
+          'email' => params[:email],
+          'acknowledge_warning' => 'true'
+        }
 
-      # Redirect back to signup form with the warning
-      redirect_to signup_path
-      return
+        # Redirect back to signup form with the warning
+        redirect_to signup_path
+        return
+      end
     end
 
     # Generate encrypted token

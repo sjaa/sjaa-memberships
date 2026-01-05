@@ -167,8 +167,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "signup warning is soft and does not block account creation" do
-    # The warning is shown but user can proceed by using a sufficiently different email
-    # or by changing their name slightly. This test verifies it's a soft warning, not a blocker.
+    # The warning is shown but user can proceed by submitting again with acknowledge_warning
 
     # First, verify warning appears for similar name
     post signup_request_path, params: {
@@ -180,18 +179,20 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to signup_path
     assert_not_nil flash[:warning]
+    assert_equal 'true', session[:signup_data]['acknowledge_warning']
 
-    # Now verify that a dissimilar name can proceed normally
-    # (demonstrating the system doesn't block all signups)
+    # User can proceed by submitting again with acknowledge_warning flag
     assert_difference 'ActionMailer::Base.deliveries.size', 1 do
       post signup_request_path, params: {
-        first_name: 'Alice',
-        last_name: 'Johnson',
-        email: 'alice.johnson@example.com',
-        password: 'password123'
+        first_name: 'John',
+        last_name: 'Smyth',
+        email: 'john.smyth@example.com',
+        password: 'password123',
+        acknowledge_warning: 'true'
       }
     end
 
+    # Should proceed to email confirmation
     assert_redirected_to login_path
     assert_match /email to complete/, flash[:notice]
   end

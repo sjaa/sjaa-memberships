@@ -66,17 +66,22 @@ class DuplicateNameWarningTest < ApplicationSystemTestCase
     fill_in "password", with: "newpassword123"
     click_on "Sign Up"
 
-    # Should show warning
+    # Should show warning and redirect back to signup
     assert_text "We found existing accounts with similar names"
     assert_current_path signup_path
 
-    # User can proceed by submitting again (form is already filled)
+    # Form should be repopulated
+    assert_equal "John", find_field("first_name").value
+    assert_equal "Smyth", find_field("last_name").value
+    assert_equal "john.smyth@example.com", find_field("email").value
+
+    # User can proceed by submitting again (acknowledge_warning is now set in hidden field)
     fill_in "password", with: "newpassword123"  # Password not repopulated for security
     click_on "Sign Up"
 
-    # This time it should show the warning again (since the name is still similar)
-    # But the user could proceed by changing their name or confirming it's correct
-    assert_text "We found existing accounts with similar names"
+    # This time it should proceed (warning acknowledged)
+    assert_current_path login_path
+    assert_text "We sent you an email to complete the sign up process"
   end
 
   test "new member signup proceeds normally for dissimilar names" do
