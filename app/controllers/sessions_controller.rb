@@ -102,17 +102,17 @@ class SessionsController < ApplicationController
     if similar_people.any?
       # Build warning message
       names = similar_people.map { |p, score| "#{p.name} (#{(score * 100).round}% match)" }.join(', ')
-      flash.now[:warning] = "We found existing accounts with similar names: #{names}. If one of these is you, please try logging in with a different email or resetting your password instead. If this is not you, you may continue signing up."
+      flash[:warning] = "We found existing accounts with similar names: #{names}. If one of these is you, please try logging in with a different email or resetting your password instead. If this is not you, you may continue signing up."
 
-      # Store signup data in flash to repopulate the form
-      flash.now[:signup_data] = {
-        first_name: params[:first_name],
-        last_name: params[:last_name],
-        email: params[:email]
+      # Store signup data in session to repopulate the form
+      session[:signup_data] = {
+        'first_name' => params[:first_name],
+        'last_name' => params[:last_name],
+        'email' => params[:email]
       }
 
-      # Show the signup form again with the warning
-      render :signup
+      # Redirect back to signup form with the warning
+      redirect_to signup_path
       return
     end
 

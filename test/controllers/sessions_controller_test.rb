@@ -33,17 +33,17 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
       password: 'newpassword123'
     }
 
-    # Should re-render the signup form with a warning
-    assert_response :success
+    # Should redirect back to signup form with a warning
+    assert_redirected_to signup_path
 
     # Should show warning flash message
     assert_match /similar names/, flash[:warning]
     assert_match /John Smith/, flash[:warning]
 
-    # Should repopulate form data
-    assert_equal 'John', flash[:signup_data][:first_name]
-    assert_equal 'Smyth', flash[:signup_data][:last_name]
-    assert_equal 'john.smyth@example.com', flash[:signup_data][:email]
+    # Should store signup data in session to repopulate form
+    assert_equal 'John', session[:signup_data]['first_name']
+    assert_equal 'Smyth', session[:signup_data]['last_name']
+    assert_equal 'john.smyth@example.com', session[:signup_data]['email']
   end
 
   test "signup_request proceeds normally for dissimilar names" do
@@ -120,8 +120,8 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
       password: 'newpassword123'
     }
 
-    # Should re-render with warning
-    assert_response :success
+    # Should redirect back to signup with warning
+    assert_redirected_to signup_path
 
     # Warning should mention the existing similar person
     assert_match /similar names/, flash[:warning]
@@ -158,12 +158,12 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
       password: 'password123'
     }
 
-    assert_response :success
+    assert_redirected_to signup_path
 
-    # Check flash data contains the values for repopulation
-    assert_equal 'John', flash[:signup_data][:first_name]
-    assert_equal 'Smyth', flash[:signup_data][:last_name]
-    assert_equal 'john.smyth@example.com', flash[:signup_data][:email]
+    # Check session data contains the values for repopulation
+    assert_equal 'John', session[:signup_data]['first_name']
+    assert_equal 'Smyth', session[:signup_data]['last_name']
+    assert_equal 'john.smyth@example.com', session[:signup_data]['email']
   end
 
   test "signup warning is soft and does not block account creation" do
@@ -178,7 +178,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
       password: 'password123'
     }
 
-    assert_response :success
+    assert_redirected_to signup_path
     assert_not_nil flash[:warning]
 
     # Now verify that a dissimilar name can proceed normally

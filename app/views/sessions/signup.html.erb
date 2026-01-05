@@ -9,21 +9,21 @@
     </p>
   </div>
 </div>
-<% signup_data = flash[:signup_data] || {} %>
+<% signup_data = session.delete(:signup_data) || {} %>
 <%= form_with(url: signup_request_path, local: true) do |form| %>
   <div class="row">
     <%= form.hidden_field :signup, value: true %>
     <div class="col-md-6 mt-2">
       <%= form.label :first_name, "First Name", class: 'form-label' %>
-      <%= form.text_field :first_name, value: signup_data[:first_name], class: 'form-control' %>
+      <%= form.text_field :first_name, value: signup_data['first_name'], class: 'form-control' %>
     </div>
     <div class="col-md-6 mt-2">
       <%= form.label :last_name, "Last Name", class: 'form-label' %>
-      <%= form.text_field :last_name, value: signup_data[:last_name], class: 'form-control' %>
+      <%= form.text_field :last_name, value: signup_data['last_name'], class: 'form-control' %>
     </div>
     <div class="col-md-6 mt-2">
       <%= form.label :email, class: 'form-label' %>
-      <%= form.email_field :email, value: signup_data[:email], class: 'form-control' %>
+      <%= form.email_field :email, value: signup_data['email'], class: 'form-control' %>
     </div>
     <div class="col-md-6 mt-2">
       <%= form.label :password, class: 'form-label' %>
