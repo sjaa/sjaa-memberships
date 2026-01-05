@@ -188,7 +188,7 @@ task find_duplicate_names: [:environment] do
         puts "    Email: #{primary_contact&.email || '(no email)'}"
         puts "    Created: #{person.created_at}"
         puts "    Updated: #{person.updated_at}"
-        puts "    Status: #{person.status&.name || '(none)'}"
+        puts "    Status: #{person.status || '(none)'}"
         puts "    Latest Membership: #{latest_membership&.start} (#{latest_membership&.term_months} months)" if latest_membership
         puts "    Memberships: #{person.memberships.size}"
         puts "    Donations: #{person.donations.size}"
@@ -241,7 +241,7 @@ task find_duplicate_names: [:environment] do
           puts "    Email: #{primary_contact&.email || '(no email)'}"
           puts "    Created: #{p.created_at}"
           puts "    Updated: #{p.updated_at}"
-          puts "    Status: #{p.status&.name || '(none)'}"
+          puts "    Status: #{p.status || '(none)'}"
           puts "    Latest Membership: #{latest_membership&.start} (#{latest_membership&.term_months} months)" if latest_membership
         end
 
