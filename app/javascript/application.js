@@ -403,5 +403,10 @@ document.addEventListener('turbo:load', function () {
   loadPayPalButtons();
   loadImageModals();
   populateJulianDate();
-  loadNotifications();
+
+  // Only load notifications if the user is authenticated (notification bell exists)
+  const notificationBell = document.getElementById('notification-bell');
+  if (notificationBell) {
+    loadNotifications();
+  }
 });
