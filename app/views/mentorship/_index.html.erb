@@ -11,67 +11,86 @@
           <div class="col-12">
             <div class="card shadow-sm">
               <div class="card-body">
-                <div class="row">
-                  <!-- Profile Picture -->
-                  <div class="col-md-4 text-center mb-3 mb-md-0">
-                    <% if mentor.profile_picture.attached? %>
-                      <div class="rounded img-thumbnail" style="width: 100%; height: 100%; margin: 0 auto; min-height: 300px; background-color: #f8f9fa; background-image: url('<%= url_for(mentor.profile_picture.variant(:display)) %>'); background-size: cover; background-position: center;">
-                      </div>
-                    <% else %>
-                      <div class="rounded bg-secondary text-white d-flex align-items-center justify-content-center" style="width: 100%; min-height: 300px; margin: 0 auto;">
-                        <i class="bi bi-person-circle" style="font-size: 6rem;"></i>
-                      </div>
-                    <% end %>
-                  </div>
-                  <!-- Mentor Info -->
-                  <div class="col-md-8">
-                    <h4 class="mb-2">
-                      <%= "#{mentor.first_name} #{mentor.last_name}" %>
-                      <button type="button"
-                            class="btn btn-primary btn-sm ms-2"
-                            data-mentor-id="<%= mentor.id %>"
-                            data-mentor-name="<%= mentor.first_name %> <%= mentor.last_name %>"
-                            data-contact-url="<%= mentor_contact_path(mentor) %>"
-                            data-action="mentor-contact#openModal">
-                        <i class="bi bi-envelope me-1"></i>Contact Mentor
-                      </button>
-                    </h4>
-                    <!-- Mentor Description -->
-                    <% if mentor.mentor_description.present? %>
-                      <div class="mb-3">
-                        <div class="alert alert-info mb-0">
-                          <strong>Why I want to mentor:</strong>
-                          <p class="mb-0 mt-2"><%= simple_format(mentor.mentor_description) %></p>
-                        </div>
-                      </div>
-                    <% end %>
-                    <!-- Interests -->
-                    <% if mentor.interests.any? %>
-                      <div class="mb-3">
-                        <strong class="text-muted small">Interests:</strong>
-                        <% mentor.interests.each do |interest| %>
-                          <span class="badge bg-light text-dark me-1"><%= interest.name.titleize %></span>
-                        <% end %>
-                      </div>
-                    <% end %>
-                    <!-- Skills -->
-                    <% active_skills = mentor.people_skills.select(&:active?).sort_by { |ps| -ps.skill_level.to_i } %>
-                    <% if active_skills.any? %>
-                      <div class="mb-2">
-                        <strong class="text-muted small">Skills:</strong>
-                      </div>
-                      <div class="row g-3">
-                        <% active_skills.each do |people_skill| %>
-                          <div class="col-md-6 col-lg-4">
-                            <%= render partial: 'shared/skill_card', locals: { people_skill: people_skill } %>
-                          </div>
-                        <% end %>
-                      </div>
-                    <% else %>
-                      <p class="text-muted mb-0"><em>Willing to mentor but no specific skills indicated.</em></p>
-                    <% end %>
-                  </div>
+                <!-- Title Section - Always at top -->
+                <div class="d-flex flex-wrap align-items-center justify-content-between mb-3 pb-3 border-bottom">
+                  <h4 class="mb-2 mb-sm-0">
+                    <%= "#{mentor.first_name} #{mentor.last_name}" %>
+                  </h4>
+                  <button type="button"
+                        class="btn btn-primary btn-sm"
+                        data-mentor-id="<%= mentor.id %>"
+                        data-mentor-name="<%= mentor.first_name %> <%= mentor.last_name %>"
+                        data-contact-url="<%= mentor_contact_path(mentor) %>"
+                        data-action="mentor-contact#openModal">
+                    <i class="bi bi-envelope me-1"></i>Contact Mentor
+                  </button>
                 </div>
+
+                <!-- Profile Picture - Floated Left on md+ -->
+                <% if mentor.profile_picture.attached? %>
+                  <div class="rounded img-thumbnail float-md-start me-md-4 mb-3 mentor-profile-picture" style="aspect-ratio: 1; background-color: #f8f9fa; background-image: url('<%= url_for(mentor.profile_picture.variant(:display)) %>'); background-size: cover; background-position: center;">
+                  </div>
+                <% else %>
+                  <div class="rounded bg-secondary text-white d-flex align-items-center justify-content-center float-md-start me-md-4 mb-3 mentor-profile-picture" style="aspect-ratio: 1;">
+                    <i class="bi bi-person-circle" style="font-size: 6rem;"></i>
+                  </div>
+                <% end %>
+
+                <!-- Mentor Description -->
+                <% if mentor.mentor_description.present? %>
+                  <% word_limit = 55 %>
+                  <% words = mentor.mentor_description.split %>
+                  <% truncated = words.length > word_limit %>
+                  <% short_text = truncated ? words.first(word_limit).join(' ') : mentor.mentor_description %>
+                  <div class="mb-3">
+                    <strong class="text-muted">Why I want to mentor:</strong>
+                    <div class="mt-1">
+                      <div class="mentor-description-short-<%= mentor.id %>">
+                        <%= simple_format(short_text) %>
+                        <% if truncated %>
+                          <a href="#" class="" onclick="event.preventDefault(); document.querySelector('.mentor-description-short-<%= mentor.id %>').style.display='none'; document.querySelector('.mentor-description-full-<%= mentor.id %>').style.display='block';">more...</a>
+                        <% end %>
+                      </div>
+                      <% if truncated %>
+                        <div class="mentor-description-full-<%= mentor.id %>" style="display: none;">
+                          <%= simple_format(mentor.mentor_description) %>
+                          <a href="#" class="" onclick="event.preventDefault(); document.querySelector('.mentor-description-short-<%= mentor.id %>').style.display='block'; document.querySelector('.mentor-description-full-<%= mentor.id %>').style.display='none';">less...</a>
+                        </div>
+                      <% end %>
+                    </div>
+                  </div>
+                <% end %>
+
+                <!-- Interests -->
+                <% if mentor.interests.any? %>
+                  <div class="mb-3">
+                    <strong class="text-muted small">Interests:</strong>
+                    <div class="mt-1">
+                      <% mentor.interests.each do |interest| %>
+                        <span class="badge bg-light text-dark me-1"><%= interest.name.titleize %></span>
+                      <% end %>
+                    </div>
+                  </div>
+                <% end %>
+
+                <!-- Skills -->
+                <% active_skills = mentor.people_skills.select(&:active?).sort_by { |ps| -ps.skill_level.to_i } %>
+                <% if active_skills.any? %>
+                  <div class="mb-2 row">
+                    <h4 class="text-muted">Skills</h4>
+                  </div>
+                  <div class="row g-3">
+                    <% active_skills.each do |people_skill| %>
+                      <div class="col-sm-6 col-lg-4">
+                        <%= render partial: 'shared/skill_card', locals: { people_skill: people_skill } %>
+                      </div>
+                    <% end %>
+                  </div>
+                <% else %>
+                  <p class="text-muted mb-0"><em>Willing to mentor but no specific skills indicated.</em></p>
+                <% end %>
+
+                <div class="clearfix"></div>
               </div>
             </div>
           </div>

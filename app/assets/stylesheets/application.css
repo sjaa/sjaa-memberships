@@ -355,3 +355,14 @@ label.btn {
   background-color: #343a40;
   color: #adb5bd;
 }
+
+/* Mentor Profile Picture Responsive Width */
+.mentor-profile-picture {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .mentor-profile-picture {
+    width: 350px;
+  }
+}
