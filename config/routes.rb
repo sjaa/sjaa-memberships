@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  mount DocumentArchive::Engine => "/document_archive"
+
   resources :app_configs, only: [:index, :edit, :update] do
     collection do
       post :seed_from_env

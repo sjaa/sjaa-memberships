@@ -10,10 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_01_04_191714) do
+ActiveRecord::Schema[7.1].define(version: 2026_01_19_000004) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
   enable_extension "plpgsql"
+  enable_extension "vector"
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
@@ -108,6 +109,52 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_04_191714) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["person_id"], name: "index_contacts_on_person_id"
+  end
+
+  create_table "document_archive_articles", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "document_id", null: false
+    t.string "title", null: false
+    t.text "summary"
+    t.jsonb "categories", default: []
+    t.jsonb "keywords", default: []
+    t.integer "page_start"
+    t.integer "page_end"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["categories"], name: "index_document_archive_articles_on_categories", using: :gin
+    t.index ["document_id"], name: "index_document_archive_articles_on_document_id"
+    t.index ["keywords"], name: "index_document_archive_articles_on_keywords", using: :gin
+  end
+
+  create_table "document_archive_documents", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "pdf_file_name"
+    t.string "pdf_content_type"
+    t.bigint "pdf_file_size"
+    t.datetime "pdf_updated_at"
+    t.string "txt_file_name"
+    t.string "txt_content_type"
+    t.bigint "txt_file_size"
+    t.datetime "txt_updated_at"
+    t.string "markdown_file_name"
+    t.string "markdown_content_type"
+    t.bigint "markdown_file_size"
+    t.datetime "markdown_updated_at"
+    t.string "json_file_name"
+    t.string "json_content_type"
+    t.bigint "json_file_size"
+    t.datetime "json_updated_at"
+  end
+
+  create_table "document_archive_embeddings", force: :cascade do |t|
+    t.uuid "article_id", null: false
+    t.vector "vector", limit: 768
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["article_id"], name: "index_document_archive_embeddings_on_article_id"
+    t.index ["vector"], name: "index_document_archive_embeddings_on_vector", opclass: :vector_cosine_ops, using: :hnsw
   end
 
   create_table "donation_items", force: :cascade do |t|
@@ -493,6 +540,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_04_191714) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "document_archive_articles", "document_archive_documents", column: "document_id"
+  add_foreign_key "document_archive_embeddings", "document_archive_articles", column: "article_id"
   add_foreign_key "opportunity_skills", "opportunities"
   add_foreign_key "opportunity_skills", "skills"
   add_foreign_key "people_skills", "people"

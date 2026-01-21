@@ -1,5 +1,4 @@
 require "test_helper"
-require "minitest/mock"
 
 class GoogleGroupSyncJobTest < ActiveJob::TestCase
   include GoogleHelper

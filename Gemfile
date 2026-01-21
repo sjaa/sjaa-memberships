@@ -69,6 +69,10 @@ group :test do
   gem "selenium-webdriver"
 end
 
+# Required as bundled gem in Ruby 3.4+
+# Pin to 5.x - minitest 6.0 has breaking API changes incompatible with Rails 7.1
+gem "minitest", "~> 5.25"
+
 gem 'pg'
 gem 'csv'
 gem 'pagy'
@@ -110,3 +114,5 @@ end
 
 # Markdown support
 gem 'redcarpet'
+
+gem 'document-archive', github: 'cecomp64/document-archive', require: 'document_archive'

@@ -38,16 +38,16 @@ module Authenticatable
 
     return @current_user
   end
- 
+
   private
- 
+
   attr_writer :current_api_key
   attr_writer :current_bearer
   attr_writer :current_user
- 
+
   def authenticator(http_token, options)
     @current_api_key = ApiKey.find_by token: http_token
- 
+
     return current_api_key&.bearer
   end
 end

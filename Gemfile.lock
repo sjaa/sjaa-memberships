@@ -1,3 +1,15 @@
+GIT
+  remote: https://github.com/cecomp64/document-archive.git
+  revision: fc1c02806d68991201b9006ba2dbb6b865b821a4
+  specs:
+    document-archive (0.2.0)
+      aws-sdk-s3 (~> 1.0)
+      neighbor
+      pg
+      rails (>= 7.1.5.2)
+      redcarpet
+      sprockets-rails
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -85,8 +97,8 @@ GEM
     airbrake-ruby (6.2.2)
       rbtree3 (~> 0.6)
     aws-eventstream (1.4.0)
-    aws-partitions (1.1147.0)
-    aws-sdk-core (3.229.0)
+    aws-partitions (1.1207.0)
+    aws-sdk-core (3.241.4)
       aws-eventstream (~> 1, >= 1.3.0)
       aws-partitions (~> 1, >= 1.992.0)
       aws-sigv4 (~> 1.9)
@@ -94,19 +106,19 @@ GEM
       bigdecimal
       jmespath (~> 1, >= 1.6.1)
       logger
-    aws-sdk-kms (1.110.0)
-      aws-sdk-core (~> 3, >= 3.228.0)
+    aws-sdk-kms (1.121.0)
+      aws-sdk-core (~> 3, >= 3.241.4)
       aws-sigv4 (~> 1.5)
-    aws-sdk-s3 (1.196.1)
-      aws-sdk-core (~> 3, >= 3.228.0)
+    aws-sdk-s3 (1.212.0)
+      aws-sdk-core (~> 3, >= 3.241.4)
       aws-sdk-kms (~> 1)
       aws-sigv4 (~> 1.5)
     aws-sigv4 (1.12.1)
       aws-eventstream (~> 1, >= 1.0.2)
     base64 (0.3.0)
     bcrypt (3.1.20)
-    benchmark (0.4.0)
-    bigdecimal (3.1.9)
+    benchmark (0.5.0)
+    bigdecimal (4.0.1)
     bindex (0.8.1)
     bootsnap (1.18.4)
       msgpack (~> 1.2)
@@ -121,18 +133,19 @@ GEM
       regexp_parser (>= 1.5, < 3.0)
       xpath (~> 3.2)
     coderay (1.1.3)
-    concurrent-ruby (1.3.5)
-    connection_pool (2.4.1)
+    concurrent-ruby (1.3.6)
+    connection_pool (3.0.2)
     crass (1.0.6)
     csv (3.3.2)
     damerau-levenshtein (1.3.3)
-    date (3.4.1)
+    date (3.5.1)
     debug (1.10.0)
       irb (~> 1.10)
       reline (>= 0.3.8)
     declarative (0.0.20)
     dotenv (3.1.7)
-    drb (2.2.1)
+    drb (2.2.3)
+    erb (6.0.1)
     erubi (1.13.1)
     et-orbi (1.2.11)
       tzinfo
@@ -157,7 +170,7 @@ GEM
     fugit (1.11.1)
       et-orbi (~> 1, >= 1.2.11)
       raabro (~> 1.4)
-    globalid (1.2.1)
+    globalid (1.3.0)
       activesupport (>= 6.1)
     google-apis-admin_directory_v1 (0.60.0)
       google-apis-core (>= 0.15.0, < 2.a)
@@ -191,7 +204,7 @@ GEM
       rails (>= 7.0.7.2)
       stimulus-rails (>= 1.2)
       turbo-rails (>= 1.2)
-    i18n (1.14.6)
+    i18n (1.14.8)
       concurrent-ruby (~> 1.0)
     image_processing (1.14.0)
       mini_magick (>= 4.9.5, < 6)
@@ -200,8 +213,9 @@ GEM
       actionpack (>= 6.0.0)
       activesupport (>= 6.0.0)
       railties (>= 6.0.0)
-    io-console (0.8.0)
-    irb (1.14.3)
+    io-console (0.8.2)
+    irb (1.16.0)
+      pp (>= 0.6.0)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     jbuilder (2.13.0)
@@ -212,22 +226,23 @@ GEM
     jwt (3.1.2)
       base64
     logger (1.7.0)
-    loofah (2.24.0)
+    loofah (2.25.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
-    mail (2.8.1)
+    mail (2.9.0)
+      logger
       mini_mime (>= 0.1.1)
       net-imap
       net-pop
       net-smtp
-    marcel (1.0.4)
+    marcel (1.1.0)
     matrix (0.4.2)
     method_source (1.1.0)
     mini_magick (5.3.0)
       logger
     mini_mime (1.1.5)
     mini_portile2 (2.8.9)
-    minitest (5.25.4)
+    minitest (5.27.0)
     mission_control-jobs (1.1.0)
       actioncable (>= 7.1)
       actionpack (>= 7.1)
@@ -241,9 +256,11 @@ GEM
     msgpack (1.7.5)
     multi_json (1.17.0)
     mutex_m (0.3.0)
+    neighbor (0.6.0)
+      activerecord (>= 7.1)
     net-http (0.8.0)
       uri (>= 0.11.1)
-    net-imap (0.5.9)
+    net-imap (0.6.2)
       date
       net-protocol
     net-pop (0.1.2)
@@ -252,11 +269,11 @@ GEM
       timeout
     net-smtp (0.5.1)
       net-protocol
-    nio4r (2.7.4)
-    nokogiri (1.18.10)
+    nio4r (2.7.5)
+    nokogiri (1.19.0)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
-    nokogiri (1.18.10-x86_64-linux-gnu)
+    nokogiri (1.19.0-x86_64-linux-gnu)
       racc (~> 1.4)
     os (1.1.4)
     ostruct (0.6.1)
@@ -264,7 +281,11 @@ GEM
     paypal-checkout-sdk (1.0.6)
       paypalhttp (~> 1.0.1)
     paypalhttp (1.0.1)
-    pg (1.5.9)
+    pg (1.6.3)
+    pg (1.6.3-x86_64-linux)
+    pp (0.6.3)
+      prettyprint
+    prettyprint (0.2.0)
     propshaft (1.2.1)
       actionpack (>= 7.0.0)
       activesupport (>= 7.0.0)
@@ -278,7 +299,7 @@ GEM
       pry (~> 0.9)
       slop (~> 3.0)
     pstore (0.1.4)
-    psych (5.2.2)
+    psych (5.3.1)
       date
       stringio
     public_suffix (6.0.2)
@@ -288,13 +309,13 @@ GEM
       activesupport (>= 3.0.0)
     raabro (1.4.0)
     racc (1.8.1)
-    rack (3.2.3)
+    rack (3.2.4)
     rack-session (2.1.1)
       base64 (>= 0.1.0)
       rack (>= 3.0.0)
     rack-test (2.2.0)
       rack (>= 1.3)
-    rackup (2.2.1)
+    rackup (2.3.1)
       rack (>= 3)
     rails (7.1.5.2)
       actioncable (= 7.1.5.2)
@@ -310,7 +331,7 @@ GEM
       activesupport (= 7.1.5.2)
       bundler (>= 1.15.0)
       railties (= 7.1.5.2)
-    rails-dom-testing (2.2.0)
+    rails-dom-testing (2.3.0)
       activesupport (>= 5.0.0)
       minitest
       nokogiri (>= 1.6)
@@ -325,13 +346,15 @@ GEM
       rake (>= 12.2)
       thor (~> 1.0, >= 1.2.2)
       zeitwerk (~> 2.6)
-    rake (13.2.1)
+    rake (13.3.1)
     rbtree3 (0.7.1)
-    rdoc (6.10.0)
+    rdoc (7.1.0)
+      erb
       psych (>= 4.0.0)
+      tsort
     redcarpet (3.6.1)
     regexp_parser (2.10.0)
-    reline (0.6.0)
+    reline (0.6.3)
       io-console (~> 0.5)
     representable (3.2.0)
       declarative (< 0.1.0)
@@ -363,12 +386,21 @@ GEM
       fugit (~> 1.11.0)
       railties (>= 7.1)
       thor (~> 1.3.1)
+    sprockets (4.2.2)
+      concurrent-ruby (~> 1.0)
+      logger
+      rack (>= 2.2.4, < 4)
+    sprockets-rails (3.5.2)
+      actionpack (>= 6.1)
+      activesupport (>= 6.1)
+      sprockets (>= 3.0.0)
     stimulus-rails (1.3.4)
       railties (>= 6.0.0)
-    stringio (3.1.2)
+    stringio (3.2.0)
     thor (1.3.2)
-    timeout (0.4.3)
+    timeout (0.6.0)
     trailblazer-option (0.1.2)
+    tsort (0.2.0)
     turbo-rails (2.0.11)
       actionpack (>= 6.0.0)
       railties (>= 6.0.0)
@@ -389,7 +421,7 @@ GEM
     websocket-extensions (0.1.5)
     xpath (3.2.0)
       nokogiri (~> 1.8)
-    zeitwerk (2.7.1)
+    zeitwerk (2.7.4)
 
 GEM
   remote: https://rubygems.pkg.github.com/sjaa/
@@ -417,6 +449,7 @@ DEPENDENCIES
   connection_pool
   csv
   debug
+  document-archive!
   dotenv
   faker
   google-apis-admin_directory_v1
@@ -429,6 +462,7 @@ DEPENDENCIES
   importmap-rails
   jbuilder
   mail
+  minitest (~> 5.25)
   mission_control-jobs
   net-imap (>= 0.5.7)
   net-smtp (~> 0.5.1)

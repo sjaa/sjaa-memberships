@@ -381,3 +381,18 @@ Chrome is needed for some testing and for meetup integration.  Install it in her
 ```bash
 heroku buildpacks:add -i 1 heroku-community/chrome-for-testing
 ```
+
+# PG Weirdness in docker
+
+```
+postgres_container  | 2026-01-20 04:37:04.128 UTC [164] WARNING:  database "root" has a collation version mismatch
+postgres_container  | 2026-01-20 04:37:04.128 UTC [164] DETAIL:  The database was created using collation version 2.41, but the operating system provides version 2.36.
+postgres_container  | 2026-01-20 04:37:04.128 UTC [164] HINT:  Rebuild all objects in this database that use the default collation and run ALTER DATABASE root REFRESH COLLATION VERSION, or build PostgreSQL with the right library version.
+```
+
+## Solution
+
+```
+ALTER DATABASE root REFRESH COLLATION VERSION;
+ALTER DATABASE "sjaa-db-dev" REFRESH COLLATION VERSION;
+```

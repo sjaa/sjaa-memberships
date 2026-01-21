@@ -1,5 +1,4 @@
 require "test_helper"
-require "minitest/mock"
 
 class CalendarSyncJobTest < ActiveJob::TestCase
   setup do
