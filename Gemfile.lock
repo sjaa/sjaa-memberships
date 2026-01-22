@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/cecomp64/document-archive.git
-  revision: fc1c02806d68991201b9006ba2dbb6b865b821a4
+  revision: 80b44c1af02390b95afcabb33df37887dc25284b
   specs:
-    document-archive (0.2.0)
+    document-archive (0.2.1)
       aws-sdk-s3 (~> 1.0)
       neighbor
       pg
@@ -449,7 +449,7 @@ DEPENDENCIES
   connection_pool
   csv
   debug
-  document-archive!
+  document-archive (>= 0.2.1)!
   dotenv
   faker
   google-apis-admin_directory_v1
