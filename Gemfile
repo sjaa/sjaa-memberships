@@ -115,4 +115,4 @@ end
 # Markdown support
 gem 'redcarpet'
 
-gem 'document-archive', ">= 0.2.7", github: 'cecomp64/document-archive', require: 'document_archive'
+gem 'document-archive', ">= 0.2.8", github: 'cecomp64/document-archive', require: 'document_archive'
