@@ -146,6 +146,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_22_044535) do
     t.string "json_content_type"
     t.bigint "json_file_size"
     t.datetime "json_updated_at"
+    t.date "publication_date"
+    t.index ["publication_date"], name: "index_document_archive_documents_on_publication_date"
   end
 
   create_table "document_archive_embeddings", force: :cascade do |t|

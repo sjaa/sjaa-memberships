@@ -258,7 +258,7 @@ class DocumentArchiveIntegrationTest < ActionDispatch::IntegrationTest
     assert_response :bad_request
 
     json = JSON.parse(response.body)
-    assert_equal "Query parameter is required", json["error"]
+    assert_equal "Query or embedding parameter is required", json["error"]
   end
 
   # Note: search_text (vector search) requires GEMINI_API_KEY and embeddings

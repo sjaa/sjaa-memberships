@@ -29,7 +29,7 @@
       </div>
       <div class="col-md-6 mt-2">
         <%= label_tag :membership_term, 'Term (months)', class: 'form-label' %>
-        <%= number_field_tag "#{field_name_prefix}[term_months]", membership.term_months || SjaaMembers::DEFAULT_MEMBERSHIP_TERM, class: 'form-control', min: 1 %>
+        <%= number_field_tag "#{field_name_prefix}[term_months]", membership.term_months || SjaaMembers::DEFAULT_MEMBERSHIP_TERM, class: 'form-control', min: 0 %>
         <% if show_descriptions %>
           <small class="form-text text-muted">
             Default: <%= SjaaMembers::DEFAULT_MEMBERSHIP_TERM %> months (1 year)
