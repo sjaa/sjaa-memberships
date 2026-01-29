@@ -1393,4 +1393,29 @@ class PeopleControllerTest < ActionDispatch::IntegrationTest
     assert_nil new_membership.start
     assert_equal 12, new_membership.term_months
   end
+
+  test "contacts can be updated" do
+    person = Person.create!(first_name: "Multi", last_name: "Contacts", password: "password123")
+    Contact.create!(email: "contact@example.com", person: person, primary: true)
+    person.reload
+
+    updated_contact = {
+      person: {
+        contact_attributes: [
+          { id: person.primary_contact.id, phone: "555-1234", email: "updated@example.com" }
+        ]
+      }
+    }
+
+    login_as_person(person)
+
+    # Update person through controller
+    patch person_path(person), params: updated_contact
+    assert_redirected_to person_path(person)
+    person.reload
+
+    # Assert that the email address and phone were updated
+    assert_equal "updated@example.com", person.primary_contact.email
+    assert_equal "555-1234", person.primary_contact.phone
+  end
 end

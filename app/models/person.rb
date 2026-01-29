@@ -265,7 +265,12 @@ class Person < ApplicationRecord
         _contact_attr[:city] = city
       end
 
-      contact.assign_attributes _contact_attr
+      contact.update _contact_attr
+
+      contact.errors.each do |err|
+        self.errors.add err.attribute, err.message
+      end
+
       _contacts << contact
     end
 
