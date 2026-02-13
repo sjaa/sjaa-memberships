@@ -325,6 +325,96 @@ class CalendarSyncJobTest < ActiveJob::TestCase
     assert_equal 'Event with Missing ID', created_events.first.summary
   end
 
+  test "job saves new meetup event to database" do
+    meetup_event = create_mock_event(
+      title: 'SJAA Star Party',
+      start_time: 1.week.from_now,
+      hooks: {},
+      meetup_source: { meetup_id: 'meetup-abc-123', url: 'https://meetup.com/event/abc', image_url: 'https://meetup.com/photo.jpg' }
+    )
+
+    mock_aggregator = create_mock_aggregator([meetup_event])
+
+    stub_calendar_sync(mock_aggregator) do |calendar_service, calendar_id|
+      calendar_service.define_singleton_method(:insert_event) do |cal_id, event|
+        event
+      end
+
+      assert_difference 'MeetupEvent.count', 1 do
+        CalendarSyncJob.perform_now(@admin.email, calendar_id, 90, true)
+      end
+    end
+
+    saved = MeetupEvent.find_by(meetup_id: 'meetup-abc-123')
+    assert_not_nil saved
+    assert_equal 'SJAA Star Party', saved.title
+    assert_equal 'https://meetup.com/photo.jpg', saved.image_url
+    assert_equal 'https://meetup.com/event/abc', saved.url
+  end
+
+  test "job updates existing meetup event title, image, and time in database" do
+    existing_time = 2.weeks.from_now
+    MeetupEvent.create!(
+      meetup_id: 'meetup-update-456',
+      title: 'Old Title',
+      url: 'https://meetup.com/event/old',
+      image_url: 'https://meetup.com/old-photo.jpg',
+      time: existing_time
+    )
+
+    new_time = 3.weeks.from_now
+    updated_event = create_mock_event(
+      title: 'Updated Title',
+      start_time: new_time,
+      hooks: {},
+      meetup_source: { meetup_id: 'meetup-update-456', url: 'https://meetup.com/event/new', image_url: 'https://meetup.com/new-photo.jpg' }
+    )
+
+    mock_aggregator = create_mock_aggregator([updated_event])
+
+    stub_calendar_sync(mock_aggregator) do |calendar_service, calendar_id|
+      calendar_service.define_singleton_method(:insert_event) do |cal_id, event|
+        event
+      end
+
+      assert_no_difference 'MeetupEvent.count' do
+        CalendarSyncJob.perform_now(@admin.email, calendar_id, 90, true)
+      end
+    end
+
+    saved = MeetupEvent.find_by(meetup_id: 'meetup-update-456')
+    assert_equal 'Updated Title', saved.title
+    assert_equal 'https://meetup.com/new-photo.jpg', saved.image_url
+    assert_equal 'https://meetup.com/event/new', saved.url
+    assert_in_delta new_time.to_i, saved.time.to_i, 1
+  end
+
+  test "job saves meetup event even when google calendar sync fails" do
+    meetup_event = create_mock_event(
+      title: 'Meetup Despite Failure',
+      start_time: 1.week.from_now,
+      hooks: {},
+      meetup_source: { meetup_id: 'meetup-fail-789', url: 'https://meetup.com/event/fail', image_url: 'https://meetup.com/fail-photo.jpg' }
+    )
+
+    mock_aggregator = create_mock_aggregator([meetup_event])
+
+    stub_calendar_sync(mock_aggregator) do |calendar_service, calendar_id|
+      # Simulate Google Calendar API failure
+      calendar_service.define_singleton_method(:insert_event) do |cal_id, event|
+        raise Google::Apis::ServerError.new('Internal Server Error')
+      end
+
+      assert_difference 'MeetupEvent.count', 1 do
+        CalendarSyncJob.perform_now(@admin.email, calendar_id, 90, true)
+      end
+    end
+
+    saved = MeetupEvent.find_by(meetup_id: 'meetup-fail-789')
+    assert_not_nil saved
+    assert_equal 'Meetup Despite Failure', saved.title
+  end
+
   test "job handles multiple events in one sync" do
     events = [
       create_mock_event(title: 'Event 1', start_time: 1.week.from_now, hooks: {}),
@@ -364,7 +454,8 @@ class CalendarSyncJobTest < ActiveJob::TestCase
 
   # Create a mock aggregated event
   def create_mock_event(title:, description: nil, location: nil, start_time: nil, end_time: nil,
-                        start_date: nil, end_date: nil, all_day: false, hooks: {}, cancelled: false)
+                        start_date: nil, end_date: nil, all_day: false, hooks: {}, cancelled: false,
+                        meetup_source: nil)
     event = Object.new
     event.define_singleton_method(:title) { title }
     event.define_singleton_method(:description) { description }
@@ -376,19 +467,45 @@ class CalendarSyncJobTest < ActiveJob::TestCase
     event.define_singleton_method(:all_day?) { all_day }
     event.define_singleton_method(:hooks) { hooks }
     event.define_singleton_method(:cancelled?) { cancelled }
-    event.define_singleton_method(:respond_to?) { |method| [:update_hook].include?(method) }
+    event.define_singleton_method(:respond_to?) do |method, *args|
+      [:update_hook, :source_events].include?(method) || super(method, *args)
+    end
     event.define_singleton_method(:update_hook) { |key, value| hooks[key] = value }
+
+    # Add source_events for meetup events
+    if meetup_source
+      mock_source = create_mock_meetup_source(meetup_source)
+      event.define_singleton_method(:source_events) { [mock_source] }
+    else
+      event.define_singleton_method(:source_events) { nil }
+    end
 
     # Add properties expected by CalendarSyncJob
     event.define_singleton_method(:id) { hooks[:google_calendar_id] }
     event.define_singleton_method(:date) { all_day ? (start_date || Date.today) : (start_time&.to_date || Date.today) }
     event.define_singleton_method(:time) { all_day ? nil : start_time&.strftime('%I:%M %p') }
-    event.define_singleton_method(:source) { 'Test Source' }
+    event.define_singleton_method(:source) { meetup_source ? 'Meetup' : 'Test Source' }
     event.define_singleton_method(:venue) { location ? { name: location, address: location } : nil }
     event.define_singleton_method(:status) { cancelled ? 'cancelled' : 'confirmed' }
     event.define_singleton_method(:going_count) { nil }
 
     event
+  end
+
+  # Create a mock Meetup source event
+  def create_mock_meetup_source(attrs)
+    # Create a class with 'Meetup' in the name so is_meetup_event? detection works
+    source = Object.new
+    # Override class to report a name containing 'Meetup'
+    mock_class = Class.new do
+      define_method(:name) { 'SJAA::Calendar::MeetupEvent' }
+    end
+    source.define_singleton_method(:class) { mock_class.new }
+    source.define_singleton_method(:id) { attrs[:meetup_id] }
+    source.define_singleton_method(:url) { attrs[:url] }
+    source.define_singleton_method(:image_url) { attrs[:image_url] }
+    source.define_singleton_method(:image_highres_url) { attrs[:image_highres_url] }
+    source
   end
 
   # Create a mock aggregator

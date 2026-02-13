@@ -22,8 +22,17 @@ class CalendarSyncJob < ApplicationJob
     admin = Admin.find_by(email: admin_email)
     
     # Validate admin has refresh token
-    if admin&.refresh_token.nil?
-      Rails.logger.error "[CalendarSyncJob] Admin #{admin_email} not found or missing refresh token"
+    if admin.nil?
+      msg = "[CalendarSyncJob] Admin '#{admin_email}' not found"
+      Rails.logger.error msg
+      puts msg
+      return
+    end
+
+    if admin.refresh_token.nil?
+      msg = "[CalendarSyncJob] Admin '#{admin_email}' is missing a Google refresh token. Please authenticate via the Google integration page first."
+      Rails.logger.error msg
+      puts msg
       return
     end
     
@@ -58,10 +67,11 @@ class CalendarSyncJob < ApplicationJob
     calendar_id: "c_3ba3a0dda51b1e570c0fad01aa5bd96f1e27e5c05b5d3fd0fa581974a6305ecc@group.calendar.google.com"
     )
 
-    # Add a Meetup source
+    # Add a Meetup source (optional so failures don't block the rest of the sync)
     config.add_meetup_source(
     name: "SJAA Meetup Events",
-    meetup_url: "https://www.meetup.com/sj-astronomy/events/"
+    meetup_url: "https://www.meetup.com/sj-astronomy/events/",
+    timeout: 180
     )
 
     # Add moon phases
@@ -85,14 +95,14 @@ class CalendarSyncJob < ApplicationJob
     aggregated_events.each do |agg_event|
       begin
         sync_event(calendar_service, calendar_id, agg_event, stats, commit)
-
-        # Also save Meetup events to database for widget display
-        save_meetup_event(agg_event) if is_meetup_event?(agg_event)
       rescue => e
         stats[:errors] << {event: agg_event, error: e}
         Rails.logger.error "[CalendarSyncJob] Error syncing event '#{agg_event.title}': #{e.message}"
         Rails.logger.error e.backtrace.join("\n")
       end
+
+      # Save Meetup events to database regardless of Google Calendar sync result
+      save_meetup_event(agg_event) if is_meetup_event?(agg_event)
     end
     
     Rails.logger.info "[CalendarSyncJob] Sync complete: #{stats.inspect}"
@@ -425,8 +435,10 @@ class CalendarSyncJob < ApplicationJob
     )
 
     # Save the record
+    is_new = meetup_event.new_record?
     if meetup_event.save
-      Rails.logger.info "[CalendarSyncJob] Saved Meetup event: #{meetup_event.title} (ID: #{meetup_id})"
+      action = is_new ? "Created" : "Updated"
+      Rails.logger.info "[CalendarSyncJob] #{action} Meetup event: #{meetup_event.title} (ID: #{meetup_id})"
     else
       Rails.logger.error "[CalendarSyncJob] Failed to save Meetup event: #{meetup_event.errors.full_messages.join(', ')}"
     end
