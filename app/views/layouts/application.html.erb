@@ -81,6 +81,7 @@
                     Reports
                   </a>
                   <ul class="dropdown-menu">
+                    <li><%= link_to 'Document Archive', about_document_archive_path, class: 'dropdown-item' %></li>
                     <li><%= link_to 'Memberships', memberships_report_path, class: 'dropdown-item' %></li>
                     <li><%= link_to 'Renewal Reminders', renewal_reminders_path, class: 'dropdown-item' %></li>
                     <!--<li><a class="dropdown-item" href="#">YTD Donations</a></li>-->
@@ -94,6 +95,9 @@
               <% else %>
               <li class="nav-item">
                 <%= link_to "Profile", person_path(@user), class: 'nav-link' %>
+              </li>
+              <li class="nav-item">
+                <%= link_to 'Document Archive', about_document_archive_path, class: 'nav-link' %>
               </li>
               <% end %>
               <li class="nav-item">
