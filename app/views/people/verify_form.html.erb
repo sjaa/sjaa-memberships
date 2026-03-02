@@ -1,7 +1,7 @@
 <div class="row">
   <div class="col-12">
     <h1>Membership Verification</h1>
-    <p class="text-muted">Enter an email address to verify membership status</p>
+    <p class="text-muted">Enter an email address or member name to verify membership status</p>
   </div>
 </div>
 
@@ -13,14 +13,18 @@
           <%= f.label :email, "Email Address", class: "form-label" %>
           <%= f.email_field :email,
               placeholder: "member@example.com",
-              class: "form-control #{'is-invalid' if @verification_result&.dig(:error)}",
-              value: params[:email],
-              required: true %>
-          <% if @verification_result&.dig(:error) %>
-            <div class="invalid-feedback">
-              <%= @verification_result[:error] %>
-            </div>
-          <% end %>
+              class: "form-control",
+              value: params[:email] %>
+        </div>
+
+        <div class="text-muted text-center mb-3">— or —</div>
+
+        <div class="mb-3">
+          <%= f.label :name, "Member Name", class: "form-label" %>
+          <%= f.text_field :name,
+              placeholder: "First Last",
+              class: "form-control",
+              value: params[:name] %>
         </div>
 
         <%= f.submit "Verify Membership", class: "btn btn-primary" %>
@@ -36,4 +40,3 @@
     <% end %>
   <% end %>
 <% end %>
-

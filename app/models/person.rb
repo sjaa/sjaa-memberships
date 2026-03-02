@@ -54,6 +54,13 @@ class Person < ApplicationRecord
     email.nil? ? nil : Contact.find_by(email: email)&.person
   end
 
+  # Find people by concatenated first+last name, ignoring whitespace and case.
+  # Returns an ActiveRecord::Relation (may have 0, 1, or many results).
+  def self.find_by_name(name)
+    normalized = name.gsub(/\s+/, '').downcase
+    where("LOWER(REGEXP_REPLACE(first_name || last_name, '\\s+', '', 'g')) = ?", normalized)
+  end
+
   def latest_membership
     # Make a nil end (lifetime membership) come up as the latest result
     memberships.sort_by{|m| m.end || (DateTime.now + 999.years)}.last

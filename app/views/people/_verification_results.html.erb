@@ -3,7 +3,10 @@
     <div class="card">
       <div class="card-body">
         <h5 class="card-title">
-          <% if verification_result[:valid] %>
+          <% if verification_result[:multiple_matches] %>
+            <i class="bi bi-exclamation-circle-fill text-warning"></i>
+            Multiple Matches Found
+          <% elsif verification_result[:valid] %>
             <i class="bi bi-check-circle-fill text-success"></i>
             <%= verification_result[:message] %>
           <% else %>
@@ -11,6 +14,12 @@
             <%= verification_result[:message] %>
           <% end %>
         </h5>
+
+        <% if verification_result[:multiple_matches] %>
+          <p class="card-text text-warning">
+            <%= verification_result[:message] %>
+          </p>
+        <% end %>
 
         <% if verification_result[:expires] %>
           <p class="card-text">

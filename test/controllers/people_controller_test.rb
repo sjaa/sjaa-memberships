@@ -143,21 +143,21 @@ class PeopleControllerTest < ActionDispatch::IntegrationTest
     assert_select 'small', text: /Verified on/
   end
 
-  test "verify with blank email shows validation error" do
+  test "verify with blank email and blank name shows validation error" do
     login_as_admin(@admin)
-    post verify_membership_path, params: { email: "" }
+    post verify_membership_path, params: { email: "", name: "" }
 
     assert_response :unprocessable_content
-    assert_select '.alert-danger', text: /Email address is required/
+    assert_select '.alert-danger', text: /Email address or name is required/
     assert_select 'small', text: /Attempted on/
   end
 
-  test "verify with whitespace-only email shows validation error" do
+  test "verify with whitespace-only email and no name shows validation error" do
     login_as_admin(@admin)
-    post verify_membership_path, params: { email: "   " }
+    post verify_membership_path, params: { email: "   ", name: "" }
 
     assert_response :unprocessable_content
-    assert_select '.alert-danger', text: /Email address is required/
+    assert_select '.alert-danger', text: /Email address or name is required/
   end
 
   test "verify handles case-insensitive email lookup" do
@@ -217,6 +217,87 @@ class PeopleControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     expected_expiration = @expired_membership.end.strftime("%B %Y")
     assert_select 'p', text: /Expired: #{Regexp.escape(expected_expiration)}/
+  end
+
+  # Name-based verification tests
+  test "verify by name finds active member" do
+    login_as_admin(@admin)
+    post verify_membership_path, params: { name: "Test Member" }
+
+    assert_response :success
+    assert_select '.card-title', text: /Valid Member/
+    assert_select '.text-success'
+  end
+
+  test "verify by name finds expired member" do
+    login_as_admin(@admin)
+    post verify_membership_path, params: { name: "Expired Member" }
+
+    assert_response :success
+    assert_select '.card-title', text: /Membership Expired/
+    assert_select '.text-danger'
+  end
+
+  test "verify by name returns not found when no match" do
+    login_as_admin(@admin)
+    post verify_membership_path, params: { name: "Nobody Here" }
+
+    assert_response :success
+    assert_select '.card-title', text: /No member found with this name/
+  end
+
+  test "verify by name returns multiple matches message when name is ambiguous" do
+    duplicate = Person.create!(first_name: "Test", last_name: "Member", password: "password123")
+
+    login_as_admin(@admin)
+    post verify_membership_path, params: { name: "Test Member" }
+
+    assert_response :success
+    assert_select '.card-title', text: /Multiple Matches Found/
+    assert_select '.card-text', text: /Please provide an email address/
+  ensure
+    duplicate.destroy
+  end
+
+  test "verify by name ignores whitespace in search term" do
+    login_as_admin(@admin)
+    post verify_membership_path, params: { name: "TestMember" }
+
+    assert_response :success
+    assert_select '.card-title', text: /Valid Member/
+  end
+
+  test "verify by name is case insensitive" do
+    login_as_admin(@admin)
+    post verify_membership_path, params: { name: "test member" }
+
+    assert_response :success
+    assert_select '.card-title', text: /Valid Member/
+  end
+
+  test "verify by name ignores extra internal whitespace" do
+    login_as_admin(@admin)
+    post verify_membership_path, params: { name: "Test  Member" }
+
+    assert_response :success
+    assert_select '.card-title', text: /Valid Member/
+  end
+
+  test "verify email takes precedence when both email and name are provided" do
+    login_as_admin(@admin)
+    # email points to active member, name points to expired member
+    post verify_membership_path, params: { email: "member@example.com", name: "Expired Member" }
+
+    assert_response :success
+    assert_select '.card-title', text: /Valid Member/
+  end
+
+  test "verify with name only and no email succeeds" do
+    login_as_admin(@admin)
+    post verify_membership_path, params: { email: "", name: "Test Member" }
+
+    assert_response :success
+    assert_select '.card-title', text: /Valid Member/
   end
 
   # Skills update tests

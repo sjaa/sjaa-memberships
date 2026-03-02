@@ -123,29 +123,34 @@ class PeopleController < ApplicationController
   # POST /people/verify
   def verify
     email = params[:email]&.strip&.downcase
+    name  = params[:name]&.strip
     @verification_result = { timestamp: Time.current.strftime("%B %d, %Y at %I:%M %p") }
 
-    if email.blank?
-      @verification_result[:error] = "Email address is required"
+    if email.blank? && name.blank?
+      @verification_result[:error] = "Email address or name is required"
       render :verify_form, status: :unprocessable_content
       return
     end
 
-    person = Person.find_by_email(email)
-
-    if person.nil?
-      @verification_result[:valid] = false
-      @verification_result[:message] = "No member found with this email address"
-    else
-      latest_membership = person.latest_membership
-      if latest_membership&.is_active?
-        @verification_result[:valid] = true
-        @verification_result[:message] = "Valid Member"
-        @verification_result[:expires] = latest_membership.end&.strftime("%B %Y") || "Lifetime"
-      else
+    if email.present?
+      person = Person.find_by_email(email)
+      if person.nil?
         @verification_result[:valid] = false
-        @verification_result[:message] = "Membership Expired"
-        @verification_result[:expires] = latest_membership&.end&.strftime("%B %Y")
+        @verification_result[:message] = "No member found with this email address"
+      else
+        apply_membership_result(person)
+      end
+    else
+      people = Person.find_by_name(name)
+      if people.empty?
+        @verification_result[:valid] = false
+        @verification_result[:message] = "No member found with this name"
+      elsif people.size > 1
+        @verification_result[:valid] = false
+        @verification_result[:multiple_matches] = true
+        @verification_result[:message] = "Multiple members found with this name. Please provide an email address or other proof of identity to verify membership."
+      else
+        apply_membership_result(people.first)
       end
     end
 
@@ -230,6 +235,19 @@ class PeopleController < ApplicationController
   end
   
   private
+
+  def apply_membership_result(person)
+    latest_membership = person.latest_membership
+    if latest_membership&.is_active?
+      @verification_result[:valid] = true
+      @verification_result[:message] = "Valid Member"
+      @verification_result[:expires] = latest_membership.end&.strftime("%B %Y") || "Lifetime"
+    else
+      @verification_result[:valid] = false
+      @verification_result[:message] = "Membership Expired"
+      @verification_result[:expires] = latest_membership&.end&.strftime("%B %Y")
+    end
+  end
 
   # Use callbacks to share common setup or constraints between actions.
   def set_person
