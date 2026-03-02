@@ -202,7 +202,9 @@ class AdminRenewalTest < ApplicationSystemTestCase
       click_button "Create Membership"
     end
 
-    # Wait for success message
+    # Wait for Turbo navigation to complete before asserting on the new page,
+    # avoiding stale element references from the pre-navigation DOM.
+    assert_current_path(person_path(@person), wait: 5)
     assert_text "Membership was successfully created"
 
     # Verify the membership appears in the membership history table

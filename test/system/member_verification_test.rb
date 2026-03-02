@@ -156,15 +156,17 @@ class MemberVerificationTest < ApplicationSystemTestCase
     assert_text "Verified on"
   end
 
-  test "email field has HTML5 required validation" do
+  test "form has email and name fields" do
     login_as(@admin.email, 'password123')
     visit verify_membership_form_path
 
-    # Verify the email field has the required attribute for HTML5 validation
-    assert_selector "input[type='email'][required]"
+    # Both search fields should be present (neither is individually required)
+    assert_selector "input[type='email']"
+    assert_selector "input[type='text']"
 
-    # Verify the field is properly labeled
+    # Both fields should be properly labeled
     assert_selector "label", text: "Email Address"
+    assert_selector "label", text: "Member Name"
   end
 
   test "form allows multiple consecutive verifications" do
