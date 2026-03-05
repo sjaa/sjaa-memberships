@@ -114,11 +114,11 @@ class AppConfig < ApplicationRecord
     end
 
     def google_members_group
-      get('google_members_group', required: false) || 'membership-app-test-group@sjaa.net'
+      get('google_members_group', required: false).presence || 'membership-app-test-group@sjaa.net'
     end
 
     def google_remove_group
-      get('google_remove_group', required: false) || 'expired-members@sjaa.net'
+      get('google_remove_group', required: false).presence || 'expired-members@sjaa.net'
     end
 
     def google_api_key
@@ -135,12 +135,12 @@ class AppConfig < ApplicationRecord
 
     # For backward compatibility, prefer all_events, fall back to merged
     def google_calendar_id
-      get('google_all_events_calendar_id') || get('google_merged_calendar_id')
+      get('google_all_events_calendar_id').presence || get('google_merged_calendar_id').presence
     end
 
     # Get membership renewal threshold in months
     def membership_renewal_threshold_months
-      (get('membership_renewal_threshold_months') || '2').to_i
+      (get('membership_renewal_threshold_months').presence || '2').to_i
     end
 
     # Find a config definition by key

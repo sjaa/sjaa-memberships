@@ -87,7 +87,7 @@ class MemberVerificationTest < ApplicationSystemTestCase
     visit verify_membership_form_path
 
     assert_text "Membership Verification"
-    assert_text "Enter an email address to verify membership status"
+    assert_text "Enter an email address or member name to verify membership status"
     assert_selector "input[type='email']"
     assert_button "Verify Membership"
   end
