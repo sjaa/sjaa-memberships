@@ -258,7 +258,12 @@
                       </td>
                       <td class="text-end"><%= dollar_format(membership.donation_amount) %></td>
                       <td class="text-center"><%= ephemeris_format membership.ephemeris %></td>
-                      <td><%= membership.notes %></td>
+                      <td>
+                        <%= membership.notes %>
+                        <% if membership.author.present? %>
+                          <br><small class="text-muted"><%= membership.author %></small>
+                        <% end %>
+                      </td>
                       <td>
                         <% if membership.is_active? %>
                           <span class="badge bg-success">Active</span>
