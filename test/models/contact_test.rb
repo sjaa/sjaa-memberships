@@ -25,13 +25,12 @@ class ContactTest < ActiveSupport::TestCase
     assert contact.valid?
   end
 
-  test 'contact requires email' do
+  test 'contact email is optional' do
     contact = Contact.new(
       person: @person,
       primary: false
     )
-    assert_not contact.valid?
-    assert_includes contact.errors[:email], "can't be blank"
+    assert contact.valid?, "Expected contact without email to be valid, got: #{contact.errors.full_messages}"
   end
 
   test 'contact requires person' do

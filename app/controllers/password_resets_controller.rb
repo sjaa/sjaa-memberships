@@ -8,10 +8,12 @@ class PasswordResetsController < ApplicationController
   def create
     user = Admin.find_by(email: params[:email]) || Person.find_by_email(params[:email])
 
-    if user
-      user.generate_password_reset_token!
+    if user && user.generate_password_reset_token!
       AccountMailer.password_reset(user).deliver_now
       redirect_to login_path, notice: 'Password reset email has been sent.  It may take up to 5 minutes to receive it.'
+    elsif user
+      flash[:alert] = "Could not send password reset email: #{user.errors.full_messages.join(', ')}"
+      redirect_to new_password_reset_path
     else
       flash[:alert] = 'Email address not found.  Please sign up or correct your address.'
       redirect_to login_path

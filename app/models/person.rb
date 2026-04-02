@@ -284,15 +284,27 @@ class Person < ApplicationRecord
     self.contacts = _contacts
   end
 
-  # Custom validation to check all contacts are valid
-  validate :contacts_must_be_valid
+  # Contacts with an email must pass Contact validations (e.g. uniqueness).
+  # Contacts without an email are permitted.
+  validate :contacts_with_email_must_be_valid
 
-  def contacts_must_be_valid
+  def contacts_with_email_must_be_valid
     contacts.each do |contact|
+      next if contact.email.blank?
       next if contact.valid?
       contact.errors.each do |error|
         errors.add(:base, "Contact #{error.attribute}: #{error.message}")
       end
+    end
+  end
+
+  # A person must have at least one contact with an email address
+  validate :must_have_primary_email
+
+  def must_have_primary_email
+    return if contacts.empty?
+    unless contacts.any? { |c| c.email.present? }
+      errors.add(:base, "Must have at least one contact with an email address")
     end
   end
 

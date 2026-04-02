@@ -6,7 +6,7 @@ class Contact < ApplicationRecord
   # Normalize email before validation: strip whitespace and downcase
   before_validation :normalize_email
 
-  validates :email, presence: true, uniqueness: true
+  validates :email, uniqueness: { allow_blank: true }
 
   private
 

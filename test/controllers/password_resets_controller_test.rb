@@ -50,6 +50,21 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Password reset email has been sent.  It may take up to 5 minutes to receive it.", flash[:notice]
   end
 
+  test "should create password reset for person with a blank-email contact" do
+    # Reproduces a bug where contacts without an email address caused validation
+    # errors when saving the reset token, returning 422 instead of sending the email.
+    Contact.create!(person: @person, primary: false)
+
+    assert_emails 1 do
+      post password_resets_path, params: { email: @contact.email }
+    end
+
+    @person.reload
+    assert_not_nil @person.reset_password_token
+    assert_redirected_to login_path
+    assert_equal "Password reset email has been sent.  It may take up to 5 minutes to receive it.", flash[:notice]
+  end
+
   test "should show error for non-existent email without signup" do
     post password_resets_path, params: { email: "nonexistent@example.com" }
     
