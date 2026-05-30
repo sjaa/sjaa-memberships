@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>SJAA Membership Card</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag "bootstrap.min", media: "all" %>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <style>
+      body {
+        background: #f0f0f0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        margin: 0;
+        font-family: sans-serif;
+      }
+
+      .no-print {
+        margin-bottom: 1.5rem;
+      }
+
+      @media print {
+        @page {
+          size: landscape;
+          margin: 0.5in;
+        }
+
+        body {
+          background: white;
+          display: block;
+          min-height: unset;
+          margin: 0;
+        }
+
+        .no-print {
+          display: none !important;
+        }
+
+        /* Scale 680px card to 3.375in (CR80): 3.375*96/680 = 0.476 */
+        .membership-card {
+          box-shadow: none !important;
+          transform: scale(0.476);
+          transform-origin: top left;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="no-print">
+      <button class="btn btn-primary" onclick="window.print()">
+        <i class="bi bi-printer me-2"></i>Print Card
+      </button>
+      <%= link_to "Back to Profile", person_path(@person), class: 'btn btn-outline-secondary ms-2' %>
+    </div>
+    <%= yield %>
+  </body>
+</html>

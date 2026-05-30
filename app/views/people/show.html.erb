@@ -17,6 +17,9 @@
           <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
             <%= link_to "Edit Profile", edit_person_path(@person), class: 'btn btn-primary' %>
             <%= render partial: 'renew_button' %>
+            <%= link_to membership_card_path(@person), class: 'btn btn-outline-secondary', target: '_blank' do %>
+              <i class="bi bi-credit-card me-1"></i>Membership Card
+            <% end %>
           </div>
           <% if @user.is_a?(Admin) %>
             <div class="btn-group" role="group">

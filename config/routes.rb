@@ -22,6 +22,7 @@ Rails.application.routes.draw do
   post '/signup_request', to: 'sessions#signup_request', as: :signup_request
   get '/confirm_email/:token', to: 'sessions#signup_response', as: :signup_response
   
+  get '/people/:id/card', to: 'people#card', as: :membership_card
   get '/people/remind_all', to: 'people#remind_all', as: :remind_all
   get '/people/:id/new_membership', to: 'people#new_membership', as: :membership_renewal
   post '/people/:id/approve_mentorship', to: 'people#approve_mentorship', as: :approve_mentorship

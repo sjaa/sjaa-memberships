@@ -112,6 +112,9 @@ source "https://rubygems.pkg.github.com/sjaa" do
   gem "sjaa-ruby-calendar-aggregator", "0.5.1"
 end
 
+# QR code generation for membership cards
+gem 'rqrcode'
+
 # Markdown support
 gem 'redcarpet'
 

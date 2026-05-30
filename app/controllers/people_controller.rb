@@ -3,7 +3,7 @@ class PeopleController < ApplicationController
   include Filterable
   include GoogleHelper
 
-  before_action :set_person, only: %i[ show edit update destroy new_membership  remind approve_mentorship deny_mentorship admin_renew]
+  before_action :set_person, only: %i[ show edit update destroy new_membership remind approve_mentorship deny_mentorship admin_renew card]
   skip_before_action :verify_authenticity_token, only: [:update], if: -> { request.format.json? }
 
   # GET /people or /people.json
@@ -18,6 +18,13 @@ class PeopleController < ApplicationController
   
   # GET /people/1 or /people/1.json
   def show
+  end
+
+  # GET /people/1/card
+  def card
+    authorize @person, policy_class: PersonPolicy
+    @qr = RQRCode::QRCode.new(@person.id.to_s)
+    render layout: 'card'
   end
 
   def admin
