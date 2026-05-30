@@ -23,35 +23,18 @@ class PeopleController < ApplicationController
   # GET /people/1/card
   def card
     authorize @person, policy_class: PersonPolicy
-    @qr = RQRCode::QRCode.new(@person.id.to_s)
+    setup_card_data
+    svg = render_to_string('people/card_image', layout: false, formats: [:svg])
+              .sub(/\A<\?xml[^?]*\?>\n?/, '')          # strip XML declaration for HTML embedding
+              .sub(/<svg /, '<svg class="membership-card" ')
+    @svg = svg.html_safe
     render layout: 'card'
   end
 
   # GET /people/1/card_image — standalone SVG download
   def card_image
     authorize @person, policy_class: PersonPolicy
-    @qr = RQRCode::QRCode.new(@person.id.to_s)
-
-    latest = @person.latest_membership
-    @member_since  = @person.first_membership&.start&.strftime("%B %Y") || "—"
-    @valid_through = (latest&.term_months.nil? && latest.present?) ? "Lifetime" : (latest&.end&.strftime("%B %Y") || "—")
-    @active        = latest&.is_active?
-
-    if @person.profile_picture.attached?
-      blob = @person.profile_picture.blob
-      @photo_data_url = "data:#{blob.content_type};base64,#{Base64.strict_encode64(blob.download)}"
-    end
-
-    logo_path = Rails.root.join('app/assets/images/logo_small.png')
-    @logo_data_url = "data:image/png;base64,#{Base64.strict_encode64(File.binread(logo_path))}"
-
-    bg_path = Rails.root.join('app/assets/images/Original.png')
-    @bg_data_url = "data:image/png;base64,#{Base64.strict_encode64(File.binread(bg_path))}"
-
-    qr_raw = @qr.as_svg(module_size: 1, standalone: true, use_path: true)
-    @qr_viewbox   = qr_raw[/viewBox="([^"]+)"/, 1] || "0 0 21 21"
-    @qr_path_data = qr_raw[/<path[^>]+d="([^"]+)"/, 1]
-
+    setup_card_data
     response.headers['Content-Disposition'] = "attachment; filename=\"sjaa-membership-card-#{@person.id}.svg\""
     render layout: false, content_type: 'image/svg+xml'
   end
@@ -283,6 +266,29 @@ class PeopleController < ApplicationController
       @verification_result[:message] = "Membership Expired"
       @verification_result[:expires] = latest_membership&.end&.strftime("%B %Y")
     end
+  end
+
+  def setup_card_data
+    latest = @person.latest_membership
+    @member_since  = @person.first_membership&.start&.strftime("%B %Y") || "—"
+    @valid_through = (latest&.term_months.nil? && latest.present?) ? "Lifetime" : (latest&.end&.strftime("%B %Y") || "—")
+    @active        = latest&.is_active?
+
+    @qr       = RQRCode::QRCode.new(@person.id.to_s)
+    qr_raw    = @qr.as_svg(module_size: 1, standalone: true, use_path: true)
+    @qr_viewbox   = qr_raw[/viewBox="([^"]+)"/, 1] || "0 0 21 21"
+    @qr_path_data = qr_raw[/<path[^>]+d="([^"]+)"/, 1]
+
+    if @person.profile_picture.attached?
+      blob = @person.profile_picture.blob
+      @photo_data_url = "data:#{blob.content_type};base64,#{Base64.strict_encode64(blob.download)}"
+    end
+
+    logo_path = Rails.root.join('app/assets/images/logo_small.png')
+    @logo_data_url = "data:image/png;base64,#{Base64.strict_encode64(File.binread(logo_path))}"
+
+    bg_path = Rails.root.join('app/assets/images/Original.png')
+    @bg_data_url = "data:image/png;base64,#{Base64.strict_encode64(File.binread(bg_path))}"
   end
 
   # Use callbacks to share common setup or constraints between actions.
