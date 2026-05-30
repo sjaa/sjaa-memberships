@@ -75,7 +75,7 @@ class CalendarSyncJob < ApplicationJob
     )
 
     # Add moon phases
-    config.add_moon_phase_source
+    #config.add_moon_phase_source
 
     # Create aggregator
     aggregator = SJAA::Calendar::Aggregator.new(config)
