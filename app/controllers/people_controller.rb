@@ -3,7 +3,7 @@ class PeopleController < ApplicationController
   include Filterable
   include GoogleHelper
 
-  before_action :set_person, only: %i[ show edit update destroy new_membership remind approve_mentorship deny_mentorship admin_renew card]
+  before_action :set_person, only: %i[ show edit update destroy new_membership remind approve_mentorship deny_mentorship admin_renew card card_image]
   skip_before_action :verify_authenticity_token, only: [:update], if: -> { request.format.json? }
 
   # GET /people or /people.json
@@ -25,6 +25,35 @@ class PeopleController < ApplicationController
     authorize @person, policy_class: PersonPolicy
     @qr = RQRCode::QRCode.new(@person.id.to_s)
     render layout: 'card'
+  end
+
+  # GET /people/1/card_image — standalone SVG download
+  def card_image
+    authorize @person, policy_class: PersonPolicy
+    @qr = RQRCode::QRCode.new(@person.id.to_s)
+
+    latest = @person.latest_membership
+    @member_since  = @person.first_membership&.start&.strftime("%B %Y") || "—"
+    @valid_through = (latest&.term_months.nil? && latest.present?) ? "Lifetime" : (latest&.end&.strftime("%B %Y") || "—")
+    @active        = latest&.is_active?
+
+    if @person.profile_picture.attached?
+      blob = @person.profile_picture.blob
+      @photo_data_url = "data:#{blob.content_type};base64,#{Base64.strict_encode64(blob.download)}"
+    end
+
+    logo_path = Rails.root.join('app/assets/images/logo_small.png')
+    @logo_data_url = "data:image/png;base64,#{Base64.strict_encode64(File.binread(logo_path))}"
+
+    bg_path = Rails.root.join('app/assets/images/Original.png')
+    @bg_data_url = "data:image/png;base64,#{Base64.strict_encode64(File.binread(bg_path))}"
+
+    qr_raw = @qr.as_svg(module_size: 1, standalone: true, use_path: true)
+    @qr_viewbox   = qr_raw[/viewBox="([^"]+)"/, 1] || "0 0 21 21"
+    @qr_path_data = qr_raw[/<path[^>]+d="([^"]+)"/, 1]
+
+    response.headers['Content-Disposition'] = "attachment; filename=\"sjaa-membership-card-#{@person.id}.svg\""
+    render layout: false, content_type: 'image/svg+xml'
   end
 
   def admin

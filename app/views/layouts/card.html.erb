@@ -16,11 +16,22 @@
         justify-content: center;
         min-height: 100vh;
         margin: 0;
+        padding: 1rem;
+        box-sizing: border-box;
         font-family: sans-serif;
       }
 
       .no-print {
         margin-bottom: 1.5rem;
+      }
+
+      #card-scaler {
+        width: 100%;
+        max-width: 680px;
+      }
+
+      .membership-card {
+        transform-origin: top left;
       }
 
       @media print {
@@ -34,6 +45,7 @@
           display: block;
           min-height: unset;
           margin: 0;
+          padding: 0;
         }
 
         .no-print {
@@ -41,21 +53,87 @@
         }
 
         /* Scale 680px card to 3.375in (CR80): 3.375*96/680 = 0.476 */
+        #card-scaler { width: auto; }
         .membership-card {
           box-shadow: none !important;
-          transform: scale(0.476);
-          transform-origin: top left;
+          transform: scale(0.476) !important;
+          transform-origin: top left !important;
         }
       }
     </style>
   </head>
   <body>
-    <div class="no-print">
+    <div class="no-print d-flex flex-wrap gap-2 justify-content-center">
       <button class="btn btn-primary" onclick="window.print()">
-        <i class="bi bi-printer me-2"></i>Print Card
+        <i class="bi bi-printer me-1"></i>Print Card
       </button>
-      <%= link_to "Back to Profile", person_path(@person), class: 'btn btn-outline-secondary ms-2' %>
+      <%= link_to membership_card_image_path(@person), class: 'btn btn-outline-secondary', download: "sjaa-membership-card-#{@person.id}.svg" do %>
+        <i class="bi bi-filetype-svg me-1"></i>Download SVG
+      <% end %>
+      <button class="btn btn-outline-secondary" id="png-btn" onclick="downloadPng.call(this)">
+        <i class="bi bi-file-image me-1"></i>Download PNG
+      </button>
+      <%= link_to "Back to Profile", person_path(@person), class: 'btn btn-outline-secondary' %>
     </div>
-    <%= yield %>
+    <div id="card-scaler">
+      <%= yield %>
+    </div>
+    <script>
+      // Scale card to fit narrow screens
+      function scaleCard() {
+        var scaler = document.getElementById('card-scaler');
+        var card = scaler && scaler.querySelector('.membership-card');
+        if (!card) return;
+        var scale = Math.min(scaler.clientWidth / 680, 1);
+        card.style.transform = scale < 1 ? 'scale(' + scale + ')' : '';
+        scaler.style.height = scale < 1 ? (428 * scale) + 'px' : '';
+      }
+      document.addEventListener('DOMContentLoaded', scaleCard);
+      window.addEventListener('resize', scaleCard);
+
+      // Fetch the standalone SVG (base64-embedded images), draw to canvas, download as PNG
+      function downloadPng() {
+        var btn = this;
+        var original = btn.innerHTML;
+        btn.disabled = true;
+        btn.textContent = 'Generating…';
+
+        fetch('<%= membership_card_image_path(@person) %>')
+          .then(function(r) { return r.text(); })
+          .then(function(svg) {
+            var blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
+            var url  = URL.createObjectURL(blob);
+            var img  = new Image();
+            img.onload = function() {
+              var scale  = 3; // 3× → ~2040×1284px, good for print
+              var canvas = document.createElement('canvas');
+              canvas.width  = 680 * scale;
+              canvas.height = 428 * scale;
+              var ctx = canvas.getContext('2d');
+              ctx.scale(scale, scale);
+              ctx.drawImage(img, 0, 0, 680, 428);
+              URL.revokeObjectURL(url);
+              canvas.toBlob(function(pngBlob) {
+                var a = document.createElement('a');
+                a.href = URL.createObjectURL(pngBlob);
+                a.download = 'sjaa-membership-card-<%= @person.id %>.png';
+                a.click();
+                btn.disabled = false;
+                btn.innerHTML = original;
+              }, 'image/png');
+            };
+            img.onerror = function() {
+              btn.disabled = false;
+              btn.innerHTML = original;
+              alert('PNG generation failed — try downloading the SVG instead.');
+            };
+            img.src = url;
+          })
+          .catch(function() {
+            btn.disabled = false;
+            btn.innerHTML = original;
+          });
+      }
+    </script>
   </body>
 </html>

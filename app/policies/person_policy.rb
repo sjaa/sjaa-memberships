@@ -40,6 +40,10 @@ class PersonPolicy < ApplicationPolicy
     user&.has_permission?(:read) || user.id == record.id
   end
 
+  def card_image?
+    user&.has_permission?(:read) || user.id == record.id
+  end
+
   def verify?
     user&.has_permission?(:read) || user&.has_permission?(:verify_members)
   end

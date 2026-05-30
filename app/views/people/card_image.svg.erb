@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     viewBox="0 0 680 428" width="680" height="428">
+  <defs>
+    <!-- Clip entire card to rounded rect -->
+    <clipPath id="cardClip">
+      <rect x="0" y="0" width="680" height="428" rx="12" ry="12"/>
+    </clipPath>
+    <!-- Clip background image to the white body area only (below header, above footer) -->
+    <clipPath id="bodyClip">
+      <rect x="0" y="52" width="680" height="370"/>
+    </clipPath>
+    <!-- Clip profile photo to rounded rect -->
+    <clipPath id="photoClip">
+      <rect x="18" y="150" width="160" height="260" rx="6" ry="6"/>
+    </clipPath>
+  </defs>
+
+  <!-- Card background -->
+  <rect x="0" y="0" width="680" height="428" rx="12" ry="12" fill="white"/>
+
+  <g clip-path="url(#cardClip)">
+
+    <!-- ── Background texture ──
+         150% of 680px body width → 1020×999px, centered: x=(680-1020)/2=-170, y=52+(370-999)/2=-263
+         opacity 0.06 matches HTML's rgba(255,255,255,0.94) white overlay -->
+    <image href="<%= @bg_data_url %>"
+           x="-170" y="-263" width="1020" height="999"
+           opacity="0.06" clip-path="url(#bodyClip)"/>
+
+    <!-- ── Header ── -->
+    <rect x="0" y="0" width="680" height="52" fill="#1a2a4a"/>
+    <image href="<%= @logo_data_url %>" x="18" y="10" width="32" height="32" preserveAspectRatio="xMidYMid meet"/>
+    <text x="62" y="32" font-family="Arial, Helvetica, sans-serif" fill="white">
+      <tspan font-size="24" font-weight="700" letter-spacing="1">San Jose Astronomical Association</tspan>
+      <tspan font-size="10" opacity="0.75" letter-spacing="1.2" dx="6">MEMBERSHIP CARD</tspan>
+    </text>
+
+    <!-- ── Name row ── -->
+    <text x="18" y="104" font-family="Arial, Helvetica, sans-serif" font-size="48" font-weight="700" fill="#1a2a4a"><%= @person.first_name %> <%= @person.last_name %></text>
+    <text x="18" y="126" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#6c757d" letter-spacing="0.5">Member</text>
+
+    <!-- Divider -->
+    <line x1="18" y1="138" x2="662" y2="138" stroke="#e9ecef" stroke-width="1"/>
+
+    <!-- ── Bottom row ── -->
+
+    <!-- Profile photo -->
+    <% if @photo_data_url %>
+      <image href="<%= @photo_data_url %>" x="18" y="150" width="160" height="260"
+             clip-path="url(#photoClip)" preserveAspectRatio="xMidYMid slice"/>
+    <% else %>
+      <!-- Placeholder: filled background + person silhouette -->
+      <rect x="18" y="150" width="160" height="260" rx="6" fill="#e8edf5"/>
+      <circle cx="98" cy="255" r="38" fill="#8a9bbf"/>
+      <ellipse cx="98" cy="365" rx="56" ry="42" fill="#8a9bbf"/>
+    <% end %>
+    <rect x="18" y="150" width="160" height="260" rx="6" fill="none" stroke="#dddddd" stroke-width="2"/>
+
+    <!-- Member info (vertically centred in the 260px content zone y=150–410) -->
+    <text x="196" y="228" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6c757d" letter-spacing="0.9">MEMBER SINCE</text>
+    <text x="196" y="250" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="600" fill="#1a2a4a"><%= @member_since %></text>
+
+    <text x="196" y="278" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6c757d" letter-spacing="0.9">VALID THROUGH</text>
+    <text x="196" y="300" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="600" fill="#1a2a4a"><%= @valid_through %></text>
+
+    <!-- Status badge -->
+    <% badge_color = @active ? '#198754' : '#dc3545' %>
+    <% badge_label = @active ? 'ACTIVE' : 'EXPIRED' %>
+    <% badge_w     = @active ? 76 : 86 %>
+    <rect x="196" y="316" width="<%= badge_w %>" height="24" rx="12" ry="12" fill="<%= badge_color %>"/>
+    <text x="<%= 196 + badge_w / 2 %>" y="333" font-family="Arial, Helvetica, sans-serif" font-size="12"
+          font-weight="700" fill="white" text-anchor="middle" letter-spacing="1"><%= badge_label %></text>
+
+    <!-- QR code: 200×200 container, centred vertically: (260-200)/2=30 → top=180
+         x = 680-18-200 = 462; inner SVG at x=468, y=186, 188×188 -->
+    <rect x="462" y="180" width="200" height="200" rx="6" ry="6" fill="white" stroke="#dddddd" stroke-width="1"/>
+    <% if @qr_path_data %>
+      <svg x="468" y="186" width="188" height="188" viewBox="<%= @qr_viewbox %>">
+        <path d="<%= @qr_path_data %>" fill="#000000" fill-rule="evenodd"/>
+      </svg>
+    <% end %>
+    <text x="562" y="397" font-family="Arial, Helvetica, sans-serif" font-size="9" fill="#adb5bd" text-anchor="middle" letter-spacing="0.4">ID: <%= @person.id %></text>
+
+    <!-- ── Footer stripe ── -->
+    <rect x="0" y="422" width="680" height="6" fill="#1a2a4a"/>
+
+  </g>
+</svg>
