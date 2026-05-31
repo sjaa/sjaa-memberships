@@ -82,7 +82,8 @@ class AdminRenewalTest < ApplicationSystemTestCase
       click_button "Create Membership"
     end
 
-    # Verify success message
+    # Wait for Turbo navigation to complete before asserting on the new page
+    assert_current_path(person_path(@person), wait: 5)
     assert_text "Membership was successfully created for John Doe"
 
     # Verify the membership was created

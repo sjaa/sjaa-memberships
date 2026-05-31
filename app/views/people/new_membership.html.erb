@@ -71,9 +71,28 @@
         </tr>
       </table>
     </div>
-    <div class="col-md-4 col-sm-8 mt-4 mb-4" style="max-width: 400px;">
-      <div id="paypal-button-container" data-paypal-mode="<%=Rails.application.config.paypal_mode%>"></div>
+    <div class="col-12 mt-4">
+      <div class="form-check">
+        <input type="checkbox" class="form-check-input" id="age_certification" onchange="togglePayPalButton(this.checked)">
+        <label class="form-check-label" for="age_certification">
+          Membership is only available for folks 18 years of age or older. By checking this box, you certify that you are at least 18 years old.
+        </label>
+      </div>
     </div>
+    <div class="col-md-4 col-sm-8 mt-4 mb-4" style="max-width: 400px;">
+      <div id="paypal-button-wrapper" style="opacity: 0.4; pointer-events: none;">
+        <div id="paypal-button-container" data-paypal-mode="<%=Rails.application.config.paypal_mode%>"></div>
+      </div>
+      <p id="paypal-age-notice" class="text-muted"><small>Please check the box above to proceed with payment.</small></p>
+    </div>
+    <script>
+      function togglePayPalButton(checked) {
+        var wrapper = document.getElementById('paypal-button-wrapper');
+        wrapper.style.opacity = checked ? '1' : '0.4';
+        wrapper.style.pointerEvents = checked ? 'auto' : 'none';
+        document.getElementById('paypal-age-notice').style.display = checked ? 'none' : 'block';
+      }
+    </script>
     <!-- Bootstrap Modal for PayPal Success -->
     <div class="modal fade" id="paypalSuccessModal" tabindex="-1" aria-labelledby="paypalSuccessModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">

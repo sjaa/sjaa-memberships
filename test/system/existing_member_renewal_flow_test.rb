@@ -169,6 +169,31 @@ class ExistingMemberRenewalFlowTest < ApplicationSystemTestCase
     assert_text "Ephemeris"
   end
 
+  test "renewal form shows age certification checkbox" do
+    visit membership_renewal_path(id: @person.id)
+
+    assert_selector "#age_certification"
+    assert_text "Membership is only available for folks 18 years of age or older"
+  end
+
+  test "renewal form PayPal button is disabled before age certification" do
+    visit membership_renewal_path(id: @person.id)
+
+    wrapper = find("#paypal-button-wrapper")
+    assert_includes wrapper[:style], "pointer-events: none"
+    assert_text "Please check the box above to proceed with payment."
+  end
+
+  test "renewal form PayPal button enables after checking age certification" do
+    visit membership_renewal_path(id: @person.id)
+
+    check "age_certification"
+
+    wrapper = find("#paypal-button-wrapper")
+    assert_not_includes wrapper[:style], "pointer-events: none"
+    assert_no_text "Please check the box above to proceed with payment."
+  end
+
   test "renewal handles PayPal errors gracefully" do
     visit membership_renewal_path(id: @person.id)
 

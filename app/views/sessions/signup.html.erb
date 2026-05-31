@@ -30,6 +30,12 @@
       <%= form.label :password, class: 'form-label' %>
       <%= form.password_field :password, class: 'form-control' %>
     </div>
+    <div class="col-12 mt-3">
+      <div class="form-check">
+        <%= check_box_tag :age_certification, "1", false, required: true, class: 'form-check-input', id: 'age_certification' %>
+        <%= label_tag :age_certification, "Membership is only available for folks 18 years of age or older. By checking this box, you certify that you are at least 18 years old.", class: 'form-check-label' %>
+      </div>
+    </div>
     <div class="col-12 mt-2">
     <%= form.submit 'Sign Up', class: 'btn btn-success mt-2' %>
     </div>

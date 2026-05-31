@@ -24,6 +24,7 @@ class NewMemberSignupFlowTest < ApplicationSystemTestCase
     fill_in "last_name", with: "Smith"
     fill_in "email", with: "jane@example.com"
     fill_in "password", with: "newpassword123"
+    check "age_certification"
     click_on "Sign Up"
 
     # Should redirect to login page with notice
@@ -73,6 +74,7 @@ class NewMemberSignupFlowTest < ApplicationSystemTestCase
     fill_in "last_name", with: "Smith"
     fill_in "email", with: "john@example.com"  # Use existing email
     fill_in "password", with: "newpassword123"
+    check "age_certification"
     click_on "Sign Up"
 
     # Should redirect to login with error message
@@ -168,12 +170,44 @@ class NewMemberSignupFlowTest < ApplicationSystemTestCase
   test "new member signup validates required fields" do
     visit signup_path
 
-    # Try to submit without required fields
+    # Check the age box so browser validation passes, but leave name/email/password empty
+    check "age_certification"
     click_on "Sign Up"
 
-    # Should redirect back to signup with error message
+    # Server-side check catches the missing fields
     assert_text "Please fill in *all* fields"
     assert_current_path signup_path
+  end
+
+  test "signup form requires age certification checkbox" do
+    visit signup_path
+
+    fill_in "first_name", with: "Jane"
+    fill_in "last_name", with: "Smith"
+    fill_in "email", with: "jane@example.com"
+    fill_in "password", with: "newpassword123"
+    # intentionally do not check age_certification
+
+    click_on "Sign Up"
+
+    # Browser HTML5 validation blocks submission; we stay on the signup page
+    assert_current_path signup_path
+    assert_no_text "We sent you an email"
+  end
+
+  test "signup form proceeds when age certification is checked" do
+    visit signup_path
+
+    fill_in "first_name", with: "Jane"
+    fill_in "last_name", with: "Smith"
+    fill_in "email", with: "jane@example.com"
+    fill_in "password", with: "newpassword123"
+    check "age_certification"
+
+    click_on "Sign Up"
+
+    assert_text "We sent you an email to complete the sign up process"
+    assert_current_path login_path
   end
 
   test "clicking confirmation link twice does not create duplicate person" do
@@ -184,6 +218,7 @@ class NewMemberSignupFlowTest < ApplicationSystemTestCase
     fill_in "last_name", with: "Jones"
     fill_in "email", with: "bob@example.com"
     fill_in "password", with: "password123"
+    check "age_certification"
     click_on "Sign Up"
 
     # Should redirect to login page with notice

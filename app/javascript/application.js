@@ -33,6 +33,13 @@ function loadPayPalButtons() {
       paypal.Buttons({
         env: container.dataset.paypal_mode, // Valid values are sandbox and live.
         createOrder: async () => {
+          // Enforce age certification if checkbox is present
+          const ageCert = document.getElementById('age_certification');
+          if (ageCert && !ageCert.checked) {
+            showPayPalError('Please certify that you are at least 18 years old before proceeding.');
+            return;
+          }
+
           // Get the form element
           const form = document.getElementById('new_membership');
 

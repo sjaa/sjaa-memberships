@@ -24,8 +24,11 @@ module SjaaMembers
     #config.assets.paths = [Rails.root.join("app/assets")]
     config.assets.paths << Rails.root.join("app/javascript")
 
-    # Use app-based auth for mission control
+    # Use app-based auth for mission control (pre-set user/password to prevent
+    # the gem from trying to read Rails credentials, which we don't use)
     config.mission_control.jobs.http_basic_auth_enabled = false
+    config.mission_control.jobs.http_basic_auth_user = ""
+    config.mission_control.jobs.http_basic_auth_password = ""
 
     # Configuration for the application, engines, and railties goes here.
     #
