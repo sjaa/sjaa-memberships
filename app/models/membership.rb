@@ -4,6 +4,7 @@ class Membership < ApplicationRecord
   belongs_to :kind, class_name: 'MembershipKind', required: false
   before_save :update_end_date
   after_commit :add_to_members_group, on: [:create]
+  after_commit :add_to_default_groups, on: [:create]
   inheritance_column = :inherits
 
   def is_active?
@@ -70,6 +71,21 @@ class Membership < ApplicationRecord
       AddMemberToGroupJob.perform_later(person.id, admin_email)
     else
       Rails.logger.warn "[Membership] Could not queue AddMemberToGroupJob - admin_email: #{admin_email}, person_id: #{person&.id}"
+    end
+  end
+
+  def add_to_default_groups
+    return unless person.present?
+    return unless Membership.where(person: person).count == 1
+
+    admin_email = Admin.where.not(refresh_token: nil).first&.email
+
+    Group.where(joinable: true, default_membership: true).each do |group|
+      person.groups << group unless person.groups.include?(group)
+
+      if admin_email.present? && group.email.present?
+        AddMemberToGroupJob.perform_later(person.id, admin_email, group.email)
+      end
     end
   end
 end

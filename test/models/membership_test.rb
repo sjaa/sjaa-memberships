@@ -356,4 +356,63 @@ class MembershipTest < ActiveSupport::TestCase
       @membership.update!(term_months: 24)
     end
   end
+
+  # default_membership group assignment tests
+
+  test 'first membership creation adds person to default_membership joinable groups' do
+    default_group = Group.create!(name: 'General Members', email: 'general@sjaa.net', joinable: true, default_membership: true)
+    opt_in_group  = Group.create!(name: 'Observers',       email: 'obs@sjaa.net',     joinable: true, default_membership: false)
+
+    @membership.save!
+    @person.reload
+
+    assert_includes @person.groups, default_group
+    assert_not_includes @person.groups, opt_in_group
+  end
+
+  test 'first membership creation does not add non-joinable default_membership groups' do
+    non_joinable = Group.create!(name: 'Board', email: 'board@sjaa.net', joinable: false, default_membership: true)
+
+    @membership.save!
+    @person.reload
+
+    assert_not_includes @person.groups, non_joinable
+  end
+
+  test 'renewal does not add default_membership groups again' do
+    default_group = Group.create!(name: 'General Members', email: 'general@sjaa.net', joinable: true, default_membership: true)
+
+    # First membership
+    @membership.save!
+
+    # Person opts out by removing the group
+    @person.groups.delete(default_group)
+    @person.reload
+    assert_not_includes @person.groups, default_group
+
+    # Renewal (second membership)
+    Membership.create!(person: @person, start: @membership.end + 1.day, term_months: 12)
+    @person.reload
+
+    assert_not_includes @person.groups, default_group, "Renewal should not re-add default groups"
+  end
+
+  test 'first membership queues Google sync job for each default group with email' do
+    admin = Admin.create!(email: 'vp@sjaa.net', password: 'password123', refresh_token: 'tok')
+    default_group = Group.create!(name: 'General Members', email: 'general@sjaa.net', joinable: true, default_membership: true)
+
+    assert_enqueued_with(job: AddMemberToGroupJob, args: [@person.id, admin.email, default_group.email]) do
+      @membership.save!
+    end
+  end
+
+  test 'first membership does not queue Google sync for default group without email' do
+    Admin.create!(email: 'vp@sjaa.net', password: 'password123', refresh_token: 'tok')
+    Group.create!(name: 'Internal', email: nil, joinable: true, default_membership: true)
+
+    # Only the AddMemberToGroupJob for the main members group should be enqueued (no job for the email-less group)
+    assert_enqueued_jobs 1, only: AddMemberToGroupJob do
+      @membership.save!
+    end
+  end
 end

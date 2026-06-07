@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_01_22_044535) do
+ActiveRecord::Schema[7.1].define(version: 2026_06_07_212031) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
   enable_extension "plpgsql"
@@ -215,6 +215,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_22_044535) do
     t.string "discord_id"
     t.boolean "joinable", default: false
     t.boolean "members_only", default: false
+    t.boolean "default_membership", default: false, null: false
   end
 
   create_table "groups_people", id: false, force: :cascade do |t|

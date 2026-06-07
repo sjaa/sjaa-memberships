@@ -38,6 +38,15 @@
         <%= form.label :members_only, "Sync only active members to Google Group", class: "form-check-label" %>
       </div>
     </div>
+    <div class="col-md-6 col-xs-12 mt-2">
+      <div class="form-check">
+        <%= form.check_box :default_membership, class: 'form-check-input' %>
+        <%= form.label :default_membership, "Add new members by default (opt-out)", class: "form-check-label" %>
+      </div>
+      <small class="form-text text-muted">
+        When enabled, new members will be pre-selected for this group when filling out their profile.
+      </small>
+    </div>
     <div class="col-12 mt-2">
       <%= form.submit class: 'btn btn-primary' %>
     </div>

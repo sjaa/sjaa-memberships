@@ -142,6 +142,6 @@ class GroupsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def group_params
-      params.require(:group).permit(:discord_id, :name, :short_name, :email, :joinable, :members_only)
+      params.require(:group).permit(:discord_id, :name, :short_name, :email, :joinable, :members_only, :default_membership)
     end
 end

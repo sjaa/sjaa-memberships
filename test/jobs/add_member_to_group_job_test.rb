@@ -140,6 +140,27 @@ class AddMemberToGroupJobTest < ActiveJob::TestCase
     end
   end
 
+  test "job uses provided group_email instead of default members_group" do
+    custom_group_email = "custom-group@sjaa.net"
+    inserted_group = nil
+
+    mock_auth = Object.new
+    mock_client = Object.new
+    def mock_client.authorization=(auth); end
+    def mock_client.insert_member(group, member)
+      @inserted_group = group
+    end
+
+    self.stub :get_auth, mock_auth do
+      Google::Apis::AdminDirectoryV1::DirectoryService.stub :new, mock_client do
+        AddMemberToGroupJob.perform_now(@person.id, @admin.email, custom_group_email)
+        inserted_group = mock_client.instance_variable_get(:@inserted_group)
+      end
+    end
+
+    assert_equal custom_group_email, inserted_group
+  end
+
   test "membership creation callback uses admin with refresh token" do
     assert_not_nil @admin.refresh_token
 

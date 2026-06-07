@@ -3,12 +3,13 @@ class AddMemberToGroupJob < ApplicationJob
   include JobsHelper
   include GoogleHelper
 
-  # AddMemberToGroupJob.perform_later(person_id, admin_email)
-  #   person_id - ID of the person to add to the members group
+  # AddMemberToGroupJob.perform_later(person_id, admin_email, group_email)
+  #   person_id   - ID of the person to add to the group
   #   admin_email - Email of admin account with Google Groups access (e.g. vp@sjaa.net)
+  #   group_email - Google Group email to add the person to (defaults to the configured members group)
   #
-  # Adds a newly active member to the members@sjaa.net Google Group
-  def perform(person_id, admin_email = nil)
+  # Adds a newly active member to a Google Group
+  def perform(person_id, admin_email = nil, group_email = nil)
     person = Person.find_by(id: person_id)
 
     unless person
@@ -42,6 +43,8 @@ class AddMemberToGroupJob < ApplicationJob
       return
     end
 
+    target_group = group_email.present? ? group_email : members_group
+
     begin
       # Get Google API authorization
       Rails.logger.debug "[AddMemberToGroupJob] Getting Google API authorization for admin: #{admin.email}"
@@ -64,25 +67,24 @@ class AddMemberToGroupJob < ApplicationJob
       )
       Rails.logger.debug "[AddMemberToGroupJob] Member object created: #{member.inspect}"
       Rails.logger.debug "[AddMemberToGroupJob] Member as JSON: #{member.to_json}"
-      Rails.logger.debug "[AddMemberToGroupJob] Calling insert_member with group: #{members_group}"
+      Rails.logger.debug "[AddMemberToGroupJob] Calling insert_member with group: #{target_group}"
+      client.insert_member(target_group, member)
 
-      client.insert_member(members_group, member)
-
-      Rails.logger.info "[AddMemberToGroupJob] Successfully added #{email} to #{members_group}"
+      Rails.logger.info "[AddMemberToGroupJob] Successfully added #{email} to #{target_group}"
 
     rescue Google::Apis::ClientError => e
       # Handle duplicate member error gracefully (409 Conflict or 'Member already exists' message)
       if e.status_code == 409 || e.message.include?("Member already exists") || e.message.include?("duplicate")
-        Rails.logger.info "[AddMemberToGroupJob] Person #{person.id} (#{email}) is already in #{members_group}"
+        Rails.logger.info "[AddMemberToGroupJob] Person #{person.id} (#{email}) is already in #{target_group}"
         return
       end
 
-      Rails.logger.error "[AddMemberToGroupJob] Failed to add #{email} to #{members_group}: #{e.class.name} - #{e.message}"
+      Rails.logger.error "[AddMemberToGroupJob] Failed to add #{email} to #{target_group}: #{e.class.name} - #{e.message}"
       Rails.logger.error "[AddMemberToGroupJob] Error details: #{e.inspect}"
       Rails.logger.error e.backtrace.join("\n")
       raise e
     rescue => e
-      Rails.logger.error "[AddMemberToGroupJob] Failed to add #{email} to #{members_group}: #{e.class.name} - #{e.message}"
+      Rails.logger.error "[AddMemberToGroupJob] Failed to add #{email} to #{target_group}: #{e.class.name} - #{e.message}"
       Rails.logger.error "[AddMemberToGroupJob] Error details: #{e.inspect}"
       Rails.logger.error e.backtrace.join("\n")
       raise e

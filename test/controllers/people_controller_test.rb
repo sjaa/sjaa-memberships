@@ -921,6 +921,67 @@ class PeopleControllerTest < ActionDispatch::IntegrationTest
     assert_no_match /membership has expired/, flash[:notice], "Should not show warning when no groups are removed"
   end
 
+  # default_membership group tests
+  test "creating a person with a default_membership group ID assigns the group" do
+    write_permission = Permission.find_or_create_by(name: 'write')
+    @admin.permissions << write_permission unless @admin.permissions.include?(write_permission)
+    login_as_admin(@admin)
+    default_group = Group.create!(name: "General Members", email: "general@sjaa.net", joinable: true, default_membership: true)
+
+    stub_google_api_not_called do
+      post people_path, params: {
+        person: {
+          first_name: "New",
+          last_name: "Member",
+          joinable_group_ids: ["", default_group.id]
+        }
+      }
+    end
+
+    person = Person.find_by(first_name: "New", last_name: "Member")
+    assert_not_nil person
+    assert_includes person.groups, default_group
+  end
+
+  test "creating a person without selecting a default_membership group does not assign it" do
+    write_permission = Permission.find_or_create_by(name: 'write')
+    @admin.permissions << write_permission unless @admin.permissions.include?(write_permission)
+    login_as_admin(@admin)
+    default_group = Group.create!(name: "General Members", email: "general@sjaa.net", joinable: true, default_membership: true)
+
+    stub_google_api_not_called do
+      post people_path, params: {
+        person: {
+          first_name: "Opt",
+          last_name: "Out",
+          joinable_group_ids: [""]
+        }
+      }
+    end
+
+    person = Person.find_by(first_name: "Opt", last_name: "Out")
+    assert_not_nil person
+    assert_not_includes person.groups, default_group
+  end
+
+  test "default_membership does not affect existing person edit" do
+    login_as_admin(@admin)
+    default_group = Group.create!(name: "General Members", email: "general@sjaa.net", joinable: true, default_membership: true)
+
+    stub_google_api_not_called do
+      patch person_path(@member), params: {
+        person: {
+          first_name: @member.first_name,
+          last_name: @member.last_name,
+          joinable_group_ids: [""]
+        }
+      }
+    end
+
+    @member.reload
+    assert_not_includes @member.groups, default_group
+  end
+
   private
 
   def login_as_admin(admin)
