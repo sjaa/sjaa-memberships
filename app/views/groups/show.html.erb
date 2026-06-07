@@ -1,4 +1,13 @@
-<%= render partial: 'group', locals: {group: @group, show_people: true} %>
+<div class="col-12">
+  <h1><%= @group&.name %> <small><%=@group.short_name.present? ? '(' + @group.short_name + ')' : ''%></small></h1>
+  <%= render partial: 'layouts/object_table', locals: {obj: @group} %>
+</div>
+
+<div class="mt-3 d-flex gap-2">
+  <%= link_to "Edit this group", edit_group_path(@group), class: 'btn btn-primary' %>
+  <%= link_to "Back to groups", groups_path, class: 'btn btn-secondary' %>
+  <%= button_to "Destroy this group", @group, method: :delete, class: 'btn btn-danger', data: {turbo_confirm: 'Are you sure?'} %>
+</div>
 
 <% if @group.email.present? %>
   <div class="card mt-4">
@@ -28,8 +37,4 @@
   </div>
 <% end %>
 
-<div class="mt-3">
-  <%= link_to "Edit this group", edit_group_path(@group), class: 'btn btn-primary' %>
-  <%= link_to "Back to groups", groups_path, class: 'btn btn-secondary' %>
-  <%= button_to "Destroy this group", @group, method: :delete, class: 'btn btn-danger d-inline-block', data: {turbo_confirm: 'Are you sure?'} %>
-</div>
+<%= render partial: 'group', locals: {group: @group, show_people: true} %>
