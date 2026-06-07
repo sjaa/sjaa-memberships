@@ -291,7 +291,7 @@
       <%= render partial: 'donations/index', locals: {donations: @person.donations} %>
     <% end %>
     <!-- Admin Actions -->
-    <% if @user.is_a?(Admin) %>
+    <% if @user.is_a?(Admin) && @user.has_permission?(:write) %>
       <div class="col-12">
         <div class="card border-danger">
           <div class="card-header bg-danger text-white">
