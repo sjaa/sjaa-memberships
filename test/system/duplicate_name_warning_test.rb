@@ -37,6 +37,7 @@ class DuplicateNameWarningTest < ApplicationSystemTestCase
     fill_in "last_name", with: "Smyth"
     fill_in "email", with: "john.smyth@example.com"
     fill_in "password", with: "newpassword123"
+    check 'age_certification'
     click_on "Sign Up"
 
     # Should redirect back to signup page with warning
@@ -64,6 +65,7 @@ class DuplicateNameWarningTest < ApplicationSystemTestCase
     fill_in "last_name", with: "Smyth"
     fill_in "email", with: "john.smyth@example.com"
     fill_in "password", with: "newpassword123"
+    check 'age_certification'
     click_on "Sign Up"
 
     # Should show warning and redirect back to signup
@@ -77,6 +79,7 @@ class DuplicateNameWarningTest < ApplicationSystemTestCase
 
     # User can proceed by submitting again (acknowledge_warning is now set in hidden field)
     fill_in "password", with: "newpassword123"  # Password not repopulated for security
+    check 'age_certification'
     click_on "Sign Up"
 
     # This time it should proceed (warning acknowledged)
@@ -92,6 +95,7 @@ class DuplicateNameWarningTest < ApplicationSystemTestCase
     fill_in "last_name", with: "Johnson"
     fill_in "email", with: "alice.johnson@example.com"
     fill_in "password", with: "password123"
+    check 'age_certification'
     click_on "Sign Up"
 
     # Should proceed to login page without warning
@@ -122,6 +126,7 @@ class DuplicateNameWarningTest < ApplicationSystemTestCase
     fill_in "last_name", with: "Smith"
     fill_in "email", with: "new.john.smith@example.com"
     fill_in "password", with: "password123"
+    check 'age_certification'
     click_on "Sign Up"
 
     # Should show warning with multiple similar names
@@ -139,6 +144,7 @@ class DuplicateNameWarningTest < ApplicationSystemTestCase
     fill_in "last_name", with: "Smith"
     fill_in "email", with: "different.email@example.com"
     fill_in "password", with: "password123"
+    check 'age_certification'
     click_on "Sign Up"
 
     # Should show warning with percentage match
@@ -154,6 +160,7 @@ class DuplicateNameWarningTest < ApplicationSystemTestCase
     fill_in "last_name", with: "Person"
     fill_in "email", with: "john.smith@example.com"  # Existing email
     fill_in "password", with: "password123"
+    check 'age_certification'
     click_on "Sign Up"
 
     # Should redirect to login with error (not just warning)
@@ -170,6 +177,7 @@ class DuplicateNameWarningTest < ApplicationSystemTestCase
     fill_in "last_name", with: "Smyth"
     fill_in "email", with: "john.smyth@example.com"
     fill_in "password", with: "password123"
+    check 'age_certification'
     click_on "Sign Up"
 
     # Should have warning alert (not danger/error alert)
@@ -196,6 +204,7 @@ class DuplicateNameWarningTest < ApplicationSystemTestCase
     fill_in "last_name", with: "User"
     fill_in "email", with: "regular@example.com"
     fill_in "password", with: "password123"
+    check 'age_certification'
 
     # Should not crash
     assert_nothing_raised do

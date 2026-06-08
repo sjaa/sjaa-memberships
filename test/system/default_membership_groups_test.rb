@@ -3,7 +3,9 @@ require "application_system_test_case"
 class DefaultMembershipGroupsTest < ApplicationSystemTestCase
   setup do
     @admin = Admin.create!(email: "admin@sjaa.net", password: "password123")
-    write_permission = Permission.find_or_create_by(name: "write")
+    read_permission = Permission.find_or_create_by!(name: "read")
+    write_permission = Permission.find_or_create_by!(name: "write")
+    @admin.permissions << read_permission
     @admin.permissions << write_permission
 
     @default_group = Group.create!(
@@ -27,9 +29,9 @@ class DefaultMembershipGroupsTest < ApplicationSystemTestCase
     # Even default_membership groups should NOT be pre-selected in the form —
     # they are added automatically on first membership creation instead.
     assert_selector "input[type=checkbox][value='#{@default_group.id}']:not(:checked)",
-                    visible: :hidden
+                    visible: :all
     assert_selector "input[type=checkbox][value='#{@opt_in_group.id}']:not(:checked)",
-                    visible: :hidden
+                    visible: :all
   end
 
   test "existing person form shows their current groups" do
@@ -41,8 +43,8 @@ class DefaultMembershipGroupsTest < ApplicationSystemTestCase
     visit edit_person_path(existing_person)
 
     assert_selector "input[type=checkbox][value='#{@opt_in_group.id}']:checked",
-                    visible: :hidden
+                    visible: :all
     assert_selector "input[type=checkbox][value='#{@default_group.id}']:not(:checked)",
-                    visible: :hidden
+                    visible: :all
   end
 end

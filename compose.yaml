@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:17.6
+    image: sjaa-memberships-db
     platform: linux/amd64
     container_name: postgres_container
     build:
