@@ -3,7 +3,7 @@ source "https://rubygems.org"
 ruby "3.4.9"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
-gem "rails", "~> 7.1.5.2"
+gem "rails", "~> 7.2.3"
 
 # The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
 # Propshaft replacement asset pipeline that doesn't require sassc
@@ -31,7 +31,7 @@ gem "jbuilder"
 # gem "kredis"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
-gem "bcrypt", "~> 3.1.20"
+gem "bcrypt", ">= 3.1.22"
 gem "pundit"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
@@ -98,13 +98,18 @@ gem 'airbrake'
 gem "mission_control-jobs"
 gem 'connection_pool'
 
-# Security udpates
-gem "rack", ">= 3.2.3"
+# Security updates
+gem "rack", ">= 3.2.6"
 gem "rexml", ">= 3.4.2"
-gem "nokogiri", ">= 1.18.9"
-gem "rack-session", ">= 2.1.1"
-gem "net-imap", ">= 0.5.7"
+gem "nokogiri", ">= 1.19.3"
+gem "rack-session", ">= 2.1.2"
+gem "net-imap", ">= 0.6.4"
 gem "uri", ">= 1.0.3"
+gem "jwt", ">= 3.2.0"
+gem "faraday", ">= 2.14.2"
+gem "loofah", ">= 2.25.1"
+gem "json", ">= 2.17.1.2"
+gem "erb", ">= 6.0.1.1"
 
 # To authenticate to the GitHub Packages RubyGems registry, use one of the following methods:
 # bundle config set --global https://rubygems.pkg.github.com/sjaa USERNAME:TOKEN
