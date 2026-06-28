@@ -59,6 +59,17 @@
     </div>
     <% if @user.is_a?(Admin) %>
       <div class="col-md-6 mt-2">
+        <%= form.label :deceased, 'Mark as Deceased', class: 'form-label mb-0' %>
+        <br/>
+        <small class="form-text text-muted">
+          Check if this member has passed away. This is for internal record-keeping only.
+        </small>
+        <div class="form-check mt-1">
+          <%= form.check_box :deceased, class: 'form-check-input' %>
+          <%= form.label :deceased, 'Deceased', class: 'form-check-label' %>
+        </div>
+      </div>
+      <div class="col-md-6 mt-2">
         <%= form.label :discord_id, 'Discord ID', class: 'form-label mb-0' %>
         <br/>
         <small class="form-text text-muted">

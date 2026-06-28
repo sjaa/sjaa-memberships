@@ -92,6 +92,7 @@ class Person < ApplicationRecord
   end
 
   def status
+    return 'Departed' if deceased?
     is_active? ? 'Active' : 'Expired'
   end
 

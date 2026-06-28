@@ -6,8 +6,11 @@
         <div class="card-body p-4">
           <h1 class="mb-3">
             <%= @person.first_name %> <%= @person.last_name %>
+            <% if @person.deceased? %>
+              <span class="badge bg-primary fs-6 align-middle ms-2">Departed</span>
+            <% end %>
           </h1>
-          <% unless @person.latest_membership&.is_active? %>
+          <% unless @person.deceased? || @person.latest_membership&.is_active? %>
             <div class="alert alert-warning mb-3 mb-0" role="alert">
               <strong>Membership Inactive:</strong>
               <%= link_to "Renew your membership", membership_renewal_path(id: @person.id), class: 'alert-link' %>

@@ -188,12 +188,12 @@
       <tbody class="table-group-divider">
         <% @people.each do |person| %>
           <% active_membership = person.membership_map(@active_memberships, true)&.last %>
-          <% active = active_membership ? 'ACTIVE' : 'INACTIVE' %>
+          <% active = person.deceased? ? 'DEPARTED' : (active_membership ? 'ACTIVE' : 'INACTIVE') %>
           <tr>
             <td>
               <input type="checkbox" class="form-check-input" value="<%= person.id %>" data-bulk-actions-target="checkbox" data-action="change->bulk-actions#toggleOne">
             </td>
-            <td class="<%=active.downcase%>"><%=active%></td>
+            <td class="<%=active.downcase.gsub(' ', '-')%>"><%=active%></td>
             <td><%=link_to "#{person.first_name} #{person.last_name}", person_path(person.id), data: {turbo: false} %></td>
             <td><%=person.contacts.map(&:email).join('<br/>').html_safe%></td>
             <td data-column="phone" class="column-hidden"><%=person.contacts.map(&:phone).join('<br/>').html_safe%></td>

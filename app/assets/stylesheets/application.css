@@ -32,6 +32,13 @@ div.hw-combobox__main__wrapper {
   font-weight: bold;
 }
 
+.departed {
+  background-color: rgba(13, 110, 253, 0.1) !important;
+  color: rgb(13, 110, 253) !important;
+  text-align: center;
+  font-weight: bold;
+}
+
 hr.thick {
   background-color: black;
   height: 5px;
