@@ -102,6 +102,48 @@ class PeopleController < ApplicationController
     }
   end
 
+  def bulk_update_permissions
+    authorize Person, :bulk_update_permissions?, policy_class: PersonPolicy
+
+    person_ids = params[:person_ids] || []
+    permission_ids = params[:permission_ids] || []
+    operation = params[:operation]
+
+    if person_ids.empty? || permission_ids.empty?
+      render json: { error: 'Please select at least one person and one permission' }, status: :unprocessable_content
+      return
+    end
+
+    unless %w[grant revoke].include?(operation)
+      render json: { error: 'Invalid operation' }, status: :unprocessable_content
+      return
+    end
+
+    people = Person.where(id: person_ids)
+    permissions = Permission.where(id: permission_ids)
+    changed_count = 0
+
+    people.each do |person|
+      permissions.each do |permission|
+        if operation == 'grant' && !person.permissions.include?(permission)
+          person.permissions << permission
+          changed_count += 1
+        elsif operation == 'revoke' && person.permissions.include?(permission)
+          person.permissions.delete(permission)
+          changed_count += 1
+        end
+      end
+    end
+
+    verb = operation == 'grant' ? 'granted' : 'revoked'
+    render json: {
+      message: "Successfully #{verb} #{permissions.count} permission(s) for #{people.count} person(s). #{changed_count} change(s) made.",
+      changed_count: changed_count,
+      people_count: people.count,
+      permissions_count: permissions.count
+    }
+  end
+
   # POST /people/:id/approve_mentorship
   def approve_mentorship
     if @person.approve_mentorship!

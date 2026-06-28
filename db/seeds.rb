@@ -10,6 +10,11 @@
 require_relative('./sjaa_port')
 include SjaaPort
 
+# Ensure core permissions always exist
+%w[read write permit verify_members].each do |name|
+  Permission.find_or_create_by!(name: name)
+end
+
 # Application configuration
 # These values should be updated with actual credentials after deployment
 puts "Creating application configuration..."

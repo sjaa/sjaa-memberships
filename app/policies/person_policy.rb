@@ -56,6 +56,10 @@ class PersonPolicy < ApplicationPolicy
     user&.has_permission?(:write)
   end
 
+  def bulk_update_permissions?
+    user&.has_permission?(:permit)
+  end
+
   def approve_mentorship?
     user&.has_permission?(:write)
   end

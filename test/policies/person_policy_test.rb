@@ -131,6 +131,36 @@ class PersonPolicyTest < ActiveSupport::TestCase
     assert_not policy.search?
   end
 
+  # bulk_update_permissions policy tests
+  test "admin with permit permission can bulk_update_permissions" do
+    permit_permission = Permission.find_or_create_by(name: 'permit')
+    admin_with_permit = Admin.create!(email: "admin_permit@sjaa.net", password: "password123")
+    admin_with_permit.permissions << permit_permission
+
+    policy = PersonPolicy.new(admin_with_permit, @target_person)
+    assert policy.bulk_update_permissions?
+  end
+
+  test "admin with only write permission cannot bulk_update_permissions" do
+    policy = PersonPolicy.new(@admin_with_write, @target_person)
+    assert_not policy.bulk_update_permissions?
+  end
+
+  test "admin with only read permission cannot bulk_update_permissions" do
+    policy = PersonPolicy.new(@admin_with_read, @target_person)
+    assert_not policy.bulk_update_permissions?
+  end
+
+  test "regular person cannot bulk_update_permissions" do
+    policy = PersonPolicy.new(@regular_person, @target_person)
+    assert_not policy.bulk_update_permissions?
+  end
+
+  test "unauthenticated user cannot bulk_update_permissions" do
+    policy = PersonPolicy.new(nil, @target_person)
+    assert_not policy.bulk_update_permissions?
+  end
+
   # Remind permission tests (existing functionality)
   test "admin with write permission can send reminders" do
     policy = PersonPolicy.new(@admin_with_write, @target_person)

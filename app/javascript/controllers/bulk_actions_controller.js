@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 // Connects to data-controller="bulk-actions"
 export default class extends Controller {
-  static targets = ["checkbox", "selectAll", "selectedCount", "submitButton", "groupSelector"]
+  static targets = ["checkbox", "selectAll", "selectedCount", "submitButton", "groupSelector", "permissionSelector", "permissionGrantButton", "permissionRevokeButton"]
   static values = {
     csrfToken: String
   }
@@ -43,6 +43,14 @@ export default class extends Controller {
     // Enable/disable submit button based on selection
     if (this.hasSubmitButtonTarget) {
       this.submitButtonTarget.disabled = selectedCount === 0
+    }
+
+    // Enable/disable permission buttons based on selection
+    if (this.hasPermissionGrantButtonTarget) {
+      this.permissionGrantButtonTarget.disabled = selectedCount === 0
+    }
+    if (this.hasPermissionRevokeButtonTarget) {
+      this.permissionRevokeButtonTarget.disabled = selectedCount === 0
     }
   }
 
@@ -95,6 +103,56 @@ export default class extends Controller {
         window.location.reload()
       } else {
         alert(data.error || 'An error occurred while adding people to groups')
+      }
+    } catch (error) {
+      console.error('Error:', error)
+      alert('An error occurred while processing your request')
+    }
+  }
+
+  async submitPermissions(event) {
+    event.preventDefault()
+
+    const operation = event.currentTarget.dataset.operation
+    const selectedCheckboxes = this.checkboxTargets.filter(cb => cb.checked)
+    const personIds = selectedCheckboxes.map(cb => cb.value)
+
+    if (personIds.length === 0) {
+      alert('Please select at least one person')
+      return
+    }
+
+    const permissionIds = Array.from(this.permissionSelectorTarget.selectedOptions).map(option => option.value)
+
+    if (!permissionIds || permissionIds.length === 0) {
+      alert('Please select at least one permission')
+      return
+    }
+
+    try {
+      const response = await fetch('/people/bulk_update_permissions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': this.csrfTokenValue
+        },
+        body: JSON.stringify({
+          person_ids: personIds,
+          permission_ids: permissionIds,
+          operation: operation
+        })
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        alert(data.message)
+        this.checkboxTargets.forEach(cb => cb.checked = false)
+        this.permissionSelectorTarget.selectedIndex = -1
+        this.updateUI()
+        window.location.reload()
+      } else {
+        alert(data.error || 'An error occurred while updating permissions')
       }
     } catch (error) {
       console.error('Error:', error)

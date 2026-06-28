@@ -39,6 +39,7 @@ Rails.application.routes.draw do
   post '/people/search', to: 'people#search', as: :people_search
   get '/people/search', to: 'people#search'
   post '/people/bulk_add_to_groups', to: 'people#bulk_add_to_groups', as: :bulk_add_to_groups
+  post '/people/bulk_update_permissions', to: 'people#bulk_update_permissions', as: :bulk_update_permissions
   post '/donations/search', to: 'donations#search', as: :donations_search
   get '/donations/search', to: 'donations#search'
   get '/donations/letter/:id', to: 'donations#send_letter', as: :donations_letter

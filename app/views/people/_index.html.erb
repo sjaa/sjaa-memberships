@@ -73,6 +73,12 @@
                     <%= label_tag 'column_telescopius', 'Telescopius', class: 'form-check-label' %>
                   </div>
                 </div>
+                <div class="col-md-3 col-sm-6">
+                  <div class="form-check">
+                    <%= check_box_tag 'column_permissions', 'permissions', false, class: 'form-check-input', data: { column_visibility_target: 'checkbox', column: 'permissions', action: 'change->column-visibility#toggle' } %>
+                    <%= label_tag 'column_permissions', 'Permissions', class: 'form-check-label' %>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -111,6 +117,32 @@
                   </button>
                 </div>
               </div>
+              <% if @user.has_permission?(:permit) %>
+              <hr>
+              <div class="row">
+                <div class="col-12 mb-3">
+                  <p class="mb-2">Grant or revoke permissions for the selected people:</p>
+                </div>
+                <div class="col-md-8 col-sm-12 mb-3">
+                  <label for="bulk_permission_selector" class="form-label">Select Permissions:</label>
+                  <select id="bulk_permission_selector" name="permission_ids[]" multiple class="form-select" size="5" data-bulk-actions-target="permissionSelector">
+                    <% Permission.order(:name).each do |permission| %>
+                      <option value="<%= permission.id %>"><%= permission.name %></option>
+                    <% end %>
+                  </select>
+                  <small class="text-muted">Hold Ctrl (Cmd on Mac) to select multiple permissions</small>
+                </div>
+                <div class="col-md-4 col-sm-12 mb-3">
+                  <label class="form-label d-block">&nbsp;</label>
+                  <button type="button" class="btn btn-success w-100 mb-2" data-bulk-actions-target="permissionGrantButton" data-action="click->bulk-actions#submitPermissions" data-operation="grant" disabled>
+                    Grant Permissions
+                  </button>
+                  <button type="button" class="btn btn-danger w-100" data-bulk-actions-target="permissionRevokeButton" data-action="click->bulk-actions#submitPermissions" data-operation="revoke" disabled>
+                    Revoke Permissions
+                  </button>
+                </div>
+              </div>
+              <% end %>
             </div>
           </div>
         </div>
@@ -150,6 +182,7 @@
         <th data-column="skills" class="column-hidden">Skills</th>
         <th data-column="astrobin" class="column-hidden">Astrobin</th>
         <th data-column="telescopius" class="column-hidden">Telescopius</th>
+        <th data-column="permissions" class="column-hidden">Permissions</th>
         <!--<th>Donations</th>-->
       </tr>
       <tbody class="table-group-divider">
@@ -172,6 +205,7 @@
             <td data-column="skills" class="column-hidden"><%=person.skills.map(&:name).join(', ')%></td>
             <td data-column="astrobin" class="column-hidden"><%=person.astrobin&.username%></td>
             <td data-column="telescopius" class="column-hidden"><%=person.telescopius&.username%></td>
+            <td data-column="permissions" class="column-hidden"><%=person.permissions.map(&:name).join(', ')%></td>
             <!--<td><%=person.donations.map{|d| dollar_format(d.value)}.join(', ')%></td>-->
           </tr>
         <% end %>

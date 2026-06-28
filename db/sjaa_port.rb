@@ -49,7 +49,7 @@ module SjaaPort
   end
   
   PERMISSION_HASH = {}
-  %w(read write permit).each do |p|
+  %w(read write permit verify_members).each do |p|
   PERMISSION_HASH[p] = Permission.find_or_create_by(name: p)
   end
   

@@ -1226,6 +1226,182 @@ class PeopleControllerTest < ActionDispatch::IntegrationTest
     assert_match /select at least one person and one group/, json_response['error']
   end
 
+  # bulk_update_permissions tests
+  test "bulk_update_permissions requires authentication" do
+    permission = Permission.find_or_create_by(name: 'verify_members')
+    person = Person.create!(first_name: "Test", last_name: "Person")
+
+    post bulk_update_permissions_path, params: {
+      person_ids: [person.id],
+      permission_ids: [permission.id],
+      operation: 'grant'
+    }, as: :json
+
+    assert_response :unauthorized
+  end
+
+  test "bulk_update_permissions requires permit permission" do
+    write_permission = Permission.find_or_create_by(name: 'write')
+    @admin.permissions << write_permission
+    login_as_admin @admin
+
+    permission = Permission.find_or_create_by(name: 'verify_members')
+    person = Person.create!(first_name: "Test", last_name: "Person")
+
+    post bulk_update_permissions_path, params: {
+      person_ids: [person.id],
+      permission_ids: [permission.id],
+      operation: 'grant'
+    }, as: :json
+
+    assert_response :unauthorized
+  end
+
+  test "bulk_update_permissions grants permission to multiple people" do
+    permit_permission = Permission.find_or_create_by(name: 'permit')
+    @admin.permissions << permit_permission
+    login_as_admin @admin
+
+    verify_permission = Permission.find_or_create_by(name: 'verify_members')
+    person1 = Person.create!(first_name: "Test", last_name: "Person1")
+    person2 = Person.create!(first_name: "Test", last_name: "Person2")
+
+    post bulk_update_permissions_path, params: {
+      person_ids: [person1.id, person2.id],
+      permission_ids: [verify_permission.id],
+      operation: 'grant'
+    }, as: :json
+
+    assert_response :success
+
+    json = JSON.parse(response.body)
+    assert_equal 2, json['people_count']
+    assert_equal 2, json['changed_count']
+
+    assert_includes person1.reload.permissions, verify_permission
+    assert_includes person2.reload.permissions, verify_permission
+  end
+
+  test "bulk_update_permissions revokes permission from multiple people" do
+    permit_permission = Permission.find_or_create_by(name: 'permit')
+    @admin.permissions << permit_permission
+    login_as_admin @admin
+
+    verify_permission = Permission.find_or_create_by(name: 'verify_members')
+    person1 = Person.create!(first_name: "Test", last_name: "Person1")
+    person2 = Person.create!(first_name: "Test", last_name: "Person2")
+    person1.permissions << verify_permission
+    person2.permissions << verify_permission
+
+    post bulk_update_permissions_path, params: {
+      person_ids: [person1.id, person2.id],
+      permission_ids: [verify_permission.id],
+      operation: 'revoke'
+    }, as: :json
+
+    assert_response :success
+
+    json = JSON.parse(response.body)
+    assert_equal 2, json['changed_count']
+
+    assert_not_includes person1.reload.permissions, verify_permission
+    assert_not_includes person2.reload.permissions, verify_permission
+  end
+
+  test "bulk_update_permissions grant is idempotent" do
+    permit_permission = Permission.find_or_create_by(name: 'permit')
+    @admin.permissions << permit_permission
+    login_as_admin @admin
+
+    verify_permission = Permission.find_or_create_by(name: 'verify_members')
+    person = Person.create!(first_name: "Test", last_name: "Person")
+    person.permissions << verify_permission
+
+    post bulk_update_permissions_path, params: {
+      person_ids: [person.id],
+      permission_ids: [verify_permission.id],
+      operation: 'grant'
+    }, as: :json
+
+    assert_response :success
+
+    json = JSON.parse(response.body)
+    assert_equal 0, json['changed_count']
+    assert_equal 1, person.reload.permissions.count
+  end
+
+  test "bulk_update_permissions revoke is idempotent" do
+    permit_permission = Permission.find_or_create_by(name: 'permit')
+    @admin.permissions << permit_permission
+    login_as_admin @admin
+
+    verify_permission = Permission.find_or_create_by(name: 'verify_members')
+    person = Person.create!(first_name: "Test", last_name: "Person")
+
+    post bulk_update_permissions_path, params: {
+      person_ids: [person.id],
+      permission_ids: [verify_permission.id],
+      operation: 'revoke'
+    }, as: :json
+
+    assert_response :success
+
+    json = JSON.parse(response.body)
+    assert_equal 0, json['changed_count']
+  end
+
+  test "bulk_update_permissions rejects invalid operation" do
+    permit_permission = Permission.find_or_create_by(name: 'permit')
+    @admin.permissions << permit_permission
+    login_as_admin @admin
+
+    verify_permission = Permission.find_or_create_by(name: 'verify_members')
+    person = Person.create!(first_name: "Test", last_name: "Person")
+
+    post bulk_update_permissions_path, params: {
+      person_ids: [person.id],
+      permission_ids: [verify_permission.id],
+      operation: 'delete'
+    }, as: :json
+
+    assert_response :unprocessable_content
+    assert_match /Invalid operation/, JSON.parse(response.body)['error']
+  end
+
+  test "bulk_update_permissions requires person_ids" do
+    permit_permission = Permission.find_or_create_by(name: 'permit')
+    @admin.permissions << permit_permission
+    login_as_admin @admin
+
+    verify_permission = Permission.find_or_create_by(name: 'verify_members')
+
+    post bulk_update_permissions_path, params: {
+      person_ids: [],
+      permission_ids: [verify_permission.id],
+      operation: 'grant'
+    }, as: :json
+
+    assert_response :unprocessable_content
+    assert_match /select at least one person/, JSON.parse(response.body)['error']
+  end
+
+  test "bulk_update_permissions requires permission_ids" do
+    permit_permission = Permission.find_or_create_by(name: 'permit')
+    @admin.permissions << permit_permission
+    login_as_admin @admin
+
+    person = Person.create!(first_name: "Test", last_name: "Person")
+
+    post bulk_update_permissions_path, params: {
+      person_ids: [person.id],
+      permission_ids: [],
+      operation: 'grant'
+    }, as: :json
+
+    assert_response :unprocessable_content
+    assert_match /select at least one person/, JSON.parse(response.body)['error']
+  end
+
   # Mentorship approval tests
   test "approve_mentorship requires authentication" do
     mentor = Person.create!(first_name: "Mentor", last_name: "User", mentor: true, password: "password123")

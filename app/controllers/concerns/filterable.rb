@@ -47,7 +47,7 @@ module Filterable
       @query_params.delete(:submit)
       @query_params.select!{|k,v| v.present?}
       @query_params = @query_params.permit(
-      :search, :has_astrobin, :has_telescopius, :astrobin_username, :telescopius_username, :group_operation, :interest_operation, :skill_operation, :first_name, :last_name, :email, :phone, :city, :state, :ephemeris, :active, :volunteer, :mentor, :discord_id, interests: [], groups: [], skills: []
+      :search, :has_astrobin, :has_telescopius, :astrobin_username, :telescopius_username, :group_operation, :interest_operation, :skill_operation, :first_name, :last_name, :email, :phone, :city, :state, :ephemeris, :active, :volunteer, :mentor, :discord_id, :lifetime, interests: [], groups: [], skills: [], permissions: []
       )
       qp = @query_params.to_h
     else
@@ -136,6 +136,19 @@ module Filterable
     query = query.where(mentor: true) if(qp[:mentor] == 'yes')
     query = query.where(mentor: false) if(qp[:mentor] == 'no')
 
+    # Filter by permissions
+    if qp[:permissions].present?
+      permission_ids = qp[:permissions].select(&:present?)
+      query = query.joins(:permissions).where(permissions: {id: permission_ids}).distinct if permission_ids.any?
+    end
+
+    # Filter by lifetime membership
+    if qp[:lifetime] == 'yes'
+      query = query.joins(:memberships).where(memberships: {end: nil}).distinct
+    elsif qp[:lifetime] == 'no'
+      query = query.where.not(id: Person.lifetime_members.select(:id))
+    end
+
     # Do the active filter last, as this turns query into an Array
     if(qp[:active] == 'yes')
       # Subtract out the inactive people
@@ -148,7 +161,7 @@ module Filterable
     @active_memberships = Person.common_active_membership_query(Membership.all).group_by{|m| m.person_id}
     #@active_memberships = query.active_members.group_by{|m| m.id}
     #@all_people = Person.where(id: query.map(&:id).uniq).includes(:donations, :memberships, :contacts, :interests, :groups)
-    @all_people = query.includes(:donations, :memberships, :interests, :groups, :skills, :astrobin, :telescopius, contacts: [:city, :state])
+    @all_people = query.includes(:donations, :memberships, :interests, :groups, :skills, :astrobin, :telescopius, :permissions, contacts: [:city, :state])
     @totals = {total: @all_people.count}
     @pagy, @people = pagy(@all_people, limit: 40, params: qp)
   end

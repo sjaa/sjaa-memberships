@@ -216,6 +216,43 @@
                 </span>
               </div>
             </div>
+            <div class="col-md-3 col-xs-12 mb-3">
+              <%= f.label :lifetime, 'Lifetime Members', class: 'form-label' %>
+              <div class="col-12">
+                <span style="margin-right: 20px;">
+                  <%= radio_button_tag 'lifetime', 'yes', class: 'form-check-input', checked: @query_params[:lifetime] == 'yes', data: {action: "search-form#search"} %>
+                  <%= label_tag 'lifetime_yes', 'Yes', class: 'form-check-label' %>
+                </span>
+                <span style="margin-right: 20px;">
+                  <%= radio_button_tag 'lifetime', 'no', class: 'form-check-input', checked: @query_params[:lifetime] == 'no', data: {action: "search-form#search"} %>
+                  <%= label_tag 'lifetime_no', 'No', class: 'form-check-label' %>
+                </span>
+                <span style="margin-right: 20px;">
+                  <%= radio_button_tag 'lifetime', 'either', class: 'form-check-input', checked: !(['yes', 'no'].include?(@query_params[:lifetime])), data: {action: "search-form#search"} %>
+                  <%= label_tag 'lifetime_either', 'Either', class: 'form-check-label' %>
+                </span>
+              </div>
+            </div>
+
+            <!-- Permissions -->
+            <div class="col-md-6 col-xs-12 mb-2" data-controller="form">
+              <div class="row">
+                <div class="col-12">
+                  <%= label_tag 'permissions', 'Permissions', class: 'form-label' %>
+                  <div data-form-target="fields mt-2 mb-2">
+                  </div>
+                  <template data-form-target="template">
+                    <span id="NEWID" class="d-inline-block mt-2" style="margin-right: 0.5em;">
+                      <%= hidden_field_tag 'permissions[]', 'REPLACEVALUE' %>
+                      <a data-form-id-param="NEWID" data-action="search-form#search form#removeField" class="btn btn-secondary">REPLACENAME</a>
+                    </span>
+                  </template>
+                </div>
+                <div class="col-12 mt-2">
+                  <%= combobox_tag "permissions[]", Permission.order(:name).map{|p| {display: p.name, value: p.id}}, placeholder: 'Select Permissions', data: { form_baseid_param: 'permission', form_target: 'source', action: "hw-combobox:selection->search-form#search hw-combobox:selection->form#addField" } %>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
