@@ -87,6 +87,7 @@
                     <!--<li><a class="dropdown-item" href="#">YTD Donations</a></li>-->
                     <li><%= link_to 'Ephemeris List', ephemeris_report_path, class: 'dropdown-item'%></li>
                     <li><%= link_to 'Jobs', '/jobs', class: 'dropdown-item' %></li>
+                    <li><%= link_to 'Verify Membership', verify_membership_form_path, class: 'dropdown-item' %></li>
                   </ul>
                 </li>
                 <li class="nav-item">
@@ -98,6 +99,9 @@
               </li>
               <li class="nav-item">
                 <%= link_to 'Document Archive', about_document_archive_path, class: 'nav-link' %>
+              </li>
+              <li class="nav-item">
+                <%= link_to 'Verify Membership', verify_membership_form_path, class: 'nav-link' %>
               </li>
               <% end %>
               <li class="nav-item">
