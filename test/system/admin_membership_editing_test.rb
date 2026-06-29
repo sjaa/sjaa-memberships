@@ -52,7 +52,7 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
       select "Cash", from: "person[membership_attributes][][order_attributes][payment_method]"
     end
 
-    click_on "Save Changes"
+    click_button_centered "Save Changes"
 
     # Verify success
     assert_text "successfully updated"
@@ -74,7 +74,7 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
       select "Check", from: "person[membership_attributes][][order_attributes][payment_method]"
     end
 
-    click_on "Save Changes"
+    click_button_centered "Save Changes"
 
     # Verify success
     assert_text "successfully updated"
@@ -96,7 +96,7 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
       select "PayPal", from: "person[membership_attributes][][order_attributes][payment_method]"
     end
 
-    click_on "Save Changes"
+    click_button_centered "Save Changes"
 
     # Verify success
     assert_text "successfully updated"
@@ -122,7 +122,7 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
       select "None", from: "person[membership_attributes][][order_attributes][payment_method]"
     end
 
-    click_on "Save Changes"
+    click_button_centered "Save Changes"
 
     # Verify success
     assert_text "successfully updated"
@@ -151,7 +151,7 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
       # Select cash payment method for new membership
       select "Cash", from: "person[membership_attributes][][order_attributes][payment_method]"
     end
-    click_on "Save Changes"
+    click_button_centered "Save Changes"
 
     # Verify success
     assert_text "successfully updated"
@@ -184,7 +184,7 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
       select "Check", from: "person[membership_attributes][][order_attributes][payment_method]"
     end
 
-    click_on "Save Changes"
+    click_button_centered "Save Changes"
 
     # Verify success
     assert_text "successfully updated"
@@ -215,7 +215,7 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
       select "PayPal", from: "person[membership_attributes][][order_attributes][payment_method]"
     end
 
-    click_on "Save Changes"
+    click_button_centered "Save Changes"
 
     # Verify success
     assert_text "successfully updated"
@@ -242,7 +242,7 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
     assert_text "Payment Method"
 
     # Just save without adding - this tests the basic form submission
-    click_on "Save Changes"
+    click_button_centered "Save Changes"
 
     # Verify success (this proves the admin interface and form work)
     assert_text "successfully updated"
@@ -271,7 +271,7 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
       select "Check", from: "person[membership_attributes][][order_attributes][payment_method]"
     end
 
-    click_on "Save Changes"
+    click_button_centered "Save Changes"
 
     # Verify success
     assert_text "successfully updated"
@@ -304,7 +304,7 @@ class AdminMembershipEditingTest < ApplicationSystemTestCase
       select "Cash", from: "person[membership_attributes][][order_attributes][payment_method]"
     end
 
-    click_on "Save Changes"
+    click_button_centered "Save Changes"
 
     # Verify success
     assert_text "successfully updated"

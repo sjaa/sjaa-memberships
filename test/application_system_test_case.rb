@@ -35,6 +35,18 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     setup_test_constants
   end
 
+  def click_button_centered(locator)
+    btn = find_button(locator)
+    execute_script("arguments[0].scrollIntoView({block: 'center', inline: 'nearest'})", btn)
+    btn.click
+  end
+
+  def click_on_centered(locator)
+    el = find(locator)
+    execute_script("arguments[0].scrollIntoView({block: 'center', inline: 'nearest'})", el)
+    el.click
+  end
+
   def login_as(email, password)
     # Login through the web interface
     visit '/login'
