@@ -375,7 +375,12 @@ class PeopleController < ApplicationController
 
     # Find an admin with Google credentials
     admin = @user.is_a?(Admin) && @user.refresh_token.present? ? @user : Admin.where.not(refresh_token: nil).first
-    return unless admin&.refresh_token.present?
+    if admin&.refresh_token.blank?
+      message = "Could not sync Google Groups for #{person.name} (person ##{person.id}): no admin has valid Google credentials configured."
+      Rails.logger.error "[PeopleController] #{message}"
+      Admin.find_each { |a| NotificationBroadcaster.google_sync_error(a, message) }
+      return
+    end
 
     begin
       # Get Google API authorization
@@ -404,7 +409,9 @@ class PeopleController < ApplicationController
         rescue Google::Apis::ClientError => e
           # Ignore duplicate member errors
           unless e.status_code == 409 || e.message.include?("Member already exists")
-            Rails.logger.error "[PeopleController] Failed to add #{person.email} to #{group.email}: #{e.message}"
+            message = "Failed to add #{person.email} to Google Group #{group.email}: #{e.message}"
+            Rails.logger.error "[PeopleController] #{message}"
+            NotificationBroadcaster.google_sync_error(admin, message)
           end
         end
       end
@@ -417,13 +424,17 @@ class PeopleController < ApplicationController
         rescue Google::Apis::ClientError => e
           # Ignore "member not found" errors
           unless e.status_code == 404 || e.message.include?("Resource Not Found")
-            Rails.logger.error "[PeopleController] Failed to remove #{person.email} from #{group.email}: #{e.message}"
+            message = "Failed to remove #{person.email} from Google Group #{group.email}: #{e.message}"
+            Rails.logger.error "[PeopleController] #{message}"
+            NotificationBroadcaster.google_sync_error(admin, message)
           end
         end
       end
 
     rescue => e
-      Rails.logger.error "[PeopleController] Failed to sync Google Groups for person #{person.id}: #{e.message}"
+      message = "Failed to sync Google Groups for #{person.name} (person ##{person.id}): #{e.message}"
+      Rails.logger.error "[PeopleController] #{message}"
+      NotificationBroadcaster.google_sync_error(admin, message)
       # Don't fail the update if Google sync fails
     end
   end
