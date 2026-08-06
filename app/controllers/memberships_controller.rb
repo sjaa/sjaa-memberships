@@ -103,15 +103,15 @@ class MembershipsController < ApplicationController
         # Send welcome email
         begin
           AccountMailer.welcome(membership).deliver_now
-        rescue e
+        rescue => e
           logger.error e
         end
         return render :json => {:status => response.result.status, redirect: edit_person_path(membership.person)}, :status => :ok
       else
-        return render :json => {:error => (order.errors.full_messages + membership.errors.full_messages).join('  ')}, :status => :error
+        return render :json => {:error => (order.errors.full_messages + membership.errors.full_messages).join('  ')}, :status => :unprocessable_content
       end
     rescue PayPalHttp::HttpError => ioe
-      return render :json => {:error => ioe.to_s}, :status => :error
+      return render :json => {:error => ioe.to_s}, :status => :unprocessable_content
     end
   end
 
