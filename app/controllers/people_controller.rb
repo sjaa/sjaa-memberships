@@ -36,7 +36,7 @@ class PeopleController < ApplicationController
     authorize @person, policy_class: PersonPolicy
     setup_card_data
     response.headers['Content-Disposition'] = "attachment; filename=\"sjaa-membership-card-#{@person.id}.svg\""
-    render layout: false, content_type: 'image/svg+xml'
+    render layout: false, formats: [:svg], content_type: 'image/svg+xml'
   end
 
   def admin

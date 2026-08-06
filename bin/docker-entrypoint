@@ -3,8 +3,15 @@
 # Remove stale PID file that might prevent Rails from starting
 rm -f /rails/tmp/pids/server.pid
 
-# If running the rails server then create or migrate existing database
-if [ "${1}" == "./bin/rails" ] && [ "${2}" == "server" ]; then
+# If running the rails server then wait for the database, then create or
+# migrate it. The dev CMD wraps the actual command in `sh -c "..."`, so
+# match against the full argument string rather than positional args.
+if [[ "${*}" == *"rails server"* ]]; then
+  echo "Waiting for database at ${DATABASE_HOST:-db}..."
+  until pg_isready -h "${DATABASE_HOST:-db}" -U "${DATABASE_USER:-root}" -q; do
+    sleep 1
+  done
+
   ./bin/rails db:prepare
 fi
 
